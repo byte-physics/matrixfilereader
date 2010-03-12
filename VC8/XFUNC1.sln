@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XFUNC1", "XFUNC1.vcproj", "{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6AE16886-D517-483C-9FFF-41B95746EB2A}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\IGOR.lib = ..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\IGOR.lib
+		..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\VC8\XOPSupport.lib = ..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\VC8\XOPSupport.lib
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}.Debug|Win32.Build.0 = Debug|Win32
+		{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}.Release|Win32.ActiveCfg = Release|Win32
+		{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

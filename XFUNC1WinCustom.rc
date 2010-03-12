@@ -1,0 +1,54 @@
+/*	XOP-specific resources for XFUNC1 on Windows
+
+	This file is compiled by the resource compiler and creates XOP-specific
+	resources that IGOR looks for in an XOP module.
+*/
+
+#include "C:\Documents and Settings\brt127\My Documents\gitRepo\Coding\XOP Toolkit 5\IgorXOPs5\XOPSupport\XOPResources.h"			// Defines XOP-specific symbols.
+
+1100 STR#					// Custom error messages.
+BEGIN
+	"XFUNC1 requires Igor 2.0 or later.\0",			// Symbol from XFUNC1.h: REQUIRES_IGOR_200
+
+	// You can add error messages here.
+	
+	0,								// NOTE: 0 required to terminate the resource.
+END
+
+/* no menu item */
+
+1100 XOPI							// XOPI - Describes general XOP properties to IGOR. 
+BEGIN
+	XOP_VERSION,					// Version number of host XOP system.
+	DEV_SYS_CODE,					// Code for development system used to make XOP.
+	0,								// Obsolete - set to zero.
+	0,								// Obsolete - set to zero.
+	XOP_TOOLKIT_VERSION				// XOP Toolkit version.
+END
+
+1100 XOPF							// Describes functions added by XOP to IGOR.
+BEGIN
+	"XFUNC1Add\0",					// Function name.
+	F_UTIL | F_EXTERNAL,			// Function category,
+	NT_FP64,						// Return value type.
+		NT_FP64,					// First parameter type.
+		NT_FP64,					// Second parameter type.
+		0,							// NOTE: 0 required to terminate list of parameter types.
+
+	"XFUNC1Div\0",					// Function name.
+	F_UTIL | F_EXTERNAL,			// Function category,
+	NT_FP64,						// Return value type.
+		NT_FP64,					// First parameter type.
+		NT_FP64,					// Second parameter type.
+		0,							// NOTE: 0 required to terminate list of parameter types.
+
+	"XFUNC1ComplexConjugate\0",		// Function name.
+	F_CMPLX | F_EXTERNAL,			// Function category.
+	NT_FP64 | NT_CMPLX,				// Return value type: double precision complex.
+		NT_FP64 | NT_CMPLX,			// Double precision complex parameter.			
+		0,							// NOTE: 0 required to terminate list of parameter types.
+	
+	// More function descriptions can appear here.
+	
+	0,								// NOTE: 0 required to terminate the resource.
+END

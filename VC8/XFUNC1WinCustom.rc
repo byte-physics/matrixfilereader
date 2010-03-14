@@ -8,7 +8,7 @@
 
 1100 STR#					// Custom error messages.
 BEGIN
-	"XFUNC1 requires Igor 2.0 or later.\0",			// Symbol from XFUNC1.h: REQUIRES_IGOR_200
+	"XFUNC1 requires Igor 6.0 or later.\0",			// Symbol from XFUNC1.h: REQUIRES_IGOR_200
 
 	// You can add error messages here.
 	
@@ -28,24 +28,25 @@ END
 
 1100 XOPF							// Describes functions added by XOP to IGOR.
 BEGIN
-	"XFUNC1Add\0",					// Function name.
+	//variable openResultFile(string filepath, string fileName);
+	"openResultFile\0";
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,						// Return value type.
-		NT_FP64,					// First parameter type.
-		NT_FP64,					// Second parameter type.
+		HSTRING_TYPE,				// First parameter type.
+		HSTRING_TYPE,				// Second parameter type.
 		0,							// NOTE: 0 required to terminate list of parameter types.
 
-	"XFUNC1Div\0",					// Function name.
+	//variable closeResultFile();
+	"closeResultFile\0",			// Function name.
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,						// Return value type.
-		NT_FP64,					// First parameter type.
-		NT_FP64,					// Second parameter type.
+		NT_FP64,					// Return value type.
 		0,							// NOTE: 0 required to terminate list of parameter types.
 
-	"XFUNC1ComplexConjugate\0",		// Function name.
-	F_CMPLX | F_EXTERNAL,			// Function category.
-	NT_FP64 | NT_CMPLX,				// Return value type: double precision complex.
-		NT_FP64 | NT_CMPLX,			// Double precision complex parameter.			
+//	variable getNumberOfBricklets(variable *totalNumberOfBricklets);
+	"getNumberOfBricklets\0",		// Function name.
+	F_UTIL | F_EXTERNAL,			// Function category.
+	NT_FP64,						// Return value
+		FV_REF_TYPE | NT_FP64,		// first parameter.			
 		0,							// NOTE: 0 required to terminate list of parameter types.
 	
 	// More function descriptions can appear here.

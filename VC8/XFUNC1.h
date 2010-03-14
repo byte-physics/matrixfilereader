@@ -4,7 +4,7 @@
 
 /* XFUNC1 custom error codes */
 
-#define REQUIRES_IGOR_200 1 + FIRST_XOP_ERR
+#define REQUIRES_IGOR_600 1 + FIRST_XOP_ERR
 
 /* Prototypes */
 HOST_IMPORT void main(IORecHandle ioRecHandle);

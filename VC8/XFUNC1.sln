@@ -4,7 +4,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XFUNC1", "XFUNC1.vcproj", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6AE16886-D517-483C-9FFF-41B95746EB2A}"
 	ProjectSection(SolutionItems) = preProject
+		..\api-layout.h = ..\api-layout.h
 		..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\IGOR.lib = ..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\IGOR.lib
+		XFUNC1WinCustom.rc = XFUNC1WinCustom.rc
 		..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\VC8\XOPSupport.lib = ..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\VC8\XOPSupport.lib
 	EndProjectSection
 EndProject

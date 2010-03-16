@@ -1,20 +1,4 @@
-/*	XFUNC1.c -- illustrates Igor external functions.
 
-*/
-
-#include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
-#include "XFUNC1.h"
-
-#include "dataclass.h"
-
-#include "globalvariables.h"
-#include "utils.h"
-
-#define DEBUG_LEVEL 1
-
-#include "Vernissage.h"
-
-#define ASSERT(A) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL. You might want to drop the author a note :)\r"); return 0; } }
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{
@@ -46,6 +30,9 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 	return 0;
 }
 
+
+
+
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct closeResultFileParams{
 	double  result;	
@@ -67,8 +54,7 @@ static int closeResultFile(closeResultFileParams *p){
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT(pSession);
 
-	pSession->eraseResultSets();
-	pMyData->closeSession();
+
 
 	p->result = SUCCESS;
 	return 0;
@@ -106,6 +92,8 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 	p->result = SUCCESS;
 	return 0;
 }
+
+
 
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
@@ -311,14 +299,14 @@ struct getErrorMessageParams{
 typedef struct getErrorMessageParams getErrorMessageParams;
 #pragma pack()
 
-// string getHumanReadableStringFromErrorCode(variable errorCode)
+// string getErrorMessage(variable errorCode)
 static int getErrorMessage(getErrorMessageParams *p){
 
-	//p->result = UNKOWN_ERROR;
+	p->result = UNKOWN_ERROR;
 
 	ASSERT(pMyData);
 	if(!pMyData->resultFileOpen()){
-		//p->result = NO_FILE_OPEN;
+		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
@@ -327,7 +315,7 @@ static int getErrorMessage(getErrorMessageParams *p){
 
 
 
-	//p->result = SUCCESS;
+	p->result = SUCCESS;
 	return 0;
 }
 
@@ -346,7 +334,6 @@ typedef struct getNumberOfBrickletsParams getNumberOfBrickletsParams;
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
 	p->result = UNKOWN_ERROR;
-	*p->totalNumberOfBricklets = -1;
 
 	ASSERT(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -357,14 +344,7 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT(pSession);
 
-	*p->totalNumberOfBricklets = pSession->getBrickletCount();
 
-	if(*p->totalNumberOfBricklets == 0){
-		p->result = EMPTY_RESULTFILE;
-	}
-	else{
-		p->result = SUCCESS;
-	}
 
 	p->result = SUCCESS;
 	return 0;
@@ -597,6 +577,7 @@ static int getXOPVersion(getXOPVersionParams *p){
 
 
 
+
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct openResultFileParams{
 	Handle  fileName;
@@ -612,58 +593,16 @@ static int openResultFile(openResultFileParams *p){
 	p->result = UNKOWN_ERROR;
 
 	ASSERT(pMyData);
-	if(pMyData->resultFileOpen()){
-		p->result = ALREADY_FILE_OPEN;
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT(pSession);
 
-	char filePath[MAX_PATH_LEN+1];
-	char fileName[MAX_PATH_LEN+1];
-	std::wstring wstringFilePath,wstringFileName;
 
-	int returnValueInt = 0;
-	
-	returnValueInt = GetCStringFromHandle(p->absoluteFilePath,filePath,MAX_PATH_LEN);
-	if( returnValueInt != 0 ){
-		return returnValueInt;
-	}
 
-	returnValueInt = GetCStringFromHandle(p->fileName,fileName,MAX_PATH_LEN);
-	if( returnValueInt != 0 ){
-		return returnValueInt;
-	}
-
-	if(pSession == NULL){
-		outputToHistory("Could not create session object.");
-		p->result = UNKOWN_ERROR;
-		return 0;
-	}
-	
-	ASSERT(pSession);
-
-	wstringFilePath = CharPtrToWString(filePath);
-	wstringFileName = CharPtrToWString(fileName);
-
-	char buf[1000];
-	sprintf(buf,"filename %s",WStringToString(wstringFileName).c_str());
-	debugOutputToHistory(DEBUG_LEVEL,buf);
-
-	sprintf(buf,"filepath %s",WStringToString(wstringFilePath).c_str());
-	debugOutputToHistory(DEBUG_LEVEL,buf);
-
-	bool retValue = pSession->loadResultSet(wstringFilePath,wstringFileName,true);
-
-	if(!retValue){
-		sprintf(buf,"File %s/%s is not readable.",WStringToString(wstringFilePath).c_str(),WStringToString(wstringFileName).c_str());
-		outputToHistory(buf);
-		p->result = FILE_NOT_READABLE;
-		return 0;
-	}
-
-	pMyData->setResultFile(wstringFilePath,wstringFileName);
 	p->result = SUCCESS;
 	return 0;
 }
@@ -741,59 +680,7 @@ static long RegisterFunction()
 		case 18:						
 			returnValue = (long) openResultFile;
 			break;
-	}
 
+	}
 	return returnValue;
-}
-
-
-/*	XOPEntry()
-
-	This is the entry point from the host application to the XOP for all messages after the
-	INIT message.
-*/
-
-// FIXME add cleanup message support
-
-static void XOPEntry(void)
-{	
-	long result = 0;
-
-	switch (GetXOPMessage()) {
-		case FUNCADDRS:
-			result = RegisterFunction();
-			break;
-	}
-	SetXOPResult(result);
-}
-
-/*	main(ioRecHandle)
-
-	This is the initial entry point at which the host application calls XOP.
-	The message sent by the host must be INIT.
-	main() does any necessary initialization and then sets the XOPEntry field of the
-	ioRecHandle to the address to be called for future messages.
-*/
-
-
-HOST_IMPORT void
-main(IORecHandle ioRecHandle)
-{	
-	XOPInit(ioRecHandle);							/* do standard XOP initialization */
-	SetXOPEntry(XOPEntry);							/* set entry point for future calls */
-
-	if (igorVersion < 600){
-		SetXOPResult(REQUIRES_IGOR_600);
-		return;
-	}
-
-	pMyData = new myData();
-	if(pMyData == NULL){ // out of memory
-		SetXOPResult(OUT_OF_MEMORY);
-		return;
-	}
-
-	SetXOPResult(0L);
-
-	return;
 }

@@ -68,14 +68,15 @@ typedef WAVE_TYPE FP64WAVE;
  *  @param[in] errorCode return value from the functions here
  *  @return string with error message, an empty string in case the error code is not found
 */ 
-string getHumanReadableStringFromErrorCode(variable errorCode);
+string getErrorMessage(variable errorCode);
 
 /**
  *  Open a matrix result file for further treating. Usually you want to do that as first step.
- *  @param[in] absoluteFilePath absolute path for an result file to open. This is @b no Igor symbolic path.
+ *  @param[in] absoluteFilePath absolute path for an result file to open. This is @b not a Igor symbolic path.
+ *  @param[in] fileName fileName of the result file
  *  @return SUCCESS | FILE_NOT_READABLE | ALREADY_FILE_OPEN
 */
-variable openResultFile(string absoluteFilePath);
+variable openResultFile(string absoluteFilePath, string fileName);
 
 /**
  *  Close the result file. This will free the memory used for the result file and all of its bricklets in the Vernissage DLLs.

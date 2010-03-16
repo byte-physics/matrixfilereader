@@ -28,6 +28,8 @@ public:
 	bool resultFileOpen();
 	Vernissage::Session* getSession();
 	void closeSession();
+	int getDebugLevel(){ return  m_debugLevel; };
+	void setDebugLevel(int level){ m_debugLevel= level; }
 
 
 public:
@@ -38,6 +40,8 @@ public:
 	TimeStampIntMap  brickletTimeStampIDMap;
 	TimeStampVoidMap brickletTimeStampBrickletPointerMap;
 	IntVoidMap		 brickletIDBrickletPointerMap;
+
+	int m_debugLevel;
 
 private:
 

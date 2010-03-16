@@ -3,10 +3,13 @@
 
 #include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
 
-#define DEBUG_LEVEL 1
-#define MAX_DEBUG_LEVEL 10
+#include "dataclass.h"
 
-#define ARRAY_SIZE 1000
+#include "globalvariables.h"
+
+#include "utils.h"
+
+#define DEBUG_LEVEL 1 // standard debug level for this file
 
 using std::string;
 using std::vector;
@@ -15,63 +18,16 @@ DllStuff::DllStuff():
 	m_foundationModule(NULL),
 	m_pGetSessionFunc(NULL),
 	m_pReleaseSessionFunc(NULL),
-	m_vernissageVersion("0.00"),
-	m_debuglevel(1){
+	m_vernissageVersion("0.00"){
 }
-
-	void DllStuff::debugOutputToHistory(int level, char* str){
-		
-		const char* formatString = "DEBUG %d: %s\r";
-
-		if(str == NULL){
-			outputToHistory("BUG: null pointer in debugOutputToHistory");
-			return;
-		}
-
-		if(level > MAX_DEBUG_LEVEL){
-			outputToHistory("BUG: debug level must no exceed MAX_DEBUG_LEVEL.");
-			return;
-		}
-		
-		int length = strlen(str) + strlen(formatString) + 2;
-		if(length >= ARRAY_SIZE){
-			outputToHistory("BUG: string too long to output.");
-		}
-
-		if(level >= m_debuglevel){
-			char buf[ARRAY_SIZE];
-			sprintf(buf,formatString,level,str);
-			XOPNotice(buf);
-		}
-	}
-
-	void DllStuff::outputToHistory(char *str){
-
-		const char* formatString = "%s\r";	
-
-		if( str == NULL){
-			XOPNotice("BUG: null pointer in outputToHistory\r");
-			return;		
-		}
-
-		int length = strlen(str) + strlen(formatString);
-
-		if(length >= ARRAY_SIZE){
-			XOPNotice("BUG: string too long to output\r");
-			return;
-		}
-
-		char buf[ARRAY_SIZE];
-		sprintf(buf,formatString,str);
-		XOPNotice(buf);
-	}
-
 
 void DllStuff::closeSession(){
 
-	if(m_pReleaseSessionFunc != NULL){
-		(*m_pReleaseSessionFunc) ();
+	if(m_pReleaseSessionFunc == NULL){
+		outputToHistory("BUG: Can not close vernissage Session.");
+		return;
 	}
+	(*m_pReleaseSessionFunc) ();
 
 	//printf("FreeLibrary");
 	

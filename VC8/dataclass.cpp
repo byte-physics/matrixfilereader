@@ -3,12 +3,13 @@
 
 #include "vernissage.h"
 
-#include "error-codes.h"
-
 #include "dataclass.h"
 
+#include "globalvariables.h"
+
 myData::myData():
-	m_VernissageSession(NULL){
+	m_VernissageSession(NULL),
+	m_debugLevel(0){
 
 	m_dllStuff = new DllStuff;
 

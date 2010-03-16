@@ -37,12 +37,6 @@ class DllStuff{
 		HMODULE m_foundationModule;
 		std::string m_vernissageVersion;
 
-		int m_debuglevel;
-		// functions
-
-
-		void debugOutputToHistory(int level, char *str);
-		void outputToHistory(char *str);
 };
 
 

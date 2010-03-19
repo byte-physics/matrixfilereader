@@ -113,17 +113,19 @@ Vernissage::Session* DllStuff::createSessionObject(){
 
 	string dllDirectory (data);
 	dllDirectory.append("\\Bin");
-	wsprintf(buf, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
+	sprintf(buf, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
 	debugOutputToHistory(DEBUG_LEVEL,buf);
 	result = SetDllDirectory((LPCSTR) dllDirectory.c_str());
 
 	if(!result){
-		debugOutputToHistory(DEBUG_LEVEL,"Error setting DLL load path\n");
+		debugOutputToHistory(DEBUG_LEVEL,"Error setting DLL load path");
 		return pSession;
 	}
 
 	string version = subKeyName;
 	m_vernissageVersion = version.substr(1,version.length()-1);
+	sprintf(buf,"Vernissage version %s",m_vernissageVersion.c_str());
+	debugOutputToHistory(DEBUG_LEVEL,buf);
 
 	for( vector<string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
 		dllName = *it;

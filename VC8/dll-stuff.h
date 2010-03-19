@@ -29,6 +29,7 @@ class DllStuff{
 		// functions
 		void closeSession();
 		Vernissage::Session* createSessionObject();
+		std::string getVernissageVersion(){ return m_vernissageVersion;};
 
 	private:
 		// variables

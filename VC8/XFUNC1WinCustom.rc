@@ -165,14 +165,14 @@ BEGIN
 	"getVernissageVersion\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,				// Return value type.
-		FV_REF_TYPE | NT_FP64,			// parameter 1
+		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
 	0,
 
 	// variable getXOPVersion(variable *xopVersion)
 	"getXOPVersion\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,				// Return value type.
-		FV_REF_TYPE | NT_FP64,			// parameter 1
+		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
 	0,
 
 	// variable openResultFile(string absoluteFilePath, string fileName)

@@ -1,11 +1,16 @@
 
+#include "xopstandardheaders.h"
+
 #include "stdlib.h"
 
 #include "vernissage.h"
 
 #include "dataclass.h"
+#include "utils.h"
 
 #include "globalvariables.h"
+
+#define DEBUG_LEVEL 1
 
 myData::myData():
 	m_VernissageSession(NULL),
@@ -35,11 +40,37 @@ Vernissage::Session* myData::getSession(){
 void myData::closeSession(){
 
 	if(m_VernissageSession != NULL){
+
+		//unload bricklets
+		IntVoidMap::const_iterator it;
+		for(it = m_brickletIDBrickletPointerMap.begin(); it != m_brickletIDBrickletPointerMap.end(); it++){
+			m_VernissageSession->unloadBrickletContents(it->second);
+		}
+
 		m_dllStuff->closeSession();
 		m_VernissageSession=NULL;
+
+		// erase filenames
 		m_resultFileName.erase();
 		m_resultFilePath.erase();
+
+		// empty maps
+		m_brickletIDBrickletPointerMap.clear();
+		m_brickletIDRawBufferMap.clear();
+		m_brickletIDRawBufferLengthMap.clear();
 	}
+}
+
+std::string myData::getVernissageVersion(){
+
+	std::string version= "Unknown version";
+
+	if(m_VernissageSession != NULL){
+	
+		version = m_dllStuff->getVernissageVersion();
+	}
+
+	return version;
 }
 
 bool myData::resultFileOpen(){
@@ -52,29 +83,51 @@ bool myData::resultFileOpen(){
 	}
 }
 
-std::wstring myData::getResultFilePath(){
+std::string myData::getResultFilePath(){
 
 	return m_resultFilePath;
 
 }
 
-std::wstring myData::getResultFileName(){
+std::string myData::getResultFileName(){
 
 	return m_resultFileName;
 }
 
-	//wchar_t drive[_MAX_DRIVE];
-	//wchar_t dir[_MAX_DIR];
-	//wchar_t fname[_MAX_FNAME];
-	//wchar_t ext[_MAX_EXT];
+void myData::getBrickletContentsBuffer(int brickletID, const int** pBuffer, int &count){
 
-	//int ret = _wsplitpath_s(m_resultFileAbsolutePath.c_str(), drive, _MAX_DRIVE, dir, _MAX_DIR, fname, _MAX_FNAME, ext, _MAX_EXT);
+	char buf[ARRAY_SIZE];
+	count=0;
 
-	//if(ret != 0){ // something went wrong
-	//	return std::wstring();
-	//}
+	ASSERT_RETURN_VOID(pBuffer);
+	ASSERT_RETURN_VOID(m_VernissageSession);
 
-	//std::wstring filenameWithExtension(fname);
-	//filenameWithExtension.append(ext);
+	void* pBricklet= getBrickletPointerFromMap(brickletID);
+	ASSERT_RETURN_VOID(pBricklet);
 
-	//return filenameWithExtension;
+	// we are not called the first time
+	if(m_brickletIDRawBufferMap.find(brickletID) != m_brickletIDRawBufferMap.end()){
+		debugOutputToHistory(DEBUG_LEVEL,"myData::getBrickletContentsBuffer Using cached values");
+
+		sprintf(buf,"before: pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+
+		*pBuffer = m_brickletIDRawBufferMap[brickletID];
+		count   = m_brickletIDRawBufferLengthMap[brickletID];
+
+		sprintf(buf,"after: pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+
+		return;
+	}
+	else{ // we are called the first time
+		m_VernissageSession->loadBrickletContents(pBricklet,pBuffer,count);
+
+		sprintf(buf,"pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+
+		m_brickletIDRawBufferMap[brickletID] = *pBuffer;
+		m_brickletIDRawBufferLengthMap[brickletID] = count;
+	}
+}
+

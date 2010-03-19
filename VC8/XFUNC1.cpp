@@ -14,8 +14,6 @@
 
 #include "Vernissage.h"
 
-#define ASSERT(A) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL. You might want to drop the author a note :)\r"); return 0; } }
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{
 	double  rememberCalls;
@@ -29,16 +27,16 @@ typedef struct checkForNewBrickletsParams checkForNewBrickletsParams;
 // variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls)
 static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -56,16 +54,16 @@ typedef struct closeResultFileParams closeResultFileParams;
 // variable closeResultFile()
 static int closeResultFile(closeResultFileParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 	pSession->eraseResultSets();
 	pMyData->closeSession();
@@ -90,16 +88,16 @@ typedef struct getAllBrickletDataParams getAllBrickletDataParams;
 // variable getAllBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletData(getAllBrickletDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -121,16 +119,16 @@ typedef struct getAllBrickletMetaDataParams getAllBrickletMetaDataParams;
 // variable getAllBrickletMetaData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -155,16 +153,16 @@ typedef struct getBrickletDataParams getBrickletDataParams;
 // variable getBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable brickletID)
 static int getBrickletData(getBrickletDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -187,16 +185,16 @@ typedef struct getBrickletDimensionParams getBrickletDimensionParams;
 // variable getBrickletDimension(variable brickletID, variable *brickletDimension)
 static int getBrickletDimension(getBrickletDimensionParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -219,16 +217,16 @@ typedef struct getBrickletMetaDataParams getBrickletMetaDataParams;
 // variable getBrickletMetaData(variable brickletID, TEXTWAVE metaData)
 static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -241,7 +239,7 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletRawDataParams{
-	waveHndl  data;
+	waveHndl  rawDataWaveHandle;
 	double  brickletID;
 	double  result;	
 };
@@ -251,18 +249,76 @@ typedef struct getBrickletRawDataParams getBrickletRawDataParams;
 // variable getBrickletRawData(variable brickletID, FP64WAVE data)
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
+	char buf[ARRAY_SIZE];
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
+	int brickletID = (int) p->brickletID;
 
+	if(pSession->getBrickletCount() == 0){
+		p->result = EMPTY_RESULTFILE;
+		return 0;
+	}
+
+	if( brickletID < 1 || brickletID > pSession->getBrickletCount() ){
+		p->result = NON_EXISTENT_BRICKLET;
+		return 0;
+	}
+
+	if(p->rawDataWaveHandle == NULL ){
+		p->result = NON_EXISTENT_WAVE;
+		return 0;
+	}
+
+	if(WaveType(p->rawDataWaveHandle) != NT_I32){
+		p->result = EXPECTED_INT_WAVE;
+		return 0;
+	}
+
+	debugOutputToHistory(DEBUG_LEVEL,"Got correct DP wave, and correct brickletID");
+
+	const int *pBuffer;
+	int count=0;
+
+	pMyData->getBrickletContentsBuffer(brickletID,&pBuffer,count);
+	ASSERT_RETURN_ZERO(pBuffer);
+
+	if(count == 0){
+		outputToHistory("Could not load bricklet contents.");
+		p->result = UNKNOWN_ERROR;
+		return 0;
+	}
+
+	long dimensionSizes[MAX_DIMENSIONS+1];
+	MemClear(dimensionSizes, sizeof(dimensionSizes));
+	dimensionSizes[ROWS]=count; // resize to 1D wave with count points
+	int mode=0;
+
+	int retValue = MDChangeWave2(p->rawDataWaveHandle, -1, dimensionSizes, mode);
+
+	if(retValue != 0 ){
+		sprintf(buf,"Error %d in wave redimensioning.",retValue);
+		outputToHistory(buf);
+		p->result = UNKNOWN_ERROR;
+		return 0;
+	}
+
+	// lock wave
+	int hState=MoveLockHandle(p->rawDataWaveHandle);
+
+	int* dataPtr = (int*) WaveData(p->rawDataWaveHandle);
+	for(int i=0; i < count; i++){
+		dataPtr[i] = pBuffer[i];
+	}
+	HSetState((Handle)p->rawDataWaveHandle, hState);
 
 	p->result = SUCCESS;
 	return 0;
@@ -283,16 +339,16 @@ typedef struct getBrickletViewTypeCodeParams getBrickletViewTypeCodeParams;
 // variable getBrickletViewTypeCode(variable brickletID, FP64WAVE allViewTypeCodes)
 static int getBrickletViewTypeCode(getBrickletViewTypeCodeParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -314,16 +370,16 @@ typedef struct getErrorMessageParams getErrorMessageParams;
 // string getHumanReadableStringFromErrorCode(variable errorCode)
 static int getErrorMessage(getErrorMessageParams *p){
 
-	//p->result = UNKOWN_ERROR;
+	//p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		//p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -345,31 +401,31 @@ typedef struct getNumberOfBrickletsParams getNumberOfBrickletsParams;
 // variable getNumberOfBricklets(variable *totalNumberOfBricklets)
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 	*p->totalNumberOfBricklets = -1;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
+
+	if(p->totalNumberOfBricklets == NULL){
+		p->result = EMPTY_PARAMETER;
+	}
 
 	*p->totalNumberOfBricklets = pSession->getBrickletCount();
 
 	if(*p->totalNumberOfBricklets == 0){
 		p->result = EMPTY_RESULTFILE;
 	}
-	else{
-		p->result = SUCCESS;
-	}
 
 	p->result = SUCCESS;
 	return 0;
 }
-
 
 
 
@@ -388,16 +444,16 @@ typedef struct getRangeBrickletDataParams getRangeBrickletDataParams;
 // variable getRangeBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -423,16 +479,16 @@ typedef struct getRangeBrickletMetaDataParams getRangeBrickletMetaDataParams;
 // variable getRangeBrickletMetaData(string dataFolderPath,string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -454,16 +510,16 @@ typedef struct getResultFileMetaDataParams getResultFileMetaDataParams;
 // variable getResultFileMetaData(TEXTWAVE resultFileMetaData)
 static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -485,18 +541,24 @@ typedef struct getResultFileNameParams getResultFileNameParams;
 // variable getResultFileName(string *filename)
 static int getResultFileName(getResultFileNameParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
+	if(p->filename == NULL){
+		p->result = EMPTY_PARAMETER;
+		return 0;
+		//return NULL_STR_VAR;
+	}
 
+	PutCStringInHandle(pMyData->getResultFileName().c_str(), *p->filename);
 
 	p->result = SUCCESS;
 	return 0;
@@ -516,18 +578,24 @@ typedef struct getResultFilePathParams getResultFilePathParams;
 // variable getResultFilePath(string *absoluteFilePath)
 static int getResultFilePath(getResultFilePathParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
+	if(p->absoluteFilePath == NULL){
+		p->result = EMPTY_PARAMETER;
+		return 0;
+		//return NULL_STR_VAR;
+	}
 
+	PutCStringInHandle(pMyData->getResultFilePath().c_str(), *p->absoluteFilePath);
 
 	p->result = SUCCESS;
 	return 0;
@@ -538,58 +606,66 @@ static int getResultFilePath(getResultFilePathParams *p){
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getVernissageVersionParams{
-	double *vernissageVersion;
+	Handle *vernissageVersion;
 	double  result;	
 };
 typedef struct getVernissageVersionParams getVernissageVersionParams;
 #pragma pack()
 
-// variable getVernissageVersion(variable *vernissageVersion)
+// variable getVernissageVersion(string *vernissageVersion)
 static int getVernissageVersion(getVernissageVersionParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
+	if(p->vernissageVersion == NULL){
+		p->result = EMPTY_PARAMETER;
+		return 0;
+	}
 
+	PutCStringInHandle(pMyData->getVernissageVersion().c_str(), *p->vernissageVersion);
 
 	p->result = SUCCESS;
 	return 0;
 }
 
 
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getXOPVersionParams{
-	double *xopVersion;
+	Handle *xopVersion;
 	double  result;	
 };
 typedef struct getXOPVersionParams getXOPVersionParams;
 #pragma pack()
 
-// variable getXOPVersion(variable *xopVersion)
+// variable getXOPVersion(string *xopVersion)
 static int getXOPVersion(getXOPVersionParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
+	if(p->xopVersion == NULL){
+		p->result = EMPTY_PARAMETER;
+		return 0;
+	}
 
+	PutCStringInHandle(myVersion, *p->xopVersion);
 
 	p->result = SUCCESS;
 	return 0;
@@ -609,16 +685,21 @@ typedef struct openResultFileParams openResultFileParams;
 // variable openResultFile(string absoluteFilePath, string fileName)
 static int openResultFile(openResultFileParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(pMyData->resultFileOpen()){
 		p->result = ALREADY_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+
+	if(pSession == NULL){
+		outputToHistory("Could not create session object.");
+		p->result = UNKNOWN_ERROR;
+		return 0;
+	}
 
 	char filePath[MAX_PATH_LEN+1];
 	char fileName[MAX_PATH_LEN+1];
@@ -636,14 +717,6 @@ static int openResultFile(openResultFileParams *p){
 		return returnValueInt;
 	}
 
-	if(pSession == NULL){
-		outputToHistory("Could not create session object.");
-		p->result = UNKOWN_ERROR;
-		return 0;
-	}
-	
-	ASSERT(pSession);
-
 	wstringFilePath = CharPtrToWString(filePath);
 	wstringFileName = CharPtrToWString(fileName);
 
@@ -654,7 +727,10 @@ static int openResultFile(openResultFileParams *p){
 	sprintf(buf,"filepath %s",WStringToString(wstringFilePath).c_str());
 	debugOutputToHistory(DEBUG_LEVEL,buf);
 
+	// TODO check for file existence
+
 	bool retValue = pSession->loadResultSet(wstringFilePath,wstringFileName,true);
+
 
 	if(!retValue){
 		sprintf(buf,"File %s/%s is not readable.",WStringToString(wstringFilePath).c_str(),WStringToString(wstringFileName).c_str());
@@ -663,14 +739,26 @@ static int openResultFile(openResultFileParams *p){
 		return 0;
 	}
 
-	pMyData->setResultFile(wstringFilePath,wstringFileName);
+	if(pSession->getBrickletCount() == 0){
+		p->result = EMPTY_RESULTFILE;
+		return 0;
+	}
+
+	//starting from here the result file is valid
+	pMyData->setResultFile(WStringToString(wstringFilePath),WStringToString(wstringFileName));
+
+	void* pContext  = NULL;
+	void* pBricklet = NULL;
+
+	for(int i=1; i <= pSession->getBrickletCount(); i++ ){
+		pBricklet = pSession->getNextBricklet(&pContext);
+		ASSERT_RETURN_ZERO(pBricklet);
+		pMyData->setBrickletPointerMap(i,pBricklet);
+	}
+
 	p->result = SUCCESS;
 	return 0;
 }
-
-
-
-
 
 
 static long RegisterFunction()
@@ -752,9 +840,6 @@ static long RegisterFunction()
 	This is the entry point from the host application to the XOP for all messages after the
 	INIT message.
 */
-
-// FIXME add cleanup message support
-
 static void XOPEntry(void)
 {	
 	long result = 0;
@@ -762,6 +847,9 @@ static void XOPEntry(void)
 	switch (GetXOPMessage()) {
 		case FUNCADDRS:
 			result = RegisterFunction();
+			break;
+		case CLEANUP:
+			doCleanup();
 			break;
 	}
 	SetXOPResult(result);
@@ -782,8 +870,8 @@ main(IORecHandle ioRecHandle)
 	XOPInit(ioRecHandle);							/* do standard XOP initialization */
 	SetXOPEntry(XOPEntry);							/* set entry point for future calls */
 
-	if (igorVersion < 600){
-		SetXOPResult(REQUIRES_IGOR_600);
+	if (igorVersion < 504){
+		SetXOPResult(REQUIRES_IGOR_504);
 		return;
 	}
 
@@ -796,4 +884,14 @@ main(IORecHandle ioRecHandle)
 	SetXOPResult(0L);
 
 	return;
+}
+
+void doCleanup(){
+
+	// in case the user has forgotten to close the session
+	closeResultFileParams p;
+	closeResultFile(&p);
+
+	delete pMyData;
+	pMyData = NULL;
 }

@@ -7,9 +7,9 @@
 
 #include "dll-stuff.h"
 
-typedef	std::map<time_t,   int, std::less<time_t>>  TimeStampIntMap;
 typedef	std::map<int,	 void*, std::less<int>>		IntVoidMap;
-typedef	std::map<time_t, void*, std::less<time_t>>  TimeStampVoidMap;
+typedef std::map<int, const int*,std::less<int>> IntIntPtrMap;
+typedef std::map<int, int,std::less<int>> IntIntMap;
 
 class myData{
 
@@ -20,35 +20,37 @@ public:
 	
 public:
 	// API functions
-	std::wstring getResultFileName();
-	std::wstring getResultFilePath();
-	void setResultFile( std::wstring filePath, std::wstring fileName){ m_resultFilePath = filePath; m_resultFileName = fileName;};
+	std::string getResultFileName();
+	std::string getResultFilePath();
+	void setResultFile( std::string filePath, std::string fileName){ m_resultFilePath = filePath; m_resultFileName = fileName;};
 
 	// functions
 	bool resultFileOpen();
 	Vernissage::Session* getSession();
+	std::string getVernissageVersion();
 	void closeSession();
 	int getDebugLevel(){ return  m_debugLevel; };
 	void setDebugLevel(int level){ m_debugLevel= level; }
-
+	void* getBrickletPointerFromMap(int brickletID){ return m_brickletIDBrickletPointerMap[brickletID]; }
+	void setBrickletPointerMap(int brickletID, void *pBricklet){ m_brickletIDBrickletPointerMap[brickletID] = pBricklet; }
+	void getBrickletContentsBuffer(int brickletID, const int** pBuffer, int &count);
 
 public:
-	// variables
-	std::wstring xopVersion;
-	std::wstring vernissageVersion;
 
-	TimeStampIntMap  brickletTimeStampIDMap;
-	TimeStampVoidMap brickletTimeStampBrickletPointerMap;
-	IntVoidMap		 brickletIDBrickletPointerMap;
-
+	//TimeStampIntMap  brickletTimeStampIDMap;
+	//TimeStampVoidMap brickletTimeStampBrickletPointerMap;
 	int m_debugLevel;
 
 private:
 
 	//variables
-	std::wstring m_resultFileName, m_resultFilePath;
+	std::string m_resultFileName, m_resultFilePath;
 	Vernissage::Session *m_VernissageSession;
 	DllStuff *m_dllStuff;
+
+	IntVoidMap		m_brickletIDBrickletPointerMap;
+	IntIntPtrMap	m_brickletIDRawBufferMap;
+	IntIntMap		m_brickletIDRawBufferLengthMap;
 
 };
 

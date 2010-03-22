@@ -239,6 +239,10 @@
 				RelativePath=".\XFUNC1.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\XOPSupport.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

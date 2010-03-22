@@ -18,10 +18,8 @@ typedef WAVE_TYPE FP64WAVE;
 // @endcond
 
 /** @defgroup todoItems TODO List
- * - TODO check if C++ namespaces work
  * - TODO Where should we put the experiment deployment parameters, also in the metadata wave for each bricklet?
  * - TODO make function names more distinct, maybe prefix with "matrixReader_"
- * - TODO check if the error EMPTY_RESULTFILE really is possible 
  * - TODO document dataTypes in getBrickletData() properly
  * - TODO add Igor code for errorCode struct
  * - TODO The exact strings for the dataTypes are not yet determined.
@@ -38,7 +36,7 @@ typedef WAVE_TYPE FP64WAVE;
  *	// do error handling
  *  endif
  *  @endcode
- * - For rare cases the error code UNKOWN_ERROR might be returned. Obviously in this case something went really badly wrong and the XOP does not know why
+ * - For rare cases the error code UNKNOWN_ERROR might be returned. Obviously in this case something went really badly wrong and the XOP does not know why
  * - All waves hold wave notes of the form:
  *   	@code
  *   	xopVersion=0.1
@@ -59,8 +57,16 @@ typedef WAVE_TYPE FP64WAVE;
  *	|      	|      	| <- empty entries (their number should be considered unknown)
  *	|    	|      	|
  *	@endcode
- * - Waves are always passed as references (which means the called XOP function can and will change the waves contents).
- * - BrickletIDs are 1-based and range from 1 to totalNumberOfBricklets. It is guaranteed (at least in theory) that these IDs do not change even after closing and opening the file again.
+ * - BrickletIDs are 1-based and range from 1 to totalNumberOfBricklets. It is guaranteed that these IDs do not change even after closing and opening the file again.
+ * - result file meta data:
+ *		- filename
+ *		- filepath
+ *		- BrickletMetaData.fileCreatorName
+ *		- BrickletMetaData.fileCreatorVersion
+ *		- BrickletMetaData.userName
+ *		- BrickletMetaData.accountName
+ *		- totalNumberOfBricklets
+ *		- changeDate (this will have the timestamp of the newest bricklet)
 */
 
 /** 
@@ -70,7 +76,7 @@ typedef WAVE_TYPE FP64WAVE;
 */ 
 string getErrorMessage(variable errorCode);
 
-/**
+/** IMPLEMENTED
  *  Open a matrix result file for further treating. Usually you want to do that as first step.
  *  @param[in] absoluteFilePath absolute path for an result file to open. This is @b not a Igor symbolic path.
  *  @param[in] fileName fileName of the result file
@@ -78,51 +84,51 @@ string getErrorMessage(variable errorCode);
 */
 variable openResultFile(string absoluteFilePath, string fileName);
 
-/**
+/** IMPLEMENTED
  *  Close the result file. This will free the memory used for the result file and all of its bricklets in the Vernissage DLLs.
  *  A call to openResultFile() is needed if you want to work with a result file again
  *  @return SUCCESS | NO_FILE_OPEN
 */
 variable closeResultFile();
 
-/**
+/** IMPLEMENTED
  *  @param[out] filename of the opened result file
- *  @return SUCCESS | NO_FILE_OPEN
+ *  @return SUCCESS | NO_FILE_OPEN | EMPTY_PARAMETER
 */ 
 variable getResultFileName(string *filename);
 
-/**
+/** IMPLEMENTED
  *  @param[out] absoluteFilePath absolute path of the opened result file
- *  @return SUCCESS | NO_FILE_OPEN
+ *  @return SUCCESS | NO_FILE_OPEN | EMPTY_PARAMETER
 */  
 variable getResultFilePath(string *absoluteFilePath);
 
-/**
- * return the version of this XOP. The version number has the form: "<digit>.<digit><digit>"
+/** IMPLEMENTED
+ * Get the version of this XOP. The version number has the form: "<digit>.<digit><digit>"
  * @param[out] xopVersion
- * @return SUCCESS
+ * @return SUCCESS | EMPTY_PARAMETER
 */ 
-variable getXOPVersion(variable *xopVersion);
+variable getXOPVersion(string *xopVersion);
 
-/**
- * return the vernissage DLL version. It returns the version "x.y" from part of the registry key HKEY_LOCAL_MACHINE\Software\Omicron NanoTechnology\Vernissage\Vx.y\Main\InstallDirectory.
+/** IMPLEMENTED
+ * Get the vernissage DLL version. It returns the version "x.y" from part of the registry key HKEY_LOCAL_MACHINE\Software\Omicron NanoTechnology\Vernissage\Vx.y\Main\InstallDirectory.
  * @param[out] vernissageVersion 
- * @return SUCCESS
+ * @return SUCCESS| EMPTY_PARAMETER
 */
-variable getVernissageVersion(variable *vernissageVersion);
+variable getVernissageVersion(string *vernissageVersion);
 
-/**
+/** IMPLEMENTED
  *  @param[out] totalNumberOfBricklets total number of bricklets of the result file
- *  @return SUCCESS | NO_FILE_OPEN | EMPTY_RESULTFILE
+ *  @return SUCCESS | NO_FILE_OPEN | EMPTY_RESULTFILE| EMPTY_PARAMETER
 */
 variable getNumberOfBricklets(variable *totalNumberOfBricklets);
 
 /**
  *  Get the result file meta data. See general remarks about textwaves.
- *  @param[out] resultFileMetaData textwave (nx2) dims holding all relevant information of the complete experiment/result file
- *  @return SUCCESS | NO_FILE_OPEN
+ *  @param[out] waveName  name for a textwave (nx2) dims holding all relevant information of the complete experiment/result file. In case the wavename is empty "resultFileMetaData" is used. The wave may not exist prior to calling this function.
+ *  @return SUCCESS | NO_FILE_OPEN | WAVE_EXIST
 */
-variable getResultFileMetaData(TEXTWAVE resultFileMetaData);
+variable getResultFileMetaData(string waveName);
 
 /**
  * Check if new bricklets were added after the openResultFile() call. In case we got no new bricklets NO_NEW_BRICKLETS is returned and both startBrickletID and endBrickletID are set to -1.
@@ -149,7 +155,7 @@ variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,
  * @param[out] allViewTypeCodes wave with all viewTypeCodes of the given bricklet
  * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE
 */
-variable getBrickletViewTypeCode(variable brickletID, FP64WAVE allViewTypeCodes);
+// variable getBrickletViewTypeCode(variable brickletID, FP64WAVE allViewTypeCodes);
 
 /** Return the bricklets dimension, this together with the viewtypeCode is important for evaluating the rawData from getBrickletRawData().
  * @param[in]  brickletID
@@ -157,7 +163,7 @@ variable getBrickletViewTypeCode(variable brickletID, FP64WAVE allViewTypeCodes)
  * @sa getBrickletMetaData()
  * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE
 */ 
-variable getBrickletDimension(variable brickletID, variable *brickletDimension);
+// variable getBrickletDimension(variable brickletID, variable *brickletDimension);
 
 // removed for now
 /* Return the dimension of all bricklets
@@ -166,55 +172,55 @@ variable getBrickletDimension(variable brickletID, variable *brickletDimension);
 */ 
 // variable getAllBrickletDimension(FP64WAVE brickletDimension);
 
-/** Get the processed data for the bricklet. Processed here means it is put in the correct form as described in the Vernissage manual "Accessing raw data" p. 40. @b No other processing is done. The waves for each bricklet will be double precision with the appropriate dimension. In case a wave exists, the function returns WAVE_EXIST. If this happens the state of the dataFolderPath might be inconsistent. In case you don't get what you expect here (or you get the return value INTERNAL_ERROR_CONVERTING_DATA), try getBrickletRawData() and do the low-level data twiddling yourself. For this you definitely have to consult the Vernissage Manual. In case of INTERNAL_ERROR_CONVERTING_DATA please submit a bugreport including a testcase which shows the error.
- * @param[in] dataFolderPath path to store the bricklets, must exist before calling the function. In case it is empty "root:" is assumed.
+/** Get the processed data for the bricklet. Processed here means it is put in the correct form as described in the Vernissage manual "Accessing raw data" p. 40. @b No other processing is done. The waves for each bricklet will 32bit integer waves with the appropriate dimension put into the current datafolder. In case a wave exists, the function returns WAVE_EXIST. In case you don't get what you expect here (or you get the return value INTERNAL_ERROR_CONVERTING_DATA), try getBrickletRawData() and do the low-level data twiddling yourself. For this you definitely have to consult the Vernissage Manual. In case of INTERNAL_ERROR_CONVERTING_DATA please submit a bugreport including a testcase which shows the error.
  * @param[in] basename first part of the wavename which will be created.
- * The wavenames are in general of the form <baseName>_<brickletID>_<dataType>, in case the basename is empty, the wavename will be X_<brickletID>_<dataType>. The string dataType is needed in case the number of datawaves is greater than zero (usually the case for topographic data). If the number of data waves is one, the wavenames will be <baseName>_<brickletID>. 
+ * The wavenames are in general of the form <baseName>_<brickletID>_<dataType>, in case the basename is empty, the wavename will be X_<brickletID>_<dataType>. The string dataType is needed in case the number of datawaves is greater than one (usually the case for topographic data). If the number of data waves is one, the wavenames will be <baseName>_<brickletID>. 
  * @param[in]  separateFolderForEachBricklet must be 0 or 1, create a subfolder in dataFolderPath named as the X_brickletID for each bricklet
  * @param[in]  brickletID
- * @return SUCCESS | NON_EXISTENT_DATAFOLDER | NON_EXISTENT_BRICKLET | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
+ * @return SUCCESS | NON_EXISTENT_BRICKLET | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
 */
-variable getBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable brickletID);
+variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID);
 
 /** Get processed data for a few bricklets, might be handy together with checkForNewBricklets()
  * @param[in] startBrickletID brickletID of the first bricklet to load, must be greater or equal than 1
  * @param[in] endBrickletID brickletID of the last bricklet to load, must be smaller or equal to the totalNumberOfBricklets
- * @return SUCCESS | NON_EXISTENT_DATAFOLDER | INVALID_RANGE | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
+ * @return SUCCESS | INVALID_RANGE | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
  * @sa getBrickletData()
 */ 
-variable getRangeBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);
+variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);
 
 /** Get processed data for all bricklets of the result file.  Be sure to call checkForNewBricklets() before if you want to be sure that you catch all bricklets created until now.
- * @return SUCCESS | NON_EXISTENT_DATAFOLDER | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
+ * @return SUCCESS  | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
  * @sa getRangeBrickletData()
  * @sa getBrickletData()
 */ 
-variable getAllBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet);
+variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet);
 
-/** Get the raw data without doing any data interpretation. Useful if getBrickletData() returns rubbish or INTERNAL_ERROR_CONVERTING_DATA. You should have a deep look into the vernissage manual before using this function.
+/** IMPLEMENTED
+ * Get the raw data without doing any data interpretation. Useful if getBrickletData() returns rubbish or if it returns INTERNAL_ERROR_CONVERTING_DATA. You should have a deep look into the vernissage manual before using this function.
  * @param[in]  	brickletID
- * @param[out] 	brickletData data of the bricklet. A double precision wave with one dimension.
- * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE
-*/
-variable getBrickletRawData(variable brickletID, FP64WAVE data);
+ * @param[out] 	dataWave name of a wave to put the raw data into. The wave may not exist before calling and it will be created in the current datafolder.
+ * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST
+ * */
+variable getBrickletRawData(variable brickletID, string dataWave);
 
 /** Return all meta data of the bricklet.
  * @param[in]  brickletID
- * @param[out] metaData textwave holding all meta data of the specified bricklet
- * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE
+ * @param[out] metaDataWave name of a wave to put the bricklet meta data into. The wave may not exist before calling and it will be created in the current datafolder.
+ * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST
 */ 
-variable getBrickletMetaData(variable brickletID, TEXTWAVE metaData);
+variable getBrickletMetaData(variable brickletID, string metaData);
 
-/** Return the meta data of all bricklets
- * @return SUCCESS | NON_EXISTENT_DATAFOLDER | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE
+/** Return the meta data for all bricklets
+ * @return SUCCESS | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST
  * @sa getAllBrickletData()
  * @sa getBrickletData()
 */ 
-variable getAllBrickletMetaData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet);
+variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet);
 
 /** Return the meta data for the given range of bricklets
  * @sa getRangeBrickletData()
- * @return SUCCESS | NON_EXISTENT_DATAFOLDER | INVALID_RANGE | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE
+ * @return SUCCESS | INVALID_RANGE | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE
 */ 
-variable getRangeBrickletMetaData(string dataFolderPath,string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);
+variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);
 

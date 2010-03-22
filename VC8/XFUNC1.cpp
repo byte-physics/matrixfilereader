@@ -2,6 +2,10 @@
 
 */
 
+#include <string>
+#include <set>
+
+
 #include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
 #include "XFUNC1.h"
 
@@ -13,36 +17,6 @@
 #define DEBUG_LEVEL 1
 
 #include "Vernissage.h"
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct checkForNewBrickletsParams{
-	double  rememberCalls;
-	double *endBrickletID;
-	double *startBrickletID;
-	double  result;	
-};
-typedef struct checkForNewBrickletsParams checkForNewBrickletsParams;
-#pragma pack()
-
-// variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls)
-static int checkForNewBricklets(checkForNewBrickletsParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct closeResultFileParams{
@@ -73,180 +47,16 @@ static int closeResultFile(closeResultFileParams *p){
 }
 
 
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getAllBrickletDataParams{
-	double  separateFolderForEachBricklet;
-	Handle  baseName;
-	Handle  dataFolderPath;
-	double  result;	
-};
-typedef struct getAllBrickletDataParams getAllBrickletDataParams;
-#pragma pack()
-
-// variable getAllBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet)
-static int getAllBrickletData(getAllBrickletDataParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getAllBrickletMetaDataParams{
-	double  separateFolderForEachBricklet;
-	Handle  baseName;
-	Handle  dataFolderPath;
-	double  result;	
-};
-typedef struct getAllBrickletMetaDataParams getAllBrickletMetaDataParams;
-#pragma pack()
-
-// variable getAllBrickletMetaData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet)
-static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getBrickletDataParams{
-	double  brickletID;
-	double  separateFolderForEachBricklet;
-	Handle  baseName;
-	Handle  dataFolderPath;
-	double  result;	
-};
-typedef struct getBrickletDataParams getBrickletDataParams;
-#pragma pack()
-
-// variable getBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable brickletID)
-static int getBrickletData(getBrickletDataParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getBrickletDimensionParams{
-	double *brickletDimension;
-	double  brickletID;
-	double  result;	
-};
-typedef struct getBrickletDimensionParams getBrickletDimensionParams;
-#pragma pack()
-
-// variable getBrickletDimension(variable brickletID, variable *brickletDimension)
-static int getBrickletDimension(getBrickletDimensionParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getBrickletMetaDataParams{
-	waveHndl  metaData;
-	double  brickletID;
-	double  result;	
-};
-typedef struct getBrickletMetaDataParams getBrickletMetaDataParams;
-#pragma pack()
-
-// variable getBrickletMetaData(variable brickletID, TEXTWAVE metaData)
-static int getBrickletMetaData(getBrickletMetaDataParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletRawDataParams{
-	waveHndl  rawDataWaveHandle;
+	Handle  dataWave;
 	double  brickletID;
 	double  result;	
 };
 typedef struct getBrickletRawDataParams getBrickletRawDataParams;
 #pragma pack()
 
-// variable getBrickletRawData(variable brickletID, FP64WAVE data)
+// variable getBrickletRawData(variable brickletID, string dataWave)
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	p->result = UNKNOWN_ERROR;
@@ -273,17 +83,12 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		return 0;
 	}
 
-	if(p->rawDataWaveHandle == NULL ){
-		p->result = NON_EXISTENT_WAVE;
+	if(p->dataWave == NULL ){
+		p->result = WRONG_PARAMETER;
 		return 0;
 	}
 
-	if(WaveType(p->rawDataWaveHandle) != NT_I32){
-		p->result = EXPECTED_INT_WAVE;
-		return 0;
-	}
-
-	debugOutputToHistory(DEBUG_LEVEL,"Got correct DP wave, and correct brickletID");
+	debugOutputToHistory(DEBUG_LEVEL,"Got correct wave, and correct brickletID");
 
 	const int *pBuffer;
 	int count=0;
@@ -297,96 +102,49 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		return 0;
 	}
 
+	char dataWaveName[MAX_OBJ_NAME+1];
+	int ret;
+	ret = GetCStringFromHandle(p->dataWave,dataWaveName,MAX_OBJ_NAME);
+
+	if(ret != 0){
+		p->result = ret;
+		return 0;
+	}
+
 	long dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
-	dimensionSizes[ROWS]=count; // resize to 1D wave with count points
-	int mode=0;
+	dimensionSizes[ROWS]=count; // create 1D wave with count points
+	waveHndl waveHandle;
+	int overwrite=0;
 
-	int retValue = MDChangeWave2(p->rawDataWaveHandle, -1, dimensionSizes, mode);
+	ret = MDMakeWave(&waveHandle,dataWaveName,NULL,dimensionSizes,NT_I32,overwrite);
 
-	if(retValue != 0 ){
-		sprintf(buf,"Error %d in wave redimensioning.",retValue);
+	if(ret == NAME_WAV_CONFLICT){
+		sprintf(buf,"Wave %s already exists.",dataWaveName);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+		p->result = WAVE_EXIST;
+		return 0;	
+	}
+
+	if(ret != 0 ){
+		sprintf(buf,"Error %d in creating wave.",ret);
 		outputToHistory(buf);
 		p->result = UNKNOWN_ERROR;
 		return 0;
 	}
 
 	// lock wave
-	int hState=MoveLockHandle(p->rawDataWaveHandle);
+	int hState=MoveLockHandle(waveHandle);
 
-	int* dataPtr = (int*) WaveData(p->rawDataWaveHandle);
+	int* dataPtr = (int*) WaveData(waveHandle);
 	for(int i=0; i < count; i++){
 		dataPtr[i] = pBuffer[i];
 	}
-	HSetState((Handle)p->rawDataWaveHandle, hState);
+	HSetState((Handle) waveHandle, hState);
 
 	p->result = SUCCESS;
 	return 0;
 }
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getBrickletViewTypeCodeParams{
-	waveHndl  allViewTypeCodes;
-	double  brickletID;
-	double  result;	
-};
-typedef struct getBrickletViewTypeCodeParams getBrickletViewTypeCodeParams;
-#pragma pack()
-
-// variable getBrickletViewTypeCode(variable brickletID, FP64WAVE allViewTypeCodes)
-static int getBrickletViewTypeCode(getBrickletViewTypeCodeParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getErrorMessageParams{
-	double  errorCode;
-	Handle  result;	
-};
-typedef struct getErrorMessageParams getErrorMessageParams;
-#pragma pack()
-
-// string getHumanReadableStringFromErrorCode(variable errorCode)
-static int getErrorMessage(getErrorMessageParams *p){
-
-	//p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		//p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	//p->result = SUCCESS;
-	return 0;
-}
-
 
 
 
@@ -414,7 +172,7 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	if(p->totalNumberOfBricklets == NULL){
-		p->result = EMPTY_PARAMETER;
+		p->result = WRONG_PARAMETER;
 	}
 
 	*p->totalNumberOfBricklets = pSession->getBrickletCount();
@@ -426,108 +184,6 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 	p->result = SUCCESS;
 	return 0;
 }
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getRangeBrickletDataParams{
-	double  endBrickletID;
-	double  startBrickletID;
-	double  separateFolderForEachBricklet;
-	Handle  baseName;
-	Handle  dataFolderPath;
-	double  result;	
-};
-typedef struct getRangeBrickletDataParams getRangeBrickletDataParams;
-#pragma pack()
-
-// variable getRangeBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
-static int getRangeBrickletData(getRangeBrickletDataParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getRangeBrickletMetaDataParams{
-	double  endBrickletID;
-	double  startBrickletID;
-	double  separateFolderForEachBricklet;
-	Handle  baseName;
-	Handle  dataFolderPath;
-	double  result;	
-};
-typedef struct getRangeBrickletMetaDataParams getRangeBrickletMetaDataParams;
-#pragma pack()
-
-// variable getRangeBrickletMetaData(string dataFolderPath,string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
-static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getResultFileMetaDataParams{
-	waveHndl  resultFileMetaData;
-	double  result;	
-};
-typedef struct getResultFileMetaDataParams getResultFileMetaDataParams;
-#pragma pack()
-
-// variable getResultFileMetaData(TEXTWAVE resultFileMetaData)
-static int getResultFileMetaData(getResultFileMetaDataParams *p){
-
-	p->result = UNKNOWN_ERROR;
-
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
 
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
@@ -553,7 +209,7 @@ static int getResultFileName(getResultFileNameParams *p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	if(p->filename == NULL){
-		p->result = EMPTY_PARAMETER;
+		p->result = WRONG_PARAMETER;
 		return 0;
 		//return NULL_STR_VAR;
 	}
@@ -563,8 +219,6 @@ static int getResultFileName(getResultFileNameParams *p){
 	p->result = SUCCESS;
 	return 0;
 }
-
-
 
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
@@ -590,9 +244,8 @@ static int getResultFilePath(getResultFilePathParams *p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	if(p->absoluteFilePath == NULL){
-		p->result = EMPTY_PARAMETER;
+		p->result = WRONG_PARAMETER;
 		return 0;
-		//return NULL_STR_VAR;
 	}
 
 	PutCStringInHandle(pMyData->getResultFilePath().c_str(), *p->absoluteFilePath);
@@ -627,7 +280,7 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	if(p->vernissageVersion == NULL){
-		p->result = EMPTY_PARAMETER;
+		p->result = WRONG_PARAMETER;
 		return 0;
 	}
 
@@ -661,7 +314,7 @@ static int getXOPVersion(getXOPVersionParams *p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	if(p->xopVersion == NULL){
-		p->result = EMPTY_PARAMETER;
+		p->result = WRONG_PARAMETER;
 		return 0;
 	}
 
@@ -761,6 +414,383 @@ static int openResultFile(openResultFileParams *p){
 }
 
 
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct checkForNewBrickletsParams{
+	double  rememberCalls;
+	double *endBrickletID;
+	double *startBrickletID;
+	double  result;	
+};
+typedef struct checkForNewBrickletsParams checkForNewBrickletsParams;
+#pragma pack()
+
+// variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls)
+static int checkForNewBricklets(checkForNewBrickletsParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getAllBrickletDataParams{
+	double  separateFolderForEachBricklet;
+	Handle  baseName;
+	double  result;	
+};
+typedef struct getAllBrickletDataParams getAllBrickletDataParams;
+#pragma pack()
+
+// variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
+static int getAllBrickletData(getAllBrickletDataParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getAllBrickletMetaDataParams{
+	double  separateFolderForEachBricklet;
+	Handle  baseName;
+	double  result;	
+};
+typedef struct getAllBrickletMetaDataParams getAllBrickletMetaDataParams;
+#pragma pack()
+
+// variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet)
+static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getBrickletDataParams{
+	double  brickletID;
+	double  separateFolderForEachBricklet;
+	Handle  baseName;
+	double  result;	
+};
+typedef struct getBrickletDataParams getBrickletDataParams;
+#pragma pack()
+
+// variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
+static int getBrickletData(getBrickletDataParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getBrickletMetaDataParams{
+	Handle  metaData;
+	double  brickletID;
+	double  result;	
+};
+typedef struct getBrickletMetaDataParams getBrickletMetaDataParams;
+#pragma pack()
+
+// variable getBrickletMetaData(variable brickletID, string metaData)
+static int getBrickletMetaData(getBrickletMetaDataParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getErrorMessageParams{
+	double  errorCode;
+	Handle  result;	
+};
+typedef struct getErrorMessageParams getErrorMessageParams;
+#pragma pack()
+
+// string getErrorMessage(variable errorCode)
+static int getErrorMessage(getErrorMessageParams *p){
+
+	//p->result = NU;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		//p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	//p->result = SUCCESS;
+	return 0;
+}
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getRangeBrickletDataParams{
+	double  endBrickletID;
+	double  startBrickletID;
+	double  separateFolderForEachBricklet;
+	Handle  baseName;
+	double  result;	
+};
+typedef struct getRangeBrickletDataParams getRangeBrickletDataParams;
+#pragma pack()
+
+// variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
+static int getRangeBrickletData(getRangeBrickletDataParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getRangeBrickletMetaDataParams{
+	double  endBrickletID;
+	double  startBrickletID;
+	double  separateFolderForEachBricklet;
+	Handle  baseName;
+	double  result;	
+};
+typedef struct getRangeBrickletMetaDataParams getRangeBrickletMetaDataParams;
+#pragma pack()
+
+// variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
+static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getResultFileMetaDataParams{
+	Handle  waveName;
+	double  result;	
+};
+typedef struct getResultFileMetaDataParams getResultFileMetaDataParams;
+#pragma pack()
+
+// variable getResultFileMetaData(string waveName)
+static int getResultFileMetaData(getResultFileMetaDataParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+	if(p->waveName == NULL){
+		p->result = WRONG_PARAMETER;
+		return 0;
+	}
+
+	char metaDataWaveName[MAX_OBJ_NAME+1];
+	int ret = GetCStringFromHandle(p->waveName,metaDataWaveName,MAX_OBJ_NAME);
+
+	if(ret != 0){
+		p->result = ret;
+		return 0;
+	}
+
+	std::string metaData;
+
+ //*		- filename
+ //*		- filepath
+ //*		- BrickletMetaData.fileCreatorName
+ //*		- BrickletMetaData.fileCreatorVersion
+ //*		- BrickletMetaData.userName
+ //*		- BrickletMetaData.accountName
+ //*		- totalNumberOfBricklets
+ //*		- changeDate (this will have the timestamp of the newest bricklet)
+
+	int numberOfBricklets = pSession->getBrickletCount();
+	void* pBricklet = pMyData->getBrickletPointerFromMap(numberOfBricklets);
+	tm ctime = pSession->getCreationTimestamp(pBricklet);
+	char buf[ARRAY_SIZE];
+
+	Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
+
+	metaData.append("filePath");
+	//metaData.append('\0');
+	metaData.append("myPath");
+	//metaData.append('\0');
+
+//	metaData[std::string("fileName")] = pMyData->getResultFileName();
+//	
+//	sprintf(buf,"%d",numberOfBricklets);
+//	metaData[std::string("totalNumberOfBricklets")] = std::string(buf);
+//	
+//	sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d\n",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
+//	metaData[std::string("changeDate")] = std::string(buf);
+//
+//	metaData[std::string("BrickletMetaData.fileCreatorName")] = WStringToString(brickletMetaData.fileCreatorName);
+//	metaData[std::string("BrickletMetaData.fileCreatorVersion")] = WStringToString(brickletMetaData.fileCreatorVersion);
+//	metaData[std::string("BrickletMetaData.userName")] = WStringToString(brickletMetaData.userName);
+//	metaData[std::string("BrickletMetaData.accountName")] = WStringToString(brickletMetaData.accountName);
+//
+	long dimensionSizes[MAX_DIMENSIONS+1];
+	MemClear(dimensionSizes, sizeof(dimensionSizes));
+
+	// create 2D textwave wave with count points
+	dimensionSizes[ROWS]=1; 
+	dimensionSizes[COLUMNS]=2;
+
+	waveHndl waveHandle;
+	int overwrite=0;
+
+	ret = MDMakeWave(&waveHandle,metaDataWaveName,NULL,dimensionSizes,TEXT_WAVE_TYPE,overwrite);
+
+	if(ret == NAME_WAV_CONFLICT){
+		sprintf(buf,"Wave %s already exists.",metaDataWaveName);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+		p->result = WAVE_EXIST;
+		return 0;	
+	}
+
+	sprintf(buf,"result file meta data %s",metaData.c_str());
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+	// acquire lock
+	int hState=MoveLockHandle(waveHandle);
+
+	int mode=0;
+	Handle textDataHandle = NewHandle(metaData.size());
+
+	// FIXME use mode=2, manual p. 366
+	// write a function which takes a string vector and puts this into a textwave
+	//PutCStringInHandle(metaData.c_str(),textDataHandle);
+
+	ret = SetTextWaveData(waveHandle,mode,textDataHandle);
+
+	HSetState((Handle) waveHandle, hState);
+	DisposeHandle(textDataHandle);
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
 static long RegisterFunction()
 {
 	/*	NOTE:
@@ -788,52 +818,45 @@ static long RegisterFunction()
 			returnValue = (long) getBrickletData;
 			break;
 		case 5:						
-			returnValue = (long) getBrickletDimension;
-			break;
-		case 6:						
 			returnValue = (long) getBrickletMetaData;
 			break;
-		case 7:						
+		case 6:						
 			returnValue = (long) getBrickletRawData;
 			break;
-		case 8:						
-			returnValue = (long) getBrickletViewTypeCode;
-			break;
-		case 9:						
+		case 7:						
 			returnValue = (long) getErrorMessage;
 			break;
-		case 10:						
+		case 8:						
 			returnValue = (long) getNumberOfBricklets;
 			break;
-		case 11:						
+		case 9:						
 			returnValue = (long) getRangeBrickletData;
 			break;
-		case 12:						
+		case 10:						
 			returnValue = (long) getRangeBrickletMetaData;
 			break;
-		case 13:						
+		case 11:						
 			returnValue = (long) getResultFileMetaData;
 			break;
-		case 14:						
+		case 12:						
 			returnValue = (long) getResultFileName;
 			break;
-		case 15:						
+		case 13:						
 			returnValue = (long) getResultFilePath;
 			break;
-		case 16:						
+		case 14:						
 			returnValue = (long) getVernissageVersion;
 			break;
-		case 17:						
+		case 15:						
 			returnValue = (long) getXOPVersion;
 			break;
-		case 18:						
+		case 16:						
 			returnValue = (long) openResultFile;
 			break;
-	}
 
+	}
 	return returnValue;
 }
-
 
 /*	XOPEntry()
 

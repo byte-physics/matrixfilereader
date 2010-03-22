@@ -15,14 +15,14 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -45,14 +45,14 @@ static int closeResultFile(closeResultFileParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -67,25 +67,24 @@ static int closeResultFile(closeResultFileParams *p){
 struct getAllBrickletDataParams{
 	double  separateFolderForEachBricklet;
 	Handle  baseName;
-	Handle  dataFolderPath;
 	double  result;	
 };
 typedef struct getAllBrickletDataParams getAllBrickletDataParams;
 #pragma pack()
 
-// variable getAllBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet)
+// variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletData(getAllBrickletDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -100,25 +99,24 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 struct getAllBrickletMetaDataParams{
 	double  separateFolderForEachBricklet;
 	Handle  baseName;
-	Handle  dataFolderPath;
 	double  result;	
 };
 typedef struct getAllBrickletMetaDataParams getAllBrickletMetaDataParams;
 #pragma pack()
 
-// variable getAllBrickletMetaData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet)
+// variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -134,57 +132,24 @@ struct getBrickletDataParams{
 	double  brickletID;
 	double  separateFolderForEachBricklet;
 	Handle  baseName;
-	Handle  dataFolderPath;
 	double  result;	
 };
 typedef struct getBrickletDataParams getBrickletDataParams;
 #pragma pack()
 
-// variable getBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable brickletID)
+// variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
 static int getBrickletData(getBrickletDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getBrickletDimensionParams{
-	double *brickletDimension;
-	double  brickletID;
-	double  result;	
-};
-typedef struct getBrickletDimensionParams getBrickletDimensionParams;
-#pragma pack()
-
-// variable getBrickletDimension(variable brickletID, variable *brickletDimension)
-static int getBrickletDimension(getBrickletDimensionParams *p){
-
-	p->result = UNKOWN_ERROR;
-
-	ASSERT(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -197,26 +162,26 @@ static int getBrickletDimension(getBrickletDimensionParams *p){
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletMetaDataParams{
-	waveHndl  metaData;
+	Handle  metaData;
 	double  brickletID;
 	double  result;	
 };
 typedef struct getBrickletMetaDataParams getBrickletMetaDataParams;
 #pragma pack()
 
-// variable getBrickletMetaData(variable brickletID, TEXTWAVE metaData)
+// variable getBrickletMetaData(variable brickletID, string metaData)
 static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -229,58 +194,26 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletRawDataParams{
-	waveHndl  data;
+	Handle  dataWave;
 	double  brickletID;
 	double  result;	
 };
 typedef struct getBrickletRawDataParams getBrickletRawDataParams;
 #pragma pack()
 
-// variable getBrickletRawData(variable brickletID, FP64WAVE data)
+// variable getBrickletRawData(variable brickletID, string dataWave)
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
-
-
-
-	p->result = SUCCESS;
-	return 0;
-}
-
-
-
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getBrickletViewTypeCodeParams{
-	waveHndl  allViewTypeCodes;
-	double  brickletID;
-	double  result;	
-};
-typedef struct getBrickletViewTypeCodeParams getBrickletViewTypeCodeParams;
-#pragma pack()
-
-// variable getBrickletViewTypeCode(variable brickletID, FP64WAVE allViewTypeCodes)
-static int getBrickletViewTypeCode(getBrickletViewTypeCodeParams *p){
-
-	p->result = UNKOWN_ERROR;
-
-	ASSERT(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -304,14 +237,14 @@ static int getErrorMessage(getErrorMessageParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -335,14 +268,14 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -359,25 +292,24 @@ struct getRangeBrickletDataParams{
 	double  startBrickletID;
 	double  separateFolderForEachBricklet;
 	Handle  baseName;
-	Handle  dataFolderPath;
 	double  result;	
 };
 typedef struct getRangeBrickletDataParams getRangeBrickletDataParams;
 #pragma pack()
 
-// variable getRangeBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
+// variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -394,25 +326,24 @@ struct getRangeBrickletMetaDataParams{
 	double  startBrickletID;
 	double  separateFolderForEachBricklet;
 	Handle  baseName;
-	Handle  dataFolderPath;
 	double  result;	
 };
 typedef struct getRangeBrickletMetaDataParams getRangeBrickletMetaDataParams;
 #pragma pack()
 
-// variable getRangeBrickletMetaData(string dataFolderPath,string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
+// variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -425,25 +356,25 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getResultFileMetaDataParams{
-	waveHndl  resultFileMetaData;
+	Handle  waveName;
 	double  result;	
 };
 typedef struct getResultFileMetaDataParams getResultFileMetaDataParams;
 #pragma pack()
 
-// variable getResultFileMetaData(TEXTWAVE resultFileMetaData)
+// variable getResultFileMetaData(string waveName)
 static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -467,14 +398,14 @@ static int getResultFileName(getResultFileNameParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -498,14 +429,14 @@ static int getResultFilePath(getResultFilePathParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -518,25 +449,25 @@ static int getResultFilePath(getResultFilePathParams *p){
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getVernissageVersionParams{
-	double *vernissageVersion;
+	Handle *vernissageVersion;
 	double  result;	
 };
 typedef struct getVernissageVersionParams getVernissageVersionParams;
 #pragma pack()
 
-// variable getVernissageVersion(variable *vernissageVersion)
+// variable getVernissageVersion(string *vernissageVersion)
 static int getVernissageVersion(getVernissageVersionParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -549,25 +480,25 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getXOPVersionParams{
-	double *xopVersion;
+	Handle *xopVersion;
 	double  result;	
 };
 typedef struct getXOPVersionParams getXOPVersionParams;
 #pragma pack()
 
-// variable getXOPVersion(variable *xopVersion)
+// variable getXOPVersion(string *xopVersion)
 static int getXOPVersion(getXOPVersionParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -592,14 +523,14 @@ static int openResultFile(openResultFileParams *p){
 
 	p->result = UNKOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -639,45 +570,39 @@ static long RegisterFunction()
 			returnValue = (long) getBrickletData;
 			break;
 		case 5:						
-			returnValue = (long) getBrickletDimension;
-			break;
-		case 6:						
 			returnValue = (long) getBrickletMetaData;
 			break;
-		case 7:						
+		case 6:						
 			returnValue = (long) getBrickletRawData;
 			break;
-		case 8:						
-			returnValue = (long) getBrickletViewTypeCode;
-			break;
-		case 9:						
+		case 7:						
 			returnValue = (long) getErrorMessage;
 			break;
-		case 10:						
+		case 8:						
 			returnValue = (long) getNumberOfBricklets;
 			break;
-		case 11:						
+		case 9:						
 			returnValue = (long) getRangeBrickletData;
 			break;
-		case 12:						
+		case 10:						
 			returnValue = (long) getRangeBrickletMetaData;
 			break;
-		case 13:						
+		case 11:						
 			returnValue = (long) getResultFileMetaData;
 			break;
-		case 14:						
+		case 12:						
 			returnValue = (long) getResultFileName;
 			break;
-		case 15:						
+		case 13:						
 			returnValue = (long) getResultFilePath;
 			break;
-		case 16:						
+		case 14:						
 			returnValue = (long) getVernissageVersion;
 			break;
-		case 17:						
+		case 15:						
 			returnValue = (long) getXOPVersion;
 			break;
-		case 18:						
+		case 16:						
 			returnValue = (long) openResultFile;
 			break;
 

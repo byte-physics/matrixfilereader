@@ -6,20 +6,18 @@
 !_TAG_PROGRAM_VERSION	5.8	//
 checkForNewBricklets	api-layout.h	/^variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls);$/;"	p
 closeResultFile	api-layout.h	/^variable closeResultFile();$/;"	p
-getAllBrickletData	api-layout.h	/^variable getAllBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet);$/;"	p
-getAllBrickletMetaData	api-layout.h	/^variable getAllBrickletMetaData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet);$/;"	p
-getBrickletData	api-layout.h	/^variable getBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable brickletID);$/;"	p
-getBrickletDimension	api-layout.h	/^variable getBrickletDimension(variable brickletID, variable *brickletDimension);$/;"	p
-getBrickletMetaData	api-layout.h	/^variable getBrickletMetaData(variable brickletID, TEXTWAVE metaData);$/;"	p
-getBrickletRawData	api-layout.h	/^variable getBrickletRawData(variable brickletID, FP64WAVE data);$/;"	p
-getBrickletViewTypeCode	api-layout.h	/^variable getBrickletViewTypeCode(variable brickletID, FP64WAVE allViewTypeCodes);$/;"	p
+getAllBrickletData	api-layout.h	/^variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet);$/;"	p
+getAllBrickletMetaData	api-layout.h	/^variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet);$/;"	p
+getBrickletData	api-layout.h	/^variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID);$/;"	p
+getBrickletMetaData	api-layout.h	/^variable getBrickletMetaData(variable brickletID, string metaData);$/;"	p
+getBrickletRawData	api-layout.h	/^variable getBrickletRawData(variable brickletID, string dataWave);$/;"	p
 getErrorMessage	api-layout.h	/^string getErrorMessage(variable errorCode);$/;"	p
 getNumberOfBricklets	api-layout.h	/^variable getNumberOfBricklets(variable *totalNumberOfBricklets);$/;"	p
-getRangeBrickletData	api-layout.h	/^variable getRangeBrickletData(string dataFolderPath, string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p
-getRangeBrickletMetaData	api-layout.h	/^variable getRangeBrickletMetaData(string dataFolderPath,string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p
-getResultFileMetaData	api-layout.h	/^variable getResultFileMetaData(TEXTWAVE resultFileMetaData);$/;"	p
+getRangeBrickletData	api-layout.h	/^variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p
+getRangeBrickletMetaData	api-layout.h	/^variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p
+getResultFileMetaData	api-layout.h	/^variable getResultFileMetaData(string waveName);$/;"	p
 getResultFileName	api-layout.h	/^variable getResultFileName(string *filename);$/;"	p
 getResultFilePath	api-layout.h	/^variable getResultFilePath(string *absoluteFilePath);$/;"	p
-getVernissageVersion	api-layout.h	/^variable getVernissageVersion(variable *vernissageVersion);$/;"	p
-getXOPVersion	api-layout.h	/^variable getXOPVersion(variable *xopVersion);$/;"	p
+getVernissageVersion	api-layout.h	/^variable getVernissageVersion(string *vernissageVersion);$/;"	p
+getXOPVersion	api-layout.h	/^variable getXOPVersion(string *xopVersion);$/;"	p
 openResultFile	api-layout.h	/^variable openResultFile(string absoluteFilePath, string fileName);$/;"	p

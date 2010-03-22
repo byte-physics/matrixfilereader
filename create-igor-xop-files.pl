@@ -12,7 +12,7 @@ my $argc = @ARGV;          # get the number of arguments
 my ($line,@array,$funcSig, $returnType,@argsName,@argsType,@argsPointer,$rest,$funcName,@args,$arg,$i,@tmp,$resourceContent);
 my ($resourceParamType,$resourceReturnType,$parameterLine,$allParameters,$functions,$parameter,$allFunctions,$argNumber,$funcIndex,$allCaseLines);
 my ($registerFunctionBodyContent,$caseLine,$allCppParameters, $allFunctionSkeletonsi, $cppParamType,$functionSkeleton,$allFunctionSkeletons);
-my ($cppResultType);
+my ($cppResultType,$allhFileFuncSig,$hFileFuncSig);
 
 if($argc < 1){
 	print "Too less arguments";
@@ -80,16 +80,16 @@ typedef struct %%funcName%%Params %%funcName%%Params;
 // %%funcSig%%
 static int %%funcName%%(%%funcName%%Params *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
-	ASSERT(pMyData);
+	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession);
+	ASSERT_RETURN_ZERO(pSession);
 
 
 
@@ -108,6 +108,7 @@ $returnType="";
 $resourceContent="";
 $funcIndex=0;
 $allCaseLines="";
+$allhFileFuncSig="";
 
 while($line = <IN>){
 
@@ -208,6 +209,11 @@ while($line = <IN>){
 
 		$allCaseLines .= $caseLine;
 		$funcIndex++;
+
+		# h file
+		
+		$hFileFuncSig = "static int $funcName($funcName" . "Params *p);\n";
+		$allhFileFuncSig .= $hFileFuncSig;
 	}
 }
 	close(IN);
@@ -220,7 +226,7 @@ while($line = <IN>){
 	print OUT $resourceContent;
 	close(OUT);
 	
-	open(OUT,">functionBodys.cpp") or die "can not open resource file";
+	open(OUT,">functionBodys.cpp") or die "can not open file";
 
 	$registerFunctionBodyContent = $registerFunctionTemplate;
 	$registerFunctionBodyContent =~ s/%%caseLine%%/$allCaseLines/;
@@ -230,6 +236,14 @@ while($line = <IN>){
 	print OUT "\n\n";
 
 	print OUT $registerFunctionBodyContent;
+
+	close(OUT);
+
+	open(OUT,">functionBodys.h") or die  "can not open file";
+
+	print OUT "\n\n";
+	print OUT $allhFileFuncSig;
+	print OUT "\n\n";
 
 	close(OUT);
 

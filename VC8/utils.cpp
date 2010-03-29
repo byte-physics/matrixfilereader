@@ -13,6 +13,8 @@
 
 #include "globalvariables.h"
 
+#define DEBUG_LEVEL 1
+
 
 std::wstring StringToWString(const std::string& s)
 {
@@ -92,4 +94,80 @@ void outputToHistory(char *str){
 		char buf[ARRAY_SIZE];
 		sprintf(buf,formatString,str);
 		XOPNotice(buf);
+}
+
+int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &waveHandle){
+
+	ASSERT_RETURN_ZERO(stringVector.size());
+
+	std::vector<long int> stringSizes;
+	long int totalSize=0;
+	char buf[ARRAY_SIZE];
+
+	const long int numEntriesPlusOne = stringVector.size()+1;
+
+	std::vector<std::string>::const_iterator it;
+	for(it = stringVector.begin(); it != stringVector.end(); it++){
+		stringSizes.push_back(it->size());
+		totalSize += it->size();
 	}
+
+	totalSize += numEntriesPlusOne*sizeof(long);
+
+	char *textPtr = (char*) NewPtr(totalSize);
+	if(MemError() || textPtr == NULL){
+		return -1;
+	}
+	MemClear(textPtr,totalSize);
+
+	int i;
+	long int offset;
+
+	sprintf(buf,"totalSize of strings %d",GetPtrSize(textPtr));
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+	for(i=0; i < numEntriesPlusOne; i++){
+
+		if(i == 0){
+			offset = numEntriesPlusOne*sizeof(long);
+		}
+		else{
+			offset+=stringSizes[i-1];
+		}
+
+		sprintf(buf,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+		
+		//debugOutputToHistory(DEBUG_LEVEL,"before offset memcpy");
+
+		// write offsets into textDataHandle
+		memcpy(textPtr+i*sizeof(long),&offset,sizeof(long));
+		//debugOutputToHistory(DEBUG_LEVEL,"after offset memcpy");
+
+		if(i < stringVector.size()){
+
+			sprintf(buf,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
+			debugOutputToHistory(DEBUG_LEVEL,buf);
+
+			// put string into textDataHandle
+			memcpy(textPtr+offset,stringVector[i].c_str(),stringSizes[i]);
+
+			//debugOutputToHistory(DEBUG_LEVEL,"after string memcpy");
+		}
+	}
+	//debugOutputToHistory(DEBUG_LEVEL,"after memcpy loop");
+
+	// acquire waveHandle lock
+	int hState=MoveLockHandle(waveHandle);
+	int ret = SetTextWaveData(waveHandle,2,&textPtr);
+	
+	sprintf(buf,"SetTextWaveData returned %d",ret);
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+	// release waveHandle lock
+	HSetState((Handle) waveHandle, hState);
+
+	DisposePtr((Ptr) textPtr);
+
+	return ret;
+}

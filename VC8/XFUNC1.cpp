@@ -713,7 +713,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 		return 0;
 	}
 
-	std::string metaData;
+	std::vector<std::string> metaData;
 
  //*		- filename
  //*		- filepath
@@ -731,29 +731,38 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
 	Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
 
-	metaData.append("filePath");
-	//metaData.append('\0');
-	metaData.append("myPath");
-	//metaData.append('\0');
+	metaData.push_back("filePath");
+	metaData.push_back("fileName");
+	metaData.push_back("totalNumberOfBricklets");
+	metaData.push_back("changeDate");
+	metaData.push_back("BrickletMetaData.fileCreatorName");
+	metaData.push_back("BrickletMetaData.fileCreatorVersion");
+	metaData.push_back("BrickletMetaData.userName");
+	metaData.push_back("BrickletMetaData.accountName");
 
-//	metaData[std::string("fileName")] = pMyData->getResultFileName();
-//	
-//	sprintf(buf,"%d",numberOfBricklets);
-//	metaData[std::string("totalNumberOfBricklets")] = std::string(buf);
-//	
-//	sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d\n",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
-//	metaData[std::string("changeDate")] = std::string(buf);
-//
-//	metaData[std::string("BrickletMetaData.fileCreatorName")] = WStringToString(brickletMetaData.fileCreatorName);
-//	metaData[std::string("BrickletMetaData.fileCreatorVersion")] = WStringToString(brickletMetaData.fileCreatorVersion);
-//	metaData[std::string("BrickletMetaData.userName")] = WStringToString(brickletMetaData.userName);
-//	metaData[std::string("BrickletMetaData.accountName")] = WStringToString(brickletMetaData.accountName);
-//
+	metaData.push_back(pMyData->getResultFilePath());
+	metaData.push_back(pMyData->getResultFileName());
+	metaData.push_back(anyTypeToString<int>(numberOfBricklets));
+	
+	sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
+	metaData.push_back(buf);
+
+	metaData.push_back(WStringToString(brickletMetaData.fileCreatorName));
+	metaData.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
+	metaData.push_back(WStringToString(brickletMetaData.userName));
+	metaData.push_back(WStringToString(brickletMetaData.accountName));
+
 	long dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
 	// create 2D textwave wave with count points
-	dimensionSizes[ROWS]=1; 
+	if(metaData.size() % 2 == 0){
+		dimensionSizes[ROWS]=metaData.size()/2;
+	}
+	else{
+		outputToHistory("BUG: wrong size of textwave contents");
+		return 0;
+	}
 	dimensionSizes[COLUMNS]=2;
 
 	waveHndl waveHandle;
@@ -768,25 +777,17 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 		return 0;	
 	}
 
-	sprintf(buf,"result file meta data %s",metaData.c_str());
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	ret = stringVectorToTextWave(metaData,waveHandle);
 
-	// acquire lock
-	int hState=MoveLockHandle(waveHandle);
+	if(ret != 0){
+		sprintf(buf,"stringVectorToTextWave returned %d",ret);
+		outputToHistory(buf);
+		p->result=ret;
+	}
+	else{
+		p->result = SUCCESS;
+	}
 
-	int mode=0;
-	Handle textDataHandle = NewHandle(metaData.size());
-
-	// FIXME use mode=2, manual p. 366
-	// write a function which takes a string vector and puts this into a textwave
-	//PutCStringInHandle(metaData.c_str(),textDataHandle);
-
-	ret = SetTextWaveData(waveHandle,mode,textDataHandle);
-
-	HSetState((Handle) waveHandle, hState);
-	DisposeHandle(textDataHandle);
-
-	p->result = SUCCESS;
 	return 0;
 }
 

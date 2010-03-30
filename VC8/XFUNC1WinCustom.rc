@@ -32,7 +32,7 @@ BEGIN
 		// variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls)
 	"checkForNewBricklets\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		FV_REF_TYPE | NT_FP64,			// parameter 1
 		FV_REF_TYPE | NT_FP64,			// parameter 2
 		NT_FP64,			// parameter 3
@@ -41,13 +41,13 @@ BEGIN
 	// variable closeResultFile()
 	"closeResultFile\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 	0,
 
 	// variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
 	"getAllBrickletData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		HSTRING_TYPE,			// parameter 1
 		NT_FP64,			// parameter 2
 	0,
@@ -55,7 +55,7 @@ BEGIN
 	// variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet)
 	"getAllBrickletMetaData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		HSTRING_TYPE,			// parameter 1
 		NT_FP64,			// parameter 2
 	0,
@@ -63,7 +63,7 @@ BEGIN
 	// variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
 	"getBrickletData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		HSTRING_TYPE,			// parameter 1
 		NT_FP64,			// parameter 2
 		NT_FP64,			// parameter 3
@@ -72,7 +72,7 @@ BEGIN
 	// variable getBrickletMetaData(variable brickletID, string metaData)
 	"getBrickletMetaData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		NT_FP64,			// parameter 1
 		HSTRING_TYPE,			// parameter 2
 	0,
@@ -80,29 +80,35 @@ BEGIN
 	// variable getBrickletRawData(variable brickletID, string dataWave)
 	"getBrickletRawData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		NT_FP64,			// parameter 1
 		HSTRING_TYPE,			// parameter 2
 	0,
 
+	// string getBugReportTemplate();
+	"getBugReportTemplate\0",
+	F_UTIL | F_EXTERNAL,			// Function category,
+		HSTRING_TYPE,			// Return value type.
+	0
+
 	// string getErrorMessage(variable errorCode)
 	"getErrorMessage\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	HSTRING_TYPE,				// Return value type.
+		HSTRING_TYPE,			// Return value type.
 		NT_FP64,			// parameter 1
 	0,
 
 	// variable getNumberOfBricklets(variable *totalNumberOfBricklets)
 	"getNumberOfBricklets\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		FV_REF_TYPE | NT_FP64,			// parameter 1
 	0,
 
 	// variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 	"getRangeBrickletData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		HSTRING_TYPE,			// parameter 1
 		NT_FP64,			// parameter 2
 		NT_FP64,			// parameter 3
@@ -112,7 +118,7 @@ BEGIN
 	// variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 	"getRangeBrickletMetaData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		HSTRING_TYPE,			// parameter 1
 		NT_FP64,			// parameter 2
 		NT_FP64,			// parameter 3
@@ -122,42 +128,42 @@ BEGIN
 	// variable getResultFileMetaData(string waveName)
 	"getResultFileMetaData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		HSTRING_TYPE,			// parameter 1
 	0,
 
 	// variable getResultFileName(string *filename)
 	"getResultFileName\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
 	0,
 
 	// variable getResultFilePath(string *absoluteFilePath)
 	"getResultFilePath\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
 	0,
 
 	// variable getVernissageVersion(string *vernissageVersion)
 	"getVernissageVersion\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
 	0,
 
 	// variable getXOPVersion(string *xopVersion)
 	"getXOPVersion\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
 	0,
 
 	// variable openResultFile(string absoluteFilePath, string fileName)
 	"openResultFile\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
+		NT_FP64,			// Return value type.
 		HSTRING_TYPE,			// parameter 1
 		HSTRING_TYPE,			// parameter 2
 	0,
@@ -165,4 +171,3 @@ BEGIN
 
 	0,								// NOTE: 0 required to terminate the resource.
 END
-

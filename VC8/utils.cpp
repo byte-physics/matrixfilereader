@@ -43,7 +43,7 @@ std::wstring CharPtrToWString(char* cStr){
 	return StringToWString(str);
 }
 
-void debugOutputToHistory(int level, char* str){
+void debugOutputToHistory(int level,const char* str){
 		
 		const char* formatString = "DEBUG %d: %s\r";
 
@@ -75,7 +75,7 @@ void debugOutputToHistory(int level, char* str){
 		}
 	}
 
-void outputToHistory(char *str){
+void outputToHistory(const char *str){
 
 		const char* formatString = "%s\r";	
 
@@ -101,9 +101,13 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	ASSERT_RETURN_ZERO(stringVector.size());
 
 	std::vector<long int> stringSizes;
-	long int totalSize=0;
 	char buf[ARRAY_SIZE];
+	int lockStateWave, ret, i;
 
+	long int offset;
+	long int totalSize=0;
+
+	// number of 32-bit integers (aka long int) is one more compared to the number of strings
 	const long int numEntriesPlusOne = stringVector.size()+1;
 
 	std::vector<std::string>::const_iterator it;
@@ -114,60 +118,58 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 
 	totalSize += numEntriesPlusOne*sizeof(long);
 
-	char *textPtr = (char*) NewPtr(totalSize);
-	if(MemError() || textPtr == NULL){
-		return -1;
+	Handle textHandle = NewHandle(totalSize);
+	if(MemError() || textHandle == NULL){
+		return NOMEM;
 	}
-	MemClear(textPtr,totalSize);
 
-	int i;
-	long int offset;
-
-	sprintf(buf,"totalSize of strings %d",GetPtrSize(textPtr));
+	sprintf(buf,"totalSize of strings %d",GetHandleSize(textHandle));
 	debugOutputToHistory(DEBUG_LEVEL,buf);
 
 	for(i=0; i < numEntriesPlusOne; i++){
 
-		if(i == 0){
+		if(i == 0){// position of the first string
 			offset = numEntriesPlusOne*sizeof(long);
 		}
-		else{
+		else{ // and of all the others
 			offset+=stringSizes[i-1];
 		}
-
 		sprintf(buf,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
 		debugOutputToHistory(DEBUG_LEVEL,buf);
-		
-		//debugOutputToHistory(DEBUG_LEVEL,"before offset memcpy");
 
-		// write offsets into textDataHandle
-		memcpy(textPtr+i*sizeof(long),&offset,sizeof(long));
-		//debugOutputToHistory(DEBUG_LEVEL,"after offset memcpy");
+		// write offsets
+		memcpy(*textHandle+i*sizeof(long),&offset,sizeof(long));
 
 		if(i < stringVector.size()){
 
 			sprintf(buf,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
 			debugOutputToHistory(DEBUG_LEVEL,buf);
 
-			// put string into textDataHandle
-			memcpy(textPtr+offset,stringVector[i].c_str(),stringSizes[i]);
-
-			//debugOutputToHistory(DEBUG_LEVEL,"after string memcpy");
+			// write strings
+			memcpy(*textHandle+offset,stringVector[i].c_str(),stringSizes[i]);
 		}
 	}
-	//debugOutputToHistory(DEBUG_LEVEL,"after memcpy loop");
+
+	// mode = 2 defines the format of the handle contents to
+	// offsetToFirstString
+	// offsetToSecondString
+	// ...
+	// offsetToPositionAfterLastString
+	// firstString
+	//...
+	int mode=2;
 
 	// acquire waveHandle lock
-	int hState=MoveLockHandle(waveHandle);
-	int ret = SetTextWaveData(waveHandle,2,&textPtr);
+	lockStateWave=MoveLockHandle(waveHandle);
+	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
 	sprintf(buf,"SetTextWaveData returned %d",ret);
 	debugOutputToHistory(DEBUG_LEVEL,buf);
 
 	// release waveHandle lock
-	HSetState((Handle) waveHandle, hState);
+	HSetState(waveHandle, lockStateWave);
 
-	DisposePtr((Ptr) textPtr);
+	DisposeHandle(textHandle);
 
 	return ret;
 }

@@ -63,7 +63,7 @@ void myData::closeSession(){
 
 std::string myData::getVernissageVersion(){
 
-	std::string version= "Unknown version";
+	std::string version= "unknown";
 
 	if(m_VernissageSession != NULL){
 	

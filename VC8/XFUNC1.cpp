@@ -304,15 +304,6 @@ static int getXOPVersion(getXOPVersionParams *p){
 
 	p->result = UNKNOWN_ERROR;
 
-	ASSERT_RETURN_ZERO(pMyData);
-	if(!pMyData->resultFileOpen()){
-		p->result = NO_FILE_OPEN;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
 	if(p->xopVersion == NULL){
 		p->result = WRONG_PARAMETER;
 		return 0;
@@ -675,7 +666,61 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	return 0;
 }
 
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getBugReportTemplateParams{
+	Handle  result;	
+};
+typedef struct getBugReportTemplateParams getBugReportTemplateParams;
+#pragma pack()
 
+// string getBugReportTemplate();
+static int getBugReportTemplate(getBugReportTemplateParams *p){
+
+	std::string str;
+
+	// get windows version
+	// see http://msdn.microsoft.com/en-us/library/ms724451%28VS.85%29.aspx
+    OSVERSIONINFO osvi;
+ 
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    BOOL retValue = GetVersionEx(&osvi);
+
+	str.append("####\r");
+	// non zero is success here
+	if(retValue != 0){
+		str.append("Windows version: " + anyTypeToString<int>(osvi.dwMajorVersion) + "." + anyTypeToString<int>(osvi.dwMinorVersion) + " (Build " + anyTypeToString<int>(osvi.dwBuildNumber) + ")\r" );
+	}
+	else{
+		str.append("Windows version: unknown\r");
+	}
+
+	#if defined(_MSC_VER)
+		str.append("Visual Studio version: " + anyTypeToString<int>(_MSC_VER) + "\r");
+	#else
+		str.append("Unknown compiler\r");
+	#endif
+	str.append("Igor Pro Version: " + anyTypeToString<int>(igorVersion) + "\r");
+	if(pMyData != NULL){
+		str.append("Vernissage version: " + pMyData->getVernissageVersion() + "\r");
+	}
+	else{
+		str.append("Venissage version: Can't access internal data\r");
+	}
+	str.append("XOP version: " + std::string(myVersion) + "\r");
+	str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
+	str.append("\r");
+	str.append("Your Name:\r");
+	str.append("Bug description:\r");
+	str.append("####\r");
+
+	p->result = NewHandle(str.size());
+	PutCStringInHandle(str.c_str(),p->result);
+
+	outputToHistory(str.c_str());
+	return 0;
+}
 
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
@@ -714,27 +759,23 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	}
 
 	std::vector<std::string> metaData;
+	char buf[ARRAY_SIZE];
+	waveHndl waveHandle;
+	int overwrite=0;
 
- //*		- filename
- //*		- filepath
- //*		- BrickletMetaData.fileCreatorName
- //*		- BrickletMetaData.fileCreatorVersion
- //*		- BrickletMetaData.userName
- //*		- BrickletMetaData.accountName
- //*		- totalNumberOfBricklets
- //*		- changeDate (this will have the timestamp of the newest bricklet)
-
+	// use the timestamp of the last bricklet as dateOfLastChange
 	int numberOfBricklets = pSession->getBrickletCount();
 	void* pBricklet = pMyData->getBrickletPointerFromMap(numberOfBricklets);
 	tm ctime = pSession->getCreationTimestamp(pBricklet);
-	char buf[ARRAY_SIZE];
+
 
 	Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
 
 	metaData.push_back("filePath");
 	metaData.push_back("fileName");
 	metaData.push_back("totalNumberOfBricklets");
-	metaData.push_back("changeDate");
+	metaData.push_back("dateOfLastChange");
+	metaData.push_back("timeStampOfLastChange");
 	metaData.push_back("BrickletMetaData.fileCreatorName");
 	metaData.push_back("BrickletMetaData.fileCreatorVersion");
 	metaData.push_back("BrickletMetaData.userName");
@@ -747,6 +788,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
 	metaData.push_back(buf);
 
+	metaData.push_back(anyTypeToString<time_t>(mktime(&ctime)));
 	metaData.push_back(WStringToString(brickletMetaData.fileCreatorName));
 	metaData.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
 	metaData.push_back(WStringToString(brickletMetaData.userName));
@@ -755,7 +797,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	long dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-	// create 2D textwave wave with count points
+	// create 2D textwave with metaData.size()/2 rows and 2 columns
 	if(metaData.size() % 2 == 0){
 		dimensionSizes[ROWS]=metaData.size()/2;
 	}
@@ -765,9 +807,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	}
 	dimensionSizes[COLUMNS]=2;
 
-	waveHndl waveHandle;
-	int overwrite=0;
-
+	// NULL says that we want to create the wave in the current datafolder
 	ret = MDMakeWave(&waveHandle,metaDataWaveName,NULL,dimensionSizes,TEXT_WAVE_TYPE,overwrite);
 
 	if(ret == NAME_WAV_CONFLICT){
@@ -777,6 +817,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 		return 0;	
 	}
 
+	ASSERT_RETURN_ZERO(waveHandle);
 	ret = stringVectorToTextWave(metaData,waveHandle);
 
 	if(ret != 0){
@@ -790,7 +831,6 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
 	return 0;
 }
-
 
 static long RegisterFunction()
 {
@@ -825,33 +865,36 @@ static long RegisterFunction()
 			returnValue = (long) getBrickletRawData;
 			break;
 		case 7:						
-			returnValue = (long) getErrorMessage;
+			returnValue = (long) getBugReportTemplate;
 			break;
 		case 8:						
-			returnValue = (long) getNumberOfBricklets;
+			returnValue = (long) getErrorMessage;
 			break;
 		case 9:						
-			returnValue = (long) getRangeBrickletData;
+			returnValue = (long) getNumberOfBricklets;
 			break;
 		case 10:						
-			returnValue = (long) getRangeBrickletMetaData;
+			returnValue = (long) getRangeBrickletData;
 			break;
 		case 11:						
-			returnValue = (long) getResultFileMetaData;
+			returnValue = (long) getRangeBrickletMetaData;
 			break;
 		case 12:						
-			returnValue = (long) getResultFileName;
+			returnValue = (long) getResultFileMetaData;
 			break;
 		case 13:						
-			returnValue = (long) getResultFilePath;
+			returnValue = (long) getResultFileName;
 			break;
 		case 14:						
-			returnValue = (long) getVernissageVersion;
+			returnValue = (long) getResultFilePath;
 			break;
 		case 15:						
-			returnValue = (long) getXOPVersion;
+			returnValue = (long) getVernissageVersion;
 			break;
 		case 16:						
+			returnValue = (long) getXOPVersion;
+			break;
+		case 17:						
 			returnValue = (long) openResultFile;
 			break;
 

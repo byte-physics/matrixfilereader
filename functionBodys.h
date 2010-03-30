@@ -7,6 +7,7 @@ static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p);
 static int getBrickletData(getBrickletDataParams *p);
 static int getBrickletMetaData(getBrickletMetaDataParams *p);
 static int getBrickletRawData(getBrickletRawDataParams *p);
+static int getBugReportTemplate(getBugReportTemplateParams *p);
 static int getErrorMessage(getErrorMessageParams *p);
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p);
 static int getRangeBrickletData(getRangeBrickletDataParams *p);

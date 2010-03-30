@@ -59,15 +59,15 @@ typedef WAVE_TYPE FP64WAVE;
  *	@endcode
  * - BrickletIDs are 1-based and range from 1 to totalNumberOfBricklets. It is guaranteed that these IDs do not change even after closing and opening the file again.
  * - result file meta data:
- *		- filename
- *		- filepath
+ *		- filenNme
+ *		- filePath
  *		- BrickletMetaData.fileCreatorName
  *		- BrickletMetaData.fileCreatorVersion
  *		- BrickletMetaData.userName
  *		- BrickletMetaData.accountName
  *		- totalNumberOfBricklets
- *		- changeDate (this will have the timestamp of the newest bricklet)
-*/
+ *		- timeStampOfLastChange (this will have the timestamp of the newest bricklet)
+ *		- dateOfLastChange		(timeStampOfLastChange in human readable form)
 
 /** 
  *  Return a human readable error string, applications should show the user this string instead of the error code
@@ -123,7 +123,7 @@ variable getVernissageVersion(string *vernissageVersion);
 */
 variable getNumberOfBricklets(variable *totalNumberOfBricklets);
 
-/**
+/** IMPLEMENTED
  *  Get the result file meta data. See general remarks about textwaves.
  *  @param[out] waveName  name for a textwave (nx2) dims holding all relevant information of the complete experiment/result file. In case the wavename is empty "resultFileMetaData" is used. The wave may not exist prior to calling this function.
  *  @return SUCCESS | NO_FILE_OPEN | WAVE_EXIST
@@ -224,3 +224,8 @@ variable getAllBrickletMetaData(string baseName, variable separateFolderForEachB
 */ 
 variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);
 
+/** IMPLEMENTED
+ *  Get some useful information for bug reporting. Prints the information to the Igor Pro History and into the returned string
+ *  @return string with information to be included into bug reports
+*/ 
+string getBugReportTemplate();

@@ -57,6 +57,12 @@ BEGIN
 		HSTRING_TYPE,			// parameter 2
 	0,
 
+	// string getBugReportTemplate();
+	"getBugReportTemplate\0",
+	F_UTIL | F_EXTERNAL,			// Function category,
+	HSTRING_TYPE,				// Return value type.
+	0,
+
 	// string getErrorMessage(variable errorCode)
 	"getErrorMessage\0",
 	F_UTIL | F_EXTERNAL,			// Function category,

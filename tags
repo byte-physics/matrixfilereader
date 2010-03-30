@@ -11,6 +11,7 @@ getAllBrickletMetaData	api-layout.h	/^variable getAllBrickletMetaData(string bas
 getBrickletData	api-layout.h	/^variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID);$/;"	p
 getBrickletMetaData	api-layout.h	/^variable getBrickletMetaData(variable brickletID, string metaData);$/;"	p
 getBrickletRawData	api-layout.h	/^variable getBrickletRawData(variable brickletID, string dataWave);$/;"	p
+getBugReportTemplate	api-layout.h	/^string getBugReportTemplate();/;"	p
 getErrorMessage	api-layout.h	/^string getErrorMessage(variable errorCode);$/;"	p
 getNumberOfBricklets	api-layout.h	/^variable getNumberOfBricklets(variable *totalNumberOfBricklets);$/;"	p
 getRangeBrickletData	api-layout.h	/^variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p

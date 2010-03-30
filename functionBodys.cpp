@@ -13,7 +13,7 @@ typedef struct checkForNewBrickletsParams checkForNewBrickletsParams;
 // variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls)
 static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -43,7 +43,7 @@ typedef struct closeResultFileParams closeResultFileParams;
 // variable closeResultFile()
 static int closeResultFile(closeResultFileParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -75,7 +75,7 @@ typedef struct getAllBrickletDataParams getAllBrickletDataParams;
 // variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletData(getAllBrickletDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -107,7 +107,7 @@ typedef struct getAllBrickletMetaDataParams getAllBrickletMetaDataParams;
 // variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -140,7 +140,7 @@ typedef struct getBrickletDataParams getBrickletDataParams;
 // variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
 static int getBrickletData(getBrickletDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -172,7 +172,7 @@ typedef struct getBrickletMetaDataParams getBrickletMetaDataParams;
 // variable getBrickletMetaData(variable brickletID, string metaData)
 static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -204,7 +204,37 @@ typedef struct getBrickletRawDataParams getBrickletRawDataParams;
 // variable getBrickletRawData(variable brickletID, string dataWave)
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getBugReportTemplateParams{
+	Handle  result;	
+};
+typedef struct getBugReportTemplateParams getBugReportTemplateParams;
+#pragma pack()
+
+// string getBugReportTemplate();
+static int getBugReportTemplate(getBugReportTemplateParams *p){
+
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -235,7 +265,7 @@ typedef struct getErrorMessageParams getErrorMessageParams;
 // string getErrorMessage(variable errorCode)
 static int getErrorMessage(getErrorMessageParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -266,7 +296,7 @@ typedef struct getNumberOfBrickletsParams getNumberOfBrickletsParams;
 // variable getNumberOfBricklets(variable *totalNumberOfBricklets)
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -300,7 +330,7 @@ typedef struct getRangeBrickletDataParams getRangeBrickletDataParams;
 // variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -334,7 +364,7 @@ typedef struct getRangeBrickletMetaDataParams getRangeBrickletMetaDataParams;
 // variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -365,7 +395,7 @@ typedef struct getResultFileMetaDataParams getResultFileMetaDataParams;
 // variable getResultFileMetaData(string waveName)
 static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -396,7 +426,7 @@ typedef struct getResultFileNameParams getResultFileNameParams;
 // variable getResultFileName(string *filename)
 static int getResultFileName(getResultFileNameParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -427,7 +457,7 @@ typedef struct getResultFilePathParams getResultFilePathParams;
 // variable getResultFilePath(string *absoluteFilePath)
 static int getResultFilePath(getResultFilePathParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -458,7 +488,7 @@ typedef struct getVernissageVersionParams getVernissageVersionParams;
 // variable getVernissageVersion(string *vernissageVersion)
 static int getVernissageVersion(getVernissageVersionParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -489,7 +519,7 @@ typedef struct getXOPVersionParams getXOPVersionParams;
 // variable getXOPVersion(string *xopVersion)
 static int getXOPVersion(getXOPVersionParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -521,7 +551,7 @@ typedef struct openResultFileParams openResultFileParams;
 // variable openResultFile(string absoluteFilePath, string fileName)
 static int openResultFile(openResultFileParams *p){
 
-	p->result = UNKOWN_ERROR;
+	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -576,33 +606,36 @@ static long RegisterFunction()
 			returnValue = (long) getBrickletRawData;
 			break;
 		case 7:						
-			returnValue = (long) getErrorMessage;
+			returnValue = (long) getBugReportTemplate;
 			break;
 		case 8:						
-			returnValue = (long) getNumberOfBricklets;
+			returnValue = (long) getErrorMessage;
 			break;
 		case 9:						
-			returnValue = (long) getRangeBrickletData;
+			returnValue = (long) getNumberOfBricklets;
 			break;
 		case 10:						
-			returnValue = (long) getRangeBrickletMetaData;
+			returnValue = (long) getRangeBrickletData;
 			break;
 		case 11:						
-			returnValue = (long) getResultFileMetaData;
+			returnValue = (long) getRangeBrickletMetaData;
 			break;
 		case 12:						
-			returnValue = (long) getResultFileName;
+			returnValue = (long) getResultFileMetaData;
 			break;
 		case 13:						
-			returnValue = (long) getResultFilePath;
+			returnValue = (long) getResultFileName;
 			break;
 		case 14:						
-			returnValue = (long) getVernissageVersion;
+			returnValue = (long) getResultFilePath;
 			break;
 		case 15:						
-			returnValue = (long) getXOPVersion;
+			returnValue = (long) getVernissageVersion;
 			break;
 		case 16:						
+			returnValue = (long) getXOPVersion;
+			break;
+		case 17:						
 			returnValue = (long) openResultFile;
 			break;
 

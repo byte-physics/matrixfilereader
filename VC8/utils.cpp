@@ -208,6 +208,12 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		return WAVE_EXIST;
 	}
 
+	if(ret != 0 ){
+		sprintf(buf,"Error %d in creating wave %s.",ret, waveName);
+		outputToHistory(buf);
+		return UNKNOWN_ERROR;
+	}
+
 	ASSERT_RETURN_MINUSONE(waveHandle);
 
 	// append the strings from the second column at the end of the first column strings

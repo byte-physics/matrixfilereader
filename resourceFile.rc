@@ -41,20 +41,20 @@ BEGIN
 		NT_FP64,			// parameter 3
 	0,
 
-	// variable getBrickletMetaData(variable brickletID, string metaData)
+	// variable getBrickletMetaData(string baseName, variable brickletID)
 	"getBrickletMetaData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,				// Return value type.
-		NT_FP64,			// parameter 1
-		HSTRING_TYPE,			// parameter 2
+		HSTRING_TYPE,			// parameter 1
+		NT_FP64,			// parameter 2
 	0,
 
-	// variable getBrickletRawData(variable brickletID, string dataWave)
+	// variable getBrickletRawData(string baseName, variable brickletID)
 	"getBrickletRawData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,				// Return value type.
-		NT_FP64,			// parameter 1
-		HSTRING_TYPE,			// parameter 2
+		HSTRING_TYPE,			// parameter 1
+		NT_FP64,			// parameter 2
 	0,
 
 	// string getBugReportTemplate();

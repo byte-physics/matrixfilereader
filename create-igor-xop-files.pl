@@ -12,7 +12,7 @@ my $argc = @ARGV;          # get the number of arguments
 my ($line,@array,$funcSig, $returnType,@argsName,@argsType,@argsPointer,$rest,$funcName,@args,$arg,$i,@tmp,$resourceContent);
 my ($resourceParamType,$resourceReturnType,$parameterLine,$allParameters,$functions,$parameter,$allFunctions,$argNumber,$funcIndex,$allCaseLines);
 my ($registerFunctionBodyContent,$caseLine,$allCppParameters, $allFunctionSkeletonsi, $cppParamType,$functionSkeleton,$allFunctionSkeletons);
-my ($cppResultType,$allhFileFuncSig,$hFileFuncSig);
+my ($cppResultType,$allhfileFuncSig,$hfileFuncSig,$hfileSkeleton);
 
 if($argc < 1){
 	print "Too less arguments";
@@ -69,13 +69,19 @@ our $registerFunctionCaseTemplate = <<EOF;
 			break;
 EOF
 
-our $functionBodyTemplate= <<EOF;
+our $hfileFunctionTemplate = <<EOF;
+
+
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct %%funcName%%Params{
-%%functionBodyParamterLine%%	
+%%functionParamterLine%%
 };
 typedef struct %%funcName%%Params %%funcName%%Params;
 #pragma pack()
+
+EOF
+
+our $functionBodyTemplate= <<EOF;
 
 // %%funcSig%%
 static int %%funcName%%(%%funcName%%Params *p){
@@ -108,7 +114,7 @@ $returnType="";
 $resourceContent="";
 $funcIndex=0;
 $allCaseLines="";
-$allhFileFuncSig="";
+$allhfileFuncSig="";
 
 while($line = <IN>){
 
@@ -196,11 +202,9 @@ while($line = <IN>){
 		# cpp files
 
 		$cppResultType = &convertParameterTypeForCPPFile($returnType,0);
-		$allCppParameters .= "\t$cppResultType" . "result;";
 		$functionSkeleton = $functionBodyTemplate;
 		$functionSkeleton =~ s/%%funcName%%/$funcName/g;
 		$functionSkeleton =~ s/%%funcSig%%/$funcSig/g;
-		$functionSkeleton =~ s/%%functionBodyParamterLine%%/$allCppParameters/g;
 		$allFunctionSkeletons .= $functionSkeleton;
 
 		$caseLine = $registerFunctionCaseTemplate;
@@ -211,9 +215,14 @@ while($line = <IN>){
 		$funcIndex++;
 
 		# h file
-		
-		$hFileFuncSig = "static int $funcName($funcName" . "Params *p);\n";
-		$allhFileFuncSig .= $hFileFuncSig;
+		$allCppParameters .= "\t$cppResultType" . "result;";
+		$hfileSkeleton = $hfileFunctionTemplate;
+		$hfileSkeleton =~ s/%%functionParamterLine%%/$allCppParameters/g;
+		$hfileSkeleton =~ s/%%funcName%%/$funcName/g;
+
+		$hfileFuncSig = "static int $funcName($funcName" . "Params *p);\n";
+		$allhfileFuncSig .= $hfileSkeleton;
+		$allhfileFuncSig .= $hfileFuncSig;
 	}
 }
 	close(IN);
@@ -242,7 +251,7 @@ while($line = <IN>){
 	open(OUT,">functionBodys.h") or die  "can not open file";
 
 	print OUT "\n\n";
-	print OUT $allhFileFuncSig;
+	print OUT $allhfileFuncSig;
 	print OUT "\n\n";
 
 	close(OUT);

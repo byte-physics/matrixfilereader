@@ -172,7 +172,8 @@ variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,
 */ 
 // variable getAllBrickletDimension(FP64WAVE brickletDimension);
 
-/** Get the processed data for the bricklet. Processed here means it is put in the correct form as described in the Vernissage manual "Accessing raw data" p. 40. @b No other processing is done. The waves for each bricklet will 32bit integer waves with the appropriate dimension put into the current datafolder. In case a wave exists, the function returns WAVE_EXIST. In case you don't get what you expect here (or you get the return value INTERNAL_ERROR_CONVERTING_DATA), try getBrickletRawData() and do the low-level data twiddling yourself. For this you definitely have to consult the Vernissage Manual. In case of INTERNAL_ERROR_CONVERTING_DATA please submit a bugreport including a testcase which shows the error.
+/** IMPLEMENTED as wrapper to getRangeBrickletData
+ * Get the processed data for the bricklet. Processed here means it is put in the correct form as described in the Vernissage manual "Accessing raw data" p. 40. @b No other processing is done. The waves for each bricklet will 32bit integer waves with the appropriate dimension put into the current datafolder. In case a wave exists, the function returns WAVE_EXIST. In case you don't get what you expect here (or you get the return value INTERNAL_ERROR_CONVERTING_DATA), try getBrickletRawData() and do the low-level data twiddling yourself. For this you definitely have to consult the Vernissage Manual. In case of INTERNAL_ERROR_CONVERTING_DATA please submit a bugreport including a testcase which shows the error.
  * @param[in] basename first part of the wavename which will be created.
  * The wavenames are in general of the form <baseName>_<brickletID>_<dataType>, in case the basename is empty, the wavename will be X_<brickletID>_<dataType>. The string dataType is needed in case the number of datawaves is greater than one (usually the case for topographic data). If the number of data waves is one, the wavenames will be <baseName>_<brickletID>. 
  * @param[in]  separateFolderForEachBricklet must be 0 or 1, create a subfolder in dataFolderPath named as the X_brickletID for each bricklet
@@ -181,7 +182,8 @@ variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,
 */
 variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID);
 
-/** Get processed data for a few bricklets, might be handy together with checkForNewBricklets()
+/**
+ * Get processed data for a few bricklets, might be handy together with checkForNewBricklets()
  * @param[in] startBrickletID brickletID of the first bricklet to load, must be greater or equal than 1
  * @param[in] endBrickletID brickletID of the last bricklet to load, must be smaller or equal to the totalNumberOfBricklets
  * @return SUCCESS | INVALID_RANGE | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
@@ -189,7 +191,8 @@ variable getBrickletData(string baseName, variable separateFolderForEachBricklet
 */ 
 variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);
 
-/** Get processed data for all bricklets of the result file.  Be sure to call checkForNewBricklets() before if you want to be sure that you catch all bricklets created until now.
+/** IMPLEMENTED as wrapper to getRangeBrickletData 
+ * Get processed data for all bricklets of the result file.  Be sure to call checkForNewBricklets() before if you want to be sure that you catch all bricklets created until now.
  * @return SUCCESS  | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE | INTERNAL_ERROR_CONVERTING_DATA
  * @sa getRangeBrickletData()
  * @sa getBrickletData()
@@ -198,27 +201,30 @@ variable getAllBrickletData(string baseName, variable separateFolderForEachBrick
 
 /** IMPLEMENTED
  * Get the raw data without doing any data interpretation. Useful if getBrickletData() returns rubbish or if it returns INTERNAL_ERROR_CONVERTING_DATA. You should have a deep look into the vernissage manual before using this function.
+ * @param[in] 	baseName name of a wave to put the raw data into. The wave may not exist before calling and it will be created in the current datafolder. The format is described in ???
  * @param[in]  	brickletID
- * @param[out] 	dataWave name of a wave to put the raw data into. The wave may not exist before calling and it will be created in the current datafolder.
- * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST
+  * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST
  * */
-variable getBrickletRawData(variable brickletID, string dataWave);
+variable getBrickletRawData(string baseName, variable brickletID);
 
-/** Return all meta data of the bricklet.
+/** IMPLEMENTED as wrapper to getRangeBrickletMetaData
+ * Return all meta data of the bricklet.
  * @param[in]  brickletID
- * @param[out] metaDataWave name of a wave to put the bricklet meta data into. The wave may not exist before calling and it will be created in the current datafolder.
+ * @param[int] baseName name of a wave to put the bricklet meta data into. The wave may not exist before calling and it will be created in the current datafolder. The format is described in ???
  * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST
 */ 
-variable getBrickletMetaData(variable brickletID, string metaData);
+variable getBrickletMetaData(string baseName, variable brickletID);
 
-/** Return the meta data for all bricklets
+/** IMPLEMENTED as wrapper to getRangeBrickletMetaData
+ * Return the meta data for all bricklets
  * @return SUCCESS | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST
  * @sa getAllBrickletData()
  * @sa getBrickletData()
 */ 
 variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet);
 
-/** Return the meta data for the given range of bricklets
+/**
+ * Return the meta data for the given range of bricklets
  * @sa getRangeBrickletData()
  * @return SUCCESS | INVALID_RANGE | WAVE_EXIST | NO_FILE_OPEN | EMPTY_RESULTFILE
 */ 

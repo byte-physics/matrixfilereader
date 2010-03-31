@@ -758,75 +758,51 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 		return 0;
 	}
 
-	std::vector<std::string> metaData;
+	std::vector<std::string> keys,values;
 	char buf[ARRAY_SIZE];
-	waveHndl waveHandle;
-	int overwrite=0;
 
 	// use the timestamp of the last bricklet as dateOfLastChange
 	int numberOfBricklets = pSession->getBrickletCount();
 	void* pBricklet = pMyData->getBrickletPointerFromMap(numberOfBricklets);
 	tm ctime = pSession->getCreationTimestamp(pBricklet);
 
-
 	Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
 
-	metaData.push_back("filePath");
-	metaData.push_back("fileName");
-	metaData.push_back("totalNumberOfBricklets");
-	metaData.push_back("dateOfLastChange");
-	metaData.push_back("timeStampOfLastChange");
-	metaData.push_back("BrickletMetaData.fileCreatorName");
-	metaData.push_back("BrickletMetaData.fileCreatorVersion");
-	metaData.push_back("BrickletMetaData.userName");
-	metaData.push_back("BrickletMetaData.accountName");
+	keys.push_back("filePath");
+	values.push_back(pMyData->getResultFilePath());
 
-	metaData.push_back(pMyData->getResultFilePath());
-	metaData.push_back(pMyData->getResultFileName());
-	metaData.push_back(anyTypeToString<int>(numberOfBricklets));
-	
+	keys.push_back("fileName");
+	values.push_back(pMyData->getResultFileName());
+
+	keys.push_back("totalNumberOfBricklets");
+	values.push_back(anyTypeToString<int>(numberOfBricklets));
+
+	keys.push_back("dateOfLastChange");
 	sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
-	metaData.push_back(buf);
+	values.push_back(buf);
 
-	metaData.push_back(anyTypeToString<time_t>(mktime(&ctime)));
-	metaData.push_back(WStringToString(brickletMetaData.fileCreatorName));
-	metaData.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
-	metaData.push_back(WStringToString(brickletMetaData.userName));
-	metaData.push_back(WStringToString(brickletMetaData.accountName));
+	keys.push_back("timeStampOfLastChange");
+	values.push_back(anyTypeToString<time_t>(mktime(&ctime)));
 
-	long dimensionSizes[MAX_DIMENSIONS+1];
-	MemClear(dimensionSizes, sizeof(dimensionSizes));
+	keys.push_back("Brickletkeys.fileCreatorName");
+	values.push_back(WStringToString(brickletMetaData.fileCreatorName));
 
-	// create 2D textwave with metaData.size()/2 rows and 2 columns
-	if(metaData.size() % 2 == 0){
-		dimensionSizes[ROWS]=metaData.size()/2;
-	}
-	else{
-		outputToHistory("BUG: wrong size of textwave contents");
-		return 0;
-	}
-	dimensionSizes[COLUMNS]=2;
+	keys.push_back("Brickletkeys.fileCreatorVersion");
+	values.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
 
-	// NULL says that we want to create the wave in the current datafolder
-	ret = MDMakeWave(&waveHandle,metaDataWaveName,NULL,dimensionSizes,TEXT_WAVE_TYPE,overwrite);
+	keys.push_back("Brickletkeys.userName");
+	values.push_back(WStringToString(brickletMetaData.userName));
 
-	if(ret == NAME_WAV_CONFLICT){
-		sprintf(buf,"Wave %s already exists.",metaDataWaveName);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
-		p->result = WAVE_EXIST;
-		return 0;	
-	}
+	keys.push_back("Brickletkeys.accountName");
+	values.push_back(WStringToString(brickletMetaData.accountName));
 
-	ASSERT_RETURN_ZERO(waveHandle);
-	ret = stringVectorToTextWave(metaData,waveHandle);
+	ret = createAndFillTextWave(keys,values,metaDataWaveName);
 
 	if(ret != 0){
-		sprintf(buf,"stringVectorToTextWave returned %d",ret);
+		sprintf(buf,"internal error (%d) in createAndFillTextWave ",ret);
 		outputToHistory(buf);
-		p->result=ret;
-	}
-	else{
-		p->result = SUCCESS;
+		p->result = ret;
+		return 0;
 	}
 
 	return 0;

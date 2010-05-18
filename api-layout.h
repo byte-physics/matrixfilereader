@@ -22,13 +22,14 @@ typedef WAVE_TYPE FP64WAVE;
  * - TODO make function names more distinct, maybe prefix with "matrixReader_"
  * - TODO document dataTypes in getBrickletData() properly
  * - TODO add Igor code for errorCode struct
- * - TODO The exact strings for the dataTypes are not yet determined.
+ * - TODO do we really need UNKNOWN_ERROR
+ * - Add wave notes stuff
 */
 
  /** @mainpage General Remarks
  * - The data types "string" and "variable" denote the Igor Pro data types 
- * - All functions return a floating point value as error code. This error code is either zero (everything is okay) or non-zero in case something went wrong. In this manual these error codes are denoted by human readable strings. See the errorCode struct for the numeric value.
- *  This means the functions can be called in Igor like
+ * - All functions return a floating point value as error code. This error code is either zero (everything is okay) or non-zero in case something went wrong. In this manual these error codes are denoted by human readable strings. See the errorCode struct in error-codes.h for the numeric value. The reason it is a floating point is due to Igor Pro XOP limitations
+ *  These API functions can be called in Igor like
  *  @code
  *  if( openResultFile() == errorCode.SUCCESS )
  *  	// call succeeded
@@ -36,7 +37,7 @@ typedef WAVE_TYPE FP64WAVE;
  *	// do error handling
  *  endif
  *  @endcode
- * - For rare cases the error code UNKNOWN_ERROR might be returned. Obviously in this case something went really badly wrong and the XOP does not know why
+ * - For rare cases the error code UNKNOWN_ERROR might be returned. Obviously in this case something went really badly wrong and the XOP does not know why.
  * - All waves hold wave notes of the form:
  *   	@code
  *   	xopVersion=0.1
@@ -52,14 +53,11 @@ typedef WAVE_TYPE FP64WAVE;
  *	| key4 	| value4|
  *	| key1 	| value1|
  *	| key2 	| value2|
- *	| key3 	| value3|
- *	|      	|      	| <- last entry because the whole row is empty
- *	|      	|      	| <- empty entries (their number should be considered unknown)
- *	|    	|      	|
+ *	| key3 	| value3|  <- last entry because
  *	@endcode
- * - BrickletIDs are 1-based and range from 1 to totalNumberOfBricklets. It is guaranteed that these IDs do not change even after closing and opening the file again.
- * - result file meta data:
- *		- filenNme
+ * - BrickletIDs are 1-based and range from 1 to totalNumberOfBricklets. It is guaranteed that these IDs do not change even after closing and opening the result file again.
+ * - Result file keys for metadata textwave:
+ *		- filenName
  *		- filePath
  *		- BrickletMetaData.fileCreatorName
  *		- BrickletMetaData.fileCreatorVersion
@@ -67,7 +65,8 @@ typedef WAVE_TYPE FP64WAVE;
  *		- BrickletMetaData.accountName
  *		- totalNumberOfBricklets
  *		- timeStampOfLastChange (this will have the timestamp of the newest bricklet)
- *		- dateOfLastChange		(timeStampOfLastChange in human readable form)
+ *		- dateOfLastChange	(timeStampOfLastChange in human readable form)
+*/
 
 /** 
  *  Return a human readable error string, applications should show the user this string instead of the error code
@@ -93,40 +92,40 @@ variable closeResultFile();
 
 /** IMPLEMENTED
  *  @param[out] filename of the opened result file
- *  @return SUCCESS | NO_FILE_OPEN | EMPTY_PARAMETER
+ *  @return SUCCESS | NO_FILE_OPEN | WRONG_PARAMETER
 */ 
 variable getResultFileName(string *filename);
 
 /** IMPLEMENTED
  *  @param[out] absoluteFilePath absolute path of the opened result file
- *  @return SUCCESS | NO_FILE_OPEN | EMPTY_PARAMETER
+ *  @return SUCCESS | NO_FILE_OPEN | WRONG_PARAMETER
 */  
 variable getResultFilePath(string *absoluteFilePath);
 
 /** IMPLEMENTED
  * Get the version of this XOP. The version number has the form: "<digit>.<digit><digit>"
  * @param[out] xopVersion
- * @return SUCCESS | EMPTY_PARAMETER
+ * @return SUCCESS | WRONG_PARAMETER
 */ 
-variable getXOPVersion(string *xopVersion);
+variable getXOPVersion(variable *xopVersion);
 
 /** IMPLEMENTED
  * Get the vernissage DLL version. It returns the version "x.y" from part of the registry key HKEY_LOCAL_MACHINE\Software\Omicron NanoTechnology\Vernissage\Vx.y\Main\InstallDirectory.
  * @param[out] vernissageVersion 
- * @return SUCCESS| EMPTY_PARAMETER
+ * @return SUCCESS| WRONG_PARAMETER
 */
-variable getVernissageVersion(string *vernissageVersion);
+variable getVernissageVersion(variable *vernissageVersion);
 
 /** IMPLEMENTED
  *  @param[out] totalNumberOfBricklets total number of bricklets of the result file
- *  @return SUCCESS | NO_FILE_OPEN | EMPTY_RESULTFILE| EMPTY_PARAMETER
+ *  @return SUCCESS | NO_FILE_OPEN | EMPTY_RESULTFILE| WRONG_PARAMETER
 */
 variable getNumberOfBricklets(variable *totalNumberOfBricklets);
 
 /** IMPLEMENTED
  *  Get the result file meta data. See general remarks about textwaves.
- *  @param[out] waveName  name for a textwave (nx2) dims holding all relevant information of the complete experiment/result file. In case the wavename is empty "resultFileMetaData" is used. The wave may not exist prior to calling this function.
- *  @return SUCCESS | NO_FILE_OPEN | WAVE_EXIST
+ *  @param[out] waveName  name for a textwave (nx2) dims holding all relevant information of the complete experiment/result file.
+ *  @return SUCCESS | NO_FILE_OPEN | WAVE_EXIST | WRONG_PARAMETER
 */
 variable getResultFileMetaData(string waveName);
 
@@ -135,7 +134,7 @@ variable getResultFileMetaData(string waveName);
  * @param[out] 	startBrickletID first new brickletID
  * @param[out] 	endBrickletID last new brickletID
  * @param[in]  	rememberCalls can be 1 (true) or 0 (false). If true, the call to  checkForNewBricklets() is internally remembered and succesive calls to it only return sucessfully, if the result file changed again. Useful for checking for updates in an endless loop.
- * @return SUCCESS | NO_NEW_BRICKLETS | NO_FILE_OPEN
+ * @return SUCCESS | NO_NEW_BRICKLETS | NO_FILE_OPEN | WRONG_PARAMETER
  */
 variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls);
 
@@ -232,6 +231,6 @@ variable getRangeBrickletMetaData(string baseName,variable separateFolderForEach
 
 /** IMPLEMENTED
  *  Get some useful information for bug reporting. Prints the information to the Igor Pro History and into the returned string
- *  @return string with information to be included into bug reports
+ *  @return string with information to be included into all bug reports
 */ 
 string getBugReportTemplate();

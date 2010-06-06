@@ -8,8 +8,9 @@
 #include "dll-stuff.h"
 
 typedef	std::map<int,	 void*, std::less<int>>		IntVoidMap;
-typedef std::map<int, const int*,std::less<int>> IntIntPtrMap;
-typedef std::map<int, int,std::less<int>> IntIntMap;
+typedef std::map<int, const int*, std::less<int>> IntIntPtrMap;
+typedef std::map<int, int, std::less<int>> IntIntMap;
+typedef std::map<int, std::vector<std::string>, std::less<int>> IntStdVecMap;
 
 class myData{
 
@@ -30,10 +31,13 @@ public:
 	std::string getVernissageVersion();
 	void closeSession();
 	int getDebugLevel(){ return  m_debugLevel; };
-	void setDebugLevel(int level){ m_debugLevel= level; }
-	void* getBrickletPointerFromMap(int brickletID){ return m_brickletIDBrickletPointerMap[brickletID]; }
-	void setBrickletPointerMap(int brickletID, void *pBricklet){ m_brickletIDBrickletPointerMap[brickletID] = pBricklet; }
-	void getBrickletContentsBuffer(int brickletID, const int** pBuffer, int &count);
+	void  setDebugLevel(int level){ m_debugLevel= level; }
+	void* getBrickletPointerFromMap(int brickletID);
+	void  setBrickletPointerMap(int brickletID, void *pBricklet);
+	void  getBrickletContentsBuffer(int brickletID, const int** pBuffer, int &count);
+	bool  gotCachedBrickletMetaData(int brickletID);
+	void  storeBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values);
+	void  loadCachedBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values);
 
 public:
 
@@ -51,7 +55,8 @@ private:
 	IntVoidMap		m_brickletIDBrickletPointerMap;
 	IntIntPtrMap	m_brickletIDRawBufferMap;
 	IntIntMap		m_brickletIDRawBufferLengthMap;
-
+	IntStdVecMap    m_brickletIDMetaDataKeysMap;
+	IntStdVecMap    m_brickletIDMetaDataValuesMap;
 };
 
 #endif // DATACLASS_H

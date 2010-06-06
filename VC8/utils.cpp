@@ -1,5 +1,4 @@
 
-// Taken from http://www.codeguru.com/forum/archive/index.php/t-193852.html
 
 #include <string>
 #include <algorithm>
@@ -15,6 +14,7 @@
 
 #define DEBUG_LEVEL 1
 
+// Taken from http://www.codeguru.com/forum/archive/index.php/t-193852.html
 
 std::wstring StringToWString(const std::string& s)
 {
@@ -123,8 +123,8 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 		return NOMEM;
 	}
 
-	sprintf(buf,"totalSize of strings %d",GetHandleSize(textHandle));
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	//sprintf(buf,"totalSize of strings %d",GetHandleSize(textHandle));
+	//debugOutputToHistory(DEBUG_LEVEL,buf);
 
 	for(i=0; i < numEntriesPlusOne; i++){
 
@@ -134,16 +134,16 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 		else{ // and of all the others
 			offset+=stringSizes[i-1];
 		}
-		sprintf(buf,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		//sprintf(buf,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
+		//debugOutputToHistory(DEBUG_LEVEL,buf);
 
 		// write offsets
 		memcpy(*textHandle+i*sizeof(long),&offset,sizeof(long));
 
 		if(i < stringVector.size()){
 
-			sprintf(buf,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
-			debugOutputToHistory(DEBUG_LEVEL,buf);
+			//sprintf(buf,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
+			//debugOutputToHistory(DEBUG_LEVEL,buf);
 
 			// write strings
 			memcpy(*textHandle+offset,stringVector[i].c_str(),stringSizes[i]);
@@ -163,8 +163,8 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	lockStateWave=MoveLockHandle(waveHandle);
 	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
-	sprintf(buf,"SetTextWaveData returned %d",ret);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	//sprintf(buf,"SetTextWaveData returned %d",ret);
+	//debugOutputToHistory(DEBUG_LEVEL,buf);
 
 	// release waveHandle lock
 	HSetState(waveHandle, lockStateWave);
@@ -174,13 +174,14 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	return ret;
 }
 
-int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, const char *waveName){
+int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName){
 
 	long dimensionSizes[MAX_DIMENSIONS+1];
 	int overwrite=0;
 	waveHndl waveHandle;
 	int ret=-1;
 	char buf[ARRAY_SIZE];
+	std::vector<std::string> allColumns;
 
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
@@ -188,19 +189,34 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	if(firstColumn.size() == secondColumn.size() ){
 		dimensionSizes[ROWS] = firstColumn.size();
 	}
-	else if(firstColumn.size() == 0 ){
-		outputToHistory("BUG: got empty list");
+	else if(firstColumn.size() == 0 || secondColumn.size() == 0 ){
+		sprintf(buf,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(buf);
 		return UNKNOWN_ERROR;
 	}
 	else{
-		outputToHistory("BUG: size mismatch of first and second column data");
+		sprintf(buf,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(buf);
+		
+		std::vector<std::string>::const_iterator it;
+
+		outputToHistory("keys are:");
+		for(it= firstColumn.begin(); it != firstColumn.end(); it++){
+			sprintf(buf,"_%s_",it->c_str());
+			outputToHistory(buf);
+		}
+
+		outputToHistory("values are:");
+		for(it= secondColumn.begin(); it != secondColumn.end(); it++){
+			sprintf(buf,"_%s_",it->c_str());
+			outputToHistory(buf);
+		}
 		return UNKNOWN_ERROR;
 	}
 
 	dimensionSizes[COLUMNS]=2;
-
-	// NULL says that we want to create the wave in the current datafolder
-	ret = MDMakeWave(&waveHandle,waveName,NULL,dimensionSizes,TEXT_WAVE_TYPE,overwrite);
+	
+	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,overwrite);
 
 	if(ret == NAME_WAV_CONFLICT){
 		sprintf(buf,"Wave %s already exists.",waveName);
@@ -216,9 +232,13 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 
 	ASSERT_RETURN_MINUSONE(waveHandle);
 
-	// append the strings from the second column at the end of the first column strings
-	firstColumn.insert(firstColumn.end(),secondColumn.begin(),secondColumn.end());
-	ret = stringVectorToTextWave(firstColumn,waveHandle);
+	// copy the strings of both columns into a new vector
+	// so that they are then 1D
+	// first firstColumn, then secondColumn
+	allColumns.insert(allColumns.begin(),firstColumn.begin(),firstColumn.end());
+	allColumns.insert(allColumns.end(),secondColumn.begin(),secondColumn.end());
+
+	ret = stringVectorToTextWave(allColumns,waveHandle);
 
 	if(ret != 0){
 		sprintf(buf,"stringVectorToTextWave returned %d",ret);

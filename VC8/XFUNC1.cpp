@@ -364,7 +364,7 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 
 	getRangeBrickletDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
-	rangeParams.startBrickletID = 0;
+	rangeParams.startBrickletID = 1;
 	rangeParams.endBrickletID = pSession->getBrickletCount();
 	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
@@ -381,6 +381,7 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 
 	p->result = UNKNOWN_ERROR;
+	int ret;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -391,21 +392,16 @@ static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT_RETURN_ZERO(pSession);
 
-	if(p->baseName == NULL){
-		p->result = WRONG_PARAMETER;
-		return 0;
-	}
-
 	getRangeBrickletMetaDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
-	rangeParams.startBrickletID = 0;
+	rangeParams.startBrickletID = 1;
 	rangeParams.endBrickletID = pSession->getBrickletCount();
 	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
-	getRangeBrickletMetaData(&rangeParams);
+	ret = getRangeBrickletMetaData(&rangeParams);
 
 	p->result = rangeParams.result;
-	return 0;
+	return ret;
 }
 
 // variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
@@ -466,6 +462,7 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 	return 0;
 }
 
+// TODO
 // string getErrorMessage(variable errorCode)
 static int getErrorMessage(getErrorMessageParams *p){
 
@@ -486,6 +483,7 @@ static int getErrorMessage(getErrorMessageParams *p){
 	return 0;
 }
 
+// TODO
 // variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
@@ -504,8 +502,21 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	return 0;
 }
 
+// TODO
 // variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
+
+	void* pBricklet = NULL;
+	std::vector<std::string> keys,values;
+	std::vector<std::wstring> elementInstanceNames;
+	std::map<std::wstring, Vernissage::Session::Parameter> elementInstanceParamsMap;
+	Vernissage::Session::SpatialInfo spatialInfo;
+	Vernissage::Session::ExperimentInfo experimentInfo;
+
+	char metaDataBaseName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1], metaDataName[MAX_OBJ_NAME+1];
+	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
+	char buf[ARRAY_SIZE];
+	int brickletID=-1, ret=-1, index=-1;
 
 	p->result = UNKNOWN_ERROR;
 
@@ -524,7 +535,267 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 		return 0;
 	}
 
+	if(	p->startBrickletID >  p->endBrickletID
+		|| p->startBrickletID <  1 // brickletIDs are 1-based
+		|| p->endBrickletID   <  1 
+		|| p->startBrickletID > numberOfBricklets
+		|| p->endBrickletID   > numberOfBricklets){
+			p->result = INVALID_RANGE;
+			return 0;
+	}
+	// from here on we have a none empty result set open and valid start- and end bricklet IDs
 
+	if( GetHandleSize(p->baseName) == 0L ){
+		sprintf(metaDataBaseName,"brickletMetaData");
+	}
+	else
+	{
+		ret = GetCStringFromHandle(p->baseName,metaDataBaseName,MAX_OBJ_NAME);
+		if(ret != 0){
+			p->result = ret;
+			return 0;
+		}
+	}
+	// now we got a valid baseName
+
+	for(brickletID=p->startBrickletID; brickletID <= p->endBrickletID; brickletID++){
+
+
+		pBricklet = pMyData->getBrickletPointerFromMap(brickletID);
+		ASSERT_RETURN_ZERO(pBricklet);
+
+		sprintf(metaDataName,"%s_%03d",metaDataBaseName,brickletID);
+
+		if(p->separateFolderForEachBricklet != 0.0){
+
+			ret = GetCurrentDataFolder(&parentDataFolderHPtr);
+
+			if(ret != 0){
+				p->result = ret;
+				return 0;
+			}
+			sprintf(dataFolderName,"X_%03d",brickletID);
+			ret = NewDataFolder(parentDataFolderHPtr, dataFolderName, &newDataFolderHPtr);
+		
+			if(ret == FOLDER_NAME_EXISTS){
+				p->result = DATAFOLDER_EXIST;
+				return 0;
+			}
+			else if(ret != 0){
+				p->result = ret;
+				return 0;
+			}
+		}
+
+		keys.clear();
+		values.clear();
+		elementInstanceNames.clear();
+
+		if( !pMyData->gotCachedBrickletMetaData(brickletID) ){
+
+			// timestamp of creation
+			tm ctime = pSession->getCreationTimestamp(pBricklet);
+
+			keys.push_back("creationTimeStamp");
+			values.push_back(anyTypeToString<time_t>(mktime(&ctime)));
+
+			// BEGIN pSession->getBrickletMetaData
+			Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
+			keys.push_back("brickletMetaData.fileCreatorName");
+			values.push_back(WStringToString(brickletMetaData.fileCreatorName));
+
+			keys.push_back("brickletMetaData.fileCreatorVersion");
+			values.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
+			
+			keys.push_back("brickletMetaData.accountName");
+			values.push_back(WStringToString(brickletMetaData.accountName));
+
+			keys.push_back("brickletMetaData.userName");
+			values.push_back(WStringToString(brickletMetaData.userName));
+			// END pSession->getBrickletMetaData 
+			
+			keys.push_back("sequenceID");
+			values.push_back(anyTypeToString<int>(pSession->getSequenceId(pBricklet)));
+
+			keys.push_back("creationComment");
+			values.push_back(WStringToString(pSession->getCreationComment(pBricklet)));
+
+			keys.push_back("dimension");
+			values.push_back(anyTypeToString<int>(pSession->getDimensionCount(pBricklet)));
+
+			keys.push_back("rootAxis");
+			values.push_back(WStringToString(pSession->getRootAxisName(pBricklet)));
+
+			keys.push_back("triggerAxis");
+			values.push_back(WStringToString(pSession->getTriggerAxisName(pBricklet)));
+
+			keys.push_back("channelName");
+			values.push_back(WStringToString(pSession->getChannelName(pBricklet)));
+
+			keys.push_back("channelInstanceName");
+			values.push_back(WStringToString(pSession->getChannelInstanceName(pBricklet)));
+
+			keys.push_back("runCycleCount");
+			values.push_back(anyTypeToString<int>(pSession->getRunCycleCount(pBricklet)));
+
+			keys.push_back("scanCycleCount");
+			values.push_back(anyTypeToString<int>(pSession->getScanCycleCount(pBricklet)));
+
+			elementInstanceNames = pSession->getExperimentElementInstanceNames(pBricklet,L"");
+
+			std::vector<std::wstring>::iterator itElementInstanceNames;
+			std::map<std::wstring, Vernissage::Session::Parameter>::iterator itMap;
+			
+			for(itElementInstanceNames = elementInstanceNames.begin(); itElementInstanceNames != elementInstanceNames.end(); itElementInstanceNames++){
+
+				elementInstanceParamsMap = pSession->getExperimentElementParameters(pBricklet,*itElementInstanceNames);
+
+				for(itMap = elementInstanceParamsMap.begin(); itMap != elementInstanceParamsMap.end(); itMap++){
+
+					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first));
+					values.push_back("");
+
+					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".value") );
+					values.push_back( WStringToString(itMap->second.value));
+
+					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".unit") );
+					values.push_back( WStringToString(itMap->second.unit));
+
+					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".valueType") );
+					values.push_back( anyTypeToString<int>(itMap->second.valueType));
+				}
+			}
+
+			// BEGIN Vernissage::Session::SpatialInfo
+			//spatialInfo = pSession->getSpatialInfo(pBricklet);
+			// Vernissage crashes here with getSpatialInfo ??
+
+			//std::vector<double>::const_iterator it;
+			//for( it = spatialInfo.physicalX.begin(); it != spatialInfo.physicalX.end(); it++){
+			//	index = it - spatialInfo.physicalX.begin() + 1 ; // one-based Index
+			//	sprintf(buf,"spatialInfo.physicalX.No%d",index);
+			//	keys.push_back(buf);
+			//	values.push_back(anyTypeToString<double>(*it));
+			//};
+
+			//for( it = spatialInfo.physicalY.begin(); it != spatialInfo.physicalY.end(); it++){
+			//	index = it - spatialInfo.physicalY.begin() + 1 ; // one-based Index
+			//	sprintf(buf,"spatialInfo.physicalY.No%d",index);
+			//	keys.push_back(buf);
+			//	values.push_back(anyTypeToString<double>(*it));
+			//};
+
+			//keys.push_back("spatialInfo.originatorKnown");
+			//values.push_back(spatialInfo.originatorKnown ? "true" : "false");
+
+			//keys.push_back("spatialInfo.channelName");
+			//values.push_back(WStringToString(spatialInfo.channelName));
+			//
+			//keys.push_back("spatialInfo.sequenceId");
+			//values.push_back(anyTypeToString<int>(spatialInfo.sequenceId));
+
+			//keys.push_back("spatialInfo.runCycleCount");
+			//values.push_back(anyTypeToString<int>(spatialInfo.runCycleCount));
+			//
+			//keys.push_back("spatialInfo.scanCycleCount");
+			//values.push_back(anyTypeToString<int>(spatialInfo.scanCycleCount));
+			//
+			//keys.push_back("spatialInfo.viewName");
+			//values.push_back(WStringToString(spatialInfo.viewName));
+			//
+			//keys.push_back("spatialInfo.viewSelectionId");
+			//values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionId));
+
+			//keys.push_back("spatialInfo.viewSelectionIndex");
+			//values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionIndex));		
+			//// END Vernissage::Session::SpatialInfo
+
+			// BEGIN Vernissage::Session::ExperimentInfo
+			experimentInfo = pSession->getExperimentInfo(pBricklet);
+
+			keys.push_back("experimentInfo.Name");
+			values.push_back(WStringToString(experimentInfo.experimentName));
+
+			keys.push_back("experimentInfo.Version");
+			values.push_back(WStringToString(experimentInfo.experimentVersion));
+
+			keys.push_back("experimentInfo.Description");
+			values.push_back(WStringToString(experimentInfo.experimentDescription));
+			
+			keys.push_back("experimentInfo.FileSpec");
+			values.push_back(WStringToString(experimentInfo.experimentFileSpec));
+			
+			keys.push_back("experimentInfo.projectName");
+			values.push_back(WStringToString(experimentInfo.projectName));
+		
+			keys.push_back("experimentInfo.projectVersion");
+			values.push_back(WStringToString(experimentInfo.projectVersion));
+			
+			keys.push_back("experimentInfo.projectFileSpec");
+			values.push_back(WStringToString(experimentInfo.projectFileSpec));
+			// END Vernissage::Session::ExperimentInfo
+
+			//std::vector<std::wstring> allAxes = getAllAxesNames(pSession,pBricklet);
+
+			//Vernissage::Session::AxisDescriptor axisDescriptor;
+
+			//for(vector<wstring>::iterator itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
+			//	wprintf(L"##Axis name: %s\n",itAllAxes->c_str());
+
+			//	axisDescriptor = pSession->getAxisDescriptor(pBricklet,*itAllAxes);
+			//	wprintf(L"\tclocks: %d\n", axisDescriptor.clocks);
+			//	wprintf(L"\tmirrored: %s\n", (axisDescriptor.mirrored)? L"true" : L"false");
+			//	wprintf(L"\tphysicalUnit: %s\n", axisDescriptor.physicalUnit.c_str());
+			//	wprintf(L"\tphysicalIncrement: %g\n", axisDescriptor.physicalIncrement);
+			//	wprintf(L"\tphysicalStart: %g\n", axisDescriptor.physicalStart);
+			//	wprintf(L"\trawIncrement: %d\n",axisDescriptor.rawIncrement);
+			//	wprintf(L"\trawStart: %d\n",axisDescriptor.rawStart);
+			//	wprintf(L"\ttriggerAxisName: %s\n",axisDescriptor.triggerAxisName.c_str());
+
+			//	axisTableSets = pSession->getAxisTableSets(pBricklet,*itAllAxes);
+
+			//	printf("Number of axis table sets: %d\n",axisTableSets.size());
+
+
+			//	for(Vernissage::Session::AxisTableSets::iterator itTabelSets = axisTableSets.begin(); itTabelSets != axisTableSets.end(); itTabelSets++ ){
+			//		wprintf(L"\tAxis name: %s (start, stop, step)=",itTabelSets->first);
+			//		for(Vernissage::Session::TableSet::iterator itOneTableSet = itTabelSets->second.begin(); itOneTableSet != itTabelSets->second.end(); itOneTableSet++){
+			//			printf("\t(%g, %g, %g,),",itOneTableSet->start,itOneTableSet->step,itOneTableSet->stop);
+			//		}
+			//		printf("\n");
+			//	}
+
+			//	// if it is empty, we got the standard table set which is [1,clocks,1]
+			//	if(axisTableSets.size() == 0){
+			//		printf("Standard axis table set: [start,stop,step] = [1,%d,1]\n",axisDescriptor.clocks); 
+			//	}
+
+
+			ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName);
+
+			if(ret != 0){
+				sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);
+				outputToHistory(buf);
+				p->result = ret;
+				return 0;
+			}
+
+			 //the metaData could be saved to a textwave successfully, so we can cache it
+			pMyData->storeBrickletMetaData(brickletID,keys,values);
+		}
+		else{ // we got the metaData cached
+			pMyData->loadCachedBrickletMetaData(brickletID,keys,values);
+			
+			ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName);
+
+			if(ret != 0){
+				sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);
+				outputToHistory(buf);
+				p->result = ret;
+				return 0;
+			}
+		}
+	}
 	p->result = SUCCESS;
 	return 0;
 }
@@ -643,7 +914,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	keys.push_back("Brickletkeys.accountName");
 	values.push_back(WStringToString(brickletMetaData.accountName));
 
-	ret = createAndFillTextWave(keys,values,metaDataWaveName);
+	ret = createAndFillTextWave(keys,values,NULL,metaDataWaveName);
 
 	if(ret != 0){
 		sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);

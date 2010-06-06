@@ -58,6 +58,8 @@ void myData::closeSession(){
 		m_brickletIDBrickletPointerMap.clear();
 		m_brickletIDRawBufferMap.clear();
 		m_brickletIDRawBufferLengthMap.clear();
+		m_brickletIDMetaDataKeysMap.clear();
+		m_brickletIDMetaDataValuesMap.clear();
 	}
 }
 
@@ -93,6 +95,21 @@ std::string myData::getResultFileName(){
 
 	return m_resultFileName;
 }
+
+void* myData::getBrickletPointerFromMap(int brickletID){
+
+	return m_brickletIDBrickletPointerMap[brickletID];
+}
+
+void myData::setBrickletPointerMap(int brickletID, void *pBricklet){
+	
+	char buf[ARRAY_SIZE];
+	sprintf(buf,"setBrickletPointerMap brickletID=%d,pBricklet=%p\n",brickletID,pBricklet);
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+	m_brickletIDBrickletPointerMap[brickletID] = pBricklet;
+}
+
 
 void myData::getBrickletContentsBuffer(int brickletID, const int** pBuffer, int &count){
 
@@ -131,3 +148,43 @@ void myData::getBrickletContentsBuffer(int brickletID, const int** pBuffer, int 
 	}
 }
 
+bool myData::gotCachedBrickletMetaData(int brickletID){
+
+	return (   m_brickletIDMetaDataKeysMap.find(brickletID)   != m_brickletIDMetaDataKeysMap.end() 
+			&& m_brickletIDMetaDataValuesMap.find(brickletID) != m_brickletIDMetaDataValuesMap.end()
+			);
+}
+
+void myData::storeBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values){
+
+	char buf[ARRAY_SIZE];
+
+	m_brickletIDMetaDataKeysMap[brickletID]   = keys;
+	m_brickletIDMetaDataValuesMap[brickletID] = values;
+
+	sprintf(buf,"Storing (%d,%d) key/value pairs of cached for brickletMetaData for bricklet %d.",
+		m_brickletIDMetaDataKeysMap[brickletID].size(),m_brickletIDMetaDataValuesMap[brickletID].size(),brickletID);
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+}
+
+void  myData::loadCachedBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values){
+
+	char buf[ARRAY_SIZE];
+
+	keys.clear();
+	values.clear();
+
+	if( !gotCachedBrickletMetaData(brickletID) ){
+		sprintf(buf,"BUG: cached metaData for bricklet=%d could not be found.",brickletID);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+		return;
+	}
+
+	keys = m_brickletIDMetaDataKeysMap[brickletID];
+	values = m_brickletIDMetaDataValuesMap[brickletID];
+
+	sprintf(buf,"Loading (%d,%d) key/value pairs of cached for brickletMetaData for bricklet %d.",keys.size(),values.size(),brickletID);
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+}

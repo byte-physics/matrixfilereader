@@ -32,6 +32,6 @@ std::string anyTypeToString(const T& t){
 }
 
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
-int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn,const char *waveName);
 
+int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName);
 #endif // UTILS_H

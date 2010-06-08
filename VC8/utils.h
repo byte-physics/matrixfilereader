@@ -34,4 +34,8 @@ std::string anyTypeToString(const T& t){
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
 
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName);
+
+std::vector<std::wstring> getAllAxesNames(void *pBricklet);
+std::string viewTypeCodeToString(int idx);
+std::string valueTypeToString(int idx);
 #endif // UTILS_H

@@ -51,7 +51,7 @@
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;XFUNC1_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				StructMemberAlignment="2"
+				StructMemberAlignment="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Release/XFUNC1.pch"

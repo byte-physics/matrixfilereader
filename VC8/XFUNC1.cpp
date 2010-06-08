@@ -483,7 +483,7 @@ static int getErrorMessage(getErrorMessageParams *p){
 	return 0;
 }
 
-// TODO
+// TODO store some lists of important info in some stringlists for later
 // variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
@@ -510,8 +510,14 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	std::vector<std::string> keys,values;
 	std::vector<std::wstring> elementInstanceNames;
 	std::map<std::wstring, Vernissage::Session::Parameter> elementInstanceParamsMap;
-	Vernissage::Session::SpatialInfo spatialInfo;
 	Vernissage::Session::ExperimentInfo experimentInfo;
+	Vernissage::Session::SpatialInfo spatialInfo;
+	std::vector<std::wstring> allAxes;
+	std::wstring allAxesAsOneWString;
+	Vernissage::Session::AxisDescriptor axisDescriptor;
+	Vernissage::Session::AxisTableSets axisTableSetsMap;
+	std::wstring axisNameWString;
+	std::string axisNameString, baseName;
 
 	char metaDataBaseName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1], metaDataName[MAX_OBJ_NAME+1];
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
@@ -576,12 +582,9 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 			}
 			sprintf(dataFolderName,"X_%03d",brickletID);
 			ret = NewDataFolder(parentDataFolderHPtr, dataFolderName, &newDataFolderHPtr);
-		
-			if(ret == FOLDER_NAME_EXISTS){
-				p->result = DATAFOLDER_EXIST;
-				return 0;
-			}
-			else if(ret != 0){
+	
+			// continue if the datafolder alrady exists, abort on all other errors
+			if( ret != 0 && ret != FOLDER_NAME_EXISTS ){
 				p->result = ret;
 				return 0;
 			}
@@ -590,6 +593,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 		keys.clear();
 		values.clear();
 		elementInstanceNames.clear();
+		allAxes.clear();
 
 		if( !pMyData->gotCachedBrickletMetaData(brickletID) ){
 
@@ -662,53 +666,80 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 					values.push_back( WStringToString(itMap->second.unit));
 
 					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".valueType") );
-					values.push_back( anyTypeToString<int>(itMap->second.valueType));
+					values.push_back( valueTypeToString(itMap->second.valueType) );
 				}
 			}
 
 			// BEGIN Vernissage::Session::SpatialInfo
-			//spatialInfo = pSession->getSpatialInfo(pBricklet);
-			// Vernissage crashes here with getSpatialInfo ??
+			spatialInfo = pSession->getSpatialInfo(pBricklet);
 
-			//std::vector<double>::const_iterator it;
-			//for( it = spatialInfo.physicalX.begin(); it != spatialInfo.physicalX.end(); it++){
-			//	index = it - spatialInfo.physicalX.begin() + 1 ; // one-based Index
-			//	sprintf(buf,"spatialInfo.physicalX.No%d",index);
-			//	keys.push_back(buf);
-			//	values.push_back(anyTypeToString<double>(*it));
-			//};
+			std::vector<double>::const_iterator it;
+			for( it = spatialInfo.physicalX.begin(); it != spatialInfo.physicalX.end(); it++){
+				index = it - spatialInfo.physicalX.begin() + 1 ; // one-based Index
+				sprintf(buf,"spatialInfo.physicalX.No%d",index);
+				keys.push_back(buf);
+				values.push_back(anyTypeToString<double>(*it));
+			}
 
-			//for( it = spatialInfo.physicalY.begin(); it != spatialInfo.physicalY.end(); it++){
-			//	index = it - spatialInfo.physicalY.begin() + 1 ; // one-based Index
-			//	sprintf(buf,"spatialInfo.physicalY.No%d",index);
-			//	keys.push_back(buf);
-			//	values.push_back(anyTypeToString<double>(*it));
-			//};
+			for( it = spatialInfo.physicalY.begin(); it != spatialInfo.physicalY.end(); it++){
+				index = it - spatialInfo.physicalY.begin() + 1 ; // one-based Index
+				sprintf(buf,"spatialInfo.physicalY.No%d",index);
+				keys.push_back(buf);
+				values.push_back(anyTypeToString<double>(*it));
+			}
 
-			//keys.push_back("spatialInfo.originatorKnown");
-			//values.push_back(spatialInfo.originatorKnown ? "true" : "false");
+			keys.push_back("spatialInfo.originatorKnown");
+			values.push_back(spatialInfo.originatorKnown ? "true" : "false");
 
-			//keys.push_back("spatialInfo.channelName");
-			//values.push_back(WStringToString(spatialInfo.channelName));
-			//
-			//keys.push_back("spatialInfo.sequenceId");
-			//values.push_back(anyTypeToString<int>(spatialInfo.sequenceId));
+			keys.push_back("spatialInfo.channelName");
+			if(spatialInfo.originatorKnown){
+				values.push_back(WStringToString(spatialInfo.channelName));
+			}else{
+				values.push_back("");
+			}
 
-			//keys.push_back("spatialInfo.runCycleCount");
-			//values.push_back(anyTypeToString<int>(spatialInfo.runCycleCount));
-			//
-			//keys.push_back("spatialInfo.scanCycleCount");
-			//values.push_back(anyTypeToString<int>(spatialInfo.scanCycleCount));
-			//
-			//keys.push_back("spatialInfo.viewName");
-			//values.push_back(WStringToString(spatialInfo.viewName));
-			//
-			//keys.push_back("spatialInfo.viewSelectionId");
-			//values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionId));
+			keys.push_back("spatialInfo.sequenceId");
+			if(spatialInfo.originatorKnown){
+				values.push_back(anyTypeToString<int>(spatialInfo.sequenceId));
+			}else{
+				values.push_back("");
+			}
 
-			//keys.push_back("spatialInfo.viewSelectionIndex");
-			//values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionIndex));		
-			//// END Vernissage::Session::SpatialInfo
+			keys.push_back("spatialInfo.runCycleCount");
+			if(spatialInfo.originatorKnown){
+				values.push_back(anyTypeToString<int>(spatialInfo.runCycleCount));
+			}else{
+				values.push_back("");
+			}
+
+			keys.push_back("spatialInfo.scanCycleCount");
+			if(spatialInfo.originatorKnown){
+				values.push_back(anyTypeToString<int>(spatialInfo.scanCycleCount));
+			}else{
+				values.push_back("");
+			}
+
+			keys.push_back("spatialInfo.viewName");
+			if(spatialInfo.originatorKnown){
+				values.push_back(WStringToString(spatialInfo.viewName));
+			}else{
+				values.push_back("");
+			}
+
+			keys.push_back("spatialInfo.viewSelectionId");
+			if(spatialInfo.originatorKnown){
+				values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionId));
+			}else{
+				values.push_back("");
+			}
+
+			keys.push_back("spatialInfo.viewSelectionIndex");
+			if(spatialInfo.originatorKnown){
+				values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionIndex));		
+			}else{
+				values.push_back("");
+			}
+			//END Vernissage::Session::SpatialInfo
 
 			// BEGIN Vernissage::Session::ExperimentInfo
 			experimentInfo = pSession->getExperimentInfo(pBricklet);
@@ -735,41 +766,93 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 			values.push_back(WStringToString(experimentInfo.projectFileSpec));
 			// END Vernissage::Session::ExperimentInfo
 
-			//std::vector<std::wstring> allAxes = getAllAxesNames(pSession,pBricklet);
+			// store a list of all axes
+			allAxes = getAllAxesNames(pBricklet);
+			keys.push_back("allAxes");
+			
+			allAxesAsOneWString.clear();
+			std::vector<std::wstring>::const_iterator itAllAxes;
+			for(itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
+				allAxesAsOneWString.append(*itAllAxes + L";");
+			}
+			values.push_back(WStringToString(allAxesAsOneWString));
 
-			//Vernissage::Session::AxisDescriptor axisDescriptor;
+			// BEGIN Vernissage::Session::axisDescriptor
+			for(itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
+				axisNameWString = *itAllAxes;
+				axisNameString  = WStringToString(*itAllAxes);
 
-			//for(vector<wstring>::iterator itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
-			//	wprintf(L"##Axis name: %s\n",itAllAxes->c_str());
+				axisDescriptor = pSession->getAxisDescriptor(pBricklet,axisNameWString);
 
-			//	axisDescriptor = pSession->getAxisDescriptor(pBricklet,*itAllAxes);
-			//	wprintf(L"\tclocks: %d\n", axisDescriptor.clocks);
-			//	wprintf(L"\tmirrored: %s\n", (axisDescriptor.mirrored)? L"true" : L"false");
-			//	wprintf(L"\tphysicalUnit: %s\n", axisDescriptor.physicalUnit.c_str());
-			//	wprintf(L"\tphysicalIncrement: %g\n", axisDescriptor.physicalIncrement);
-			//	wprintf(L"\tphysicalStart: %g\n", axisDescriptor.physicalStart);
-			//	wprintf(L"\trawIncrement: %d\n",axisDescriptor.rawIncrement);
-			//	wprintf(L"\trawStart: %d\n",axisDescriptor.rawStart);
-			//	wprintf(L"\ttriggerAxisName: %s\n",axisDescriptor.triggerAxisName.c_str());
+				keys.push_back(axisNameString + ".clocks");
+				values.push_back(anyTypeToString<int>(axisDescriptor.clocks));
+				
+				keys.push_back(axisNameString + ".mirrored");
+				values.push_back((axisDescriptor.mirrored)? "true" : "false");
+				
+				keys.push_back(axisNameString + ".physicalUnit");
+				values.push_back(WStringToString(axisDescriptor.physicalUnit));
+				
+				keys.push_back(axisNameString + ".physicalIncrement");
+				values.push_back(anyTypeToString<double>(axisDescriptor.physicalIncrement));
+				
+				keys.push_back(axisNameString + ".physicalStart");
+				values.push_back(anyTypeToString<double>(axisDescriptor.physicalStart));
+				
+				keys.push_back(axisNameString + ".rawIncrement");
+				values.push_back(anyTypeToString<int>(axisDescriptor.rawIncrement));
+				
+				keys.push_back(axisNameString + ".rawStart");
+				values.push_back(anyTypeToString<int>(axisDescriptor.rawStart));
+				
+				keys.push_back(axisNameString + ".triggerAxisName");
+				values.push_back(WStringToString(axisDescriptor.triggerAxisName));
+				// END Vernissage::Session::axisDescriptor
 
-			//	axisTableSets = pSession->getAxisTableSets(pBricklet,*itAllAxes);
+				// BEGIN Vernissage::Session:AxisTableSet
+				axisTableSetsMap = pSession->getAxisTableSets(pBricklet,*itAllAxes);
 
-			//	printf("Number of axis table sets: %d\n",axisTableSets.size());
+				// if it is empty, we got the standard table set which is [start=1,step=clocks,stop=1]
+				if(axisTableSetsMap.size() == 0){
 
+					keys.push_back(axisNameString + ".axisTableSetNo1.axisName");
+					values.push_back(axisNameString);
 
-			//	for(Vernissage::Session::AxisTableSets::iterator itTabelSets = axisTableSets.begin(); itTabelSets != axisTableSets.end(); itTabelSets++ ){
-			//		wprintf(L"\tAxis name: %s (start, stop, step)=",itTabelSets->first);
-			//		for(Vernissage::Session::TableSet::iterator itOneTableSet = itTabelSets->second.begin(); itOneTableSet != itTabelSets->second.end(); itOneTableSet++){
-			//			printf("\t(%g, %g, %g,),",itOneTableSet->start,itOneTableSet->step,itOneTableSet->stop);
-			//		}
-			//		printf("\n");
-			//	}
+					keys.push_back(axisNameString + ".axisTableSetNo1.start");
+					values.push_back(anyTypeToString<int>(1));
 
-			//	// if it is empty, we got the standard table set which is [1,clocks,1]
-			//	if(axisTableSets.size() == 0){
-			//		printf("Standard axis table set: [start,stop,step] = [1,%d,1]\n",axisDescriptor.clocks); 
-			//	}
+					keys.push_back(axisNameString + ".axisTableSetNo1.step");
+					values.push_back(anyTypeToString<int>(1));
 
+					keys.push_back(axisNameString + ".axisTableSetNo1.stop");
+					values.push_back(anyTypeToString<int>(axisDescriptor.clocks));
+				}
+				else{
+
+					Vernissage::Session::AxisTableSets::const_iterator itAxisTabelSetsMap;
+					Vernissage::Session::TableSet::const_iterator itAxisTableSetsMapStruct;
+					index=0;
+					for( itAxisTabelSetsMap = axisTableSetsMap.begin(); itAxisTabelSetsMap != axisTableSetsMap.end(); itAxisTabelSetsMap++ ){
+						index++; // 1-based index
+						baseName = axisNameString + "axisTableSetNo" + anyTypeToString<int>(index) + ".";
+						keys.push_back(baseName + axisNameString);
+						values.push_back(WStringToString(itAxisTabelSetsMap->first));
+
+						for(itAxisTableSetsMapStruct= itAxisTabelSetsMap->second.begin(); itAxisTableSetsMapStruct != itAxisTabelSetsMap->second.end(); itAxisTableSetsMapStruct++){
+							baseName = baseName + WStringToString(itAxisTabelSetsMap->first) + ".";
+							keys.push_back(baseName + "start");
+							values.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->start));
+
+							keys.push_back(baseName + "step");
+							values.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->step));
+
+							keys.push_back(baseName + "stop");
+							values.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->stop));
+						}
+					}
+				}
+				// END Vernissage::Session:AxisTableSet
+			}
 
 			ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName);
 

@@ -12,6 +12,7 @@ typedef std::map<int, const int*, std::less<int>> IntIntPtrMap;
 typedef std::map<int, int, std::less<int>> IntIntMap;
 typedef std::map<int, std::vector<std::string>, std::less<int>> IntStdVecMap;
 
+// TODO move bricklet Data to an own Bricklet class and only one or two maps
 class myData{
 
 public:

@@ -248,3 +248,89 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 
 	return 0;
 }
+
+// see Vernissage Manual page 20/21
+// the idea here is to first get the root and triggerAxis for the Bricklet
+// Then we know the starting point of the axis hierachy (rootAxis) and the endpoint (triggerAxis)
+// In this way we can then traverse from the endpoint (triggerAxis) to the starting point (rootAxis) and record all axis names
+// In more than 99% of the cases this routine will return one or two axes
+// The value of maxRuns is strictly speaking wrong becase the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
+// The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName" 
+std::vector<std::wstring> getAllAxesNames(void *pBricklet){
+
+	std::vector<std::wstring> allAxes;
+	std::wstring axisName, rootAxis, triggerAxis;
+
+	int numRuns=0,maxRuns=100;
+
+	ASSERT(pBricklet,allAxes);
+	ASSERT(pMyData,allAxes);
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT(pSession,allAxes);
+
+	rootAxis= pSession->getRootAxisName(pBricklet);
+	triggerAxis = pSession->getTriggerAxisName(pBricklet);
+
+	axisName = triggerAxis;
+	allAxes.push_back(triggerAxis);
+
+	while(axisName != rootAxis){
+		axisName= pSession->getAxisDescriptor(pBricklet,axisName).triggerAxisName;
+		allAxes.push_back(axisName);
+
+		numRuns++;
+		if(numRuns > maxRuns){
+			outputToHistory("Found more than 100 axes in the axis hierachy. This is highliy unlikely and therefore a bug in this XOP or in Vernissage.");
+			break;
+		}
+	}
+
+	return allAxes;
+}
+
+std::string viewTypeCodeToString(int idx){
+
+	char buf[ARRAY_SIZE];
+	std::vector<std::string> names;
+
+	names.push_back("vtc_Other");
+	names.push_back("vtc_Simple2D");
+	names.push_back("vtc_Simple1D");
+	names.push_back("vtc_ForwardBackward2D");
+	names.push_back("vtc_2Dof3D");
+	names.push_back("vtc_Spectroscopy");
+	names.push_back("vtc_ForceCurve");
+	names.push_back("vtc_1DProfile");
+
+	if(idx < 0 || idx >= names.size()){
+		sprintf(buf,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+		outputToHistory(buf);
+		return 0;
+	}
+	else{
+		return names.at(idx);
+	}
+}
+
+std::string valueTypeToString(int idx){
+
+	char buf[ARRAY_SIZE];
+	std::vector<std::string> names;
+
+	names.push_back("vt_Special");
+	names.push_back("vt_Integer");
+	names.push_back("vt_Double");
+	names.push_back("vt_Boolean");
+	names.push_back("vt_Enum");
+	names.push_back("vt_String");
+
+	if(idx < 0 || idx >= names.size()){
+		sprintf(buf,"BUG: valueTypeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+		outputToHistory(buf);
+		return 0;
+	}
+	else{
+		return names.at(idx);
+	}
+}

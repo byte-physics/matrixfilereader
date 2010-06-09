@@ -6,13 +6,14 @@
 #include <ctime>
 
 #include "dll-stuff.h"
+#include "myBricklet.h"
+#include "xopstandardheaders.h"
 
-typedef	std::map<int,	 void*, std::less<int>>		IntVoidMap;
-typedef std::map<int, const int*, std::less<int>> IntIntPtrMap;
-typedef std::map<int, int, std::less<int>> IntIntMap;
-typedef std::map<int, std::vector<std::string>, std::less<int>> IntStdVecMap;
+typedef	std::map<int,	 MyBricklet*, std::less<int>>		IntMyBrickletPtrMap;
+//typedef std::map<int, const int*, std::less<int>> IntIntPtrMap;
+//typedef std::map<int, int, std::less<int>> IntIntMap;
+//typedef std::map<int, std::vector<std::string>, std::less<int>> IntStdVecMap;
 
-// TODO move bricklet Data to an own Bricklet class and only one or two maps
 class myData{
 
 public:
@@ -33,18 +34,12 @@ public:
 	void closeSession();
 	int getDebugLevel(){ return  m_debugLevel; };
 	void  setDebugLevel(int level){ m_debugLevel= level; }
-	void* getBrickletPointerFromMap(int brickletID);
-	void  setBrickletPointerMap(int brickletID, void *pBricklet);
-	void  getBrickletContentsBuffer(int brickletID, const int** pBuffer, int &count);
-	bool  gotCachedBrickletMetaData(int brickletID);
-	void  storeBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values);
-	void  loadCachedBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values);
+	MyBricklet* getBrickletClassFromMap(int brickletID);
+	void setBrickletClassMap(int brickletID, void *pBricklet);
+	void setWaveNote(int brickletID,waveHndl waveHandle);
 
 public:
 
-	//TimeStampIntMap  brickletTimeStampIDMap;
-	//TimeStampVoidMap brickletTimeStampBrickletPointerMap;
-	int m_debugLevel;
 
 private:
 
@@ -52,12 +47,13 @@ private:
 	std::string m_resultFileName, m_resultFilePath;
 	Vernissage::Session *m_VernissageSession;
 	DllStuff *m_dllStuff;
+	int m_debugLevel;
 
-	IntVoidMap		m_brickletIDBrickletPointerMap;
-	IntIntPtrMap	m_brickletIDRawBufferMap;
-	IntIntMap		m_brickletIDRawBufferLengthMap;
-	IntStdVecMap    m_brickletIDMetaDataKeysMap;
-	IntStdVecMap    m_brickletIDMetaDataValuesMap;
+	IntMyBrickletPtrMap		m_brickletIDBrickletClassMap;
+	//IntIntPtrMap			m_brickletIDRawBufferMap;
+	//IntIntMap				m_brickletIDRawBufferLengthMap;
+	//IntStdVecMap			m_brickletIDMetaDataKeysMap;
+	//IntStdVecMap			m_brickletIDMetaDataValuesMap;
 };
 
 #endif // DATACLASS_H

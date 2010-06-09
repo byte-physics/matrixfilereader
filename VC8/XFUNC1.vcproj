@@ -232,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\myBricklet.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\utils.cpp"
 				>
 			</File>
@@ -262,6 +266,10 @@
 			</File>
 			<File
 				RelativePath=".\globalvariables.h"
+				>
+			</File>
+			<File
+				RelativePath=".\myBricklet.h"
 				>
 			</File>
 			<File

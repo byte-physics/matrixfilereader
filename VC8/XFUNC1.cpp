@@ -76,7 +76,9 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	const int *pBuffer;
 	int count=0;
 
-	pMyData->getBrickletContentsBuffer(brickletID,&pBuffer,count);
+	MyBricklet* bricklet = pMyData->getBrickletClassFromMap(brickletID);
+
+	bricklet->getBrickletContentsBuffer(&pBuffer,count);
 	ASSERT_RETURN_ZERO(pBuffer);
 
 	if(count == 0){
@@ -123,7 +125,10 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	for(int i=0; i < count; i++){
 		dataPtr[i] = pBuffer[i];
 	}
+
 	HSetState((Handle) waveHandle, hState);
+
+	pMyData->setWaveNote(brickletID,waveHandle);
 
 	p->result = SUCCESS;
 	return 0;
@@ -244,7 +249,7 @@ static int getXOPVersion(getXOPVersionParams *p){
 		return 0;
 	}
 
-	PutCStringInHandle(myVersion, *p->xopVersion);
+	PutCStringInHandle(myXopVersion, *p->xopVersion);
 
 	p->result = SUCCESS;
 	return 0;
@@ -254,6 +259,12 @@ static int getXOPVersion(getXOPVersionParams *p){
 static int openResultFile(openResultFileParams *p){
 
 	p->result = UNKNOWN_ERROR;
+
+	char filePath[MAX_PATH_LEN+1];
+	char fileName[MAX_PATH_LEN+1];
+	std::wstring wstringFilePath,wstringFileName;
+	char buf[ARRAY_SIZE];
+	int ret = 0;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(pMyData->resultFileOpen()){
@@ -268,49 +279,40 @@ static int openResultFile(openResultFileParams *p){
 		p->result = UNKNOWN_ERROR;
 		return 0;
 	}
-
-	char filePath[MAX_PATH_LEN+1];
-	char fileName[MAX_PATH_LEN+1];
-	std::wstring wstringFilePath,wstringFileName;
-
-	int returnValueInt = 0;
 	
-	returnValueInt = GetCStringFromHandle(p->absoluteFilePath,filePath,MAX_PATH_LEN);
-	if( returnValueInt != 0 ){
-		return returnValueInt;
+	ret = GetCStringFromHandle(p->absoluteFilePath,filePath,MAX_PATH_LEN);
+	if( ret != 0 ){
+		return ret;
 	}
 
-	returnValueInt = GetCStringFromHandle(p->fileName,fileName,MAX_PATH_LEN);
-	if( returnValueInt != 0 ){
-		return returnValueInt;
+	ret = GetCStringFromHandle(p->fileName,fileName,MAX_PATH_LEN);
+	if( ret != 0 ){
+		return ret;
 	}
 
 	wstringFilePath = CharPtrToWString(filePath);
 	wstringFileName = CharPtrToWString(fileName);
 
-	char buf[1000];
 	sprintf(buf,"filename %s",WStringToString(wstringFileName).c_str());
 	debugOutputToHistory(DEBUG_LEVEL,buf);
 
 	sprintf(buf,"filepath %s",WStringToString(wstringFilePath).c_str());
 	debugOutputToHistory(DEBUG_LEVEL,buf);
 
-	// TODO check for file existence
-
-	bool retValue = pSession->loadResultSet(wstringFilePath,wstringFileName,true);
-
-
-	if(!retValue){
-		sprintf(buf,"File %s/%s is not readable.",WStringToString(wstringFilePath).c_str(),WStringToString(wstringFileName).c_str());
+	if( !pSession->directoryExists(wstringFilePath)){
+		sprintf(buf,"The folder %s is not readable.",WStringToString(wstringFilePath).c_str());
 		outputToHistory(buf);
 		p->result = FILE_NOT_READABLE;
-		return 0;
+		return 0;	
+	}
+	if( !fileExists(WStringToString(wstringFilePath), WStringToString(wstringFileName))){
+		sprintf(buf,"The file %s is not readable.",WStringToString(wstringFileName).c_str());
+		outputToHistory(buf);
+		p->result = FILE_NOT_READABLE;
+		return 0;	
 	}
 
-	//if(pSession->getBrickletCount() == 0){
-	//	p->result = EMPTY_RESULTFILE;
-	//	return 0;
-	//}
+	pSession->loadResultSet(wstringFilePath,wstringFileName,true);
 
 	//starting from here the result file is valid
 	pMyData->setResultFile(WStringToString(wstringFilePath),WStringToString(wstringFileName));
@@ -321,13 +323,14 @@ static int openResultFile(openResultFileParams *p){
 	for(int i=1; i <= pSession->getBrickletCount(); i++ ){
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
-		pMyData->setBrickletPointerMap(i,pBricklet);
+		pMyData->setBrickletClassMap(i,pBricklet);
 	}
 
 	p->result = SUCCESS;
 	return 0;
 }
 
+// TODO
 // variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls)
 static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
@@ -483,9 +486,16 @@ static int getErrorMessage(getErrorMessageParams *p){
 	return 0;
 }
 
-// TODO store some lists of important info in some stringlists for later
+// TODO
 // variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletData(getRangeBrickletDataParams *p){
+
+	MyBricklet* myBricklet = NULL;
+	std::vector<std::string> keys,values;
+	char dataBaseName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1], dataName[MAX_OBJ_NAME+1];
+	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
+	char buf[ARRAY_SIZE];
+	int brickletID=-1, ret=-1;
 
 	p->result = UNKNOWN_ERROR;
 
@@ -498,31 +508,81 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT_RETURN_ZERO(pSession);
 
+	const int numberOfBricklets = pSession->getBrickletCount();
+	if(numberOfBricklets == 0){
+		p->result = EMPTY_RESULTFILE;
+		return 0;
+	}
+
+	if(	p->startBrickletID >  p->endBrickletID
+		|| p->startBrickletID <  1 // brickletIDs are 1-based
+		|| p->endBrickletID   <  1 
+		|| p->startBrickletID > numberOfBricklets
+		|| p->endBrickletID   > numberOfBricklets){
+			p->result = INVALID_RANGE;
+			return 0;
+	}
+	// from here on we have a none empty result set open and valid start- and end bricklet IDs
+
+	if( GetHandleSize(p->baseName) == 0L ){
+		sprintf(dataBaseName,"brickletData");
+	}
+	else
+	{
+		ret = GetCStringFromHandle(p->baseName,dataBaseName,MAX_OBJ_NAME);
+		if(ret != 0){
+			p->result = ret;
+			return 0;
+		}
+	}
+	// now we got a valid baseName
+
+	for(brickletID=p->startBrickletID; brickletID <= p->endBrickletID; brickletID++){
+
+		myBricklet = pMyData->getBrickletClassFromMap(brickletID);
+		ASSERT_RETURN_ZERO(myBricklet);
+
+		sprintf(dataName,"%s_%03d",dataBaseName,brickletID);
+
+		if(p->separateFolderForEachBricklet != 0.0){
+
+			ret = GetCurrentDataFolder(&parentDataFolderHPtr);
+
+			if(ret != 0){
+				p->result = ret;
+				return 0;
+			}
+			sprintf(dataFolderName,"X_%03d",brickletID);
+			ret = NewDataFolder(parentDataFolderHPtr, dataFolderName, &newDataFolderHPtr);
+	
+			// continue if the datafolder alrady exists, abort on all other errors
+			if( ret != 0 && ret != FOLDER_NAME_EXISTS ){
+				p->result = ret;
+				return 0;
+			}
+		}
+			ret = createAndFillDataWave(newDataFolderHPtr,dataName,brickletID);
+
+			if(ret != 0){
+				sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);
+				outputToHistory(buf);
+				p->result = ret;
+				return 0;
+			}
+	}
 	p->result = SUCCESS;
 	return 0;
 }
 
-// TODO
 // variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
-	void* pBricklet = NULL;
+	MyBricklet* myBricklet = NULL;
 	std::vector<std::string> keys,values;
-	std::vector<std::wstring> elementInstanceNames;
-	std::map<std::wstring, Vernissage::Session::Parameter> elementInstanceParamsMap;
-	Vernissage::Session::ExperimentInfo experimentInfo;
-	Vernissage::Session::SpatialInfo spatialInfo;
-	std::vector<std::wstring> allAxes;
-	std::wstring allAxesAsOneWString;
-	Vernissage::Session::AxisDescriptor axisDescriptor;
-	Vernissage::Session::AxisTableSets axisTableSetsMap;
-	std::wstring axisNameWString;
-	std::string axisNameString, baseName;
-
 	char metaDataBaseName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1], metaDataName[MAX_OBJ_NAME+1];
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
 	char buf[ARRAY_SIZE];
-	int brickletID=-1, ret=-1, index=-1;
+	int brickletID=-1, ret=-1;
 
 	p->result = UNKNOWN_ERROR;
 
@@ -567,8 +627,8 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	for(brickletID=p->startBrickletID; brickletID <= p->endBrickletID; brickletID++){
 
 
-		pBricklet = pMyData->getBrickletPointerFromMap(brickletID);
-		ASSERT_RETURN_ZERO(pBricklet);
+		myBricklet = pMyData->getBrickletClassFromMap(brickletID);
+		ASSERT_RETURN_ZERO(myBricklet);
 
 		sprintf(metaDataName,"%s_%03d",metaDataBaseName,brickletID);
 
@@ -589,272 +649,9 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 				return 0;
 			}
 		}
+			myBricklet->getBrickletMetaData(keys,values);
 
-		keys.clear();
-		values.clear();
-		elementInstanceNames.clear();
-		allAxes.clear();
-
-		if( !pMyData->gotCachedBrickletMetaData(brickletID) ){
-
-			// timestamp of creation
-			tm ctime = pSession->getCreationTimestamp(pBricklet);
-
-			keys.push_back("creationTimeStamp");
-			values.push_back(anyTypeToString<time_t>(mktime(&ctime)));
-
-			// BEGIN pSession->getBrickletMetaData
-			Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
-			keys.push_back("brickletMetaData.fileCreatorName");
-			values.push_back(WStringToString(brickletMetaData.fileCreatorName));
-
-			keys.push_back("brickletMetaData.fileCreatorVersion");
-			values.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
-			
-			keys.push_back("brickletMetaData.accountName");
-			values.push_back(WStringToString(brickletMetaData.accountName));
-
-			keys.push_back("brickletMetaData.userName");
-			values.push_back(WStringToString(brickletMetaData.userName));
-			// END pSession->getBrickletMetaData 
-			
-			keys.push_back("sequenceID");
-			values.push_back(anyTypeToString<int>(pSession->getSequenceId(pBricklet)));
-
-			keys.push_back("creationComment");
-			values.push_back(WStringToString(pSession->getCreationComment(pBricklet)));
-
-			keys.push_back("dimension");
-			values.push_back(anyTypeToString<int>(pSession->getDimensionCount(pBricklet)));
-
-			keys.push_back("rootAxis");
-			values.push_back(WStringToString(pSession->getRootAxisName(pBricklet)));
-
-			keys.push_back("triggerAxis");
-			values.push_back(WStringToString(pSession->getTriggerAxisName(pBricklet)));
-
-			keys.push_back("channelName");
-			values.push_back(WStringToString(pSession->getChannelName(pBricklet)));
-
-			keys.push_back("channelInstanceName");
-			values.push_back(WStringToString(pSession->getChannelInstanceName(pBricklet)));
-
-			keys.push_back("runCycleCount");
-			values.push_back(anyTypeToString<int>(pSession->getRunCycleCount(pBricklet)));
-
-			keys.push_back("scanCycleCount");
-			values.push_back(anyTypeToString<int>(pSession->getScanCycleCount(pBricklet)));
-
-			elementInstanceNames = pSession->getExperimentElementInstanceNames(pBricklet,L"");
-
-			std::vector<std::wstring>::iterator itElementInstanceNames;
-			std::map<std::wstring, Vernissage::Session::Parameter>::iterator itMap;
-			
-			for(itElementInstanceNames = elementInstanceNames.begin(); itElementInstanceNames != elementInstanceNames.end(); itElementInstanceNames++){
-
-				elementInstanceParamsMap = pSession->getExperimentElementParameters(pBricklet,*itElementInstanceNames);
-
-				for(itMap = elementInstanceParamsMap.begin(); itMap != elementInstanceParamsMap.end(); itMap++){
-
-					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first));
-					values.push_back("");
-
-					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".value") );
-					values.push_back( WStringToString(itMap->second.value));
-
-					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".unit") );
-					values.push_back( WStringToString(itMap->second.unit));
-
-					keys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".valueType") );
-					values.push_back( valueTypeToString(itMap->second.valueType) );
-				}
-			}
-
-			// BEGIN Vernissage::Session::SpatialInfo
-			spatialInfo = pSession->getSpatialInfo(pBricklet);
-
-			std::vector<double>::const_iterator it;
-			for( it = spatialInfo.physicalX.begin(); it != spatialInfo.physicalX.end(); it++){
-				index = it - spatialInfo.physicalX.begin() + 1 ; // one-based Index
-				sprintf(buf,"spatialInfo.physicalX.No%d",index);
-				keys.push_back(buf);
-				values.push_back(anyTypeToString<double>(*it));
-			}
-
-			for( it = spatialInfo.physicalY.begin(); it != spatialInfo.physicalY.end(); it++){
-				index = it - spatialInfo.physicalY.begin() + 1 ; // one-based Index
-				sprintf(buf,"spatialInfo.physicalY.No%d",index);
-				keys.push_back(buf);
-				values.push_back(anyTypeToString<double>(*it));
-			}
-
-			keys.push_back("spatialInfo.originatorKnown");
-			values.push_back(spatialInfo.originatorKnown ? "true" : "false");
-
-			keys.push_back("spatialInfo.channelName");
-			if(spatialInfo.originatorKnown){
-				values.push_back(WStringToString(spatialInfo.channelName));
-			}else{
-				values.push_back("");
-			}
-
-			keys.push_back("spatialInfo.sequenceId");
-			if(spatialInfo.originatorKnown){
-				values.push_back(anyTypeToString<int>(spatialInfo.sequenceId));
-			}else{
-				values.push_back("");
-			}
-
-			keys.push_back("spatialInfo.runCycleCount");
-			if(spatialInfo.originatorKnown){
-				values.push_back(anyTypeToString<int>(spatialInfo.runCycleCount));
-			}else{
-				values.push_back("");
-			}
-
-			keys.push_back("spatialInfo.scanCycleCount");
-			if(spatialInfo.originatorKnown){
-				values.push_back(anyTypeToString<int>(spatialInfo.scanCycleCount));
-			}else{
-				values.push_back("");
-			}
-
-			keys.push_back("spatialInfo.viewName");
-			if(spatialInfo.originatorKnown){
-				values.push_back(WStringToString(spatialInfo.viewName));
-			}else{
-				values.push_back("");
-			}
-
-			keys.push_back("spatialInfo.viewSelectionId");
-			if(spatialInfo.originatorKnown){
-				values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionId));
-			}else{
-				values.push_back("");
-			}
-
-			keys.push_back("spatialInfo.viewSelectionIndex");
-			if(spatialInfo.originatorKnown){
-				values.push_back(anyTypeToString<int>(spatialInfo.viewSelectionIndex));		
-			}else{
-				values.push_back("");
-			}
-			//END Vernissage::Session::SpatialInfo
-
-			// BEGIN Vernissage::Session::ExperimentInfo
-			experimentInfo = pSession->getExperimentInfo(pBricklet);
-
-			keys.push_back("experimentInfo.Name");
-			values.push_back(WStringToString(experimentInfo.experimentName));
-
-			keys.push_back("experimentInfo.Version");
-			values.push_back(WStringToString(experimentInfo.experimentVersion));
-
-			keys.push_back("experimentInfo.Description");
-			values.push_back(WStringToString(experimentInfo.experimentDescription));
-			
-			keys.push_back("experimentInfo.FileSpec");
-			values.push_back(WStringToString(experimentInfo.experimentFileSpec));
-			
-			keys.push_back("experimentInfo.projectName");
-			values.push_back(WStringToString(experimentInfo.projectName));
-		
-			keys.push_back("experimentInfo.projectVersion");
-			values.push_back(WStringToString(experimentInfo.projectVersion));
-			
-			keys.push_back("experimentInfo.projectFileSpec");
-			values.push_back(WStringToString(experimentInfo.projectFileSpec));
-			// END Vernissage::Session::ExperimentInfo
-
-			// store a list of all axes
-			allAxes = getAllAxesNames(pBricklet);
-			keys.push_back("allAxes");
-			
-			allAxesAsOneWString.clear();
-			std::vector<std::wstring>::const_iterator itAllAxes;
-			for(itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
-				allAxesAsOneWString.append(*itAllAxes + L";");
-			}
-			values.push_back(WStringToString(allAxesAsOneWString));
-
-			// BEGIN Vernissage::Session::axisDescriptor
-			for(itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
-				axisNameWString = *itAllAxes;
-				axisNameString  = WStringToString(*itAllAxes);
-
-				axisDescriptor = pSession->getAxisDescriptor(pBricklet,axisNameWString);
-
-				keys.push_back(axisNameString + ".clocks");
-				values.push_back(anyTypeToString<int>(axisDescriptor.clocks));
-				
-				keys.push_back(axisNameString + ".mirrored");
-				values.push_back((axisDescriptor.mirrored)? "true" : "false");
-				
-				keys.push_back(axisNameString + ".physicalUnit");
-				values.push_back(WStringToString(axisDescriptor.physicalUnit));
-				
-				keys.push_back(axisNameString + ".physicalIncrement");
-				values.push_back(anyTypeToString<double>(axisDescriptor.physicalIncrement));
-				
-				keys.push_back(axisNameString + ".physicalStart");
-				values.push_back(anyTypeToString<double>(axisDescriptor.physicalStart));
-				
-				keys.push_back(axisNameString + ".rawIncrement");
-				values.push_back(anyTypeToString<int>(axisDescriptor.rawIncrement));
-				
-				keys.push_back(axisNameString + ".rawStart");
-				values.push_back(anyTypeToString<int>(axisDescriptor.rawStart));
-				
-				keys.push_back(axisNameString + ".triggerAxisName");
-				values.push_back(WStringToString(axisDescriptor.triggerAxisName));
-				// END Vernissage::Session::axisDescriptor
-
-				// BEGIN Vernissage::Session:AxisTableSet
-				axisTableSetsMap = pSession->getAxisTableSets(pBricklet,*itAllAxes);
-
-				// if it is empty, we got the standard table set which is [start=1,step=clocks,stop=1]
-				if(axisTableSetsMap.size() == 0){
-
-					keys.push_back(axisNameString + ".axisTableSetNo1.axisName");
-					values.push_back(axisNameString);
-
-					keys.push_back(axisNameString + ".axisTableSetNo1.start");
-					values.push_back(anyTypeToString<int>(1));
-
-					keys.push_back(axisNameString + ".axisTableSetNo1.step");
-					values.push_back(anyTypeToString<int>(1));
-
-					keys.push_back(axisNameString + ".axisTableSetNo1.stop");
-					values.push_back(anyTypeToString<int>(axisDescriptor.clocks));
-				}
-				else{
-
-					Vernissage::Session::AxisTableSets::const_iterator itAxisTabelSetsMap;
-					Vernissage::Session::TableSet::const_iterator itAxisTableSetsMapStruct;
-					index=0;
-					for( itAxisTabelSetsMap = axisTableSetsMap.begin(); itAxisTabelSetsMap != axisTableSetsMap.end(); itAxisTabelSetsMap++ ){
-						index++; // 1-based index
-						baseName = axisNameString + "axisTableSetNo" + anyTypeToString<int>(index) + ".";
-						keys.push_back(baseName + axisNameString);
-						values.push_back(WStringToString(itAxisTabelSetsMap->first));
-
-						for(itAxisTableSetsMapStruct= itAxisTabelSetsMap->second.begin(); itAxisTableSetsMapStruct != itAxisTabelSetsMap->second.end(); itAxisTableSetsMapStruct++){
-							baseName = baseName + WStringToString(itAxisTabelSetsMap->first) + ".";
-							keys.push_back(baseName + "start");
-							values.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->start));
-
-							keys.push_back(baseName + "step");
-							values.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->step));
-
-							keys.push_back(baseName + "stop");
-							values.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->stop));
-						}
-					}
-				}
-				// END Vernissage::Session:AxisTableSet
-			}
-
-			ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName);
+			ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName,brickletID);
 
 			if(ret != 0){
 				sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);
@@ -862,22 +659,6 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 				p->result = ret;
 				return 0;
 			}
-
-			 //the metaData could be saved to a textwave successfully, so we can cache it
-			pMyData->storeBrickletMetaData(brickletID,keys,values);
-		}
-		else{ // we got the metaData cached
-			pMyData->loadCachedBrickletMetaData(brickletID,keys,values);
-			
-			ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName);
-
-			if(ret != 0){
-				sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);
-				outputToHistory(buf);
-				p->result = ret;
-				return 0;
-			}
-		}
 	}
 	p->result = SUCCESS;
 	return 0;
@@ -918,7 +699,7 @@ static int getBugReportTemplate(getBugReportTemplateParams *p){
 	else{
 		str.append("Venissage version: Can't access internal data\r");
 	}
-	str.append("XOP version: " + std::string(myVersion) + "\r");
+	str.append("XOP version: " + std::string(myXopVersion) + "\r");
 	str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
 	str.append("\r");
 	str.append("Your Name:\r");
@@ -964,7 +745,10 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
 	// use the timestamp of the last bricklet as dateOfLastChange
 	int numberOfBricklets = pSession->getBrickletCount();
-	void* pBricklet = pMyData->getBrickletPointerFromMap(numberOfBricklets);
+
+	void *pBricklet = pMyData->getBrickletClassFromMap(numberOfBricklets)->getBrickletPointer();
+	ASSERT_RETURN_ZERO(pBricklet);
+
 	tm ctime = pSession->getCreationTimestamp(pBricklet);
 
 	Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
@@ -997,7 +781,8 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	keys.push_back("Brickletkeys.accountName");
 	values.push_back(WStringToString(brickletMetaData.accountName));
 
-	ret = createAndFillTextWave(keys,values,NULL,metaDataWaveName);
+	// brickletID=0 because the waveNote of the resultfile metadata does hold an empty brickletID wavenote property
+	ret = createAndFillTextWave(keys,values,NULL,metaDataWaveName,0);
 
 	if(ret != 0){
 		sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);

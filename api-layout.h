@@ -28,7 +28,7 @@ typedef WAVE_TYPE FP64WAVE;
 
  /** @mainpage General Remarks
  * - The data types "string" and "variable" denote the Igor Pro data types 
- * - All functions return a floating point value as error code. This error code is either zero (everything is okay) or non-zero in case something went wrong. In this manual these error codes are denoted by human readable strings. See the errorCode struct in error-codes.h for the numeric value. The reason it is a floating point is due to Igor Pro XOP limitations
+ * - All functions return a floating point value as error code. This error code is either zero (everything is okay) or non-zero in case something went wrong. In this manual these error codes can be translated to human readable strings. See the errorCode struct in error-codes.h for the numeric value. The reason it is a floating point is due to Igor Pro XOP limitations.
  *  These API functions can be called in Igor like
  *  @code
  *  if( openResultFile() == errorCode.SUCCESS )
@@ -40,11 +40,11 @@ typedef WAVE_TYPE FP64WAVE;
  * - For rare cases the error code UNKNOWN_ERROR might be returned. Obviously in this case something went really badly wrong and the XOP does not know why.
  * - All waves hold wave notes of the form:
  *   	@code
- *   	xopVersion=0.1
- *   	vernissageVersion=1.0
- *   	resultFilePath=c:\data\10MicronLong-GNR_001.mtrx
- *   	DateOfWaveCreation=01/13/2010 18:25:47
- *   	brickletID=28
+ *   		xopVersion=0.1
+ *   		vernissageVersion=1.0
+ *   		resultFilePath=c:\data
+ *			resultFileName=10MicronLong-GNR_001.mtrx
+ *   		brickletID=28
  *   	@endcode
  *   	In case the brickletID does not make any sense, the entry is "brickletID=".
  * - Textwaves with (nx2) dimensions must never be considered ordered in any sense. Always check in the first column for a key and then readout the value from same row and the second column. 
@@ -65,7 +65,6 @@ typedef WAVE_TYPE FP64WAVE;
  *		- BrickletMetaData.accountName
  *		- totalNumberOfBricklets
  *		- timeStampOfLastChange (this will have the timestamp of the newest bricklet)
- *		- dateOfLastChange	(timeStampOfLastChange in human readable form)
 */
 
 /** 

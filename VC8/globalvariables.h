@@ -10,4 +10,6 @@
 #include "dataclass.h"
 extern myData *pMyData;
 
+const char myXopVersion[] = "0.01";
+
 #endif // GLOBALVARIABLES_H

@@ -2,12 +2,11 @@
 
 #include <string>
 #include <algorithm>
-
+#include <sys/stat.h>
 
 #include "utils.h"
 
 #include "xopstandardheaders.h"
-
 #include "dataclass.h"
 
 #include "globalvariables.h"
@@ -174,7 +173,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	return ret;
 }
 
-int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName){
+int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID){
 
 	long dimensionSizes[MAX_DIMENSIONS+1];
 	int overwrite=0;
@@ -246,47 +245,10 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		return ret;
 	}
 
+	ASSERT_RETURN_ZERO(pMyData);
+	pMyData->setWaveNote(brickletID,waveHandle);
+
 	return 0;
-}
-
-// see Vernissage Manual page 20/21
-// the idea here is to first get the root and triggerAxis for the Bricklet
-// Then we know the starting point of the axis hierachy (rootAxis) and the endpoint (triggerAxis)
-// In this way we can then traverse from the endpoint (triggerAxis) to the starting point (rootAxis) and record all axis names
-// In more than 99% of the cases this routine will return one or two axes
-// The value of maxRuns is strictly speaking wrong becase the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
-// The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName" 
-std::vector<std::wstring> getAllAxesNames(void *pBricklet){
-
-	std::vector<std::wstring> allAxes;
-	std::wstring axisName, rootAxis, triggerAxis;
-
-	int numRuns=0,maxRuns=100;
-
-	ASSERT(pBricklet,allAxes);
-	ASSERT(pMyData,allAxes);
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT(pSession,allAxes);
-
-	rootAxis= pSession->getRootAxisName(pBricklet);
-	triggerAxis = pSession->getTriggerAxisName(pBricklet);
-
-	axisName = triggerAxis;
-	allAxes.push_back(triggerAxis);
-
-	while(axisName != rootAxis){
-		axisName= pSession->getAxisDescriptor(pBricklet,axisName).triggerAxisName;
-		allAxes.push_back(axisName);
-
-		numRuns++;
-		if(numRuns > maxRuns){
-			outputToHistory("Found more than 100 axes in the axis hierachy. This is highliy unlikely and therefore a bug in this XOP or in Vernissage.");
-			break;
-		}
-	}
-
-	return allAxes;
 }
 
 std::string viewTypeCodeToString(int idx){
@@ -333,4 +295,25 @@ std::string valueTypeToString(int idx){
 	else{
 		return names.at(idx);
 	}
+}
+
+
+bool fileExists(std::string filePath, std::string fileName){
+
+	struct stat stFileInfo;
+	int intStat;
+	std::string fullPath = filePath + "\\" + fileName;
+
+	// Attempt to get the file attributes
+	intStat = stat(fullPath.c_str(),&stFileInfo);
+	if(intStat == 0) {
+		return true;
+	} else{
+		return false;
+	}
+}
+
+int createAndFillDataWave(DataFolderHandle, const char *waveName, int brickletID){
+
+	return 0;
 }

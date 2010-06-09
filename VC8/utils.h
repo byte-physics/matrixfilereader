@@ -33,9 +33,11 @@ std::string anyTypeToString(const T& t){
 
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
 
-int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName);
+int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID);
+int createAndFillDataWave(DataFolderHandle, const char *waveName, int brickletID);
 
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
 std::string valueTypeToString(int idx);
+bool fileExists(std::string filePath, std::string fileName);
 #endif // UTILS_H

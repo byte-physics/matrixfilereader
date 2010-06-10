@@ -1,6 +1,7 @@
 #include "myBricklet.h"
 
 #include "globalvariables.h"
+#include <algorithm>
 #include "utils.h"
 
 #define DEBUG_LEVEL 1
@@ -54,14 +55,15 @@ void MyBricklet::getBrickletMetaData(std::vector<std::string> &keys, std::vector
 
 		loadBrickletMetaDataFromResultFile();
 
-		sprintf(buf,"Storing (%d,%d) key/value pairs of brickletMetaData for late cached access.",m_metaDataKeys.size(),m_metaDataValues.size());
+		sprintf(buf,"Storing (%d,%d) key/value pairs of brickletMetaData for late cached access.",
+			m_metaDataKeys.size(), m_metaDataValues.size());
 		debugOutputToHistory(DEBUG_LEVEL,buf);
 	}
 
 	keys = m_metaDataKeys;
 	values = m_metaDataValues;
 }
-// TODO add viewTypecodes and a convenient function to read it out for later use
+
 void MyBricklet::loadBrickletMetaDataFromResultFile(){
 
 	std::vector<std::wstring> elementInstanceNames;
@@ -74,7 +76,8 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	Vernissage::Session::AxisDescriptor axisDescriptor;
 	Vernissage::Session::AxisTableSets axisTableSetsMap;
 	std::wstring axisNameWString;
-	std::string axisNameString, baseName;
+	std::vector<std::wstring> allAxesAsWString;
+	std::string axisNameString, baseName, viewTypeCodesAsOneString;
 	int index;
 	char buf[ARRAY_SIZE];
 
@@ -89,6 +92,14 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	m_metaDataKeys.push_back("creationTimeStamp");
 	m_metaDataValues.push_back(anyTypeToString<time_t>(mktime(&ctime)));
 
+	// viewTypeCodes
+	m_viewTypeCodes = m_VernissageSession->getViewTypes(m_brickletPtr);
+	std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCode;
+	for(itViewTypeCode = m_viewTypeCodes.begin(); itViewTypeCode != m_viewTypeCodes.end(); itViewTypeCode++){
+		viewTypeCodesAsOneString.append( viewTypeCodeToString(*itViewTypeCode) + ";");
+	}
+	m_metaDataKeys.push_back("viewTypeCodes");
+	m_metaDataValues.push_back(viewTypeCodesAsOneString);
 
 	// resultfile name
 	m_metaDataKeys.push_back("fileName");
@@ -123,8 +134,9 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	m_metaDataKeys.push_back("creationComment");
 	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getCreationComment(m_brickletPtr)));
 
+	m_dimension = m_VernissageSession->getDimensionCount(m_brickletPtr);
 	m_metaDataKeys.push_back("dimension");
-	m_metaDataValues.push_back(anyTypeToString<int>(m_VernissageSession->getDimensionCount(m_brickletPtr)));
+	m_metaDataValues.push_back(anyTypeToString<int>(m_dimension));
 
 	m_metaDataKeys.push_back("rootAxis");
 	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getRootAxisName(m_brickletPtr)));
@@ -266,17 +278,18 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	// END Vernissage::Session::ExperimentInfo
 
 	// store a list of all axes
-	m_allAxes = getAllAxesNames();
+	allAxesAsWString = generateAllAxesVector();
 	m_metaDataKeys.push_back("allAxes");
 
 	std::vector<std::wstring>::const_iterator itAllAxes;
-	for(itAllAxes = m_allAxes.begin(); itAllAxes != m_allAxes.end(); itAllAxes++){
+	for(itAllAxes = allAxesAsWString.begin(); itAllAxes != allAxesAsWString.end(); itAllAxes++){
 		allAxesAsOneString.append(WStringToString(*itAllAxes) + ";");
+		m_allAxes.push_back(WStringToString(*itAllAxes));
 	}
 	m_metaDataValues.push_back(allAxesAsOneString);
 
 	// BEGIN Vernissage::Session::axisDescriptor
-	for(itAllAxes = m_allAxes.begin(); itAllAxes != m_allAxes.end(); itAllAxes++){
+	for(itAllAxes = allAxesAsWString.begin(); itAllAxes != allAxesAsWString.end(); itAllAxes++){
 		axisNameWString = *itAllAxes;
 		axisNameString  = WStringToString(*itAllAxes);
 
@@ -360,9 +373,10 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 // In more than 99% of the cases this routine will return one or two axes
 // The value of maxRuns is strictly speaking wrong becase the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
 // The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName" 
-std::vector<std::wstring> MyBricklet::getAllAxesNames(){
+std::vector<std::wstring> MyBricklet::generateAllAxesVector(){
 
 	std::wstring axisName, rootAxis, triggerAxis;
+	std::vector<std::wstring> allAxes;
 
 	char buf[ARRAY_SIZE];
 
@@ -372,11 +386,11 @@ std::vector<std::wstring> MyBricklet::getAllAxesNames(){
 	triggerAxis = m_VernissageSession->getTriggerAxisName(m_brickletPtr);
 
 	axisName = triggerAxis;
-	m_allAxes.push_back(triggerAxis);
+	allAxes.push_back(triggerAxis);
 
 	while(axisName != rootAxis){
 		axisName= m_VernissageSession->getAxisDescriptor(m_brickletPtr,axisName).triggerAxisName;
-		m_allAxes.push_back(axisName);
+		allAxes.push_back(axisName);
 
 		numRuns++;
 		if(numRuns > maxRuns){
@@ -385,5 +399,31 @@ std::vector<std::wstring> MyBricklet::getAllAxesNames(){
 		}
 	}
 
-	return m_allAxes;
+	return allAxes;
+}
+
+int	MyBricklet::getMetaDataValueAsInt(std::string key){
+	return stringToAnyType<int>(this->getMetaDataValueAsString(key));
+};
+
+double MyBricklet::getMetaDataValueAsDouble(std::string key){
+	return stringToAnyType<double>(this->getMetaDataValueAsString(key));
+};
+
+
+std::string MyBricklet::getMetaDataValueAsString(std::string key){
+
+	std::string value;
+
+	if(key.size() == 0){
+		return value;
+	}
+
+	std::vector<std::string>::iterator it = std::find(m_metaDataKeys.begin(), m_metaDataKeys.end(), key);
+
+	if(it != m_metaDataValues.end()){ // we found it
+		value = m_metaDataValues.at(it-m_metaDataKeys.begin());
+	}
+
+	return value;
 }

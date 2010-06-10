@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="XFUNC1"
+	Name="MatrixFileReader"
 	ProjectGUID="{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}"
 	RootNamespace="XFUNC1"
 	>
@@ -48,13 +48,13 @@
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Coding\matrix-file-reader\VernissageSDK_V1.1\src\Incl&quot;;&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;XFUNC1_EXPORTS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				StructMemberAlignment="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/XFUNC1.pch"
+				PrecompiledHeaderFile=".\Release/matrixFileReader.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -78,13 +78,13 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="version.lib igor.lib XOPSupport.lib"
-				OutputFile="XFUNC1.xop"
+				OutputFile="matrixFileReader.xop"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\VC8&quot;;&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport&quot;"
 				IgnoreDefaultLibraryNames=""
-				ProgramDatabaseFile=".\Release/XFUNC1.pdb"
-				ImportLibrary=".\Release/XFUNC1.lib"
+				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"
+				ImportLibrary=".\Release/matrixFileReader.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -232,19 +232,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\matrixFileReader.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\myBricklet.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\utils.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\XFUNC1.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\XOPSupport.c"
 				>
 			</File>
 		</Filter>
@@ -269,15 +265,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\matrixFileReader.h"
+				>
+			</File>
+			<File
 				RelativePath=".\myBricklet.h"
 				>
 			</File>
 			<File
 				RelativePath=".\utils.h"
-				>
-			</File>
-			<File
-				RelativePath=".\XFUNC1.h"
 				>
 			</File>
 		</Filter>
@@ -286,7 +282,7 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath=".\XFUNC1.rc"
+				RelativePath=".\matrixFileReader.rc"
 				>
 				<FileConfiguration
 					Name="Release|Win32"

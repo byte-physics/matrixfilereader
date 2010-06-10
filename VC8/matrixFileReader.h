@@ -1,8 +1,8 @@
 /*
-	XFUNC1.h -- equates for XFUNC1 XOP
+	TODO
 */
 
-/* XFUNC1 custom error codes */
+/* custom error codes */
 
 #define REQUIRES_IGOR_504	FIRST_XOP_ERR + 1
 #define OUT_OF_MEMORY		FIRST_XOP_ERR + 2
@@ -13,11 +13,6 @@ HOST_IMPORT void main(IORecHandle ioRecHandle);
 static void XOPEntry();
 static long RegisterFunction();
 void doCleanup();
-
-
-
-
-
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{

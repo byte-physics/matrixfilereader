@@ -1,4 +1,4 @@
-/*	XOP-specific resources for XFUNC1 on Windows
+/*	XOP-specific resources for TODO on Windows
 
 	This file is compiled by the resource compiler and creates XOP-specific
 	resources that IGOR looks for in an XOP module.
@@ -6,9 +6,9 @@
 
 #include "C:\Documents and Settings\brt127\My Documents\gitRepo\Coding\XOP Toolkit 5\IgorXOPs5\XOPSupport\XOPResources.h"			// Defines XOP-specific symbols.
 
-1100 STR#					// Custom error messages, symbols defined in XFUNC1.h
+1100 STR#					// Custom error messages
 BEGIN
-	"XFUNC1 requires Igor 6.0 or later.\0",			
+	"MatrixFileReader requires Igor 6.0 or later.\0",			
 	"Out of memory. Bad luck...\0",
 	// You can add error messages here.
 	

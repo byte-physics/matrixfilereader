@@ -280,12 +280,12 @@ std::string valueTypeToString(int idx){
 	char buf[ARRAY_SIZE];
 	std::vector<std::string> names;
 
-	names.push_back("vt_Special");
-	names.push_back("vt_Integer");
-	names.push_back("vt_Double");
-	names.push_back("vt_Boolean");
-	names.push_back("vt_Enum");
-	names.push_back("vt_String");
+	names.push_back(VT_SPECIAL_STRING);
+	names.push_back(VT_INTEGER_STRING);
+	names.push_back(VT_DOUBLE_STRING);
+	names.push_back(VT_BOOLEAN_STRING);
+	names.push_back(VT_ENUM_STRING);
+	names.push_back(VT_STRING_STRING);
 
 	if(idx < 0 || idx >= names.size()){
 		sprintf(buf,"BUG: valueTypeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
@@ -313,7 +313,186 @@ bool fileExists(std::string filePath, std::string fileName){
 	}
 }
 
-int createAndFillDataWave(DataFolderHandle, const char *waveName, int brickletID){
+// TODO guess what ???
+int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
+
+	char buf[ARRAY_SIZE];
+
+	const int noOverwrite=0;
+
+	int dimension;
+	std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes;
+	Vernissage::Session *pSession;
+	std::vector<std::string> allAxes;
+	Vernissage::Session::AxisDescriptor triggerAxis, rootAxis; 
+	int numPointsTriggerAxis, numPointsRootAxis, numWavesToCreate, ret=-1,i;
+	double physicalLengthTriggerAxis, physicalLengthRootAxis;
+	std::vector<waveHndl> waveHandleVector;
+	waveHndl waveHandle;
+	std::vector<std::string> waveNameVector;
+
+	std::vector<std::string>::const_iterator itWaveNames;
+
+	long dimensionSizes[MAX_DIMENSIONS+1];
+	MemClear(dimensionSizes, sizeof(dimensionSizes));
+
+	std::string waveBaseName(waveBaseNameChar);
+
+	ASSERT_RETURN_MINUSONE(pMyData);
+	MyBricklet *myBricklet = pMyData->getBrickletClassFromMap(brickletID);
+	void *pBricklet = myBricklet->getBrickletPointer();
+	pSession = pMyData->getSession();
+	ASSERT_RETURN_MINUSONE(myBricklet);
+	ASSERT_RETURN_MINUSONE(pSession);
+
+	myBricklet->getDimension(dimension);
+	myBricklet->getAxes(allAxes);
+	myBricklet->getViewTypeCodes(viewTypeCodes);
+
+	sprintf(buf,"### BrickletID %d ###",brickletID);
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+	sprintf(buf,"dimension %d",dimension);
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+	std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCodes;
+	for(itViewTypeCodes = viewTypeCodes.begin(); itViewTypeCodes != viewTypeCodes.end(); itViewTypeCodes++){
+		sprintf(buf,"viewType %s",viewTypeCodeToString(*itViewTypeCodes).c_str());
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+	}
+	
+	debugOutputToHistory(DEBUG_LEVEL,"Axis order is from triggerAxis to rootAxis");
+
+	std::vector<std::string>::const_iterator itAllAxes;	
+	for(itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
+		sprintf(buf,"Axis %s",itAllAxes->c_str());
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+	}
+
+
+	switch(dimension){
+	
+		case 1:
+
+			break;
+
+		case 2:
+
+			// Two dimensions, probably an image
+			triggerAxis = pSession->getAxisDescriptor(pBricklet,pSession->getTriggerAxisName(pBricklet));
+			
+			// Determine the length of one "line" of data
+			numPointsTriggerAxis = triggerAxis.clocks;
+			
+			if (triggerAxis.mirrored)
+			{
+				// The axis has the "mirrored" characteristic, thus it has a
+				// "forward" and a "backward" section. Thus, the length of one line
+				// is only half the number of clocks that triggered the channel.
+				numPointsTriggerAxis /= 2;
+			}
+
+			// Now we can determine the Bricklet "width". If the axis has the unit
+			// "meter", then it would be really a width (probably the scan area
+			// width.)
+			physicalLengthTriggerAxis = triggerAxis.physicalStart + triggerAxis.physicalIncrement * ( numPointsTriggerAxis -1 );
+
+			// There must be another axis, because the Bricklet has two dimensions:
+			rootAxis = pSession->getAxisDescriptor(pBricklet,triggerAxis.triggerAxisName);
+
+			// Determine the length of one "line" of data
+			numPointsRootAxis = rootAxis.clocks;
+			
+			if (rootAxis.mirrored)
+			{
+				// The axis has the "mirrored" characteristic, thus it has a
+				// "forward" and a "backward" section. Thus, the length of one line
+				// is only half the number of clocks that triggered the channel.
+				numPointsRootAxis/= 2;
+			}
+
+			// Now we can determine the Bricklet "width". If the axis has the unit
+			// "meter", then it would be really a width (probably the scan area
+			// width.)
+			physicalLengthRootAxis = rootAxis.physicalStart + rootAxis.physicalIncrement * (numPointsRootAxis - 1);
+
+			sprintf(buf,"physicalLengthRootAxis=%g",physicalLengthRootAxis);
+			debugOutputToHistory(DEBUG_LEVEL,buf);
+
+			sprintf(buf,"physicalLengthTriggerAxis=%g",physicalLengthTriggerAxis);
+			debugOutputToHistory(DEBUG_LEVEL,buf);
+
+			// now we have to disinguish three cases on how many 2D waves we need
+			// both are mirrored:		4
+			// one mirrored, one not:	2
+			// none mirrored:			1
+			if( triggerAxis.mirrored && rootAxis.mirrored ){
+				waveNameVector.push_back(waveBaseName + "_TraceUp");
+				waveNameVector.push_back(waveBaseName + "_TraceDown");
+				waveNameVector.push_back(waveBaseName + "_ReTraceDown");
+			}
+			else if( triggerAxis.mirrored ){
+				waveNameVector.push_back(waveBaseName + "_TraceUp");
+				waveNameVector.push_back(waveBaseName + "_ReTraceUp");
+			}
+			else if( rootAxis.mirrored ){
+				waveNameVector.push_back(waveBaseName + "_TraceUp");
+				waveNameVector.push_back(waveBaseName + "_TraceDown");
+			}
+			else{
+				waveNameVector.push_back(waveBaseName + "_TraceUp");
+			}
+
+			// check order of ROWS and COLUMNS
+			dimensionSizes[ROWS] = numPointsTriggerAxis;
+			dimensionSizes[COLUMNS] = numPointsRootAxis;
+
+			// get pointer to the raw data
+			const int **rawData;
+			int count;
+			myBricklet->getBrickletContentsBuffer(rawData,count);
+
+			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
+
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,NT_I32,noOverwrite);
+
+				if(ret == NAME_WAV_CONFLICT){
+					sprintf(buf,"Wave %s already exists.",itWaveNames->c_str());
+					debugOutputToHistory(DEBUG_LEVEL,buf);
+					return WAVE_EXIST;
+				}
+
+				if(ret != 0 ){
+					sprintf(buf,"Error %d in creating wave %s.",ret, itWaveNames->c_str());
+					outputToHistory(buf);
+					return UNKNOWN_ERROR;
+				}
+
+				ASSERT_RETURN_MINUSONE(waveHandle);
+				waveHandleVector.push_back(waveHandle);
+			}
+
+			// FIXME table sets are currently ignored!!
+			// TODO copy data to waves, make a solution which works for all cases of mirroring!
+			for(i = 0; i <numPointsTriggerAxis; i++){
+			
+				// copy the data linewise with memcpy at the place we got by WaveData
+			}
+
+			break;
+
+		case 3:
+
+			break;
+
+		default:
+			sprintf(buf,"BUG: Dimension %d can not be handled");
+			outputToHistory(buf);
+			break;
+	
+	
+	}
+
 
 	return 0;
 }

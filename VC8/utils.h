@@ -31,10 +31,19 @@ std::string anyTypeToString(const T& t){
 	return ss.str();
 }
 
+template <class T>
+T stringToAnyType(std::string str){
+	std::stringstream ss(str);
+	T t;
+	ss >> t;
+	return t;
+}
+
+
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
 
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID);
-int createAndFillDataWave(DataFolderHandle, const char *waveName, int brickletID);
+int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveName, int brickletID);
 
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);

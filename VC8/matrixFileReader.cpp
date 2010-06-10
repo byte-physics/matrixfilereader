@@ -1,4 +1,4 @@
-/*	XFUNC1.c -- illustrates Igor external functions.
+/*	TODO
 
 */
 
@@ -7,7 +7,7 @@
 
 
 #include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
-#include "XFUNC1.h"
+#include "matrixFileReader.h"
 
 #include "dataclass.h"
 

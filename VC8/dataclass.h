@@ -25,7 +25,7 @@ public:
 	// API functions
 	std::string getResultFileName();
 	std::string getResultFilePath();
-	void setResultFile( std::string filePath, std::string fileName){ m_resultFilePath = filePath; m_resultFileName = fileName;};
+	void setResultFile( std::string filePath, std::string fileName){ m_resultFilePath = filePath; m_resultFileName = fileName;}
 
 	// functions
 	bool resultFileOpen();
@@ -50,10 +50,6 @@ private:
 	int m_debugLevel;
 
 	IntMyBrickletPtrMap		m_brickletIDBrickletClassMap;
-	//IntIntPtrMap			m_brickletIDRawBufferMap;
-	//IntIntMap				m_brickletIDRawBufferLengthMap;
-	//IntStdVecMap			m_brickletIDMetaDataKeysMap;
-	//IntStdVecMap			m_brickletIDMetaDataValuesMap;
 };
 
 #endif // DATACLASS_H

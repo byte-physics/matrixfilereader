@@ -24,7 +24,7 @@ class DllStuff{
 	public:
 		// de/-constructors
 		DllStuff();
-		~DllStuff(){};
+		~DllStuff();
 
 		// functions
 		void closeSession();

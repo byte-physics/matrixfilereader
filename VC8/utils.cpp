@@ -315,7 +315,10 @@ bool fileExists(std::string filePath, std::string fileName){
 	}
 }
 
-// TODO guess what ???
+// TODO
+// support axis table sets
+// support 3D data (gridded spectroscopy)
+
 int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
 
 	char buf[ARRAY_SIZE];
@@ -327,29 +330,29 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	Vernissage::Session *pSession;
 	std::vector<std::string> allAxes;
 	Vernissage::Session::AxisDescriptor triggerAxis, rootAxis;
-	int numPointsTriggerAxis, numPointsRootAxis, ret=-1, i, j;
-	double physicalLengthTriggerAxis, physicalLengthRootAxis;
+	int numPointsTriggerAxis=-1, numPointsRootAxis=-1, ret=-1, i, j;
 	std::vector<waveHndl> waveHandleVector;
 	std::vector<int> hStateVector;
 	waveHndl waveHandle;
 	std::vector<std::string> waveNameVector;
-	bool dataFinished=false;
 
 	int *rawBrickletDataPtr = NULL;
-	int hState, rawBrickletSize=0, waveSize, firstBlockOffset; 
+	int hState, rawBrickletSize=0, waveSize=0, firstBlockOffset=0, triggerAxisBlockSize=0, rootAxisBlockSize=0; 
 	int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex, traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
 
 	double *traceUpDataPtr = NULL;
 	double *reTraceUpDataPtr = NULL;
 	double *traceDownDataPtr = NULL;
 	double *reTraceDownDataPtr = NULL;
+	double *waveData = NULL;
 
 	double setScaleOffset=0.0;
 
 	std::vector<int>	rawMax(4),	rawMin(4);
 	std::vector<double> scaledMax(4), scaledMin(4);
-	double scaledValue;
-	int rawValue;
+
+	int rawValue, rawMaxValue, rawMinValue;
+	double scaledMinValue, scaledMaxValue, scaledValue;
 
 	std::vector<std::string>::const_iterator itWaveNames;
 
@@ -393,11 +396,88 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 		debugOutputToHistory(DEBUG_LEVEL,buf);
 	}
 
+	// set min and max values to safe values
+	for(i=0; i < rawMin.size(); i++){
+		rawMin[i]	= _I32_MAX;
+		rawMax[i]	= _I32_MIN;
+		scaledMin[i]= DBL_MAX;
+		scaledMax[i]= -DBL_MAX;
+	}
+	rawMinValue = _I32_MAX;
+	rawMaxValue = _I32_MIN;
+	scaledMinValue = DBL_MAX;
+	scaledMaxValue = -DBL_MAX;
+
+	// get pointer to raw data
+	const int* pBuffer;
+	myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
+	rawBrickletDataPtr = (int *) pBuffer;
 
 	switch(dimension){
 	
 		case 1:
 
+			triggerAxis = pSession->getAxisDescriptor(pBricklet,pSession->getTriggerAxisName(pBricklet));
+			
+			numPointsTriggerAxis = triggerAxis.clocks;
+			
+			if (triggerAxis.mirrored)
+			{
+				numPointsTriggerAxis /= 2;
+			}
+			
+			dimensionSizes[ROWS] = numPointsTriggerAxis;
+			ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dataFolderHandle,dimensionSizes,NT_FP64,noOverwrite);
+
+			if(ret == NAME_WAV_CONFLICT){
+				sprintf(buf,"Wave %s already exists.",waveBaseName.c_str());
+				debugOutputToHistory(DEBUG_LEVEL,buf);
+				return WAVE_EXIST;
+			}
+
+			if(ret != 0 ){
+				sprintf(buf,"Error %d in creating wave %s.",ret, waveBaseName.c_str());
+				outputToHistory(buf);
+				return UNKNOWN_ERROR;
+			}
+
+			ASSERT_RETURN_MINUSONE(waveHandle);
+
+			hState = MoveLockHandle(waveHandle);
+
+			waveData = (double*) WaveData(waveHandle);
+
+			for(i=0; i < numPointsTriggerAxis; i++){
+				
+				rawValue	= rawBrickletDataPtr[i];
+				scaledValue = pSession->toPhysical(rawValue,pBricklet);			
+				waveData[i]	= scaledValue;
+
+				if(rawValue < rawMinValue){
+					rawMinValue = rawValue;
+				}
+				if(rawValue > rawMaxValue){
+					rawMaxValue = rawValue;
+				}
+				if(scaledValue < scaledMinValue){
+					scaledMinValue = scaledValue;
+				}
+				if(scaledValue > scaledMaxValue){
+					scaledMaxValue = scaledValue;
+				}
+			
+			}
+
+			pMyData->setDataWaveNote(brickletID,rawMinValue,rawMaxValue,scaledMinValue,scaledMaxValue,waveHandle);
+
+			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
+			
+			// FIXME casting should not be necessary
+			MDSetWaveUnits(waveHandle,ROWS,(char *)WStringToString(triggerAxis.physicalUnit).c_str());
+			MDSetWaveUnits(waveHandle,-1,(char *)myBricklet->getMetaDataValueAsString("channelUnit").c_str());			
+	
+			HSetState(waveHandle,hState);
+		
 			break;
 
 		case 2:
@@ -416,17 +496,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				numPointsTriggerAxis /= 2;
 			}
 
-			// Now we can determine the Bricklet "width". If the axis has the unit
-			// "meter", then it would be really a width (probably the scan area
-			// width.)
-			physicalLengthTriggerAxis = triggerAxis.physicalStart + triggerAxis.physicalIncrement * ( numPointsTriggerAxis -1 );
-
 			// There must be another axis, because the Bricklet has two dimensions:
 			rootAxis = pSession->getAxisDescriptor(pBricklet,triggerAxis.triggerAxisName);
 
 			// Determine the length of one "line" of data
 			numPointsRootAxis = rootAxis.clocks;
-			
+
+
 			if (rootAxis.mirrored)
 			{
 				// The axis has the "mirrored" characteristic, thus it has a
@@ -435,16 +511,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				numPointsRootAxis/= 2;
 			}
 
-			// Now we can determine the Bricklet "width". If the axis has the unit
-			// "meter", then it would be really a width (probably the scan area
-			// width.)
-			physicalLengthRootAxis = rootAxis.physicalStart + rootAxis.physicalIncrement * (numPointsRootAxis - 1);
-
 			sprintf(buf,"numPointsRootAxis=%d",numPointsRootAxis);
 			debugOutputToHistory(DEBUG_LEVEL,buf);
 
 			sprintf(buf,"numPointsTriggerAxis=%d",numPointsTriggerAxis);
 			debugOutputToHistory(DEBUG_LEVEL,buf);
+
+			dimensionSizes[ROWS] = numPointsTriggerAxis;
+			dimensionSizes[COLUMNS] = numPointsRootAxis;
+			waveSize = dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
 
 			// now we have to disinguish three cases on how many 2D waves we need
 			// both are mirrored:		4
@@ -468,14 +543,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				waveNameVector.push_back(waveBaseName + "_TraceUp");
 			}
 
-			dimensionSizes[ROWS] = numPointsTriggerAxis;
-			dimensionSizes[COLUMNS] = numPointsRootAxis;
-
-			// get pointer to raw data
-			const int* pBuffer;
-			myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
-			rawBrickletDataPtr = (int *) pBuffer;
-
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
 				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,NT_FP64,noOverwrite);
@@ -493,43 +560,19 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				}
 
 				ASSERT_RETURN_MINUSONE(waveHandle);
+
 				waveHandleVector.push_back(waveHandle);
+
+				// lock wave and store state
+				hStateVector.push_back(MoveLockHandle(waveHandle));
+				// clear wave
+				MemClear((double*) WaveData(waveHandle), numPointsTriggerAxis*numPointsRootAxis*sizeof(double));
 			}
 
-			// clear waves
-			// lock waves
-			if(waveHandleVector.size() == 4){
-
-				hStateVector.push_back(MoveLockHandle(waveHandleVector[0]));
-				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
-				MemClear(traceUpDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
-				rawMin[0]	= _I32_MAX; rawMax[0] = _I32_MIN;
-				scaledMin[0]= FLT_MAX;  scaledMax[0]= FLT_MIN;
-
-				hStateVector.push_back(MoveLockHandle(waveHandleVector[1]));
-				reTraceUpDataPtr  = (double*) WaveData(waveHandleVector[1]);
-				MemClear(reTraceUpDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
-				rawMin[1]	= _I32_MAX; rawMax[1] = _I32_MIN;
-				scaledMin[1]= FLT_MAX;  scaledMax[1]= FLT_MIN;
-
-				hStateVector.push_back(MoveLockHandle(waveHandleVector[2]));
-				traceDownDataPtr  = (double*) WaveData(waveHandleVector[2]);
-				MemClear(traceDownDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
-				rawMin[2]	= _I32_MAX; rawMax[2] = _I32_MIN;
-				scaledMin[2]= FLT_MAX;  scaledMax[2]= FLT_MIN;
-
-				hStateVector.push_back(MoveLockHandle(waveHandleVector[3]));
-				reTraceDownDataPtr  = (double*) WaveData(waveHandleVector[3]);
-				MemClear(reTraceDownDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
-				rawMin[3]	= _I32_MAX; rawMax[3] = _I32_MIN;
-				scaledMin[3]= FLT_MAX;  scaledMax[3]= FLT_MIN;
-
-			}
-
-			//// wave0 TraceUp aka Forward/Up
-			//// wave1 ReTraceUp aka Backward/Up
-			//// wave2 TraceDown aka Forward/Down
-			//// wave3 ReTraceDown aka Backward/Down
+			//// TraceUp aka Forward/Up
+			//// ReTraceUp aka Backward/Up
+			//// TraceDown aka Forward/Down
+			//// ReTraceDown aka Backward/Down
 			//// horizontal axis aka X axis in Pascal's Scala Routines aka triggerAxis 		aka 	ROWS
 			//// vertical   axis aka Y axis in Pascal's Scala Routines aka rootAxis 		aka		COLUMNS
 
@@ -537,11 +580,54 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// - the wave is linear in the memory
 			// - going along the arrray will first fill the first column from row 0 to end and then the second column and so on
 
-			// FIXME table sets are currently ignored!!
 
-			// TODO make a solution which works for all cases of mirroring!
-			waveSize = numPointsTriggerAxis*numPointsRootAxis;
-			firstBlockOffset = numPointsTriggerAxis *numPointsRootAxis*2;
+			// both axes are mirrored
+			if(waveHandleVector.size() == 4){
+
+				rootAxisBlockSize	 = 2*numPointsRootAxis;
+				triggerAxisBlockSize = 2*numPointsTriggerAxis;
+				firstBlockOffset	 = numPointsRootAxis * triggerAxisBlockSize;
+
+				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
+				reTraceUpDataPtr  = (double*) WaveData(waveHandleVector[1]);
+				traceDownDataPtr  = (double*) WaveData(waveHandleVector[2]);
+				reTraceDownDataPtr  = (double*) WaveData(waveHandleVector[3]);
+			}
+			// only triggerAxis (X) is mirrored
+			else if(waveHandleVector.size() == 2 && triggerAxis.mirrored){
+
+				rootAxisBlockSize	 = numPointsRootAxis;
+				triggerAxisBlockSize = 2*numPointsTriggerAxis;
+				firstBlockOffset	 = numPointsRootAxis * triggerAxisBlockSize;
+
+				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
+				reTraceUpDataPtr  = (double*) WaveData(waveHandleVector[1]);			
+			}
+			// only rootAxis (Y) is mirrored
+			else if(waveHandleVector.size() == 2 && rootAxis.mirrored){
+
+				rootAxisBlockSize	 = 2*numPointsRootAxis;
+				triggerAxisBlockSize = numPointsTriggerAxis;
+				firstBlockOffset	 = numPointsRootAxis * triggerAxisBlockSize;
+
+				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
+				traceDownDataPtr  = (double*) WaveData(waveHandleVector[1]);			
+			}
+			// no mirroring
+			else if(waveHandleVector.size() == 1 && rootAxis.mirrored == false && triggerAxis.mirrored == false){
+
+				rootAxisBlockSize	 = numPointsRootAxis;
+				triggerAxisBlockSize = numPointsTriggerAxis;
+				firstBlockOffset	 = numPointsRootAxis * triggerAxisBlockSize;
+
+				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);			
+			}
+			else{
+				outputToHistory("BUG: createAndFillDataWave()...");
+				return 1;
+			}
+
+			// TODO explain the messy indizes here and above
 
 			// COLUMNS
 			for(i = 0; i < numPointsRootAxis; i++){
@@ -551,7 +637,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 					// traceUp
 					if(traceUpDataPtr){
-						traceUpRawBrickletIndex			= 2*i*numPointsTriggerAxis + j;
+						traceUpRawBrickletIndex			= i*triggerAxisBlockSize+ j;
 						traceUpDataIndex				= i*numPointsTriggerAxis   + j;
 
 						if(	traceUpDataIndex >= 0 &&
@@ -592,8 +678,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 					// traceDown
 					if(traceDownDataPtr){
 
-						traceDownRawBrickletIndex	= firstBlockOffset + i*2*numPointsTriggerAxis + j;
-						traceDownDataIndex			= i*numPointsTriggerAxis   + ( (numPointsTriggerAxis-1) - j);
+						traceDownRawBrickletIndex	= firstBlockOffset + i*triggerAxisBlockSize + j;
+						traceDownDataIndex			= ( (numPointsRootAxis-1) - i) * numPointsTriggerAxis   + j;
 
 						if(	traceDownDataIndex >= 0 &&
 							traceDownDataIndex < waveSize &&
@@ -633,7 +719,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 					// reTraceUp
 					if(reTraceUpDataPtr){
 
-						reTraceUpRawBrickletIndex	= i*2*numPointsTriggerAxis + 2*numPointsTriggerAxis - (j+1);
+						reTraceUpRawBrickletIndex	= i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
 						reTraceUpDataIndex			= i *  numPointsTriggerAxis + j;
 
 						if(	reTraceUpDataIndex >= 0 &&
@@ -674,9 +760,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 					// reTraceDown
 					if(reTraceDownDataPtr){
 
-						// TODO explain the messy indizes here and above
-						reTraceDownRawBrickletIndex		= firstBlockOffset + i*2*numPointsTriggerAxis + 2*numPointsTriggerAxis - (j+1);
-						reTraceDownDataIndex			= i*numPointsTriggerAxis   + ( (numPointsTriggerAxis-1) - j);
+						reTraceDownRawBrickletIndex		= firstBlockOffset + i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
+						reTraceDownDataIndex			= ( (numPointsRootAxis-1) - i) * numPointsTriggerAxis   + j;
 
 						if(	reTraceDownDataIndex >= 0 &&
 							reTraceDownDataIndex < waveSize &&
@@ -727,20 +812,21 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				// FIXME casting should not be necessary
 				MDSetWaveUnits(waveHandleVector[i],ROWS,(char *)WStringToString(triggerAxis.physicalUnit).c_str());
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,(char *)WStringToString(rootAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[i],-1,(char *)myBricklet->getMetaDataValueAsString("channelUnit").c_str());
 			}
 
 			break;
 
 		case 3:
+			outputToHistory("TODO and FIXME: Not yet implemented, feel free to help :)");
+			return INTERNAL_ERROR_CONVERTING_DATA;
 
 			break;
 
 		default:
-			sprintf(buf,"BUG: Dimension %d can not be handled");
+			sprintf(buf,"BUG: Dimension %d can not be handled",dimension);
 			outputToHistory(buf);
-			break;
-	
-	
+			break;	
 	}
 
 

@@ -15,8 +15,6 @@ static long RegisterFunction();
 void doCleanup();
 
 
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{
 	double  rememberCalls;

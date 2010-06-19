@@ -1,4 +1,4 @@
-/*	TODO
+/*	TODO author affiliation, license
 
 */
 
@@ -10,7 +10,6 @@
 #include "matrixFileReader.h"
 
 #include "dataclass.h"
-
 #include "globalvariables.h"
 #include "utils.h"
 
@@ -32,7 +31,6 @@ static int closeResultFile(closeResultFileParams *p){
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT_RETURN_ZERO(pSession);
 
-	pSession->eraseResultSets();
 	pMyData->closeSession();
 
 	p->result = SUCCESS;
@@ -46,6 +44,8 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	int ret;
 	char buf[ARRAY_SIZE];
 	char dataWaveName[MAX_OBJ_NAME+1];
+	const int *pBuffer;
+	int count=0;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -79,9 +79,6 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 			return 0;
 		}
 	}
-
-	const int *pBuffer;
-	int count=0;
 
 	MyBricklet* bricklet = pMyData->getBrickletClassFromMap(brickletID);
 
@@ -136,7 +133,6 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
 	p->result = UNKNOWN_ERROR;
-	*p->totalNumberOfBricklets = -1;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -152,10 +148,6 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 	}
 
 	*p->totalNumberOfBricklets = pSession->getBrickletCount();
-
-	if(*p->totalNumberOfBricklets == 0){
-		p->result = EMPTY_RESULTFILE;
-	}
 
 	p->result = SUCCESS;
 	return 0;
@@ -178,7 +170,6 @@ static int getResultFileName(getResultFileNameParams *p){
 	if(p->filename == NULL){
 		p->result = WRONG_PARAMETER;
 		return 0;
-		//return NULL_STR_VAR;
 	}
 
 	PutCStringInHandle(pMyData->getResultFileName().c_str(), *p->filename);
@@ -231,7 +222,6 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 		return 0;
 	}
 
-	//PutCStringInHandle(pMyData->getVernissageVersion().c_str(), *p->vernissageVersion);
 	*p->vernissageVersion = stringToAnyType<double>(pMyData->getVernissageVersion());
 
 	p->result = SUCCESS;
@@ -248,7 +238,6 @@ static int getXOPVersion(getXOPVersionParams *p){
 		return 0;
 	}
 
-	//PutCStringInHandle(myXopVersion, *p->xopVersion);
 	*p->xopVersion = stringToAnyType<double>(myXopVersion);
 
 	p->result = SUCCESS;
@@ -264,7 +253,9 @@ static int openResultFile(openResultFileParams *p){
 	char fileName[MAX_PATH_LEN+1];
 	std::wstring wstringFilePath,wstringFileName;
 	char buf[ARRAY_SIZE];
-	int ret = 0;
+	int ret = 0,i;
+	void* pContext  = NULL;
+	void* pBricklet = NULL;
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(pMyData->resultFileOpen()){
@@ -273,13 +264,8 @@ static int openResultFile(openResultFileParams *p){
 	}
 
 	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
 
-	if(pSession == NULL){
-		outputToHistory("Could not create session object.");
-		p->result = UNKNOWN_ERROR;
-		return 0;
-	}
-	
 	ret = GetCStringFromHandle(p->absoluteFilePath,filePath,MAX_PATH_LEN);
 	if( ret != 0 ){
 		return ret;
@@ -317,10 +303,7 @@ static int openResultFile(openResultFileParams *p){
 	//starting from here the result file is valid
 	pMyData->setResultFile(WStringToString(wstringFilePath),WStringToString(wstringFileName));
 
-	void* pContext  = NULL;
-	void* pBricklet = NULL;
-
-	for(int i=1; i <= pSession->getBrickletCount(); i++ ){
+	for(i=1; i <= pSession->getBrickletCount(); i++ ){
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
 		pMyData->setBrickletClassMap(i,pBricklet);
@@ -344,8 +327,6 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT_RETURN_ZERO(pSession);
-
-
 
 	p->result = SUCCESS;
 	return 0;
@@ -374,9 +355,6 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 	getRangeBrickletData(&rangeParams);
 	
 	p->result = rangeParams.result;
-	return 0;
-
-	p->result = SUCCESS;
 	return 0;
 }
 
@@ -418,9 +396,6 @@ static int getBrickletData(getBrickletDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
-
 	getRangeBrickletDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
 	rangeParams.startBrickletID = p->brickletID;
@@ -444,14 +419,6 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 		p->result = NO_FILE_OPEN;
 		return 0;
 	}
-
-	if(p->baseName == NULL){
-		p->result = WRONG_PARAMETER;
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getSession();
-	ASSERT_RETURN_ZERO(pSession);
 
 	getRangeBrickletMetaDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
@@ -516,7 +483,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
 	if( ( p->separateFolderForEachBricklet - 0.0) > 1e-5
 		&& ( p->separateFolderForEachBricklet - 1.0) > 1e-5){
-			p->result = INVALID_RANGE;
+			p->result = WRONG_PARAMETER;
 			debugOutputToHistory(DEBUG_LEVEL,"Paramteter separateFolderForEachBricklet must be 0 or 1");
 			return 0;
 	}
@@ -612,7 +579,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
 	if( ( p->separateFolderForEachBricklet - 0.0) > 1e-5
 		&& ( p->separateFolderForEachBricklet - 1.0) > 1e-5){
-			p->result = INVALID_RANGE;
+			p->result = WRONG_PARAMETER;
 			debugOutputToHistory(DEBUG_LEVEL,"Paramteter separateFolderForEachBricklet must be 0 or 1");
 			return 0;
 	}
@@ -734,6 +701,15 @@ static int getBugReportTemplate(getBugReportTemplateParams *p){
 // variable getResultFileMetaData(string waveName)
 static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
+	char metaDataWaveName[MAX_OBJ_NAME+1];
+	int ret;
+	std::vector<std::string> keys,values;
+	char buf[ARRAY_SIZE];
+	int numberOfBricklets;
+	void *pBricklet;
+	tm ctime;
+	Vernissage::Session::BrickletMetaData brickletMetaData;
+
 	p->result = UNKNOWN_ERROR;
 
 	ASSERT_RETURN_ZERO(pMyData);
@@ -745,31 +721,26 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	Vernissage::Session *pSession = pMyData->getSession();
 	ASSERT_RETURN_ZERO(pSession);
 
-	if(p->waveName == NULL){
-		p->result = WRONG_PARAMETER;
-		return 0;
+	if( GetHandleSize(p->waveName) == 0L ){
+		sprintf(metaDataWaveName,"resultFileMetaData");
 	}
-
-	char metaDataWaveName[MAX_OBJ_NAME+1];
-	int ret = GetCStringFromHandle(p->waveName,metaDataWaveName,MAX_OBJ_NAME);
-
-	if(ret != 0){
-		p->result = ret;
-		return 0;
+	else{
+		ret = GetCStringFromHandle(p->waveName,metaDataWaveName,MAX_OBJ_NAME);
+		if(ret != 0){
+			p->result = ret;
+			return 0;
+		}
 	}
-
-	std::vector<std::string> keys,values;
-	char buf[ARRAY_SIZE];
 
 	// use the timestamp of the last bricklet as dateOfLastChange
-	int numberOfBricklets = pSession->getBrickletCount();
+	numberOfBricklets = pSession->getBrickletCount();
 
-	void *pBricklet = pMyData->getBrickletClassFromMap(numberOfBricklets)->getBrickletPointer();
+	pBricklet = pMyData->getBrickletClassFromMap(numberOfBricklets)->getBrickletPointer();
 	ASSERT_RETURN_ZERO(pBricklet);
 
-	tm ctime = pSession->getCreationTimestamp(pBricklet);
+	ctime = pSession->getCreationTimestamp(pBricklet);
 
-	Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
+	brickletMetaData = pSession->getMetaData(pBricklet);
 
 	keys.push_back("filePath");
 	values.push_back(pMyData->getResultFilePath());

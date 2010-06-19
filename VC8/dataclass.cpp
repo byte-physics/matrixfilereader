@@ -1,8 +1,6 @@
 
 #include "xopstandardheaders.h"
 
-#include "stdlib.h"
-
 #include "vernissage.h"
 
 #include "dataclass.h"
@@ -14,6 +12,7 @@
 
 myData::myData():
 	m_VernissageSession(NULL),
+	m_dllStuff(NULL),
 	m_debugLevel(0){
 
 	m_dllStuff = new DllStuff;
@@ -47,6 +46,7 @@ void myData::closeSession(){
 			delete it->second;
 		}
 
+		m_VernissageSession->eraseResultSets();
 		m_dllStuff->closeSession();
 		m_VernissageSession=NULL;
 
@@ -54,7 +54,7 @@ void myData::closeSession(){
 		m_resultFileName.erase();
 		m_resultFilePath.erase();
 
-		// empty maps
+		// empty map
 		m_brickletIDBrickletClassMap.clear();
 	}
 }
@@ -115,7 +115,6 @@ void myData::setDataWaveNote(int brickletID, int rawMin, int rawMax, double scal
 	waveNote.append("rawMin="    + anyTypeToString<int>(rawMin)    + "\r");
 	waveNote.append("rawMax="	 + anyTypeToString<int>(rawMax)	 + "\r");
 	
-	// TODO change anyTypeToString so that it prints more significant digits
 	waveNote.append("scaledMin=" + anyTypeToString<double>(scaledMin) + "\r");
 	waveNote.append("scaledMax=" + anyTypeToString<double>(scaledMax) + "\r");
 

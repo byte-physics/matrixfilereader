@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "float.h"
 
 #include "xopstandardheaders.h"
 
@@ -27,8 +28,7 @@ void outputToHistory(const char *str);
 template <class T>
 std::string anyTypeToString(const T& t){
 	std::stringstream ss;
-	// TODO is it enough or too much, make it a define
-	ss.precision(30);
+	ss.precision(DBL_DIG);
 	ss << t;
 	return ss.str();
 }

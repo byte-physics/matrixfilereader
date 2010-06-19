@@ -14,6 +14,13 @@ MyBricklet::MyBricklet(void* pBricklet,Vernissage::Session *pSession):m_bricklet
 
 MyBricklet::~MyBricklet(void)
 {
+	if(m_VernissageSession){
+		if(m_rawBufferContents != NULL){
+			debugOutputToHistory(DEBUG_LEVEL,"Unloading Bricklet Contents");
+			m_VernissageSession->unloadBrickletContents(m_brickletPtr);
+			m_rawBufferContents=NULL;
+		}
+	}
 }
 
 

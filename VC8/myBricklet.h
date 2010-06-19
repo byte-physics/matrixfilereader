@@ -23,10 +23,6 @@ public:
 	int			getMetaDataValueAsInt(std::string key);
 	double		getMetaDataValueAsDouble(std::string key);
 
-	//bool  gotCachedBrickletMetaData(int brickletID);
-	//void  storeBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values);
-	//void  loadCachedBrickletMetaData(int brickletID, std::vector<std::string> &keys, std::vector<std::string> &values);
-
 private:
 	void MyBricklet::loadBrickletMetaDataFromResultFile();
 

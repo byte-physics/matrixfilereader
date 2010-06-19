@@ -10,7 +10,7 @@
 #include "dataclass.h"
 extern myData *pMyData;
 
-const char myXopVersion[] = "0.01";
+const char myXopVersion[] = "0.02";
 
 const char VT_SPECIAL_STRING[] = "vt_Special";
 const char VT_INTEGER_STRING[] = "vt_Integer";

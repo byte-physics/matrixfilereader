@@ -10,9 +10,6 @@
 #include "xopstandardheaders.h"
 
 typedef	std::map<int,	 MyBricklet*, std::less<int>>		IntMyBrickletPtrMap;
-//typedef std::map<int, const int*, std::less<int>> IntIntPtrMap;
-//typedef std::map<int, int, std::less<int>> IntIntMap;
-//typedef std::map<int, std::vector<std::string>, std::less<int>> IntStdVecMap;
 
 class myData{
 
@@ -45,12 +42,12 @@ private:
 	std::string getStandardWaveNote(int brickletID);
 
 
+//variables
+
 public:
 
 
 private:
-
-	//variables
 	std::string m_resultFileName, m_resultFilePath;
 	Vernissage::Session *m_VernissageSession;
 	DllStuff *m_dllStuff;

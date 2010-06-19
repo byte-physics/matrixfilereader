@@ -41,12 +41,13 @@ BEGIN
 		NT_FP64,			// parameter 3
 	0,
 
-	// variable getBrickletMetaData(string baseName, variable brickletID)
+	// variable getBrickletMetaData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
 	"getBrickletMetaData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,				// Return value type.
 		HSTRING_TYPE,			// parameter 1
 		NT_FP64,			// parameter 2
+		NT_FP64,			// parameter 3
 	0,
 
 	// variable getBrickletRawData(string baseName, variable brickletID)
@@ -57,7 +58,7 @@ BEGIN
 		NT_FP64,			// parameter 2
 	0,
 
-	// string getBugReportTemplate();
+	// string getBugReportTemplate()
 	"getBugReportTemplate\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	HSTRING_TYPE,				// Return value type.
@@ -118,18 +119,18 @@ BEGIN
 		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
 	0,
 
-	// variable getVernissageVersion(string *vernissageVersion)
+	// variable getVernissageVersion(variable *vernissageVersion)
 	"getVernissageVersion\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,				// Return value type.
-		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
+		FV_REF_TYPE | NT_FP64,			// parameter 1
 	0,
 
-	// variable getXOPVersion(string *xopVersion)
+	// variable getXOPVersion(variable *xopVersion)
 	"getXOPVersion\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	NT_FP64,				// Return value type.
-		FV_REF_TYPE | HSTRING_TYPE,			// parameter 1
+		FV_REF_TYPE | NT_FP64,			// parameter 1
 	0,
 
 	// variable openResultFile(string absoluteFilePath, string fileName)

@@ -9,9 +9,9 @@ closeResultFile	api-layout.h	/^variable closeResultFile();$/;"	p
 getAllBrickletData	api-layout.h	/^variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet);$/;"	p
 getAllBrickletMetaData	api-layout.h	/^variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet);$/;"	p
 getBrickletData	api-layout.h	/^variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID);$/;"	p
-getBrickletMetaData	api-layout.h	/^variable getBrickletMetaData(string baseName, variable brickletID);$/;"	p
+getBrickletMetaData	api-layout.h	/^variable getBrickletMetaData(string baseName, variable separateFolderForEachBricklet, variable brickletID);$/;"	p
 getBrickletRawData	api-layout.h	/^variable getBrickletRawData(string baseName, variable brickletID);$/;"	p
-getBugReportTemplate	api-layout.h	/^string getBugReportTemplate();/;"	p
+getBugReportTemplate	api-layout.h	/^string getBugReportTemplate();$/;"	p
 getErrorMessage	api-layout.h	/^string getErrorMessage(variable errorCode);$/;"	p
 getNumberOfBricklets	api-layout.h	/^variable getNumberOfBricklets(variable *totalNumberOfBricklets);$/;"	p
 getRangeBrickletData	api-layout.h	/^variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p
@@ -19,6 +19,6 @@ getRangeBrickletMetaData	api-layout.h	/^variable getRangeBrickletMetaData(string
 getResultFileMetaData	api-layout.h	/^variable getResultFileMetaData(string waveName);$/;"	p
 getResultFileName	api-layout.h	/^variable getResultFileName(string *filename);$/;"	p
 getResultFilePath	api-layout.h	/^variable getResultFilePath(string *absoluteFilePath);$/;"	p
-getVernissageVersion	api-layout.h	/^variable getVernissageVersion(string *vernissageVersion);$/;"	p
-getXOPVersion	api-layout.h	/^variable getXOPVersion(string *xopVersion);$/;"	p
+getVernissageVersion	api-layout.h	/^variable getVernissageVersion(variable *vernissageVersion);$/;"	p
+getXOPVersion	api-layout.h	/^variable getXOPVersion(variable *xopVersion);$/;"	p
 openResultFile	api-layout.h	/^variable openResultFile(string absoluteFilePath, string fileName);$/;"	p

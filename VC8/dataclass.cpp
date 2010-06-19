@@ -107,10 +107,34 @@ void myData::setBrickletClassMap(int brickletID, void *pBricklet){
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
 
-void myData::setWaveNote(int brickletID,waveHndl waveHandle){
+void myData::setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle){
+
+	std::string	waveNote = this->getStandardWaveNote(brickletID);
+	char buf[ARRAY_SIZE];
+
+	waveNote.append("rawMin="    + anyTypeToString<int>(rawMin)    + "\r");
+	waveNote.append("rawMax="	 + anyTypeToString<int>(rawMax)	 + "\r");
+	
+	// TODO change anyTypeToString so that it prints more significant digits
+	waveNote.append("scaledMin=" + anyTypeToString<double>(scaledMin) + "\r");
+	waveNote.append("scaledMax=" + anyTypeToString<double>(scaledMax) + "\r");
+
+	this->setWaveNote(waveNote,waveHandle);
+}
+
+
+void myData::setOtherWaveNote(int brickletID, waveHndl waveHandle){
+
+	std::string waveNote = this->getStandardWaveNote(brickletID);
+
+	this->setWaveNote(waveNote,waveHandle);
+}
+
+
+
+std::string myData::getStandardWaveNote(int brickletID){
 
 	std::string waveNote;
-	char buf[ARRAY_SIZE];
 
 	waveNote.append("resultFileName=" + getResultFileName() + "\r");
 	waveNote.append("resultFilePath=" + getResultFilePath() + "\r");
@@ -124,7 +148,17 @@ void myData::setWaveNote(int brickletID,waveHndl waveHandle){
 	}
 
 	waveNote.append("xopVersion=" + std::string(myXopVersion) + "\r");
-	waveNote.append("vernissageVersion=" + this->getVernissageVersion());
+	waveNote.append("vernissageVersion=" + this->getVernissageVersion() + "\r");
+
+	return waveNote;
+}
+
+void myData::setWaveNote(std::string waveNote, waveHndl waveHandle){
+
+	if(waveNote.empty()){
+		outputToHistory("BUG: got empty waveNote in myData::setWaveNote.");
+		return;
+	}
 
 	Handle noteHandle  = NewHandle(waveNote.size()) ;
 	PutCStringInHandle(waveNote.c_str(),noteHandle);

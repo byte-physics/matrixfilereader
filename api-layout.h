@@ -212,7 +212,7 @@ variable getBrickletRawData(string baseName, variable brickletID);
  * TODO if baseName is empty the name "brickletMetaDataNo" is used
  * @return SUCCESS | NON_EXISTENT_BRICKLET | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST | WRONG_PARAMETER
 */ 
-variable getBrickletMetaData(string baseName, variable brickletID);
+variable getBrickletMetaData(string baseName, variable separateFolderForEachBricklet, variable brickletID);
 
 /** IMPLEMENTED as wrapper to getRangeBrickletMetaData
  * Return the meta data for all bricklets

@@ -43,7 +43,9 @@ static int closeResultFile(closeResultFileParams *p){
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	p->result = UNKNOWN_ERROR;
+	int ret;
 	char buf[ARRAY_SIZE];
+	char dataWaveName[MAX_OBJ_NAME+1];
 
 	ASSERT_RETURN_ZERO(pMyData);
 	if(!pMyData->resultFileOpen()){
@@ -66,12 +68,17 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		return 0;
 	}
 
-	if(p->baseName == NULL ){
-		p->result = WRONG_PARAMETER;
-		return 0;
+	if( GetHandleSize(p->baseName) == 0L ){
+		sprintf(dataWaveName,"brickletRawData_%03d",brickletID);
 	}
-
-	debugOutputToHistory(DEBUG_LEVEL,"Got correct wave, and correct brickletID");
+	else
+	{
+		ret = GetCStringFromHandle(p->baseName,dataWaveName,MAX_OBJ_NAME);
+		if(ret != 0){
+			p->result = ret;
+			return 0;
+		}
+	}
 
 	const int *pBuffer;
 	int count=0;
@@ -84,15 +91,6 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	if(count == 0){
 		outputToHistory("Could not load bricklet contents.");
 		p->result = UNKNOWN_ERROR;
-		return 0;
-	}
-
-	char dataWaveName[MAX_OBJ_NAME+1];
-	int ret;
-	ret = GetCStringFromHandle(p->baseName,dataWaveName,MAX_OBJ_NAME);
-
-	if(ret != 0){
-		p->result = ret;
 		return 0;
 	}
 
@@ -122,13 +120,13 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	int hState=MoveLockHandle(waveHandle);
 
 	int* dataPtr = (int*) WaveData(waveHandle);
-	for(int i=0; i < count; i++){
-		dataPtr[i] = pBuffer[i];
-	}
+
+	// copy data fast :)
+	memcpy(dataPtr,pBuffer,count*sizeof(int));
 
 	HSetState((Handle) waveHandle, hState);
 
-	pMyData->setWaveNote(brickletID,waveHandle);
+	pMyData->setOtherWaveNote(brickletID,waveHandle);
 
 	p->result = SUCCESS;
 	return 0;
@@ -233,7 +231,8 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 		return 0;
 	}
 
-	PutCStringInHandle(pMyData->getVernissageVersion().c_str(), *p->vernissageVersion);
+	//PutCStringInHandle(pMyData->getVernissageVersion().c_str(), *p->vernissageVersion);
+	*p->vernissageVersion = stringToAnyType<double>(pMyData->getVernissageVersion());
 
 	p->result = SUCCESS;
 	return 0;
@@ -249,7 +248,8 @@ static int getXOPVersion(getXOPVersionParams *p){
 		return 0;
 	}
 
-	PutCStringInHandle(myXopVersion, *p->xopVersion);
+	//PutCStringInHandle(myXopVersion, *p->xopVersion);
+	*p->xopVersion = stringToAnyType<double>(myXopVersion);
 
 	p->result = SUCCESS;
 	return 0;
@@ -425,7 +425,7 @@ static int getBrickletData(getBrickletDataParams *p){
 	rangeParams.baseName = p->baseName;
 	rangeParams.startBrickletID = p->brickletID;
 	rangeParams.endBrickletID = p->brickletID;
-	rangeParams.separateFolderForEachBricklet=0;
+	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
 	getRangeBrickletData(&rangeParams);
 	
@@ -457,7 +457,7 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 	rangeParams.baseName = p->baseName;
 	rangeParams.startBrickletID = p->brickletID;
 	rangeParams.endBrickletID = p->brickletID;
-	rangeParams.separateFolderForEachBricklet=0;
+	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
 	getRangeBrickletMetaData(&rangeParams);
 	
@@ -514,11 +514,20 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 		return 0;
 	}
 
+	if( ( p->separateFolderForEachBricklet - 0.0) > 1e-5
+		&& ( p->separateFolderForEachBricklet - 1.0) > 1e-5){
+			p->result = INVALID_RANGE;
+			debugOutputToHistory(DEBUG_LEVEL,"Paramteter separateFolderForEachBricklet must be 0 or 1");
+			return 0;
+	}
+
 	if(	p->startBrickletID >  p->endBrickletID
 		|| p->startBrickletID <  1 // brickletIDs are 1-based
 		|| p->endBrickletID   <  1 
 		|| p->startBrickletID > numberOfBricklets
 		|| p->endBrickletID   > numberOfBricklets){
+			sprintf(buf,"Paramteter brickletID must lie between 1 and %d (both included)",numberOfBricklets);
+			debugOutputToHistory(DEBUG_LEVEL,buf);
 			p->result = INVALID_RANGE;
 			return 0;
 	}
@@ -564,7 +573,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 			ret = createAndFillDataWave(newDataFolderHPtr,dataName,brickletID);
 
 			if(ret != 0){
-				sprintf(buf,"BUG: internal error (%d) in createAndFillTextWave ",ret);
+				sprintf(buf,"BUG: internal error (%d) in createAndFillDataWave ",ret);
 				outputToHistory(buf);
 				p->result = ret;
 				return 0;
@@ -601,11 +610,20 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 		return 0;
 	}
 
+	if( ( p->separateFolderForEachBricklet - 0.0) > 1e-5
+		&& ( p->separateFolderForEachBricklet - 1.0) > 1e-5){
+			p->result = INVALID_RANGE;
+			debugOutputToHistory(DEBUG_LEVEL,"Paramteter separateFolderForEachBricklet must be 0 or 1");
+			return 0;
+	}
+
 	if(	p->startBrickletID >  p->endBrickletID
 		|| p->startBrickletID <  1 // brickletIDs are 1-based
 		|| p->endBrickletID   <  1 
 		|| p->startBrickletID > numberOfBricklets
 		|| p->endBrickletID   > numberOfBricklets){
+			sprintf(buf,"Paramteter brickletID must lie between 1 and %d (both included)",numberOfBricklets);
+			debugOutputToHistory(DEBUG_LEVEL,buf);
 			p->result = INVALID_RANGE;
 			return 0;
 	}
@@ -769,16 +787,16 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	keys.push_back("timeStampOfLastChange");
 	values.push_back(anyTypeToString<time_t>(mktime(&ctime)));
 
-	keys.push_back("Brickletkeys.fileCreatorName");
+	keys.push_back("BrickletMetaData.fileCreatorName");
 	values.push_back(WStringToString(brickletMetaData.fileCreatorName));
 
-	keys.push_back("Brickletkeys.fileCreatorVersion");
+	keys.push_back("BrickletMetaData.fileCreatorVersion");
 	values.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
 
-	keys.push_back("Brickletkeys.userName");
+	keys.push_back("BrickletMetaData.userName");
 	values.push_back(WStringToString(brickletMetaData.userName));
 
-	keys.push_back("Brickletkeys.accountName");
+	keys.push_back("BrickletMetaData.accountName");
 	values.push_back(WStringToString(brickletMetaData.accountName));
 
 	// brickletID=0 because the waveNote of the resultfile metadata does hold an empty brickletID wavenote property

@@ -121,7 +121,7 @@ static int getBrickletData(getBrickletDataParams *p){
 
 
 
-// variable getBrickletMetaData(string baseName, variable brickletID)
+// variable getBrickletMetaData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
 static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
 	p->result = UNKNOWN_ERROR;
@@ -169,7 +169,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 
 
 
-// string getBugReportTemplate();
+// string getBugReportTemplate()
 static int getBugReportTemplate(getBugReportTemplateParams *p){
 
 	p->result = UNKNOWN_ERROR;
@@ -361,7 +361,7 @@ static int getResultFilePath(getResultFilePathParams *p){
 
 
 
-// variable getVernissageVersion(string *vernissageVersion)
+// variable getVernissageVersion(variable *vernissageVersion)
 static int getVernissageVersion(getVernissageVersionParams *p){
 
 	p->result = UNKNOWN_ERROR;
@@ -385,7 +385,7 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 
 
 
-// variable getXOPVersion(string *xopVersion)
+// variable getXOPVersion(variable *xopVersion)
 static int getXOPVersion(getXOPVersionParams *p){
 
 	p->result = UNKNOWN_ERROR;

@@ -14,6 +14,9 @@ static void XOPEntry();
 static long RegisterFunction();
 void doCleanup();
 
+
+
+
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{
 	double  rememberCalls;
@@ -77,6 +80,7 @@ static int getBrickletData(getBrickletDataParams *p);
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletMetaDataParams{
 	double  brickletID;
+	double  separateFolderForEachBricklet;
 	Handle  baseName;
 	double  result;
 };
@@ -193,7 +197,7 @@ static int getResultFilePath(getResultFilePathParams *p);
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getVernissageVersionParams{
-	Handle *vernissageVersion;
+	double *vernissageVersion;
 	double  result;
 };
 typedef struct getVernissageVersionParams getVernissageVersionParams;
@@ -204,7 +208,7 @@ static int getVernissageVersion(getVernissageVersionParams *p);
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getXOPVersionParams{
-	Handle *xopVersion;
+	double *xopVersion;
 	double  result;
 };
 typedef struct getXOPVersionParams getXOPVersionParams;
@@ -223,5 +227,3 @@ typedef struct openResultFileParams openResultFileParams;
 #pragma pack()
 
 static int openResultFile(openResultFileParams *p);
-
-

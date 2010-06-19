@@ -3,6 +3,8 @@
 #include <string>
 #include <algorithm>
 #include <sys/stat.h>
+#include <limits.h>
+#include <float.h>
 
 #include "utils.h"
 
@@ -246,7 +248,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	}
 
 	ASSERT_RETURN_ZERO(pMyData);
-	pMyData->setWaveNote(brickletID,waveHandle);
+	pMyData->setOtherWaveNote(brickletID,waveHandle);
 
 	return 0;
 }
@@ -324,12 +326,30 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes;
 	Vernissage::Session *pSession;
 	std::vector<std::string> allAxes;
-	Vernissage::Session::AxisDescriptor triggerAxis, rootAxis; 
-	int numPointsTriggerAxis, numPointsRootAxis, numWavesToCreate, ret=-1,i;
+	Vernissage::Session::AxisDescriptor triggerAxis, rootAxis;
+	int numPointsTriggerAxis, numPointsRootAxis, ret=-1, i, j;
 	double physicalLengthTriggerAxis, physicalLengthRootAxis;
 	std::vector<waveHndl> waveHandleVector;
+	std::vector<int> hStateVector;
 	waveHndl waveHandle;
 	std::vector<std::string> waveNameVector;
+	bool dataFinished=false;
+
+	int *rawBrickletDataPtr = NULL;
+	int hState, rawBrickletSize=0, waveSize, firstBlockOffset; 
+	int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex, traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
+
+	double *traceUpDataPtr = NULL;
+	double *reTraceUpDataPtr = NULL;
+	double *traceDownDataPtr = NULL;
+	double *reTraceDownDataPtr = NULL;
+
+	double setScaleOffset=0.0;
+
+	std::vector<int>	rawMax(4),	rawMin(4);
+	std::vector<double> scaledMax(4), scaledMin(4);
+	double scaledValue;
+	int rawValue;
 
 	std::vector<std::string>::const_iterator itWaveNames;
 
@@ -340,12 +360,16 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	ASSERT_RETURN_MINUSONE(pMyData);
 	MyBricklet *myBricklet = pMyData->getBrickletClassFromMap(brickletID);
-	void *pBricklet = myBricklet->getBrickletPointer();
-	pSession = pMyData->getSession();
+
 	ASSERT_RETURN_MINUSONE(myBricklet);
+	void *pBricklet = myBricklet->getBrickletPointer();
+
+	ASSERT_RETURN_MINUSONE(pBricklet);
+	pSession = pMyData->getSession();
+
 	ASSERT_RETURN_MINUSONE(pSession);
 
-	myBricklet->getDimension(dimension);
+	dimension = myBricklet->getMetaDataValueAsInt("dimension");
 	myBricklet->getAxes(allAxes);
 	myBricklet->getViewTypeCodes(viewTypeCodes);
 
@@ -416,10 +440,10 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// width.)
 			physicalLengthRootAxis = rootAxis.physicalStart + rootAxis.physicalIncrement * (numPointsRootAxis - 1);
 
-			sprintf(buf,"physicalLengthRootAxis=%g",physicalLengthRootAxis);
+			sprintf(buf,"numPointsRootAxis=%d",numPointsRootAxis);
 			debugOutputToHistory(DEBUG_LEVEL,buf);
 
-			sprintf(buf,"physicalLengthTriggerAxis=%g",physicalLengthTriggerAxis);
+			sprintf(buf,"numPointsTriggerAxis=%d",numPointsTriggerAxis);
 			debugOutputToHistory(DEBUG_LEVEL,buf);
 
 			// now we have to disinguish three cases on how many 2D waves we need
@@ -428,6 +452,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// none mirrored:			1
 			if( triggerAxis.mirrored && rootAxis.mirrored ){
 				waveNameVector.push_back(waveBaseName + "_TraceUp");
+				waveNameVector.push_back(waveBaseName + "_ReTraceUp");
 				waveNameVector.push_back(waveBaseName + "_TraceDown");
 				waveNameVector.push_back(waveBaseName + "_ReTraceDown");
 			}
@@ -443,18 +468,17 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				waveNameVector.push_back(waveBaseName + "_TraceUp");
 			}
 
-			// check order of ROWS and COLUMNS
 			dimensionSizes[ROWS] = numPointsTriggerAxis;
 			dimensionSizes[COLUMNS] = numPointsRootAxis;
 
-			// get pointer to the raw data
-			const int **rawData;
-			int count;
-			myBricklet->getBrickletContentsBuffer(rawData,count);
+			// get pointer to raw data
+			const int* pBuffer;
+			myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
+			rawBrickletDataPtr = (int *) pBuffer;
 
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
-				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,NT_I32,noOverwrite);
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,NT_FP64,noOverwrite);
 
 				if(ret == NAME_WAV_CONFLICT){
 					sprintf(buf,"Wave %s already exists.",itWaveNames->c_str());
@@ -472,11 +496,237 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				waveHandleVector.push_back(waveHandle);
 			}
 
+			// clear waves
+			// lock waves
+			if(waveHandleVector.size() == 4){
+
+				hStateVector.push_back(MoveLockHandle(waveHandleVector[0]));
+				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
+				MemClear(traceUpDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
+				rawMin[0]	= _I32_MAX; rawMax[0] = _I32_MIN;
+				scaledMin[0]= FLT_MAX;  scaledMax[0]= FLT_MIN;
+
+				hStateVector.push_back(MoveLockHandle(waveHandleVector[1]));
+				reTraceUpDataPtr  = (double*) WaveData(waveHandleVector[1]);
+				MemClear(reTraceUpDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
+				rawMin[1]	= _I32_MAX; rawMax[1] = _I32_MIN;
+				scaledMin[1]= FLT_MAX;  scaledMax[1]= FLT_MIN;
+
+				hStateVector.push_back(MoveLockHandle(waveHandleVector[2]));
+				traceDownDataPtr  = (double*) WaveData(waveHandleVector[2]);
+				MemClear(traceDownDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
+				rawMin[2]	= _I32_MAX; rawMax[2] = _I32_MIN;
+				scaledMin[2]= FLT_MAX;  scaledMax[2]= FLT_MIN;
+
+				hStateVector.push_back(MoveLockHandle(waveHandleVector[3]));
+				reTraceDownDataPtr  = (double*) WaveData(waveHandleVector[3]);
+				MemClear(reTraceDownDataPtr, numPointsTriggerAxis*numPointsRootAxis*sizeof(int));
+				rawMin[3]	= _I32_MAX; rawMax[3] = _I32_MIN;
+				scaledMin[3]= FLT_MAX;  scaledMax[3]= FLT_MIN;
+
+			}
+
+			//// wave0 TraceUp aka Forward/Up
+			//// wave1 ReTraceUp aka Backward/Up
+			//// wave2 TraceDown aka Forward/Down
+			//// wave3 ReTraceDown aka Backward/Down
+			//// horizontal axis aka X axis in Pascal's Scala Routines aka triggerAxis 		aka 	ROWS
+			//// vertical   axis aka Y axis in Pascal's Scala Routines aka rootAxis 		aka		COLUMNS
+
+			// data layout of igor waves in memory (Igor XOP Manual p. 238)
+			// - the wave is linear in the memory
+			// - going along the arrray will first fill the first column from row 0 to end and then the second column and so on
+
 			// FIXME table sets are currently ignored!!
-			// TODO copy data to waves, make a solution which works for all cases of mirroring!
-			for(i = 0; i <numPointsTriggerAxis; i++){
-			
-				// copy the data linewise with memcpy at the place we got by WaveData
+
+			// TODO make a solution which works for all cases of mirroring!
+			waveSize = numPointsTriggerAxis*numPointsRootAxis;
+			firstBlockOffset = numPointsTriggerAxis *numPointsRootAxis*2;
+
+			// COLUMNS
+			for(i = 0; i < numPointsRootAxis; i++){
+
+				// ROWS
+				for(j=0; j < numPointsTriggerAxis; j++){
+
+					// traceUp
+					if(traceUpDataPtr){
+						traceUpRawBrickletIndex			= 2*i*numPointsTriggerAxis + j;
+						traceUpDataIndex				= i*numPointsTriggerAxis   + j;
+
+						if(	traceUpDataIndex >= 0 &&
+							traceUpDataIndex < waveSize &&
+							traceUpRawBrickletIndex < rawBrickletSize &&
+							traceUpRawBrickletIndex >= 0
+							){
+								rawValue	= rawBrickletDataPtr[traceUpRawBrickletIndex];
+								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								traceUpDataPtr[traceUpDataIndex] =  scaledValue;
+
+								if(rawValue < rawMin[0]){
+									rawMin[0] = rawValue;
+								}
+								if(rawValue > rawMax[0]){
+									rawMax[0] = rawValue;
+								}
+								if(scaledValue < scaledMin[0]){
+									scaledMin[0] = scaledValue;
+								}
+								if(scaledValue > scaledMax[0]){
+									scaledMax[0] = scaledValue;
+								}
+						}
+						else{
+							debugOutputToHistory(DEBUG_LEVEL,"Index out of range in traceUp");
+
+							sprintf(buf,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							sprintf(buf,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							traceUpDataPtr=NULL;
+						}
+					}
+
+					// traceDown
+					if(traceDownDataPtr){
+
+						traceDownRawBrickletIndex	= firstBlockOffset + i*2*numPointsTriggerAxis + j;
+						traceDownDataIndex			= i*numPointsTriggerAxis   + ( (numPointsTriggerAxis-1) - j);
+
+						if(	traceDownDataIndex >= 0 &&
+							traceDownDataIndex < waveSize &&
+							traceDownRawBrickletIndex < rawBrickletSize &&
+							traceDownRawBrickletIndex >= 0
+							){
+								rawValue	= rawBrickletDataPtr[traceDownRawBrickletIndex];
+								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								traceDownDataPtr[traceDownDataIndex] =  scaledValue;
+
+								if(rawValue < rawMin[1]){
+									rawMin[1] = rawValue;
+								}
+								if(rawValue > rawMax[1]){
+									rawMax[1] = rawValue;
+								}
+								if(scaledValue < scaledMin[1]){
+									scaledMin[1] = scaledValue;
+								}
+								if(scaledValue > scaledMax[1]){
+									scaledMax[1] = scaledValue;
+								}
+						}
+						else{
+							outputToHistory("Index out of range in traceDown");
+
+							sprintf(buf,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							sprintf(buf,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							traceDownDataPtr=NULL;
+						}
+					}
+
+					// reTraceUp
+					if(reTraceUpDataPtr){
+
+						reTraceUpRawBrickletIndex	= i*2*numPointsTriggerAxis + 2*numPointsTriggerAxis - (j+1);
+						reTraceUpDataIndex			= i *  numPointsTriggerAxis + j;
+
+						if(	reTraceUpDataIndex >= 0 &&
+							reTraceUpDataIndex < waveSize &&
+							reTraceUpRawBrickletIndex < rawBrickletSize &&
+							reTraceUpRawBrickletIndex >= 0
+							){
+								rawValue	= rawBrickletDataPtr[reTraceUpRawBrickletIndex];
+								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								reTraceUpDataPtr[reTraceUpDataIndex] =  scaledValue;
+
+								if(rawValue < rawMin[2]){
+									rawMin[2] = rawValue;
+								}
+								if(rawValue > rawMax[2]){
+									rawMax[2] = rawValue;
+								}
+								if(scaledValue < scaledMin[2]){
+									scaledMin[2] = scaledValue;
+								}
+								if(scaledValue > scaledMax[2]){
+									scaledMax[2] = scaledValue;
+								}
+						}
+						else{
+							outputToHistory("Index out of range in reTraceUp");
+
+							sprintf(buf,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							sprintf(buf,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							reTraceUpDataPtr=NULL;
+						}
+					}
+
+					// reTraceDown
+					if(reTraceDownDataPtr){
+
+						// TODO explain the messy indizes here and above
+						reTraceDownRawBrickletIndex		= firstBlockOffset + i*2*numPointsTriggerAxis + 2*numPointsTriggerAxis - (j+1);
+						reTraceDownDataIndex			= i*numPointsTriggerAxis   + ( (numPointsTriggerAxis-1) - j);
+
+						if(	reTraceDownDataIndex >= 0 &&
+							reTraceDownDataIndex < waveSize &&
+							reTraceDownRawBrickletIndex < rawBrickletSize &&
+							reTraceDownRawBrickletIndex >= 0
+							){
+
+								rawValue	= rawBrickletDataPtr[reTraceDownRawBrickletIndex];
+								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								reTraceDownDataPtr[reTraceDownDataIndex] =  scaledValue;
+
+								if(rawValue < rawMin[3]){
+									rawMin[3] = rawValue;
+								}
+								if(rawValue > rawMax[3]){
+									rawMax[3] = rawValue;
+								}
+								if(scaledValue < scaledMin[3]){
+									scaledMin[3] = scaledValue;
+								}
+								if(scaledValue > scaledMax[3]){
+									scaledMax[3] = scaledValue;
+								}
+						}
+						else{
+							outputToHistory("Index out of range in reTraceDown");
+
+							sprintf(buf,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							sprintf(buf,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(DEBUG_LEVEL,buf);
+
+							reTraceDownDataPtr=NULL;
+						}
+					}
+				}
+			}
+
+			// unlock waves and set wave note
+			for(i=0; i < hStateVector.size(); i++){
+				HSetState(waveHandleVector[i],hStateVector[i]);
+				pMyData->setDataWaveNote(brickletID,rawMin[i],rawMax[i],scaledMin[i],scaledMax[i],waveHandleVector[i]);
+
+				MDSetWaveScaling(waveHandleVector[i],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
+				MDSetWaveScaling(waveHandleVector[i],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
+
+				// FIXME casting should not be necessary
+				MDSetWaveUnits(waveHandleVector[i],ROWS,(char *)WStringToString(triggerAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[i],COLUMNS,(char *)WStringToString(rootAxis.physicalUnit).c_str());
 			}
 
 			break;

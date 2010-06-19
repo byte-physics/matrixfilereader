@@ -8,8 +8,8 @@
 
 MyBricklet::MyBricklet(void* pBricklet,Vernissage::Session *pSession):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_VernissageSession(pSession)
 {
-	m_metaDataKeys.reserve(500);
-	m_metaDataValues.reserve(500);
+	m_metaDataKeys.reserve(1000);
+	m_metaDataValues.reserve(1000);
 }
 
 MyBricklet::~MyBricklet(void)
@@ -20,8 +20,10 @@ MyBricklet::~MyBricklet(void)
 void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 	char buf[ARRAY_SIZE];
-
+	
 	ASSERT_RETURN_VOID(pBuffer);
+	
+	count=0;
 
 	// we are not called the first time
 	if(m_rawBufferContents != NULL){
@@ -55,9 +57,6 @@ void MyBricklet::getBrickletMetaData(std::vector<std::string> &keys, std::vector
 
 		loadBrickletMetaDataFromResultFile();
 
-		sprintf(buf,"Storing (%d,%d) key/value pairs of brickletMetaData for late cached access.",
-			m_metaDataKeys.size(), m_metaDataValues.size());
-		debugOutputToHistory(DEBUG_LEVEL,buf);
 	}
 
 	keys = m_metaDataKeys;
@@ -149,6 +148,9 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 
 	m_metaDataKeys.push_back("channelInstanceName");
 	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getChannelInstanceName(m_brickletPtr)));
+
+	m_metaDataKeys.push_back("channelUnit");
+	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getChannelUnit(m_brickletPtr)));
 
 	m_metaDataKeys.push_back("runCycleCount");
 	m_metaDataValues.push_back(anyTypeToString<int>(m_VernissageSession->getRunCycleCount(m_brickletPtr)));
@@ -364,6 +366,15 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 		}
 		// END Vernissage::Session:AxisTableSet
 	}
+
+	sprintf(buf,"Loaded %d keys and %d values as brickletMetaData",m_metaDataKeys.size(), m_metaDataValues.size());
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
+	if(m_metaDataKeys.size() != m_metaDataValues.size()){
+		outputToHistory("BUG: key value lists don't have the same size, aborting");
+		m_metaDataKeys.clear();
+		m_metaDataValues.clear();
+	}
 }
 	
 // see Vernissage Manual page 20/21
@@ -414,16 +425,32 @@ double MyBricklet::getMetaDataValueAsDouble(std::string key){
 std::string MyBricklet::getMetaDataValueAsString(std::string key){
 
 	std::string value;
+	char buf[ARRAY_SIZE];
 
 	if(key.size() == 0){
+		outputToHistory("BUG: getMetaDataValueAsString called with empty parameter");
 		return value;
 	}
 
-	std::vector<std::string>::iterator it = std::find(m_metaDataKeys.begin(), m_metaDataKeys.end(), key);
+	if(m_metaDataKeys.size() == 0 || m_metaDataValues.size() == 0){
 
-	if(it != m_metaDataValues.end()){ // we found it
-		value = m_metaDataValues.at(it-m_metaDataKeys.begin());
+		loadBrickletMetaDataFromResultFile();
 	}
+
+	for(int i=0; i < m_metaDataKeys.size(); i++){
+		if( m_metaDataKeys[i] == key){
+			value = m_metaDataValues[i];
+			break;
+		}
+	}
+
+	// crashes
+	//std::vector<std::string>::iterator it = std::find(m_metaDataKeys.begin(), m_metaDataKeys.end(), key);
+	//if(it != m_metaDataValues.end()){ // we found it
+		//sprintf(buf,"column of key %s found",*it);
+		//debugOutputToHistory(DEBUG_LEVEL,buf);
+		//value = m_metaDataValues.at(it-m_metaDataKeys.begin());
+	//}
 
 	return value;
 }

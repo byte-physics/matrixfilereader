@@ -36,7 +36,14 @@ public:
 	void  setDebugLevel(int level){ m_debugLevel= level; }
 	MyBricklet* getBrickletClassFromMap(int brickletID);
 	void setBrickletClassMap(int brickletID, void *pBricklet);
-	void setWaveNote(int brickletID,waveHndl waveHandle);
+	void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle);
+	void setOtherWaveNote(int brickletID,waveHndl waveHandle);
+
+private:
+	
+	void setWaveNote(std::string waveNote, waveHndl waveHandle);
+	std::string getStandardWaveNote(int brickletID);
+
 
 public:
 

@@ -8,7 +8,7 @@
 class MyBricklet
 {
 public:
-	MyBricklet(void* pBricklet,Vernissage::Session *pSession);
+	MyBricklet(void* pBricklet,int brickletID);
 	~MyBricklet(void);
 
 public:
@@ -16,7 +16,6 @@ public:
 	void  getBrickletContentsBuffer(const int** pBuffer, int &count);
 	void  getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values);
 	std::vector<std::wstring> generateAllAxesVector();
-	void getDimension(int &dim){ dim = m_dimension; };
 	void getAxes(std::vector<std::string> &allAxes){ allAxes = m_allAxes; };
 	void getViewTypeCodes(std::vector<Vernissage::Session::ViewTypeCode> &viewTypeCodes){ viewTypeCodes = m_viewTypeCodes; };
 	std::string getMetaDataValueAsString(std::string key);
@@ -29,6 +28,7 @@ private:
 private:
 	void *m_brickletPtr;
 	Vernissage::Session *m_VernissageSession;
+	int m_brickletID;
 
 	// storage for the raw data
 	const int *m_rawBufferContents;
@@ -41,5 +41,4 @@ private:
 	// special meta data
 	std::vector<std::string> m_allAxes;
 	std::vector<Vernissage::Session::ViewTypeCode> m_viewTypeCodes;
-	int m_dimension;
 };

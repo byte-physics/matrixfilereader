@@ -16,7 +16,6 @@ myData::myData():
 	m_debugLevel(0){
 
 	m_dllStuff = new DllStuff;
-
 }
 
 myData::~myData(){
@@ -25,7 +24,7 @@ myData::~myData(){
 	m_dllStuff = NULL;
 }
 
-Vernissage::Session* myData::getSession(){
+Vernissage::Session* myData::getVernissageSession(){
 
 	if(m_VernissageSession != NULL){
 		return m_VernissageSession;
@@ -38,25 +37,19 @@ Vernissage::Session* myData::getSession(){
 
 void myData::closeSession(){
 
-	if(m_VernissageSession != NULL){
-
-		//unload bricklets
-		IntMyBrickletPtrMap::const_iterator it;
-		for(it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++){
-			delete it->second;
-		}
-
-		m_VernissageSession->eraseResultSets();
-		m_dllStuff->closeSession();
-		m_VernissageSession=NULL;
-
-		// erase filenames
-		m_resultFileName.erase();
-		m_resultFilePath.erase();
-
-		// empty map
-		m_brickletIDBrickletClassMap.clear();
+	//unload bricklets
+	IntMyBrickletPtrMap::const_iterator it;
+	for(it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++){
+		delete it->second;
 	}
+
+	// empty bricklet map
+	m_brickletIDBrickletClassMap.clear();
+
+	// erase filenames
+	m_resultFileName.erase();
+	m_resultFilePath.erase();
+
 }
 
 std::string myData::getVernissageVersion(){
@@ -103,7 +96,7 @@ void myData::setBrickletClassMap(int brickletID, void *pBricklet){
 	sprintf(buf,"setBrickletPointerMap brickletID=%d,pBricklet=%p\n",brickletID,pBricklet);
 	debugOutputToHistory(DEBUG_LEVEL,buf);
 */
-	MyBricklet *bricklet = new MyBricklet(pBricklet,m_VernissageSession);
+	MyBricklet *bricklet = new MyBricklet(pBricklet,brickletID);
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
 

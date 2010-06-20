@@ -27,7 +27,6 @@ class DllStuff{
 		~DllStuff();
 
 		// functions
-		void closeSession();
 		Vernissage::Session* createSessionObject();
 		std::string getVernissageVersion(){ return m_vernissageVersion;};
 
@@ -39,7 +38,5 @@ class DllStuff{
 		std::string m_vernissageVersion;
 
 };
-
-
 
 #endif // DLL_STUFF_H

@@ -1,8 +1,4 @@
 
-# ctags --totals=yes --c-kinds=+px-t api-layout.h
-
-# TODO 
-
 use strict;
 use warnings;
 use diagnostics;

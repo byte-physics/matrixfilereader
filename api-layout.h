@@ -206,3 +206,18 @@ variable getRangeBrickletMetaData(string baseName,variable separateFolderForEach
  *  @return string with information to be included into all bug reports
 */ 
 string getBugReportTemplate();
+
+/** IMPLEMENTED 
+ * Return a table with the given keys for getting an overview of the result file
+ * @param[in] waveName name of the textwave to create, in case it is empty the name is "overViewTable". The textwave has in the first row labels which are keys.
+ * Example for the keyList "brickletID;sequenceID;dimension;channelName"
+ *		@code
+ *		| brickletID | sequenceID | dimension | channelName |
+ *		|	1	|	15	|	2	|	Z	|
+ *		|	2	|	15	|	2	|	A	|
+ *		@endcode
+ * @param[in] keyList Semicolon separated list of bricklet metadata keys. One example would be "brickletID;sequenceID;dimension;channelName".
+ * @return SUCCESS | NO_FILE_OPEN | EMPTY_RESULTFILE | WAVE_EXIST | WRONG_PARAMETER
+*/ 
+variable createOverViewTable(string waveName, string keyList);
+

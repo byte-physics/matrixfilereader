@@ -6,8 +6,11 @@
 
 #define DEBUG_LEVEL 1
 
-MyBricklet::MyBricklet(void* pBricklet,Vernissage::Session *pSession):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_VernissageSession(pSession)
-{
+MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
+
+	ASSERT_RETURN_VOID(pMyData);
+	m_VernissageSession = pMyData->getVernissageSession();
+
 	m_metaDataKeys.reserve(1000);
 	m_metaDataValues.reserve(1000);
 }
@@ -107,6 +110,9 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	m_metaDataKeys.push_back("viewTypeCodes");
 	m_metaDataValues.push_back(viewTypeCodesAsOneString);
 
+	m_metaDataKeys.push_back("brickletID");
+	m_metaDataValues.push_back(anyTypeToString<int>(m_brickletID));
+
 	// resultfile name
 	m_metaDataKeys.push_back("fileName");
 	m_metaDataValues.push_back(pMyData->getResultFileName());
@@ -140,9 +146,8 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	m_metaDataKeys.push_back("creationComment");
 	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getCreationComment(m_brickletPtr)));
 
-	m_dimension = m_VernissageSession->getDimensionCount(m_brickletPtr);
 	m_metaDataKeys.push_back("dimension");
-	m_metaDataValues.push_back(anyTypeToString<int>(m_dimension));
+	m_metaDataValues.push_back(anyTypeToString<int>(m_VernissageSession->getDimensionCount(m_brickletPtr)));
 
 	m_metaDataKeys.push_back("rootAxis");
 	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getRootAxisName(m_brickletPtr)));

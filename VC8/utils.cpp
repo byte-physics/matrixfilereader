@@ -368,7 +368,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	void *pBricklet = myBricklet->getBrickletPointer();
 
 	ASSERT_RETURN_MINUSONE(pBricklet);
-	pSession = pMyData->getSession();
+	pSession = pMyData->getVernissageSession();
 
 	ASSERT_RETURN_MINUSONE(pSession);
 

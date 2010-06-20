@@ -26,7 +26,7 @@ public:
 
 	// functions
 	bool resultFileOpen();
-	Vernissage::Session* getSession();
+	Vernissage::Session* getVernissageSession();
 	std::string getVernissageVersion();
 	void closeSession();
 	int getDebugLevel(){ return  m_debugLevel; };

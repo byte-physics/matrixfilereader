@@ -49,6 +49,30 @@ static int closeResultFile(closeResultFileParams *p){
 
 
 
+// variable createOverViewTable(string waveName, string keyList)
+static int createOverViewTable(createOverViewTableParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+
 // variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletData(getAllBrickletDataParams *p){
 
@@ -452,51 +476,54 @@ static long RegisterFunction()
 			returnValue = (long) closeResultFile;
 			break;
 		case 2:						
-			returnValue = (long) getAllBrickletData;
+			returnValue = (long) createOverViewTable;
 			break;
 		case 3:						
-			returnValue = (long) getAllBrickletMetaData;
+			returnValue = (long) getAllBrickletData;
 			break;
 		case 4:						
-			returnValue = (long) getBrickletData;
+			returnValue = (long) getAllBrickletMetaData;
 			break;
 		case 5:						
-			returnValue = (long) getBrickletMetaData;
+			returnValue = (long) getBrickletData;
 			break;
 		case 6:						
-			returnValue = (long) getBrickletRawData;
+			returnValue = (long) getBrickletMetaData;
 			break;
 		case 7:						
-			returnValue = (long) getBugReportTemplate;
+			returnValue = (long) getBrickletRawData;
 			break;
 		case 8:						
-			returnValue = (long) getErrorMessage;
+			returnValue = (long) getBugReportTemplate;
 			break;
 		case 9:						
-			returnValue = (long) getNumberOfBricklets;
+			returnValue = (long) getErrorMessage;
 			break;
 		case 10:						
-			returnValue = (long) getRangeBrickletData;
+			returnValue = (long) getNumberOfBricklets;
 			break;
 		case 11:						
-			returnValue = (long) getRangeBrickletMetaData;
+			returnValue = (long) getRangeBrickletData;
 			break;
 		case 12:						
-			returnValue = (long) getResultFileMetaData;
+			returnValue = (long) getRangeBrickletMetaData;
 			break;
 		case 13:						
-			returnValue = (long) getResultFileName;
+			returnValue = (long) getResultFileMetaData;
 			break;
 		case 14:						
-			returnValue = (long) getResultFilePath;
+			returnValue = (long) getResultFileName;
 			break;
 		case 15:						
-			returnValue = (long) getVernissageVersion;
+			returnValue = (long) getResultFilePath;
 			break;
 		case 16:						
-			returnValue = (long) getXOPVersion;
+			returnValue = (long) getVernissageVersion;
 			break;
 		case 17:						
+			returnValue = (long) getXOPVersion;
+			break;
+		case 18:						
 			returnValue = (long) openResultFile;
 			break;
 

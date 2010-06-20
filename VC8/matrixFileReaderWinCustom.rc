@@ -44,6 +44,14 @@ BEGIN
 	NT_FP64,				// Return value type.
 	0,
 
+	// variable createOverViewTable(string waveName, string keyList)
+	"createOverViewTable\0",
+	F_UTIL | F_EXTERNAL,			// Function category,
+	NT_FP64,				// Return value type.
+		HSTRING_TYPE,			// parameter 1
+		HSTRING_TYPE,			// parameter 2
+	0,
+
 	// variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
 	"getAllBrickletData\0",
 	F_UTIL | F_EXTERNAL,			// Function category,

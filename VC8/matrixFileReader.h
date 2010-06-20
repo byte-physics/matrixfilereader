@@ -225,3 +225,12 @@ typedef struct openResultFileParams openResultFileParams;
 #pragma pack()
 
 static int openResultFile(openResultFileParams *p);
+
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct createOverViewTableParams{
+	Handle  keyList;
+	Handle  waveName;
+	double  result;
+};
+typedef struct createOverViewTableParams createOverViewTableParams;
+#pragma pack()

@@ -23,17 +23,11 @@ DllStuff::DllStuff():
 
 DllStuff::~DllStuff(){
 
-}
-
-
-void DllStuff::closeSession(){
-
 	ASSERT_RETURN_VOID(m_pReleaseSessionFunc);
 	(*m_pReleaseSessionFunc) ();
 	
 	// FIXME this does not return
-	//FreeLibrary(foundationModule);
-	return;
+	// FreeLibrary(foundationModule);
 }
 
 // check the registry for the path to the Vernissage DLLs and return (as pointer in the argument) a pointer to the loaded Foundation.dll

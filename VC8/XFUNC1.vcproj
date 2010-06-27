@@ -224,6 +224,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\datahandling.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dll-stuff.cpp"
 				>
 			</File>
@@ -253,6 +257,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\datahandling.h"
+				>
+			</File>
+			<File
 				RelativePath=".\dll-stuff.h"
 				>
 			</File>
@@ -261,7 +269,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\globalvariables.h"
+				RelativePath=".\globals.h"
 				>
 			</File>
 			<File
@@ -274,6 +282,10 @@
 			</File>
 			<File
 				RelativePath=".\utils.h"
+				>
+			</File>
+			<File
+				RelativePath=".\version.h"
 				>
 			</File>
 		</Filter>

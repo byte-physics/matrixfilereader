@@ -10,6 +10,8 @@
 
 #include "xopstandardheaders.h"
 
+#include "version.h"
+
 std::wstring StringToWString(const std::string& s);
 std::string WStringToString(const std::wstring& s);
 
@@ -45,10 +47,15 @@ T stringToAnyType(std::string str){
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
 
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID);
-int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveName, int brickletID);
 
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
 std::string valueTypeToString(int idx);
-bool fileExists(std::string filePath, std::string fileName);
+
+void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle);
+void setOtherWaveNote(int brickletID,waveHndl waveHandle);
+void mySetWaveNote(std::string waveNote, waveHndl waveHandle);
+
+std::string getStandardWaveNote(int brickletID);
+
 #endif // UTILS_H

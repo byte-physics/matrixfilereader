@@ -7,7 +7,8 @@
 
 /** @var  errorCode
  * @brief The error codes returned from the functions. It might be handy to define a struct in Igor which hold these values.
- */ 
+ */
+// If this enum is changed, change also myData::setLastError(...)
 enum errorCode{
 	SUCCESS =0,
 	UNKNOWN_ERROR=1,
@@ -20,7 +21,8 @@ enum errorCode{
 	NO_FILE_OPEN=128,
 	INVALID_RANGE=256,  
 	NON_EXISTENT_BRICKLET=512,
-	WAVE_EXIST=1024};
+	WAVE_EXIST=1024
+};
 
 
 #endif // ERROR_CODES_H

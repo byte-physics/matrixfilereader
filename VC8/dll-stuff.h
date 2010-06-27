@@ -8,12 +8,6 @@
 
 #include <windows.h>
 
-#include <stdio.h>
-#include <tchar.h>
-#include <vector>
-#include <ctime>
-#include <map>
-
 #include "Vernissage.h"
 
 typedef Vernissage::Session * (*GetSessionFunc) ();

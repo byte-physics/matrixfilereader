@@ -2,6 +2,8 @@
 	TODO
 */
 
+#include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
+
 /* custom error codes */
 
 #define REQUIRES_IGOR_504	FIRST_XOP_ERR + 1
@@ -13,7 +15,10 @@ HOST_IMPORT void main(IORecHandle ioRecHandle);
 static void XOPEntry();
 static long RegisterFunction();
 void doCleanup();
-
+bool isValidSeparateFolderArg(double arg);
+bool isValidBrickletRange(int startID, int endID, int numberOfBricklets);
+bool createSeparateFolders(double arg);
+bool isValidBrickletID(int brickletID, int numberOfBricklets);
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{
@@ -26,8 +31,6 @@ typedef struct checkForNewBrickletsParams checkForNewBrickletsParams;
 #pragma pack()
 
 static int checkForNewBricklets(checkForNewBrickletsParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct closeResultFileParams{
 	double  result;
@@ -36,8 +39,16 @@ typedef struct closeResultFileParams closeResultFileParams;
 #pragma pack()
 
 static int closeResultFile(closeResultFileParams *p);
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct createOverViewTableParams{
+	Handle  keyList;
+	Handle  waveName;
+	double  result;
+};
+typedef struct createOverViewTableParams createOverViewTableParams;
+#pragma pack()
 
-
+static int createOverViewTable(createOverViewTableParams *p);
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getAllBrickletDataParams{
 	double  separateFolderForEachBricklet;
@@ -48,8 +59,6 @@ typedef struct getAllBrickletDataParams getAllBrickletDataParams;
 #pragma pack()
 
 static int getAllBrickletData(getAllBrickletDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getAllBrickletMetaDataParams{
 	double  separateFolderForEachBricklet;
@@ -60,8 +69,6 @@ typedef struct getAllBrickletMetaDataParams getAllBrickletMetaDataParams;
 #pragma pack()
 
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletDataParams{
 	double  brickletID;
@@ -73,8 +80,6 @@ typedef struct getBrickletDataParams getBrickletDataParams;
 #pragma pack()
 
 static int getBrickletData(getBrickletDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletMetaDataParams{
 	double  brickletID;
@@ -86,8 +91,6 @@ typedef struct getBrickletMetaDataParams getBrickletMetaDataParams;
 #pragma pack()
 
 static int getBrickletMetaData(getBrickletMetaDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBrickletRawDataParams{
 	double  brickletID;
@@ -98,8 +101,6 @@ typedef struct getBrickletRawDataParams getBrickletRawDataParams;
 #pragma pack()
 
 static int getBrickletRawData(getBrickletRawDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getBugReportTemplateParams{
 	Handle  result;
@@ -108,19 +109,22 @@ typedef struct getBugReportTemplateParams getBugReportTemplateParams;
 #pragma pack()
 
 static int getBugReportTemplate(getBugReportTemplateParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct getErrorMessageParams{
-	double  errorCode;
-	Handle  result;
+struct getLastErrorParams{
+	double  result;
 };
-typedef struct getErrorMessageParams getErrorMessageParams;
+typedef struct getLastErrorParams getLastErrorParams;
 #pragma pack()
 
-static int getErrorMessage(getErrorMessageParams *p);
+static int getLastError(getLastErrorParams *p);
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct getLastErrorMessageParams{
+	Handle  result;
+};
+typedef struct getLastErrorMessageParams getLastErrorMessageParams;
+#pragma pack()
 
-
+static int getLastErrorMessage(getLastErrorMessageParams *p);
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getNumberOfBrickletsParams{
 	double *totalNumberOfBricklets;
@@ -130,8 +134,6 @@ typedef struct getNumberOfBrickletsParams getNumberOfBrickletsParams;
 #pragma pack()
 
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getRangeBrickletDataParams{
 	double  endBrickletID;
@@ -144,8 +146,6 @@ typedef struct getRangeBrickletDataParams getRangeBrickletDataParams;
 #pragma pack()
 
 static int getRangeBrickletData(getRangeBrickletDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getRangeBrickletMetaDataParams{
 	double  endBrickletID;
@@ -158,8 +158,6 @@ typedef struct getRangeBrickletMetaDataParams getRangeBrickletMetaDataParams;
 #pragma pack()
 
 static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getResultFileMetaDataParams{
 	Handle  waveName;
@@ -169,8 +167,6 @@ typedef struct getResultFileMetaDataParams getResultFileMetaDataParams;
 #pragma pack()
 
 static int getResultFileMetaData(getResultFileMetaDataParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getResultFileNameParams{
 	Handle *filename;
@@ -180,8 +176,6 @@ typedef struct getResultFileNameParams getResultFileNameParams;
 #pragma pack()
 
 static int getResultFileName(getResultFileNameParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getResultFilePathParams{
 	Handle *absoluteFilePath;
@@ -191,8 +185,6 @@ typedef struct getResultFilePathParams getResultFilePathParams;
 #pragma pack()
 
 static int getResultFilePath(getResultFilePathParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getVernissageVersionParams{
 	double *vernissageVersion;
@@ -202,8 +194,6 @@ typedef struct getVernissageVersionParams getVernissageVersionParams;
 #pragma pack()
 
 static int getVernissageVersion(getVernissageVersionParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct getXOPVersionParams{
 	double *xopVersion;
@@ -213,8 +203,6 @@ typedef struct getXOPVersionParams getXOPVersionParams;
 #pragma pack()
 
 static int getXOPVersion(getXOPVersionParams *p);
-
-
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct openResultFileParams{
 	Handle  fileName;
@@ -225,12 +213,3 @@ typedef struct openResultFileParams openResultFileParams;
 #pragma pack()
 
 static int openResultFile(openResultFileParams *p);
-
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct createOverViewTableParams{
-	Handle  keyList;
-	Handle  waveName;
-	double  result;
-};
-typedef struct createOverViewTableParams createOverViewTableParams;
-#pragma pack()

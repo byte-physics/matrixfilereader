@@ -1,7 +1,7 @@
 #include "myBricklet.h"
 
-#include "globalvariables.h"
-#include <algorithm>
+#include "globals.h"
+// #include <algorithm>
 #include "utils.h"
 
 #define DEBUG_LEVEL 1
@@ -11,8 +11,8 @@ MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),
 	ASSERT_RETURN_VOID(pMyData);
 	m_VernissageSession = pMyData->getVernissageSession();
 
-	m_metaDataKeys.reserve(1000);
-	m_metaDataValues.reserve(1000);
+	m_metaDataKeys.reserve(METADATA_RESERVEV_SIZE);
+	m_metaDataValues.reserve(METADATA_RESERVEV_SIZE);
 }
 
 MyBricklet::~MyBricklet(void)
@@ -181,8 +181,8 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 
 		for(itMap = elementInstanceParamsMap.begin(); itMap != elementInstanceParamsMap.end(); itMap++){
 
-			m_metaDataKeys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first));
-			m_metaDataValues.push_back("");
+			//m_metaDataKeys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first));
+			//m_metaDataValues.push_back("");
 
 			m_metaDataKeys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".value") );
 			m_metaDataValues.push_back( WStringToString(itMap->second.value));
@@ -190,8 +190,8 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 			m_metaDataKeys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".unit") );
 			m_metaDataValues.push_back( WStringToString(itMap->second.unit));
 
-			m_metaDataKeys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".valueType") );
-			m_metaDataValues.push_back( valueTypeToString(itMap->second.valueType) );
+			//m_metaDataKeys.push_back( WStringToString(*itElementInstanceNames) + std::string(".") + WStringToString(itMap->first) + std::string(".valueType") );
+			//m_metaDataValues.push_back( valueTypeToString(itMap->second.valueType) );
 		}
 	}
 

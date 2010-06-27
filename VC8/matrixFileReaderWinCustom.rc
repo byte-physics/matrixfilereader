@@ -100,11 +100,16 @@ BEGIN
 	HSTRING_TYPE,				// Return value type.
 	0,
 
-	// string getErrorMessage(variable errorCode)
-	"getErrorMessage\0",
+	// variable getLastError()
+	"getLastError\0",
+	F_UTIL | F_EXTERNAL,			// Function category,
+	NT_FP64,				// Return value type.
+	0,
+
+	// string getLastErrorMessage()
+	"getLastErrorMessage\0",
 	F_UTIL | F_EXTERNAL,			// Function category,
 	HSTRING_TYPE,				// Return value type.
-		NT_FP64,			// parameter 1
 	0,
 
 	// variable getNumberOfBricklets(variable *totalNumberOfBricklets)

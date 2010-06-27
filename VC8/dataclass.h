@@ -19,40 +19,28 @@ public:
 	~myData();
 	
 public:
-	// API functions
+	// functions
 	std::string getResultFileName();
 	std::string getResultFilePath();
-	void setResultFile( std::string filePath, std::string fileName){ m_resultFilePath = filePath; m_resultFileName = fileName;}
-
-	// functions
+	void setResultFile(char *dirPath, char *fileName){ this->setResultFile(std::string(dirPath),std::string(fileName));}
+	void setResultFile( std::string dirPath, std::string fileName){ m_resultFilePath = dirPath; m_resultFileName = fileName;}
 	bool resultFileOpen();
 	Vernissage::Session* getVernissageSession();
 	std::string getVernissageVersion();
 	void closeSession();
-	int getDebugLevel(){ return  m_debugLevel; };
-	void  setDebugLevel(int level){ m_debugLevel= level; }
 	MyBricklet* getBrickletClassFromMap(int brickletID);
 	void setBrickletClassMap(int brickletID, void *pBricklet);
-	void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle);
-	void setOtherWaveNote(int brickletID,waveHndl waveHandle);
-
-private:
-	
-	void setWaveNote(std::string waveNote, waveHndl waveHandle);
-	std::string getStandardWaveNote(int brickletID);
-
-
-//variables
-
-public:
-
+	void setLastError(int errorCode, std::string argument = std::string());
+	int getLastError(){ return m_lastError; }
+	std::string getLastErrorArgument(){ return m_lastErrorArgument; }
+	std::string getLastErrorMessage();
 
 private:
 	std::string m_resultFileName, m_resultFilePath;
 	Vernissage::Session *m_VernissageSession;
 	DllStuff *m_dllStuff;
-	int m_debugLevel;
-
+	int m_lastError;
+	std::string m_lastErrorArgument;
 	IntMyBrickletPtrMap		m_brickletIDBrickletClassMap;
 };
 

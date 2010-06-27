@@ -1,18 +1,15 @@
 
 #include "dll-stuff.h"
 
+#include <vector>
+#include <string>
+
 #include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
 
-#include "dataclass.h"
-
-#include "globalvariables.h"
-
+#include "globals.h"
 #include "utils.h"
 
 #define DEBUG_LEVEL 1 // standard debug level for this file
-
-using std::string;
-using std::vector;
 
 DllStuff::DllStuff():
 	m_foundationModule(NULL),
@@ -46,14 +43,14 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	char buf[ARRAY_SIZE];
 	DWORD dataLength = (DWORD) sizeof(data)/sizeof(char);
 	HKEY hKey, hregBaseKey;
-	string regKey;
+	std::string regKey;
 	char subKeyName[255];
 	DWORD subKeyLength = (DWORD) sizeof(subKeyName)/sizeof(WCHAR);
 	int subKeyIndex=0;
-	string regBaseKeyName = "SOFTWARE\\Omicron NanoTechnology\\Vernissage";
-	string dllName;
+	std::string regBaseKeyName = "SOFTWARE\\Omicron NanoTechnology\\Vernissage";
+	std::string dllName;
 
-	vector<string> dllNames;
+	std::vector<std::string> dllNames;
 	//dllNames.push_back("Ace.dll");
 	//dllNames.push_back("Base.dll");
 	//dllNames.push_back("Xerces.dll");
@@ -104,7 +101,7 @@ Vernissage::Session* DllStuff::createSessionObject(){
 		return pSession;
 	}
 
-	string dllDirectory (data);
+	std::string dllDirectory (data);
 	dllDirectory.append("\\Bin");
 	sprintf(buf, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
 	debugOutputToHistory(DEBUG_LEVEL,buf);
@@ -115,7 +112,7 @@ Vernissage::Session* DllStuff::createSessionObject(){
 		return pSession;
 	}
 
-	string version = subKeyName;
+	std::string version = subKeyName;
 	m_vernissageVersion = version.substr(1,version.length()-1);
 
 	if(m_vernissageVersion.compare("1.0") != 0 ){
@@ -128,7 +125,7 @@ Vernissage::Session* DllStuff::createSessionObject(){
 		debugOutputToHistory(DEBUG_LEVEL,buf);	
 	}
 
-	for( vector<string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
+	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
 		dllName = *it;
 		module = LoadLibrary( (LPCSTR) dllName.c_str());
 
@@ -153,7 +150,7 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	}
 
 	if(pSession == NULL){
-		debugOutputToHistory(DEBUG_LEVEL,"pSession is NULL.\n");
+		outputToHistory("BUG: pSession is NULL.\n");
 		return pSession;
 	}
 	return pSession;

@@ -6,14 +6,14 @@
 #include "dataclass.h"
 #include "utils.h"
 
-#include "globalvariables.h"
+#include "globals.h"
 
 #define DEBUG_LEVEL 1
 
 myData::myData():
 	m_VernissageSession(NULL),
 	m_dllStuff(NULL),
-	m_debugLevel(0){
+	m_lastError(UNKNOWN_ERROR){
 
 	m_dllStuff = new DllStuff;
 }
@@ -41,6 +41,11 @@ void myData::closeSession(){
 	IntMyBrickletPtrMap::const_iterator it;
 	for(it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++){
 		delete it->second;
+	}
+
+	// remove opened result set from internal database
+	if(m_VernissageSession){
+		m_VernissageSession->eraseResultSets();
 	}
 
 	// empty bricklet map
@@ -100,60 +105,73 @@ void myData::setBrickletClassMap(int brickletID, void *pBricklet){
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
 
-void myData::setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle){
-
-	std::string	waveNote = this->getStandardWaveNote(brickletID);
+void myData::setLastError(int errorCode, std::string argument){
+	
 	char buf[ARRAY_SIZE];
 
-	waveNote.append("rawMin="    + anyTypeToString<int>(rawMin)    + "\r");
-	waveNote.append("rawMax="	 + anyTypeToString<int>(rawMax)	 + "\r");
-	
-	waveNote.append("scaledMin=" + anyTypeToString<double>(scaledMin) + "\r");
-	waveNote.append("scaledMax=" + anyTypeToString<double>(scaledMax) + "\r");
-
-	this->setWaveNote(waveNote,waveHandle);
-}
-
-
-void myData::setOtherWaveNote(int brickletID, waveHndl waveHandle){
-
-	std::string waveNote = this->getStandardWaveNote(brickletID);
-
-	this->setWaveNote(waveNote,waveHandle);
-}
-
-
-
-std::string myData::getStandardWaveNote(int brickletID){
-
-	std::string waveNote;
-
-	waveNote.append("resultFileName=" + getResultFileName() + "\r");
-	waveNote.append("resultFilePath=" + getResultFilePath() + "\r");
-
-	// we pass brickletID=0 for waveNotes concerning the resultFileMetaData wave
-	if(brickletID > 0){
-		waveNote.append("brickletID=" + anyTypeToString<int>(brickletID) + "\r");
-	}
-	else{
-		waveNote.append("brickletID=\r");
-	}
-
-	waveNote.append("xopVersion=" + std::string(myXopVersion) + "\r");
-	waveNote.append("vernissageVersion=" + this->getVernissageVersion() + "\r");
-
-	return waveNote;
-}
-
-void myData::setWaveNote(std::string waveNote, waveHndl waveHandle){
-
-	if(waveNote.empty()){
-		outputToHistory("BUG: got empty waveNote in myData::setWaveNote.");
+	if(errorCode < SUCCESS || errorCode > WAVE_EXIST){
+		outputToHistory("BUG: errorCode is out of range");
+		m_lastError = UNKNOWN_ERROR;
 		return;
 	}
 
-	Handle noteHandle  = NewHandle(waveNote.size()) ;
-	PutCStringInHandle(waveNote.c_str(),noteHandle);
+	m_lastError = errorCode;
+	if(argument.size() == 0){
+		m_lastErrorArgument = "(missing argument)";
+	}
+	else{
+		m_lastErrorArgument = argument;
+	}
+	sprintf(buf,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+}
 
-	SetWaveNote(waveHandle, noteHandle);
+std::string myData::getLastErrorMessage(){
+
+	std::string msg;
+
+	switch(m_lastError){
+
+	case SUCCESS:
+		msg = "No error, everything went nice and smoothly.";
+		break;
+	case UNKNOWN_ERROR:
+		msg = "A strange and unknown error happened.";
+		break;
+	case ALREADY_FILE_OPEN:
+		msg = "It is already a file open and it can only be one file open at a time.";
+		break;
+	case EMPTY_RESULTFILE:
+		msg = "The result file is empty, so there is little one can do here...";
+		break;
+	case FILE_NOT_READABLE:
+		msg = "The file " + this->getLastErrorArgument() + " can not be opened for reading.";
+		break;
+	case NO_NEW_BRICKLETS:
+		msg = "There are no new bricklets in the result file.";
+		break;
+	case WRONG_PARAMETER:
+		msg = "The paramter " + this->getLastErrorArgument() + " is wrong. Please consult the documentation.";
+		break;
+	case INTERNAL_ERROR_CONVERTING_DATA:
+		msg = "The rawdata could not be interpreted. You can try using getRawBrickleData() instead. Please file also a bug report.";
+		break;
+	case NO_FILE_OPEN:
+		msg = "There is no result file open at the moment.";
+		break;
+	case INVALID_RANGE:
+		msg = "The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and startBrickletID must be smaller than endBrickletID.";
+		break;
+	case NON_EXISTENT_BRICKLET:
+		msg = "The bricklet number " + this->getLastErrorArgument() + " does not exist.";
+		break;
+	case WAVE_EXIST:
+		msg = "The wave " + this->getLastErrorArgument() + " already exists. Please move/delete it first.";
+		break;
+	default:
+		msg = "BUG: unknown error code";
+		break;
+	}
+
+	return msg;
 }

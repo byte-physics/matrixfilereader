@@ -1,0 +1,26 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+checkForNewBricklets	api-layout.h	/^variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls);$/;"	p
+closeResultFile	api-layout.h	/^variable closeResultFile();$/;"	p
+createOverViewTable	api-layout.h	/^variable createOverViewTable(string waveName, string keyList);$/;"	p
+getAllBrickletData	api-layout.h	/^variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet);$/;"	p
+getAllBrickletMetaData	api-layout.h	/^variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet);$/;"	p
+getBrickletData	api-layout.h	/^variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID);$/;"	p
+getBrickletMetaData	api-layout.h	/^variable getBrickletMetaData(string baseName, variable separateFolderForEachBricklet, variable brickletID);$/;"	p
+getBrickletRawData	api-layout.h	/^variable getBrickletRawData(string baseName, variable brickletID);$/;"	p
+getBugReportTemplate	api-layout.h	/^string getBugReportTemplate();$/;"	p
+getLastError	api-layout.h	/^variable getLastError();$/;"	p
+getLastErrorMessage	api-layout.h	/^string getLastErrorMessage();$/;"	p
+getNumberOfBricklets	api-layout.h	/^variable getNumberOfBricklets(variable *totalNumberOfBricklets);$/;"	p
+getRangeBrickletData	api-layout.h	/^variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p
+getRangeBrickletMetaData	api-layout.h	/^variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID);$/;"	p
+getResultFileMetaData	api-layout.h	/^variable getResultFileMetaData(string waveName);$/;"	p
+getResultFileName	api-layout.h	/^variable getResultFileName(string *filename);$/;"	p
+getResultFilePath	api-layout.h	/^variable getResultFilePath(string *absoluteFilePath);$/;"	p
+getVernissageVersion	api-layout.h	/^variable getVernissageVersion(variable *vernissageVersion);$/;"	p
+getXOPVersion	api-layout.h	/^variable getXOPVersion(variable *xopVersion);$/;"	p
+openResultFile	api-layout.h	/^variable openResultFile(string absoluteFilePath, string fileName);$/;"	p

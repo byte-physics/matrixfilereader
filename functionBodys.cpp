@@ -12,7 +12,7 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -36,7 +36,7 @@ static int closeResultFile(closeResultFileParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -60,7 +60,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -84,7 +84,7 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -108,7 +108,7 @@ static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -132,7 +132,7 @@ static int getBrickletData(getBrickletDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -156,7 +156,7 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -180,7 +180,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -204,7 +204,7 @@ static int getBugReportTemplate(getBugReportTemplateParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -217,8 +217,8 @@ static int getBugReportTemplate(getBugReportTemplateParams *p){
 
 
 
-// string getErrorMessage(variable errorCode)
-static int getErrorMessage(getErrorMessageParams *p){
+// variable getLastError()
+static int getLastError(getLastErrorParams *p){
 
 	p->result = UNKNOWN_ERROR;
 
@@ -228,7 +228,31 @@ static int getErrorMessage(getErrorMessageParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
+	ASSERT_RETURN_ZERO(pSession);
+
+
+
+	p->result = SUCCESS;
+	return 0;
+}
+
+
+
+
+
+// string getLastErrorMessage()
+static int getLastErrorMessage(getLastErrorMessageParams *p){
+
+	p->result = UNKNOWN_ERROR;
+
+	ASSERT_RETURN_ZERO(pMyData);
+	if(!pMyData->resultFileOpen()){
+		p->result = NO_FILE_OPEN;
+		return 0;
+	}
+
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -252,7 +276,7 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -276,7 +300,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -300,7 +324,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -324,7 +348,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -348,7 +372,7 @@ static int getResultFileName(getResultFileNameParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -372,7 +396,7 @@ static int getResultFilePath(getResultFilePathParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -396,7 +420,7 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -420,7 +444,7 @@ static int getXOPVersion(getXOPVersionParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -444,7 +468,7 @@ static int openResultFile(openResultFileParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getSession();
+	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 
@@ -457,76 +481,3 @@ static int openResultFile(openResultFileParams *p){
 
 
 
-
-static long RegisterFunction()
-{
-	/*	NOTE:
-		Some XOPs should return a result of NIL in response to the FUNCADDRS message.
-		See XOP manual "Restrictions on Direct XFUNCs" section.
-	*/
-
-	int funcIndex = GetXOPItem(0);		/* which function invoked ? */
-	long returnValue = NIL;
-
-	switch (funcIndex) {
-		case 0:						
-			returnValue = (long) checkForNewBricklets;
-			break;
-		case 1:						
-			returnValue = (long) closeResultFile;
-			break;
-		case 2:						
-			returnValue = (long) createOverViewTable;
-			break;
-		case 3:						
-			returnValue = (long) getAllBrickletData;
-			break;
-		case 4:						
-			returnValue = (long) getAllBrickletMetaData;
-			break;
-		case 5:						
-			returnValue = (long) getBrickletData;
-			break;
-		case 6:						
-			returnValue = (long) getBrickletMetaData;
-			break;
-		case 7:						
-			returnValue = (long) getBrickletRawData;
-			break;
-		case 8:						
-			returnValue = (long) getBugReportTemplate;
-			break;
-		case 9:						
-			returnValue = (long) getErrorMessage;
-			break;
-		case 10:						
-			returnValue = (long) getNumberOfBricklets;
-			break;
-		case 11:						
-			returnValue = (long) getRangeBrickletData;
-			break;
-		case 12:						
-			returnValue = (long) getRangeBrickletMetaData;
-			break;
-		case 13:						
-			returnValue = (long) getResultFileMetaData;
-			break;
-		case 14:						
-			returnValue = (long) getResultFileName;
-			break;
-		case 15:						
-			returnValue = (long) getResultFilePath;
-			break;
-		case 16:						
-			returnValue = (long) getVernissageVersion;
-			break;
-		case 17:						
-			returnValue = (long) getXOPVersion;
-			break;
-		case 18:						
-			returnValue = (long) openResultFile;
-			break;
-
-	}
-	return returnValue;
-}

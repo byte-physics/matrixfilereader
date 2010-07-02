@@ -228,6 +228,7 @@ std::string viewTypeCodeToString(int idx){
 	names.push_back(VTC_SPECTROSCOPY_STRING);
 	names.push_back(VTC_FORCECURVE_STRING);
 	names.push_back(VTC_1DPROFILE_STRING);
+	names.push_back(VTC_INTERFEROMETER);
 
 	if(idx < 0 || idx >= names.size()){
 		sprintf(buf,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);

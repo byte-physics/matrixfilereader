@@ -3,7 +3,6 @@
 #define GLOBALVARIABLES_H
 
 #define ARRAY_SIZE 1000
-#define MAX_DEBUG_LEVEL 10
 
 #include "error-codes.h"
 
@@ -18,14 +17,15 @@ const char outputFormat[]			= "%s\r";
 const char debugOutputFormat[]		= "DEBUG %d: %s\r";
 
 // format string for wavenames in igor
-const char rawBrickletFormatString[] = "brickletRawData_%03d";
+
 const char brickletDataDefault[]	 = "brickletData";
 const char brickletMetaDefault[]	 = "brickletMetaData";
 const char resultMetaDefault[]		 = "resultFileMetaData";
 const char overViewTableDefault[]	 = "overViewTable";
-const char brickletMetaDataFormat[]	 = "%s_%03d";
-const char brickletDataFormat[]		 = "%s_%03d";
-const char dataFolderFormat[]		 = "X_%03d";
+const char rawBrickletFormatString[] = "brickletRawData_%04d";
+const char brickletMetaDataFormat[]	 = "%s_%04d";
+const char brickletDataFormat[]		 = "%s_%04d";
+const char dataFolderFormat[]		 = "X_%04d";
 
 // value types from element instance parameters
 const char VT_SPECIAL_STRING[] = "vt_Special";
@@ -44,6 +44,7 @@ const char VTC_2DOF3D_STRING[]		= "vtc_2Dof3D";
 const char VTC_SPECTROSCOPY_STRING[]= "vtc_Spectroscopy";
 const char VTC_FORCECURVE_STRING[]	= "vtc_ForceCurve";
 const char VTC_1DPROFILE_STRING[]	= "vtc_1DProfile";
+const char VTC_INTERFEROMETER[]		= "vtc_Interferometer";
 
 // wave name suffixes for 2D data
 const char TRACE_UP_STRING[]		= "_TraceUp";
@@ -53,6 +54,6 @@ const char RE_TRACE_DOWN_STRING[]	= "_ReTraceDown";
 
 
 // number of key to reserve space for in the metadata std::vector
-const int  METADATA_RESERVEV_SIZE	= 1000;
+const int  METADATA_RESERVE_SIZE	= 1000;
 
 #endif // GLOBALVARIABLES_H

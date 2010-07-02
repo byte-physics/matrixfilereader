@@ -6,9 +6,9 @@
 
 #include <algorithm>
 #include <string>
+#include <math.h>
 
 #include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
-
 
 #include "dataclass.h"
 #include "utils.h"
@@ -1082,15 +1082,12 @@ void doCleanup(){
 	// in case the user has forgotten to close the session
 	closeResultFileParams p;
 	closeResultFile(&p);
-
-	delete pMyData;
-	pMyData = NULL;
 }
 
 // must be zero or one, because it is double the checking is a bit more elaborate
 bool isValidSeparateFolderArg(double arg){
 
-	return ( (arg - 0.0) < 1e-5 ||  ( arg - 1.0) < 1e-5 );
+	return ( fabs(arg - 0.0) < 1e-5 ||  fabs( arg - 1.0) < 1e-5 );
 }
 
 bool isValidBrickletRange(int startID, int endID,int numberOfBricklets){
@@ -1110,6 +1107,7 @@ bool isValidBrickletID(int brickletID, int numberOfBricklets){
 
 
 bool createSeparateFolders(double arg){
+	
+	return fabs(arg - 1.0) < 1e-5;
 
-	return (arg - 1) < 1e-5;
 }

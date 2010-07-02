@@ -11,8 +11,8 @@ MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),
 	ASSERT_RETURN_VOID(pMyData);
 	m_VernissageSession = pMyData->getVernissageSession();
 
-	m_metaDataKeys.reserve(METADATA_RESERVEV_SIZE);
-	m_metaDataValues.reserve(METADATA_RESERVEV_SIZE);
+	m_metaDataKeys.reserve(METADATA_RESERVE_SIZE);
+	m_metaDataValues.reserve(METADATA_RESERVE_SIZE);
 }
 
 MyBricklet::~MyBricklet(void)
@@ -337,19 +337,19 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 		// BEGIN Vernissage::Session:AxisTableSet
 		axisTableSetsMap = m_VernissageSession->getAxisTableSets(m_brickletPtr,*itAllAxes);
 
-		// if it is empty, we got the standard table set which is [start=1,step=clocks,stop=1]
+		// if it is empty, we got the standard table set which is [start=1,step=1,stop=clocks]
 		if(axisTableSetsMap.size() == 0){
 
-			m_metaDataKeys.push_back(axisNameString + ".axisTableSetNo1.axisName");
-			m_metaDataValues.push_back(axisNameString);
+			m_metaDataKeys.push_back( axisNameString + ".AxisTableSetNo1");
+			m_metaDataValues.push_back(WStringToString(axisDescriptor.triggerAxisName));
 
-			m_metaDataKeys.push_back(axisNameString + ".axisTableSetNo1.start");
+			m_metaDataKeys.push_back( axisNameString + ".AxisTableSetNo1.start");
 			m_metaDataValues.push_back(anyTypeToString<int>(1));
 
-			m_metaDataKeys.push_back(axisNameString + ".axisTableSetNo1.step");
+			m_metaDataKeys.push_back( axisNameString + ".AxisTableSetNo1.step");
 			m_metaDataValues.push_back(anyTypeToString<int>(1));
 
-			m_metaDataKeys.push_back(axisNameString + ".axisTableSetNo1.stop");
+			m_metaDataKeys.push_back( axisNameString + ".AxisTableSetNo1.stop");
 			m_metaDataValues.push_back(anyTypeToString<int>(axisDescriptor.clocks));
 		}
 		else{
@@ -358,21 +358,21 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 			Vernissage::Session::TableSet::const_iterator itAxisTableSetsMapStruct;
 			index=0;
 			for( itAxisTabelSetsMap = axisTableSetsMap.begin(); itAxisTabelSetsMap != axisTableSetsMap.end(); itAxisTabelSetsMap++ ){
+				for(itAxisTableSetsMapStruct= itAxisTabelSetsMap->second.begin(); itAxisTableSetsMapStruct != itAxisTabelSetsMap->second.end(); itAxisTableSetsMapStruct++){
+
 				index++; // 1-based index
-				baseName = axisNameString + "axisTableSetNo" + anyTypeToString<int>(index) + ".";
-				m_metaDataKeys.push_back(baseName + axisNameString);
+				baseName = axisNameString + ".AxisTableSetNo" + anyTypeToString<int>(index);
+				m_metaDataKeys.push_back(baseName);
 				m_metaDataValues.push_back(WStringToString(itAxisTabelSetsMap->first));
 
-				for(itAxisTableSetsMapStruct= itAxisTabelSetsMap->second.begin(); itAxisTableSetsMapStruct != itAxisTabelSetsMap->second.end(); itAxisTableSetsMapStruct++){
-					baseName = baseName + WStringToString(itAxisTabelSetsMap->first) + ".";
-					m_metaDataKeys.push_back(baseName + "start");
-					m_metaDataValues.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->start));
+				m_metaDataKeys.push_back(baseName + ".start");
+				m_metaDataValues.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->start));
 
-					m_metaDataKeys.push_back(baseName + "step");
-					m_metaDataValues.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->step));
+				m_metaDataKeys.push_back(baseName + ".step");
+				m_metaDataValues.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->step));
 
-					m_metaDataKeys.push_back(baseName + "stop");
-					m_metaDataValues.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->stop));
+				m_metaDataKeys.push_back(baseName + ".stop");
+				m_metaDataValues.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->stop));
 				}
 			}
 		}

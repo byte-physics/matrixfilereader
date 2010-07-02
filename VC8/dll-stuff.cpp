@@ -16,6 +16,7 @@ DllStuff::DllStuff():
 	m_pGetSessionFunc(NULL),
 	m_pReleaseSessionFunc(NULL),
 	m_vernissageVersion("0.00"){
+
 }
 
 DllStuff::~DllStuff(){
@@ -51,12 +52,6 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	std::string dllName;
 
 	std::vector<std::string> dllNames;
-	//dllNames.push_back("Ace.dll");
-	//dllNames.push_back("Base.dll");
-	//dllNames.push_back("Xerces.dll");
-	//dllNames.push_back("Store_XML.dll");
-	//dllNames.push_back("Store_ResultWriter.dll");
-	//dllNames.push_back("Store_Vernissage.dll");
 	dllNames.push_back("Foundation.dll");
 
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regBaseKeyName.c_str(),0,KEY_READ,&hregBaseKey);
@@ -115,15 +110,15 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	std::string version = subKeyName;
 	m_vernissageVersion = version.substr(1,version.length()-1);
 
-	if(m_vernissageVersion.compare("1.0") != 0 ){
-		sprintf(buf,"Vernissage version %s can not be used to due a bug in this version. Please install version 1.0 and try again.",m_vernissageVersion.c_str());
-		outputToHistory(buf);
-		return pSession;
-	}
-	else{
+	//if(m_vernissageVersion.compare("1.0") != 0 ){
+	//	sprintf(buf,"Vernissage version %s can not be used to due a bug in this version. Please install version 1.0 and try again.",m_vernissageVersion.c_str());
+	//	outputToHistory(buf);
+	//	return pSession;
+	//}
+	//else{
 		sprintf(buf,"Vernissage version %s",m_vernissageVersion.c_str());
 		debugOutputToHistory(DEBUG_LEVEL,buf);	
-	}
+	//}
 
 	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
 		dllName = *it;
@@ -149,9 +144,5 @@ Vernissage::Session* DllStuff::createSessionObject(){
 		pSession = (*m_pGetSessionFunc) ();
 	}
 
-	if(pSession == NULL){
-		outputToHistory("BUG: pSession is NULL.\n");
-		return pSession;
-	}
 	return pSession;
 }

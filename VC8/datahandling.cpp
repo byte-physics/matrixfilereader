@@ -517,7 +517,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 		case 3:
 			outputToHistory("TODO and FIXME: Not yet implemented, feel free to help :)");
-			return INTERNAL_ERROR_CONVERTING_DATA;
 
 			break;
 

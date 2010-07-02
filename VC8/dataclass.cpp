@@ -1,12 +1,13 @@
 
+#include "dataclass.h"
+
 #include "xopstandardheaders.h"
+
 
 #include "vernissage.h"
 
-#include "dataclass.h"
-#include "utils.h"
-
 #include "globals.h"
+#include "utils.h"
 
 #define DEBUG_LEVEL 1
 

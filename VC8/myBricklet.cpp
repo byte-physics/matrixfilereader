@@ -121,10 +121,6 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	m_metaDataKeys.push_back("filePath");
 	m_metaDataValues.push_back(pMyData->getResultFilePath());
 
-	// total number of bricklets
-	m_metaDataKeys.push_back("totalNumberOfBricklets");
-	m_metaDataValues.push_back(anyTypeToString<int>(m_VernissageSession->getBrickletCount()));
-
 	// BEGIN m_VernissageSession->getBrickletMetaData
 	brickletMetaData = m_VernissageSession->getMetaData(m_brickletPtr);
 	m_metaDataKeys.push_back("brickletMetaData.fileCreatorName");

@@ -803,7 +803,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 
 	SET_ERROR(UNKNOWN_ERROR)
 	char buf[ARRAY_SIZE], keyListChar[ARRAY_SIZE+1];
-	int pos, offset, ret=-1,count=0, countMax=100,noOverwrite=0;
+	int pos, offset, ret=-1,count=0, countMax=1000,noOverwrite=0;
 	std::string keyList, key, value;
 	waveHndl waveHandle;
 	long dimensionSizes[MAX_DIMENSIONS+1];
@@ -885,24 +885,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 		}
 	}
 
-	for(j=0; j < keys.size(); j++){
-		key = keys.at(j);
-		textWaveContents.push_back(key);
-
-		sprintf(buf,"key=%s",key.c_str());
-		debugOutputToHistory(DEBUG_LEVEL,buf);
-
-		for(i=1; i <= numberOfBricklets; i++){
-			myBricklet = pMyData->getBrickletClassFromMap(i);
-			value = myBricklet->getMetaDataValueAsString(key);
-			textWaveContents.push_back(value);
-
-			sprintf(buf,"   value=%s",value.c_str());
-			debugOutputToHistory(DEBUG_LEVEL,buf);
-		}
-	}
-
-	dimensionSizes[ROWS] = numberOfBricklets+1;
+	dimensionSizes[ROWS] = numberOfBricklets;
 	dimensionSizes[COLUMNS] = keys.size();
 	ret = MDMakeWave(&waveHandle,waveName,NULL,dimensionSizes,TEXT_WAVE_TYPE,noOverwrite);
 
@@ -918,6 +901,23 @@ static int createOverViewTable(createOverViewTableParams *p){
 
 	ASSERT_RETURN_MINUSONE(waveHandle);
 
+	for(j=0; j < keys.size(); j++){
+
+		key = keys.at(j);
+		MDSetDimensionLabel(waveHandle,COLUMNS,j,const_cast<char *> (key.c_str()));
+		sprintf(buf,"key=%s",key.c_str());
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+
+		for(i=1; i <= numberOfBricklets; i++){
+			myBricklet = pMyData->getBrickletClassFromMap(i);
+			value = myBricklet->getMetaDataValueAsString(key);
+			textWaveContents.push_back(value);
+
+			sprintf(buf,"   value=%s",value.c_str());
+			debugOutputToHistory(DEBUG_LEVEL,buf);
+		}
+	}
+
 	ret = stringVectorToTextWave(textWaveContents,waveHandle);
 
 	if(ret != 0){
@@ -925,7 +925,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 		return 0;
 	}
 
-	// brickletID equals 0 because the wave note does not hold this property
+	// brickletID equals 0 because the wave note is for a resultfile kind wave
 	setOtherWaveNote(0,waveHandle);
 
 	SET_ERROR(SUCCESS)

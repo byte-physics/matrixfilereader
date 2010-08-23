@@ -22,7 +22,6 @@ bool isValidBrickletID(int brickletID, int numberOfBricklets);
 
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{
-	double  rememberCalls;
 	double *endBrickletID;
 	double *startBrickletID;
 	double  result;

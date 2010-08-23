@@ -92,7 +92,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		}
 	}
 
-	bricklet = pMyData->getBrickletClassFromMap(brickletID);
+	bricklet = pMyData->getMyBrickletObject(brickletID);
 	ASSERT_RETURN_ZERO(bricklet);
 
 	bricklet->getBrickletContentsBuffer(&pBuffer,count);
@@ -175,7 +175,7 @@ static int getResultFileName(getResultFileNameParams *p){
 		return 0;
 	}
 
-	PutCStringInHandle(pMyData->getResultFileName().c_str(), *p->filename);
+	PutCStringInHandle(pMyData->getFileName().c_str(), *p->filename);
 
 	SET_ERROR(SUCCESS)
 	return 0;
@@ -199,7 +199,7 @@ static int getResultFilePath(getResultFilePathParams *p){
 		return 0;
 	}
 
-	PutCStringInHandle(pMyData->getResultFilePath().c_str(), *p->absoluteFilePath);
+	PutCStringInHandle(pMyData->getDirPath().c_str(), *p->absoluteFilePath);
 
 	SET_ERROR(SUCCESS)
 	return 0;
@@ -245,7 +245,6 @@ static int getXOPVersion(getXOPVersionParams *p){
 	return 0;
 }
 
-// FIXME
 // variable openResultFile(string absoluteFilePath, string fileName)
 static int openResultFile(openResultFileParams *p){
 
@@ -257,7 +256,7 @@ static int openResultFile(openResultFileParams *p){
 	char buf[ARRAY_SIZE];
 
 	if(pMyData->resultFileOpen()){
-		SET_ERROR_MSG(ALREADY_FILE_OPEN,pMyData->getResultFileName())
+		SET_ERROR_MSG(ALREADY_FILE_OPEN,pMyData->getFileName())
 		return 0;
 	}
 
@@ -352,15 +351,14 @@ static int openResultFile(openResultFileParams *p){
 	for(i=1; i <= pSession->getBrickletCount(); i++ ){
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
-		pMyData->setBrickletClassMap(i,pBricklet);
+		pMyData->createMyBrickletObject(i,pBricklet);
 	}
 
 	SET_ERROR(SUCCESS)
 	return 0;
 }
 
-// TODO
-// variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID,variable rememberCalls)
+// variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID)
 static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
 	SET_ERROR(UNKNOWN_ERROR)
@@ -372,6 +370,54 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
 	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
+
+	const int oldNumberOfBricklets = pSession->getBrickletCount();
+	void* pContext  = NULL, *pBricklet = NULL;
+	MyBricklet *myBricklet = NULL;
+	int i;
+
+	std::wstring fileName = StringToWString(pMyData->getFileName());
+	std::wstring dirPath = StringToWString(pMyData->getDirPath());
+
+	// true -> result set will be added to the database
+	// false -> replaces the current results sets in the internal databse 
+	bool loadSuccess = pSession->loadResultSet(dirPath,fileName,false);
+
+	if(!loadSuccess){
+		outputToHistory("Could not check for updates of the result file. Maybe it was moved?");
+		outputToHistory("Try closing and opening the result file again.");
+		SET_ERROR(UNKNOWN_ERROR)
+		return 0;
+	}
+
+	// starting from here we have to
+	// - update the pBricklet pointers in the MyBricklet objects
+	// - compare old to new totalNumberOfBricklets
+
+	const int numberOfBricklets = pSession->getBrickletCount();
+
+	for(i=1; i <= numberOfBricklets; i++ ){
+		pBricklet = pSession->getNextBricklet(&pContext);
+		ASSERT_RETURN_ZERO(pBricklet);
+		myBricklet = pMyData->getMyBrickletObject(i);
+
+		if(myBricklet == NULL){// this is a new bricklet
+			pMyData->createMyBrickletObject(i,pBricklet);
+		}else{	// the bricklet is old and we only have to update *pBricklet
+			myBricklet->setBrickletPointer(pBricklet);
+		}
+	}
+
+	if(oldNumberOfBricklets == numberOfBricklets){
+		*p->endBrickletID   = -1;
+		*p->startBrickletID = -1;
+		SET_ERROR(NO_NEW_BRICKLETS);
+		return 0;
+	}
+	// from here on we know that numberOfBricklets > oldNumberOfBricklets 
+
+	*p->endBrickletID   = numberOfBricklets;
+	*p->startBrickletID = oldNumberOfBricklets+1;
 
 	SET_ERROR(SUCCESS)
 	return 0;
@@ -540,7 +586,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	// now we got a valid baseName
 	for(brickletID=p->startBrickletID; brickletID <= p->endBrickletID; brickletID++){
 
-		myBricklet = pMyData->getBrickletClassFromMap(brickletID);
+		myBricklet = pMyData->getMyBrickletObject(brickletID);
 		ASSERT_RETURN_ZERO(myBricklet);
 
 		sprintf(dataName,brickletDataFormat,dataBaseName,brickletID);
@@ -627,7 +673,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	for(brickletID=p->startBrickletID; brickletID <= p->endBrickletID; brickletID++){
 
 
-		myBricklet = pMyData->getBrickletClassFromMap(brickletID);
+		myBricklet = pMyData->getMyBrickletObject(brickletID);
 		ASSERT_RETURN_ZERO(myBricklet);
 
 		sprintf(metaDataName,brickletMetaDataFormat,metaDataBaseName,brickletID);
@@ -744,7 +790,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 		return 0;
 	}
 
-	pBricklet = pMyData->getBrickletClassFromMap(numberOfBricklets)->getBrickletPointer();
+	pBricklet = pMyData->getMyBrickletObject(numberOfBricklets)->getBrickletPointer();
 	ASSERT_RETURN_ZERO(pBricklet);
 
 	// use the timestamp of the last bricklet as dateOfLastChange
@@ -753,10 +799,10 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	brickletMetaData = pSession->getMetaData(pBricklet);
 
 	keys.push_back("filePath");
-	values.push_back(pMyData->getResultFilePath());
+	values.push_back(pMyData->getDirPath());
 
 	keys.push_back("fileName");
-	values.push_back(pMyData->getResultFileName());
+	values.push_back(pMyData->getFileName());
 
 	keys.push_back("totalNumberOfBricklets");
 	values.push_back(anyTypeToString<int>(numberOfBricklets));
@@ -909,7 +955,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 		debugOutputToHistory(DEBUG_LEVEL,buf);
 
 		for(i=1; i <= numberOfBricklets; i++){
-			myBricklet = pMyData->getBrickletClassFromMap(i);
+			myBricklet = pMyData->getMyBrickletObject(i);
 			value = myBricklet->getMetaDataValueAsString(key);
 			textWaveContents.push_back(value);
 

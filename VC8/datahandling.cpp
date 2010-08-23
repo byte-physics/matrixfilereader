@@ -60,7 +60,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	std::string waveBaseName(waveBaseNameChar);
 
 	ASSERT_RETURN_MINUSONE(pMyData);
-	MyBricklet *myBricklet = pMyData->getBrickletClassFromMap(brickletID);
+	MyBricklet *myBricklet = pMyData->getMyBrickletObject(brickletID);
 
 	ASSERT_RETURN_MINUSONE(myBricklet);
 	void *pBricklet = myBricklet->getBrickletPointer();
@@ -111,6 +111,24 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
 	rawBrickletDataPtr = (int *) pBuffer;
 
+	double altScaledValue, diff, maxDiff;
+	maxDiff = 0;
+
+	// create data for raw->scaled transformation
+	// the min and max values here are for the complete bricklet data and not only for one wave
+	int xOne, xTwo;
+	double yOne, yTwo, slope, yIntercept;
+	
+	xOne = myBricklet->getRawMin();
+	xTwo = myBricklet->getRawMax();
+	yOne = myBricklet->getScaledMin();
+	yTwo = myBricklet->getScaledMax();
+
+	slope = (yOne - yTwo) / (xOne - xTwo);
+	yIntercept = yOne - slope*xOne;
+	sprintf(buf,"raw->scaled transformation: slope=%g,yIntercept=%g",slope,yIntercept);
+	debugOutputToHistory(DEBUG_LEVEL,buf);
+
 	switch(dimension){
 	
 		case 1:
@@ -148,7 +166,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			for(i=0; i < numPointsTriggerAxis; i++){
 				
 				rawValue	= rawBrickletDataPtr[i];
-				scaledValue = pSession->toPhysical(rawValue,pBricklet);			
+				scaledValue = rawValue*slope + yIntercept;
+
 				waveData[i]	= scaledValue;
 
 				if(rawValue < rawMinValue){
@@ -166,13 +185,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			
 			}
 
+			sprintf(buf,"maxDiff=%g",maxDiff);
+			debugOutputToHistory(DEBUG_LEVEL,buf);
+
 			setDataWaveNote(brickletID,rawMinValue,rawMaxValue,scaledMinValue,scaledMaxValue,waveHandle);
 
 			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
-			// FIXME casting should not be necessary
-			MDSetWaveUnits(waveHandle,ROWS,(char *)WStringToString(triggerAxis.physicalUnit).c_str());
-			MDSetWaveUnits(waveHandle,-1,(char *)myBricklet->getMetaDataValueAsString("channelUnit").c_str());			
+			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
+			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(myBricklet->getMetaDataValueAsString("channelUnit").c_str()));			
 	
 			HSetState(waveHandle,hState);
 		
@@ -278,7 +299,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// - the wave is linear in the memory
 			// - going along the arrray will first fill the first column from row 0 to end and then the second column and so on
 
-
 			// both axes are mirrored
 			if(waveHandleVector.size() == 4){
 
@@ -325,6 +345,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				return 1;
 			}
 
+
 			// TODO explain the messy indizes here and above
 
 			// COLUMNS
@@ -344,7 +365,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 							traceUpRawBrickletIndex >= 0
 							){
 								rawValue	= rawBrickletDataPtr[traceUpRawBrickletIndex];
-								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								scaledValue = rawValue*slope + yIntercept;
+
+								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
+								//diff = scaledValue - altScaledValue;
+
+								//if(diff > maxDiff){
+								//	maxDiff = diff;
+								//}
+
 								traceUpDataPtr[traceUpDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[0]){
@@ -385,7 +414,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 							traceDownRawBrickletIndex >= 0
 							){
 								rawValue	= rawBrickletDataPtr[traceDownRawBrickletIndex];
-								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								scaledValue = rawValue*slope + yIntercept;
+
+								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
+								//diff = scaledValue - altScaledValue;
+
+								//if(diff > maxDiff){
+								//	maxDiff = diff;
+								//}
+
 								traceDownDataPtr[traceDownDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[1]){
@@ -426,7 +463,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 							reTraceUpRawBrickletIndex >= 0
 							){
 								rawValue	= rawBrickletDataPtr[reTraceUpRawBrickletIndex];
-								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								scaledValue = rawValue*slope + yIntercept;
+
+								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
+								//diff = scaledValue - altScaledValue;
+
+								//if(diff > maxDiff){
+								//	maxDiff = diff;
+								//}
+
 								reTraceUpDataPtr[reTraceUpDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[2]){
@@ -468,7 +513,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 							){
 
 								rawValue	= rawBrickletDataPtr[reTraceDownRawBrickletIndex];
-								scaledValue = pSession->toPhysical(rawValue,pBricklet);
+								scaledValue = rawValue*slope + yIntercept;
+
+								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
+								//diff = scaledValue - altScaledValue;
+
+								//if(diff > maxDiff){
+								//	maxDiff = diff;
+								//}
+
 								reTraceDownDataPtr[reTraceDownDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[3]){
@@ -499,6 +552,9 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				}
 			}
 
+			//sprintf(buf,"maxDiff=%g",maxDiff);
+			//debugOutputToHistory(DEBUG_LEVEL,buf);
+
 			// unlock waves and set wave note
 			for(i=0; i < hStateVector.size(); i++){
 				HSetState(waveHandleVector[i],hStateVector[i]);
@@ -507,10 +563,9 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				MDSetWaveScaling(waveHandleVector[i],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
 				MDSetWaveScaling(waveHandleVector[i],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
 
-				// FIXME casting should not be necessary
-				MDSetWaveUnits(waveHandleVector[i],ROWS,(char *)WStringToString(triggerAxis.physicalUnit).c_str());
-				MDSetWaveUnits(waveHandleVector[i],COLUMNS,(char *)WStringToString(rootAxis.physicalUnit).c_str());
-				MDSetWaveUnits(waveHandleVector[i],-1,(char *)myBricklet->getMetaDataValueAsString("channelUnit").c_str());
+				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(triggerAxis.physicalUnit).c_str())));
+				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(rootAxis.physicalUnit).c_str()));
+				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(myBricklet->getMetaDataValueAsString("channelUnit").c_str()));
 			}
 
 			break;
@@ -525,7 +580,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			outputToHistory(buf);
 			break;	
 	}
-
 
 	return 0;
 }

@@ -13,6 +13,9 @@ public:
 
 public:
 	void* getBrickletPointer(){ return m_brickletPtr;};
+	// resetting *pBricklet is only needed after the same result file is loaded again to check for new bricklets
+	void setBrickletPointer(void* pBricklet){ m_brickletPtr = pBricklet;};
+
 	void  getBrickletContentsBuffer(const int** pBuffer, int &count);
 	void  getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values);
 	std::vector<std::wstring> generateAllAxesVector();
@@ -21,6 +24,10 @@ public:
 	std::string getMetaDataValueAsString(std::string key);
 	int			getMetaDataValueAsInt(std::string key);
 	double		getMetaDataValueAsDouble(std::string key);
+	int getRawMax(){ return m_maxRawValue; };
+	int getRawMin(){ return m_minRawValue; };
+	double getScaledMax(){ return m_maxScaledValue; };
+	double getScaledMin(){ return m_minScaledValue; };
 
 private:
 	void MyBricklet::loadBrickletMetaDataFromResultFile();
@@ -31,8 +38,14 @@ private:
 	int m_brickletID;
 
 	// storage for the raw data
-	const int *m_rawBufferContents;
+	int *m_rawBufferContents;
 	int m_rawBufferContentsSize;
+
+	// min and max raw values
+	int m_minRawValue, m_maxRawValue;
+
+	// min and max scaled values
+	double m_minScaledValue, m_maxScaledValue;
 
 	// meta data
 	std::vector<std::string> m_metaDataKeys;

@@ -17,22 +17,19 @@ MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),
 
 MyBricklet::~MyBricklet(void)
 {
-	if(m_VernissageSession){
 		if(m_rawBufferContents != NULL){
-			debugOutputToHistory(DEBUG_LEVEL,"Unloading Bricklet Contents");
-			m_VernissageSession->unloadBrickletContents(m_brickletPtr);
+			debugOutputToHistory(DEBUG_LEVEL,"Deleting raw bricklet data");
+			delete[] m_rawBufferContents;
 			m_rawBufferContents=NULL;
 		}
-	}
 }
-
 
 void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 	char buf[ARRAY_SIZE];
 	
 	ASSERT_RETURN_VOID(pBuffer);
-	
+	ASSERT_RETURN_VOID(m_VernissageSession);
 	count=0;
 
 	// we are not called the first time
@@ -43,19 +40,45 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		debugOutputToHistory(DEBUG_LEVEL,buf);
 
 		*pBuffer = m_rawBufferContents;
-		count   = m_rawBufferContentsSize;
+		count    = m_rawBufferContentsSize;
 
 		sprintf(buf,"after: pBuffer=%d,count=%d",*pBuffer,count);
 		debugOutputToHistory(DEBUG_LEVEL,buf);
 	}
 	else{ // we are called the first time
+		
+		// load raw data into vernissage DLL
 		m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
 
 		sprintf(buf,"pBuffer=%d,count=%d",*pBuffer,count);
 		debugOutputToHistory(DEBUG_LEVEL,buf);
 
-		m_rawBufferContents = *pBuffer;
+		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise the getRaw* routines will call
+		// loadbrickletContents implicitly which is quite expensive
+		m_minRawValue = m_VernissageSession->getRawMin(m_brickletPtr);
+		m_maxRawValue = m_VernissageSession->getRawMax(m_brickletPtr);
+
+		m_minScaledValue = m_VernissageSession->toPhysical(m_minRawValue, m_brickletPtr);
+		m_maxScaledValue = m_VernissageSession->toPhysical(m_maxRawValue, m_brickletPtr);
+
+		sprintf(buf,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_minRawValue,m_maxRawValue,m_minScaledValue,m_maxScaledValue);
+		debugOutputToHistory(DEBUG_LEVEL,buf);
+
+
+		// copy the raw data to our own cache
 		m_rawBufferContentsSize = count;
+		m_rawBufferContents = new int[m_rawBufferContentsSize];
+		if(m_rawBufferContents == NULL){
+			outputToHistory("Out of memory");
+			*pBuffer = NULL;
+			count=0;
+			return;
+		}
+		memcpy(m_rawBufferContents,*pBuffer,sizeof(int)*m_rawBufferContentsSize);
+		*pBuffer = m_rawBufferContents;
+
+		// release memory from vernissage DLL
+		m_VernissageSession->unloadBrickletContents(m_brickletPtr);
 	}
 }
 
@@ -115,11 +138,11 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 
 	// resultfile name
 	m_metaDataKeys.push_back("fileName");
-	m_metaDataValues.push_back(pMyData->getResultFileName());
+	m_metaDataValues.push_back(pMyData->getFileName());
 
 	// resultfile path
 	m_metaDataKeys.push_back("filePath");
-	m_metaDataValues.push_back(pMyData->getResultFilePath());
+	m_metaDataValues.push_back(pMyData->getDirPath());
 
 	// BEGIN m_VernissageSession->getBrickletMetaData
 	brickletMetaData = m_VernissageSession->getMetaData(m_brickletPtr);

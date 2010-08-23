@@ -72,7 +72,7 @@ std::string myData::getVernissageVersion(){
 
 bool myData::resultFileOpen(){
 
-	if(m_resultFilePath.empty()){
+	if(m_resultFileName.empty()){
 		return false;
 	}
 	else{
@@ -80,23 +80,30 @@ bool myData::resultFileOpen(){
 	}
 }
 
-std::string myData::getResultFilePath(){
+std::string myData::getDirPath(){
 
 	return m_resultFilePath;
 
 }
 
-std::string myData::getResultFileName(){
+std::string myData::getFileName(){
 
 	return m_resultFileName;
 }
 
-MyBricklet* myData::getBrickletClassFromMap(int brickletID){
+MyBricklet* myData::getMyBrickletObject(int brickletID){
 
-	return m_brickletIDBrickletClassMap[brickletID];
+	IntMyBrickletPtrMap::iterator it = m_brickletIDBrickletClassMap.find(brickletID);
+
+	if(it != m_brickletIDBrickletClassMap.end()){ // we found the element
+		return it->second;
+	}
+	else{
+		return NULL;
+	}
 }
 
-void myData::setBrickletClassMap(int brickletID, void *pBricklet){
+void myData::createMyBrickletObject(int brickletID, void *pBricklet){
 	
 /*	char buf[ARRAY_SIZE];
 	sprintf(buf,"setBrickletPointerMap brickletID=%d,pBricklet=%p\n",brickletID,pBricklet);

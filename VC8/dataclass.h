@@ -9,7 +9,7 @@
 #include "myBricklet.h"
 #include "xopstandardheaders.h"
 
-typedef	std::map<int,	 MyBricklet*, std::less<int>>		IntMyBrickletPtrMap;
+typedef	std::map<int, MyBricklet*, std::less<int>>		IntMyBrickletPtrMap;
 
 class myData{
 
@@ -20,16 +20,18 @@ public:
 	
 public:
 	// functions
-	std::string getResultFileName();
-	std::string getResultFilePath();
+
+	// return the filename and the dirPath of the currently loaded result set
+	std::string getFileName();
+	std::string getDirPath();
 	void setResultFile(char *dirPath, char *fileName){ this->setResultFile(std::string(dirPath),std::string(fileName));}
 	void setResultFile( std::string dirPath, std::string fileName){ m_resultFilePath = dirPath; m_resultFileName = fileName;}
 	bool resultFileOpen();
 	Vernissage::Session* getVernissageSession();
 	std::string getVernissageVersion();
 	void closeSession();
-	MyBricklet* getBrickletClassFromMap(int brickletID);
-	void setBrickletClassMap(int brickletID, void *pBricklet);
+	MyBricklet* getMyBrickletObject(int brickletID);
+	void createMyBrickletObject(int brickletID, void *pBricklet);
 	void setLastError(int errorCode, std::string argument = std::string());
 	int getLastError(){ return m_lastError; }
 	std::string getLastErrorArgument(){ return m_lastErrorArgument; }

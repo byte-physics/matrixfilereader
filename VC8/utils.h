@@ -10,7 +10,13 @@
 
 #include "xopstandardheaders.h"
 
+#include "globals.h"
+
 #include "version.h"
+
+// formatStrings
+const char outputFormat[]			= "%s\r";	//  outputToHistory
+const char debugOutputFormat[]		= "DEBUG: %s\r"; // debugOutputToHistory
 
 std::wstring StringToWString(const std::string& s);
 std::string WStringToString(const std::wstring& s);
@@ -22,7 +28,7 @@ std::string WStringToString(const std::wstring& s);
 
 std::wstring CharPtrToWString(char* cStr);
 
-void debugOutputToHistory(int level,const char *str);
+void debugOutputToHistory(const char *str);
 void outputToHistory(const char *str);
 
 // taken from http://rhyous.com/2009/10/01/how-to-convert-an-int-to-a-string-in-c/

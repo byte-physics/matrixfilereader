@@ -11,8 +11,6 @@
 #include "globals.h"
 #include "utils.h"
 
-#define DEBUG_LEVEL 1
-
 // TODO
 // support axis table sets
 // support 3D data (gridded spectroscopy)
@@ -59,7 +57,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	std::string waveBaseName(waveBaseNameChar);
 
-	ASSERT_RETURN_MINUSONE(pMyData);
 	MyBricklet *myBricklet = pMyData->getMyBrickletObject(brickletID);
 
 	ASSERT_RETURN_MINUSONE(myBricklet);
@@ -75,23 +72,23 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	myBricklet->getViewTypeCodes(viewTypeCodes);
 
 	sprintf(buf,"### BrickletID %d ###",brickletID);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 
 	sprintf(buf,"dimension %d",dimension);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 
 	std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCodes;
 	for(itViewTypeCodes = viewTypeCodes.begin(); itViewTypeCodes != viewTypeCodes.end(); itViewTypeCodes++){
 		sprintf(buf,"viewType %s",viewTypeCodeToString(*itViewTypeCodes).c_str());
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 	}
 	
-	debugOutputToHistory(DEBUG_LEVEL,"Axis order is from triggerAxis to rootAxis");
+	debugOutputToHistory("Axis order is from triggerAxis to rootAxis");
 
 	std::vector<std::string>::const_iterator itAllAxes;	
 	for(itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
 		sprintf(buf,"Axis %s",itAllAxes->c_str());
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 	}
 
 	// set min and max values to safe values
@@ -111,9 +108,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
 	rawBrickletDataPtr = (int *) pBuffer;
 
-	double altScaledValue, diff, maxDiff;
-	maxDiff = 0;
-
 	// create data for raw->scaled transformation
 	// the min and max values here are for the complete bricklet data and not only for one wave
 	int xOne, xTwo;
@@ -127,7 +121,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	slope = (yOne - yTwo) / (xOne - xTwo);
 	yIntercept = yOne - slope*xOne;
 	sprintf(buf,"raw->scaled transformation: slope=%g,yIntercept=%g",slope,yIntercept);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 
 	switch(dimension){
 	
@@ -147,7 +141,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			if(ret == NAME_WAV_CONFLICT){
 				sprintf(buf,"Wave %s already exists.",waveBaseName.c_str());
-				debugOutputToHistory(DEBUG_LEVEL,buf);
+				debugOutputToHistory(buf);
 				return WAVE_EXIST;
 			}
 
@@ -184,9 +178,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				}
 			
 			}
-
-			sprintf(buf,"maxDiff=%g",maxDiff);
-			debugOutputToHistory(DEBUG_LEVEL,buf);
 
 			setDataWaveNote(brickletID,rawMinValue,rawMaxValue,scaledMinValue,scaledMaxValue,waveHandle);
 
@@ -231,10 +222,10 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			}
 
 			sprintf(buf,"numPointsRootAxis=%d",numPointsRootAxis);
-			debugOutputToHistory(DEBUG_LEVEL,buf);
+			debugOutputToHistory(buf);
 
 			sprintf(buf,"numPointsTriggerAxis=%d",numPointsTriggerAxis);
-			debugOutputToHistory(DEBUG_LEVEL,buf);
+			debugOutputToHistory(buf);
 
 			dimensionSizes[ROWS] = numPointsTriggerAxis;
 			dimensionSizes[COLUMNS] = numPointsRootAxis;
@@ -268,7 +259,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 				if(ret == NAME_WAV_CONFLICT){
 					sprintf(buf,"Wave %s already exists.",itWaveNames->c_str());
-					debugOutputToHistory(DEBUG_LEVEL,buf);
+					debugOutputToHistory(buf);
 					return WAVE_EXIST;
 				}
 
@@ -345,7 +336,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				return 1;
 			}
 
-
 			// TODO explain the messy indizes here and above
 
 			// COLUMNS
@@ -367,13 +357,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								rawValue	= rawBrickletDataPtr[traceUpRawBrickletIndex];
 								scaledValue = rawValue*slope + yIntercept;
 
-								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
-								//diff = scaledValue - altScaledValue;
-
-								//if(diff > maxDiff){
-								//	maxDiff = diff;
-								//}
-
 								traceUpDataPtr[traceUpDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[0]){
@@ -390,13 +373,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								}
 						}
 						else{
-							debugOutputToHistory(DEBUG_LEVEL,"Index out of range in traceUp");
+							debugOutputToHistory("Index out of range in traceUp");
 
 							sprintf(buf,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							sprintf(buf,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							traceUpDataPtr=NULL;
 						}
@@ -416,13 +399,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								rawValue	= rawBrickletDataPtr[traceDownRawBrickletIndex];
 								scaledValue = rawValue*slope + yIntercept;
 
-								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
-								//diff = scaledValue - altScaledValue;
-
-								//if(diff > maxDiff){
-								//	maxDiff = diff;
-								//}
-
 								traceDownDataPtr[traceDownDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[1]){
@@ -439,13 +415,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								}
 						}
 						else{
-							outputToHistory("Index out of range in traceDown");
+							debugOutputToHistory("Index out of range in traceDown");
 
 							sprintf(buf,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							sprintf(buf,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							traceDownDataPtr=NULL;
 						}
@@ -465,13 +441,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								rawValue	= rawBrickletDataPtr[reTraceUpRawBrickletIndex];
 								scaledValue = rawValue*slope + yIntercept;
 
-								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
-								//diff = scaledValue - altScaledValue;
-
-								//if(diff > maxDiff){
-								//	maxDiff = diff;
-								//}
-
 								reTraceUpDataPtr[reTraceUpDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[2]){
@@ -488,13 +457,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								}
 						}
 						else{
-							outputToHistory("Index out of range in reTraceUp");
+							debugOutputToHistory("Index out of range in reTraceUp");
 
 							sprintf(buf,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							sprintf(buf,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							reTraceUpDataPtr=NULL;
 						}
@@ -515,13 +484,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								rawValue	= rawBrickletDataPtr[reTraceDownRawBrickletIndex];
 								scaledValue = rawValue*slope + yIntercept;
 
-								//altScaledValue = pSession->toPhysical(rawValue,pBricklet);
-								//diff = scaledValue - altScaledValue;
-
-								//if(diff > maxDiff){
-								//	maxDiff = diff;
-								//}
-
 								reTraceDownDataPtr[reTraceDownDataIndex] =  scaledValue;
 
 								if(rawValue < rawMin[3]){
@@ -538,22 +500,19 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								}
 						}
 						else{
-							outputToHistory("Index out of range in reTraceDown");
+							debugOutputToHistory("Index out of range in reTraceDown");
 
 							sprintf(buf,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							sprintf(buf,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(DEBUG_LEVEL,buf);
+							debugOutputToHistory(buf);
 
 							reTraceDownDataPtr=NULL;
 						}
 					}
 				}
 			}
-
-			//sprintf(buf,"maxDiff=%g",maxDiff);
-			//debugOutputToHistory(DEBUG_LEVEL,buf);
 
 			// unlock waves and set wave note
 			for(i=0; i < hStateVector.size(); i++){

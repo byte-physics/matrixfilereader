@@ -1,6 +1,3 @@
-/*
-	TODO
-*/
 
 #include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
 
@@ -20,6 +17,15 @@ bool isValidBrickletRange(int startID, int endID, int numberOfBricklets);
 bool createSeparateFolders(double arg);
 bool isValidBrickletID(int brickletID, int numberOfBricklets);
 
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct createDebugOutputParams{
+	double  val;
+	double  result;
+};
+typedef struct createDebugOutputParams createDebugOutputParams;
+#pragma pack()
+
+static int createDebugOutput(createDebugOutputParams *p);
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct checkForNewBrickletsParams{
 	double *endBrickletID;

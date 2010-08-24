@@ -9,7 +9,7 @@
 #include "globals.h"
 #include "utils.h"
 
-#define DEBUG_LEVEL 1
+
 
 myData::myData():
 	m_VernissageSession(NULL),
@@ -60,14 +60,11 @@ void myData::closeSession(){
 
 std::string myData::getVernissageVersion(){
 
-	std::string version= "unknown";
-
-	if(m_VernissageSession != NULL){
-	
-		version = m_dllStuff->getVernissageVersion();
+	if(m_VernissageSession == NULL){
+		this->getVernissageSession();
 	}
 
-	return version;
+	return m_dllStuff->getVernissageVersion();
 }
 
 bool myData::resultFileOpen(){
@@ -107,7 +104,7 @@ void myData::createMyBrickletObject(int brickletID, void *pBricklet){
 	
 /*	char buf[ARRAY_SIZE];
 	sprintf(buf,"setBrickletPointerMap brickletID=%d,pBricklet=%p\n",brickletID,pBricklet);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 */
 	MyBricklet *bricklet = new MyBricklet(pBricklet,brickletID);
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
@@ -131,7 +128,7 @@ void myData::setLastError(int errorCode, std::string argument){
 		m_lastErrorArgument = argument;
 	}
 	sprintf(buf,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 }
 
 std::string myData::getLastErrorMessage(){

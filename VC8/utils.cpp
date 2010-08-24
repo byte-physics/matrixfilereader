@@ -11,7 +11,7 @@
 
 #include "globals.h"
 
-#define DEBUG_LEVEL 1
+
 
 // Taken from http://www.codeguru.com/forum/archive/index.php/t-193852.html
 
@@ -42,14 +42,16 @@ std::wstring CharPtrToWString(char* cStr){
 	return StringToWString(str);
 }
 
-void debugOutputToHistory(int level,const char* str){
+void debugOutputToHistory(const char* str){
 
-	ASSERT_RETURN_VOID(pMyData);
-	ASSERT_RETURN_VOID(str);
+	if(pMyData->debuggingEnabled()){
 
-	char buf[ARRAY_SIZE];
-	sprintf(buf,debugOutputFormat,level,str);
-	XOPNotice(buf);
+		ASSERT_RETURN_VOID(str);
+
+		char buf[ARRAY_SIZE];
+		sprintf(buf,debugOutputFormat,str);
+		XOPNotice(buf);
+	}
 }
 
 void outputToHistory(const char *str){
@@ -89,7 +91,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	}
 
 	//sprintf(buf,"totalSize of strings %d",GetHandleSize(textHandle));
-	//debugOutputToHistory(DEBUG_LEVEL,buf);
+	//debugOutputToHistory(buf);
 
 	for(i=0; i < numEntriesPlusOne; i++){
 
@@ -100,7 +102,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 			offset+=stringSizes[i-1];
 		}
 		//sprintf(buf,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
-		//debugOutputToHistory(DEBUG_LEVEL,buf);
+		//debugOutputToHistory(buf);
 
 		// write offsets
 		memcpy(*textHandle+i*sizeof(long),&offset,sizeof(long));
@@ -108,7 +110,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 		if(i < stringVector.size()){
 
 			//sprintf(buf,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
-			//debugOutputToHistory(DEBUG_LEVEL,buf);
+			//debugOutputToHistory(buf);
 
 			// write strings
 			memcpy(*textHandle+offset,stringVector[i].c_str(),stringSizes[i]);
@@ -129,7 +131,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
 	//sprintf(buf,"SetTextWaveData returned %d",ret);
-	//debugOutputToHistory(DEBUG_LEVEL,buf);
+	//debugOutputToHistory(buf);
 
 	// release waveHandle lock
 	HSetState(waveHandle, lockStateWave);
@@ -185,7 +187,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 
 	if(ret == NAME_WAV_CONFLICT){
 		sprintf(buf,"Wave %s already exists.",waveName);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 		return WAVE_EXIST;
 	}
 

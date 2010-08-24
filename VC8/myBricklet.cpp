@@ -4,7 +4,7 @@
 // #include <algorithm>
 #include "utils.h"
 
-#define DEBUG_LEVEL 1
+
 
 MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 
@@ -18,7 +18,7 @@ MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),
 MyBricklet::~MyBricklet(void)
 {
 		if(m_rawBufferContents != NULL){
-			debugOutputToHistory(DEBUG_LEVEL,"Deleting raw bricklet data");
+			debugOutputToHistory("Deleting raw bricklet data");
 			delete[] m_rawBufferContents;
 			m_rawBufferContents=NULL;
 		}
@@ -34,16 +34,16 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 	// we are not called the first time
 	if(m_rawBufferContents != NULL){
-		debugOutputToHistory(DEBUG_LEVEL,"myData::getBrickletContentsBuffer Using cached values");
+		debugOutputToHistory("myData::getBrickletContentsBuffer Using cached values");
 
 		sprintf(buf,"before: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 
 		*pBuffer = m_rawBufferContents;
 		count    = m_rawBufferContentsSize;
 
 		sprintf(buf,"after: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 	}
 	else{ // we are called the first time
 		
@@ -51,7 +51,7 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
 
 		sprintf(buf,"pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 
 		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise the getRaw* routines will call
 		// loadbrickletContents implicitly which is quite expensive
@@ -62,7 +62,7 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		m_maxScaledValue = m_VernissageSession->toPhysical(m_maxRawValue, m_brickletPtr);
 
 		sprintf(buf,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_minRawValue,m_maxRawValue,m_minScaledValue,m_maxScaledValue);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 
 
 		// copy the raw data to our own cache
@@ -399,7 +399,7 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	}
 
 	sprintf(buf,"Loaded %d keys and %d values as brickletMetaData",m_metaDataKeys.size(), m_metaDataValues.size());
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 
 	if(m_metaDataKeys.size() != m_metaDataValues.size()){
 		outputToHistory("BUG: key value lists don't have the same size, aborting");
@@ -479,7 +479,7 @@ std::string MyBricklet::getMetaDataValueAsString(std::string key){
 	//std::vector<std::string>::iterator it = std::find(m_metaDataKeys.begin(), m_metaDataKeys.end(), key);
 	//if(it != m_metaDataValues.end()){ // we found it
 		//sprintf(buf,"column of key %s found",*it);
-		//debugOutputToHistory(DEBUG_LEVEL,buf);
+		//debugOutputToHistory(buf);
 		//value = m_metaDataValues.at(it-m_metaDataKeys.begin());
 	//}
 

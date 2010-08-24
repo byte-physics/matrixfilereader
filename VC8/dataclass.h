@@ -36,8 +36,12 @@ public:
 	int getLastError(){ return m_lastError; }
 	std::string getLastErrorArgument(){ return m_lastErrorArgument; }
 	std::string getLastErrorMessage();
+	bool debuggingEnabled(){ return debug; };
+	void setDebugging(bool value){ debug=value; };
 
 private:
+
+	bool debug;
 	std::string m_resultFileName, m_resultFilePath;
 	Vernissage::Session *m_VernissageSession;
 	DllStuff *m_dllStuff;

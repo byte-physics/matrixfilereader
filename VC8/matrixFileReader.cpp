@@ -17,7 +17,7 @@
 #include "globals.h"
 #include "version.h"
 
-#define DEBUG_LEVEL 1
+
 
 #include "Vernissage.h"
 
@@ -52,7 +52,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	char dataWaveName[MAX_OBJ_NAME+1];
 	const int *pBuffer;
 	int* dataPtr = NULL;
-	MyBricklet* bricklet = NULL;
+	MyBricklet* myBricklet = NULL;
 	int noOverwrite=0, count=0,ret, brickletID, hState;
 
 	long dimensionSizes[MAX_DIMENSIONS+1];
@@ -92,10 +92,10 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		}
 	}
 
-	bricklet = pMyData->getMyBrickletObject(brickletID);
-	ASSERT_RETURN_ZERO(bricklet);
+	myBricklet = pMyData->getMyBrickletObject(brickletID);
+	ASSERT_RETURN_ZERO(myBricklet);
 
-	bricklet->getBrickletContentsBuffer(&pBuffer,count);
+	myBricklet->getBrickletContentsBuffer(&pBuffer,count);
 	ASSERT_RETURN_ZERO(pBuffer);
 
 	if(count == 0){
@@ -108,6 +108,8 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	ret = MDMakeWave(&waveHandle,dataWaveName,NULL,dimensionSizes,NT_I32,noOverwrite);
 
 	if(ret == NAME_WAV_CONFLICT){
+		sprintf(buf,"Wave %s already exists.",dataWaveName);
+		debugOutputToHistory(buf);
 		SET_ERROR_MSG(WAVE_EXIST,dataWaveName)
 		return 0;	
 	}
@@ -127,7 +129,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	HSetState((Handle) waveHandle, hState);
 
-	setOtherWaveNote(brickletID,waveHandle);
+	setDataWaveNote(brickletID,myBricklet->getRawMin(),myBricklet->getRawMax(),myBricklet->getScaledMin(),myBricklet->getScaledMax(),waveHandle);
 
 	SET_ERROR(SUCCESS)
 	return 0;
@@ -167,15 +169,15 @@ static int getResultFileName(getResultFileNameParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getVernissageSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-	if(GetHandleSize(*p->filename) == 0L){
-		SET_ERROR_MSG(WRONG_PARAMETER,"filename")
-		return 0;
+	if(*p->filename == NULL){
+		*p->filename = NewHandle(0L);
 	}
 
-	PutCStringInHandle(pMyData->getFileName().c_str(), *p->filename);
+	int ret = PutCStringInHandle(pMyData->getFileName().c_str(), *p->filename);
+	if( ret != 0 ){
+		SET_INTERNAL_ERROR(ret)
+		return 0;
+	}
 
 	SET_ERROR(SUCCESS)
 	return 0;
@@ -191,37 +193,28 @@ static int getResultFilePath(getResultFilePathParams *p){
 		return 0;
 	}
 
-	Vernissage::Session *pSession = pMyData->getVernissageSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-	if( GetHandleSize(*p->absoluteFilePath) == 0L){
-		SET_ERROR_MSG(WRONG_PARAMETER,"absoluteFilePath")
-		return 0;
+	if(*p->absoluteFilePath == NULL){
+		*p->absoluteFilePath = NewHandle(0L);
 	}
 
-	PutCStringInHandle(pMyData->getDirPath().c_str(), *p->absoluteFilePath);
+	int ret = PutCStringInHandle(pMyData->getDirPath().c_str(), *p->absoluteFilePath);
+	if( ret != 0 ){
+		SET_INTERNAL_ERROR(ret)
+		return 0;
+	}
 
 	SET_ERROR(SUCCESS)
 	return 0;
 }
 
-// variable getVernissageVersion(string *vernissageVersion)
+
+// variable getVernissageVersion(double *vernissageVersion)
 static int getVernissageVersion(getVernissageVersionParams *p){
 
 	SET_ERROR(UNKNOWN_ERROR)
 
-	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
-		return 0;
-	}
-
 	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
-
-	if( p->vernissageVersion == NULL ){
-		SET_ERROR_MSG(WRONG_PARAMETER,"vernissageVersion")
-		return 0;
-	}
 
 	*p->vernissageVersion = stringToAnyType<double>(pMyData->getVernissageVersion());
 
@@ -229,15 +222,10 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 	return 0;
 }
 
-// variable getXOPVersion(string *xopVersion)
+// variable getXOPVersion(double *xopVersion)
 static int getXOPVersion(getXOPVersionParams *p){
 
 	SET_ERROR(UNKNOWN_ERROR)
-
-	if( p->xopVersion == NULL ){
-		SET_ERROR_MSG(WRONG_PARAMETER,"xopVersion")
-		return 0;
-	}
 
 	*p->xopVersion = stringToAnyType<double>(myXopVersion);
 
@@ -315,10 +303,10 @@ static int openResultFile(openResultFileParams *p){
 	// fullPath c:\data\myName.test
 
 	sprintf(buf,"filename %s",fileName);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 
 	sprintf(buf,"dirPath %s",dirPath);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 
 	if( !FullPathPointsToFolder(dirPath) ){
 		SET_ERROR_MSG(FILE_NOT_READABLE,dirPath)
@@ -785,6 +773,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	}
 
 	const int numberOfBricklets = pSession->getBrickletCount();
+
 	if(numberOfBricklets == 0){
 		SET_ERROR(EMPTY_RESULTFILE)
 		return 0;
@@ -876,7 +865,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	}
 
 	// check keyList parameter
-	if( GetHandleSize(p->keyList) == 0L ){
+	if( p->keyList == NULL || GetHandleSize(p->keyList) == 0L ){
 		SET_ERROR(WRONG_PARAMETER)
 		return 0;
 	}
@@ -892,7 +881,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	keyList.append(";"); // add ; at the end to make the list complete, double ;; are no problem
 
 	sprintf(buf,"keyList=%s",keyListChar);
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 
 	pos=-1;
 	offset=0;
@@ -909,7 +898,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 
 		keys.push_back(keyList.substr(offset,pos-offset));
 		sprintf(buf,"key=%s,pos=%d,offset=%d",keys.back().c_str(),pos,offset);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 
 		offset = pos+1;
 	}
@@ -936,6 +925,8 @@ static int createOverViewTable(createOverViewTableParams *p){
 	ret = MDMakeWave(&waveHandle,waveName,NULL,dimensionSizes,TEXT_WAVE_TYPE,noOverwrite);
 
 	if(ret == NAME_WAV_CONFLICT){
+		sprintf(buf,"Wave %s already exists.",waveName);
+		debugOutputToHistory(buf);
 		SET_ERROR_MSG(WAVE_EXIST,waveName)
 		return 0;
 	}
@@ -952,7 +943,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 		key = keys.at(j);
 		MDSetDimensionLabel(waveHandle,COLUMNS,j,const_cast<char *> (key.c_str()));
 		sprintf(buf,"key=%s",key.c_str());
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 
 		for(i=1; i <= numberOfBricklets; i++){
 			myBricklet = pMyData->getMyBrickletObject(i);
@@ -960,7 +951,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 			textWaveContents.push_back(value);
 
 			sprintf(buf,"   value=%s",value.c_str());
-			debugOutputToHistory(DEBUG_LEVEL,buf);
+			debugOutputToHistory(buf);
 		}
 	}
 
@@ -995,6 +986,20 @@ static int getLastErrorMessage(getLastErrorMessageParams *p){
 	return 0;
 }
 
+// variable createDebugOutput(variable val);
+static int createDebugOutput(createDebugOutputParams *p){
+
+
+	if(p->val < 1e-5){
+		pMyData->setDebugging(false);
+	}
+	else{
+		pMyData->setDebugging(true);
+	}
+
+	return 0;
+}
+
 
 static long RegisterFunction()
 {
@@ -1014,63 +1019,67 @@ static long RegisterFunction()
 			returnValue = (long) closeResultFile;
 			break;
 		case 2:						
-			returnValue = (long) createOverViewTable;
+			returnValue = (long) createDebugOutput;
 			break;
 		case 3:						
-			returnValue = (long) getAllBrickletData;
+			returnValue = (long) createOverViewTable;
 			break;
 		case 4:						
-			returnValue = (long) getAllBrickletMetaData;
+			returnValue = (long) getAllBrickletData;
 			break;
 		case 5:						
-			returnValue = (long) getBrickletData;
+			returnValue = (long) getAllBrickletMetaData;
 			break;
 		case 6:						
-			returnValue = (long) getBrickletMetaData;
+			returnValue = (long) getBrickletData;
 			break;
 		case 7:						
-			returnValue = (long) getBrickletRawData;
+			returnValue = (long) getBrickletMetaData;
 			break;
 		case 8:						
-			returnValue = (long) getBugReportTemplate;
+			returnValue = (long) getBrickletRawData;
 			break;
 		case 9:						
-			returnValue = (long) getLastError;
+			returnValue = (long) getBugReportTemplate;
 			break;
 		case 10:						
-			returnValue = (long) getLastErrorMessage;
+			returnValue = (long) getLastError;
 			break;
 		case 11:						
-			returnValue = (long) getNumberOfBricklets;
+			returnValue = (long) getLastErrorMessage;
 			break;
 		case 12:						
-			returnValue = (long) getRangeBrickletData;
+			returnValue = (long) getNumberOfBricklets;
 			break;
 		case 13:						
-			returnValue = (long) getRangeBrickletMetaData;
+			returnValue = (long) getRangeBrickletData;
 			break;
 		case 14:						
-			returnValue = (long) getResultFileMetaData;
+			returnValue = (long) getRangeBrickletMetaData;
 			break;
 		case 15:						
-			returnValue = (long) getResultFileName;
+			returnValue = (long) getResultFileMetaData;
 			break;
 		case 16:						
-			returnValue = (long) getResultFilePath;
+			returnValue = (long) getResultFileName;
 			break;
 		case 17:						
-			returnValue = (long) getVernissageVersion;
+			returnValue = (long) getResultFilePath;
 			break;
 		case 18:						
-			returnValue = (long) getXOPVersion;
+			returnValue = (long) getVernissageVersion;
 			break;
 		case 19:						
+			returnValue = (long) getXOPVersion;
+			break;
+		case 20:						
 			returnValue = (long) openResultFile;
 			break;
 
 	}
 	return returnValue;
 }
+
 
 /*	XOPEntry()
 

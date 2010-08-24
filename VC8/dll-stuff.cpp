@@ -9,8 +9,6 @@
 #include "globals.h"
 #include "utils.h"
 
-#define DEBUG_LEVEL 1 // standard debug level for this file
-
 DllStuff::DllStuff():
 	m_foundationModule(NULL),
 	m_pGetSessionFunc(NULL),
@@ -33,7 +31,6 @@ DllStuff::~DllStuff(){
 // - Only one vernissage version can be installed at a time, so we take the one which is referenced in the regsitry
 // - The length of the arrays is taken from "Registry Element Size Limits"@MSDN
 // - The registry key looks like "HKEY_LOCAL_MACHINE\SOFTWARE\Omicron NanoTechnology\Vernissage\V1.0\Main"
-// - Currently only Foundation.dll must be loaded, otherwise it crashes seriously. Maybe this has something to do with SetDllDirectory()
 Vernissage::Session* DllStuff::createSessionObject(){
 
 	Vernissage::Session *pSession=NULL;
@@ -57,7 +54,7 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regBaseKeyName.c_str(),0,KEY_READ,&hregBaseKey);
 
 	if(result != ERROR_SUCCESS){
-		debugOutputToHistory(DEBUG_LEVEL,"Opening the registry key failed. Is Vernissage installed?");
+		debugOutputToHistory("Opening the registry key failed. Is Vernissage installed?");
 		return pSession;
 	}
 
@@ -65,7 +62,7 @@ Vernissage::Session* DllStuff::createSessionObject(){
 
 	if(result != ERROR_SUCCESS){
 		sprintf(buf,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 		return pSession;
 	}
 
@@ -75,13 +72,13 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	regKey += "\\Main";
 
 	sprintf(buf,"Checking registry key %s",regKey.c_str());
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 		
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regKey.c_str(),0,KEY_READ,&hKey);
 
 	if(result != ERROR_SUCCESS){
 		sprintf(buf,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 		return pSession;
 	}
 
@@ -92,18 +89,18 @@ Vernissage::Session* DllStuff::createSessionObject(){
 
 	if(result != ERROR_SUCCESS){
 		sprintf(buf,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(DEBUG_LEVEL,buf);
+		debugOutputToHistory(buf);
 		return pSession;
 	}
 
 	std::string dllDirectory (data);
 	dllDirectory.append("\\Bin");
 	sprintf(buf, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
-	debugOutputToHistory(DEBUG_LEVEL,buf);
+	debugOutputToHistory(buf);
 	result = SetDllDirectory((LPCSTR) dllDirectory.c_str());
 
 	if(!result){
-		debugOutputToHistory(DEBUG_LEVEL,"Error setting DLL load path");
+		debugOutputToHistory("Error setting DLL load path");
 		return pSession;
 	}
 
@@ -117,7 +114,7 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	//}
 	//else{
 		sprintf(buf,"Vernissage version %s",m_vernissageVersion.c_str());
-		debugOutputToHistory(DEBUG_LEVEL,buf);	
+		debugOutputToHistory(buf);	
 	//}
 
 	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
@@ -126,11 +123,11 @@ Vernissage::Session* DllStuff::createSessionObject(){
 
 		if(module != NULL){
 			sprintf(buf,"Successfully loaded DLL %s",dllName.c_str());
-			debugOutputToHistory(DEBUG_LEVEL,buf);
+			debugOutputToHistory(buf);
 		}
 		else{
 			sprintf(buf,"Something went wrong loading the DLL %s",dllName.c_str());
-			debugOutputToHistory(DEBUG_LEVEL,buf);
+			debugOutputToHistory(buf);
 			return pSession;
 		}
 	}

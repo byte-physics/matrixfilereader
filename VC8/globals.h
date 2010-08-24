@@ -9,13 +9,6 @@
 #include "dataclass.h"
 extern myData *pMyData;
 
-// formatStrings
-
-//  outputToHistory
-const char outputFormat[]			= "%s\r";	
-// debugOutputToHistory
-const char debugOutputFormat[]		= "DEBUG %d: %s\r";
-
 // format string for wavenames in igor
 
 const char brickletDataDefault[]	 = "brickletData";

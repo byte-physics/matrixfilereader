@@ -12,8 +12,7 @@
 #include "utils.h"
 
 // TODO
-// support axis table sets
-// support 3D data (gridded spectroscopy)
+// check support for 3D data (gridded spectroscopy)
 
 int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
 
@@ -127,6 +126,12 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	sprintf(buf,"raw->scaled transformation: slope=%g,yIntercept=%g",slope,yIntercept);
 	debugOutputToHistory(buf);
+
+	if( dimension < 1 || dimension > 3 ){
+		sprintf(buf,"Dimension %d can not be handled. Please file a bug report and attach the measured data.",dimension);
+		outputToHistory(buf);
+		return INTERNAL_ERROR_CONVERTING_DATA;
+	}
 
 	switch(dimension){
 	
@@ -294,7 +299,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// both axes are mirrored
 			if(waveHandleVector.size() == 4){
 
-				//rootAxisBlockSize	 = 2*numPointsRootAxis;
 				triggerAxisBlockSize = 2*numPointsTriggerAxis;
 
 				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
@@ -305,7 +309,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// only triggerAxis (X) is mirrored
 			else if(waveHandleVector.size() == 2 && triggerAxis.mirrored){
 
-				//rootAxisBlockSize	 = numPointsRootAxis;
 				triggerAxisBlockSize = 2*numPointsTriggerAxis;
 
 				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
@@ -314,7 +317,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// only rootAxis (Y) is mirrored
 			else if(waveHandleVector.size() == 2 && rootAxis.mirrored){
 
-				//rootAxisBlockSize	 = 2*numPointsRootAxis;
 				triggerAxisBlockSize = numPointsTriggerAxis;
 				
 				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
@@ -323,7 +325,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// no mirroring
 			else if(waveHandleVector.size() == 1 && rootAxis.mirrored == false && triggerAxis.mirrored == false){
 
-				//rootAxisBlockSize	 = numPointsRootAxis;
 				triggerAxisBlockSize = numPointsTriggerAxis;
 
 				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);			
@@ -397,7 +398,9 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 					if(traceDownDataPtr){
 
 						traceDownRawBrickletIndex	= firstBlockOffset + i*triggerAxisBlockSize + j;
-						traceDownDataIndex			= ( (numPointsRootAxis-1) - i) * numPointsTriggerAxis   + j;
+						// compared to the traceUpDataPtr the index i is shifted
+						// this takes into account that the data in the traceDown is aquired from the highest y value to the lowest y value
+						traceDownDataIndex			= ( numPointsRootAxis -( i+1) ) * numPointsTriggerAxis   + j;
 
 						if(	traceDownDataIndex >= 0 &&
 							traceDownDataIndex < waveSize &&
@@ -438,6 +441,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 					// reTraceUp
 					if(reTraceUpDataPtr){
 
+						// here we shift the j index, because the data is now acquired from high column number to low column number
 						reTraceUpRawBrickletIndex	= i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
 						reTraceUpDataIndex			= i *  numPointsTriggerAxis + j;
 
@@ -481,7 +485,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 					if(reTraceDownDataPtr){
 
 						reTraceDownRawBrickletIndex		= firstBlockOffset + i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
-						reTraceDownDataIndex			= ( (numPointsRootAxis-1) - i) * numPointsTriggerAxis   + j;
+						reTraceDownDataIndex			= ( numPointsRootAxis -( i+1) ) * numPointsTriggerAxis   + j;
 
 						if(	reTraceDownDataIndex >= 0 &&
 							reTraceDownDataIndex < waveSize &&
@@ -597,7 +601,14 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// BEGIN Borrowed from SCALA exporter plugin
 
 			// Determine the number of different x values
-			int numPointsXAxisWithTable = 0, numPointsXAxisWithTableFWD = 0, numPointsXAxisWithTableBWD = 0;
+
+			// number of y axis points with taking the axis table sets into account
+			int numPointsXAxisWithTableBoth = 0;
+			// the part of numPointsXAxisWithTableBoth which is used in traceUp
+			int numPointsXAxisWithTableFWD = 0;
+			// the part of numPointsXAxisWithTableBoth which is used in reTraceUp
+			int numPointsXAxisWithTableBWD = 0;
+
 			bool forward = true;
 
 			xIt = xSet.begin();
@@ -605,7 +616,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	
 			while (xIt != xSet.end())
 			{
-				numPointsXAxisWithTable++;
+				numPointsXAxisWithTableBoth++;
 				tablePosX += xIt->step;
 
 				if (forward){
@@ -624,8 +635,14 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				forward = (tablePosX <= numPointsXAxis);
 			}
 
-			// Determine the number of different y values 
-			int numPointsYAxisWithTable = 0, numPointsYAxisWithTableUp = 0, numPointsYAxisWithTableDown = 0;
+			// Determine the number of different y values
+			
+			// number of y axis points with taking the axis table sets into account
+			int numPointsYAxisWithTableBoth     = 0;
+			// the part of numPointsYAxisWithTableBoth which is used in traceUp
+			int numPointsYAxisWithTableUp   = 0;
+			// the part of numPointsYAxisWithTableBoth which is used in traceDown
+			int numPointsYAxisWithTableDown = 0;
 			bool up = true;
 
 			yIt = ySet.begin();
@@ -633,7 +650,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	
 			while (yIt != ySet.end())
 			{
-				numPointsYAxisWithTable++;
+				numPointsYAxisWithTableBoth++;
 				tablePosY += yIt->step;
 
 				if (up){
@@ -659,14 +676,14 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			debugOutputToHistory(buf);
 
 			sprintf(buf,"X Axis # points with tableSet: Total=%d, Forward=%d, Backward=%d",
-				numPointsXAxisWithTable,numPointsXAxisWithTableFWD,numPointsXAxisWithTableBWD);
+				numPointsXAxisWithTableBoth,numPointsXAxisWithTableFWD,numPointsXAxisWithTableBWD);
 			debugOutputToHistory(buf);
 
 			sprintf(buf,"Y Axis # points with tableSet: Total=%d, Up=%d, Down=%d",
-				numPointsYAxisWithTable,numPointsYAxisWithTableUp,numPointsYAxisWithTableDown);
+				numPointsYAxisWithTableBoth,numPointsYAxisWithTableUp,numPointsYAxisWithTableDown);
 			debugOutputToHistory(buf);
 
-			// Theoretical the sizes of the cubes could be different but we are igoring that for now
+			// FIXME Theoretical the sizes of the cubes could be different but we are igoring that for now
 			if(numPointsXAxisWithTableBWD != 0 && numPointsXAxisWithTableFWD != numPointsXAxisWithTableBWD){
 				sprintf(buf,"BUG: Number of x axis points is different in forward and backward direction. Keep fingers crossed.");
 				outputToHistory(buf);
@@ -745,6 +762,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// set wave data pointers
 			if(waveHandleVector.size() == 4){
 
+				xAxisBlockSize	   = numPointsXAxisWithTableBWD*numPointsXAxisWithTableFWD*numPointsVAxis;
+
 				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
 				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[1]);
 				traceDownDataPtr   = (double*) WaveData(waveHandleVector[2]);
@@ -753,12 +772,14 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			}
 			else if(waveHandleVector.size() == 2 && numPointsXAxisWithTableBWD == 0){
 
-				xAxisBlockSize	 = numPointsXAxisWithTableFWD*numPointsVAxis;
+				xAxisBlockSize	   = numPointsXAxisWithTableFWD*numPointsVAxis;
 
 				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
 				traceDownDataPtr   = (double*) WaveData(waveHandleVector[1]);			
 			}
 			else if(waveHandleVector.size() == 2 && numPointsYAxisWithTableDown == 0){
+
+				xAxisBlockSize	   = numPointsXAxisWithTableBWD*numPointsXAxisWithTableFWD*numPointsVAxis;
 
 				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
 				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[1]);			
@@ -778,9 +799,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			sprintf(buf,"xAxisBlockSize=%d,firstBlockOffset=%d",xAxisBlockSize,firstBlockOffset);
 			debugOutputToHistory(buf);
-
-			long int indices[MAX_DIMENSIONS];		
-			MemClear(indices, sizeof(indices));
 
 			// COLUMNS
 			for(i = 0; i < numPointsYAxisWithTableUp; i++){
@@ -804,6 +822,9 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 									traceUpDataPtr[traceUpDataIndex] = scaledValue;
 
+//									long int indices[MAX_DIMENSIONS];		
+//									MemClear(indices, sizeof(indices));
+//
 //									// use this for debugging purposes
 //									indices[ROWS] = j; 
 //									indices[COLUMNS] = i; 
@@ -843,34 +864,138 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								debugOutputToHistory(buf);
 
 								traceUpDataPtr=NULL;
-							}// if valid range
+							}
 					}// if traceUpDataPtr
+
+					// traceDown
+					if(traceDownDataPtr){
+
+							traceDownRawBrickletIndex = firstBlockOffset + i*xAxisBlockSize + j*numPointsVAxis + k;
+							traceDownDataIndex		  = ( numPointsYAxisWithTableUp -(i+1) )*numPointsXAxisWithTableFWD + j + k*numPointsXAxisWithTableFWD*numPointsYAxisWithTableUp;
+
+						if(	traceDownDataIndex >= 0 &&
+							traceDownDataIndex < waveSize &&
+							traceDownRawBrickletIndex < rawBrickletSize &&
+							traceDownRawBrickletIndex >= 0
+							){
+								rawValue	= rawBrickletDataPtr[traceDownRawBrickletIndex];
+								scaledValue = rawValue*slope + yIntercept;
+
+								traceDownDataPtr[traceDownDataIndex] =  scaledValue;
+
+								if(rawValue < rawMin[1]){
+									rawMin[1] = rawValue;
+								}
+								if(rawValue > rawMax[1]){
+									rawMax[1] = rawValue;
+								}
+								if(scaledValue < scaledMin[1]){
+									scaledMin[1] = scaledValue;
+								}
+								if(scaledValue > scaledMax[1]){
+									scaledMax[1] = scaledValue;
+								}
+						}
+						else{
+							debugOutputToHistory("Index out of range in traceDown");
+
+							sprintf(buf,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
+							debugOutputToHistory(buf);
+
+							sprintf(buf,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(buf);
+
+							traceDownDataPtr=NULL;
+						}
+					}// if traceDownDataPtr
+
+					// reTraceUp
+					if(reTraceUpDataPtr){
+
+						reTraceUpRawBrickletIndex = i*xAxisBlockSize + (numPointsXAxisWithTableFWD - (j+1))*numPointsVAxis + k;
+						reTraceUpDataIndex		  = i*numPointsXAxisWithTableFWD + j + k*numPointsXAxisWithTableFWD*numPointsYAxisWithTableUp;
+
+						if(	reTraceUpDataIndex >= 0 &&
+							reTraceUpDataIndex < waveSize &&
+							reTraceUpRawBrickletIndex < rawBrickletSize &&
+							reTraceUpRawBrickletIndex >= 0
+							){
+								rawValue	= rawBrickletDataPtr[reTraceUpRawBrickletIndex];
+								scaledValue = rawValue*slope + yIntercept;
+
+								reTraceUpDataPtr[reTraceUpDataIndex] =  scaledValue;
+
+								if(rawValue < rawMin[2]){
+									rawMin[2] = rawValue;
+								}
+								if(rawValue > rawMax[2]){
+									rawMax[2] = rawValue;
+								}
+								if(scaledValue < scaledMin[2]){
+									scaledMin[2] = scaledValue;
+								}
+								if(scaledValue > scaledMax[2]){
+									scaledMax[2] = scaledValue;
+								}
+						}
+						else{
+							debugOutputToHistory("Index out of range in reTraceUp");
+
+							sprintf(buf,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
+							debugOutputToHistory(buf);
+
+							sprintf(buf,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(buf);
+
+							reTraceUpDataPtr=NULL;
+						}
+					}// if reTraceUpDataPtr
+
+					// reTraceDown
+					if(reTraceDownDataPtr){
+
+						reTraceDownRawBrickletIndex	= firstBlockOffset + i*xAxisBlockSize + (numPointsXAxisWithTableFWD - (j+1))*numPointsVAxis + k;
+						reTraceDownDataIndex		= ( numPointsYAxisWithTableUp - (i+1) )*numPointsXAxisWithTableFWD + j + k*numPointsXAxisWithTableFWD*numPointsYAxisWithTableUp;
+
+						if(	reTraceDownDataIndex >= 0 &&
+							reTraceDownDataIndex < waveSize &&
+							reTraceDownRawBrickletIndex < rawBrickletSize &&
+							reTraceDownRawBrickletIndex >= 0
+							){
+
+								rawValue	= rawBrickletDataPtr[reTraceDownRawBrickletIndex];
+								scaledValue = rawValue*slope + yIntercept;
+
+								reTraceDownDataPtr[reTraceDownDataIndex] =  scaledValue;
+
+								if(rawValue < rawMin[3]){
+									rawMin[3] = rawValue;
+								}
+								if(rawValue > rawMax[3]){
+									rawMax[3] = rawValue;
+								}
+								if(scaledValue < scaledMin[3]){
+									scaledMin[3] = scaledValue;
+								}
+								if(scaledValue > scaledMax[3]){
+									scaledMax[3] = scaledValue;
+								}
+						}
+						else{
+							debugOutputToHistory("Index out of range in reTraceDown");
+
+							sprintf(buf,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
+							debugOutputToHistory(buf);
+
+							sprintf(buf,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(buf);
+
+							reTraceDownDataPtr=NULL;
+						}
+					}// if reTraceDownDataPtr
 				} // for LAYERS
 			} // for ROWS
 		} // for COLUMNS
-
-			//sprintf(buf,"actualLinesPerCube =%d",actualLinesPerCube );
-			//debugOutputToHistory(buf);
-
-			//ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dataFolderHandle,dimensionSizes,NT_FP64,noOverwrite);
-
-			//if(ret == NAME_WAV_CONFLICT){
-			//	sprintf(buf,"Wave %s already exists.",waveBaseName.c_str());
-			//	debugOutputToHistory(buf);
-			//	return WAVE_EXIST;
-			//}
-
-			//if(ret != 0 ){
-			//	sprintf(buf,"Error %d in creating wave %s.",ret, waveBaseName.c_str());
-			//	outputToHistory(buf);
-			//	return UNKNOWN_ERROR;
-			//}
-
-			//ASSERT_RETURN_MINUSONE(waveHandle);
-
-			//hState = MoveLockHandle(waveHandle);
-
-			//waveData = (double*) WaveData(waveHandle);
 
 			// unlock waves and set wave note
 			for(i=0; i < hStateVector.size(); i++){
@@ -888,11 +1013,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			}
 
 			break;
-
-		//default:
-		//	sprintf(buf,"BUG: Dimension %d can not be handled",dimension);
-		//	outputToHistory(buf);
-		//	break;	
 	}
 
 	return 0;

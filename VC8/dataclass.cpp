@@ -141,7 +141,7 @@ std::string myData::getLastErrorMessage(){
 		msg = "No error, everything went nice and smoothly.";
 		break;
 	case UNKNOWN_ERROR:
-		msg = "A strange and unknown error happened.";
+		msg = "A strange and unknown error happened. It might be appropriate to file a bug report.";
 		break;
 	case ALREADY_FILE_OPEN:
 		msg = "It is already a file open and it can only be one file open at a time.";
@@ -156,7 +156,7 @@ std::string myData::getLastErrorMessage(){
 		msg = "There are no new bricklets in the result file.";
 		break;
 	case WRONG_PARAMETER:
-		msg = "The paramter " + this->getLastErrorArgument() + " is wrong. Please consult the documentation.";
+		msg = "The paramter " + this->getLastErrorArgument() + " is missing or wrong. Please consult the documentation.";
 		break;
 	case INTERNAL_ERROR_CONVERTING_DATA:
 		msg = "The rawdata could not be interpreted. You can try using getRawBrickleData() instead. Please file also a bug report.";

@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_T2.0-3\src\Incl&quot;;&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_V1.1\src\Incl&quot;;&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"

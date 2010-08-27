@@ -76,7 +76,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	}
 
 	if( !isValidBrickletID(brickletID,numberOfBricklets) ){
-		SET_ERROR(NON_EXISTENT_BRICKLET)
+		SET_ERROR_MSG(NON_EXISTENT_BRICKLET,anyTypeToString<int>(brickletID))
 		return 0;
 	}
 
@@ -252,7 +252,7 @@ static int openResultFile(openResultFileParams *p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	if( GetHandleSize(p->absoluteFilePath) == 0L){
-		SET_ERROR(WRONG_PARAMETER)
+		SET_ERROR_MSG(WRONG_PARAMETER,"absoluteFilePath")
 		return 0;
 	}
 
@@ -506,7 +506,7 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 	}
 
 	if(!isValidBrickletID(p->brickletID,numberOfBricklets)){
-		SET_ERROR(NON_EXISTENT_BRICKLET)
+		SET_ERROR_MSG(NON_EXISTENT_BRICKLET,anyTypeToString<int>(p->brickletID))
 		return 0;
 	}
 
@@ -866,7 +866,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 
 	// check keyList parameter
 	if( p->keyList == NULL || GetHandleSize(p->keyList) == 0L ){
-		SET_ERROR(WRONG_PARAMETER)
+		SET_ERROR_MSG(WRONG_PARAMETER,"keyList")
 		return 0;
 	}
 	else{
@@ -904,7 +904,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	}
 
 	if( keys.size() == 0 ){
-		SET_ERROR(WRONG_PARAMETER)
+		SET_ERROR_MSG(WRONG_PARAMETER,"keyList")
 		return 0;
 	}
 

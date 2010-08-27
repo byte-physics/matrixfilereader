@@ -64,7 +64,6 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		sprintf(buf,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_minRawValue,m_maxRawValue,m_minScaledValue,m_maxScaledValue);
 		debugOutputToHistory(buf);
 
-
 		// copy the raw data to our own cache
 		m_rawBufferContentsSize = count;
 		m_rawBufferContents = new int[m_rawBufferContentsSize];
@@ -359,8 +358,11 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 		// if it is empty, we got the standard table set which is [start=1,step=1,stop=clocks]
 		if(axisTableSetsMap.size() == 0){
 
-			m_metaDataKeys.push_back( axisNameString + ".AxisTableSetNo1");
-			m_metaDataValues.push_back(WStringToString(axisDescriptor.triggerAxisName));
+			m_metaDataKeys.push_back( axisNameString + ".AxisTableSet.count");
+			m_metaDataValues.push_back(anyTypeToString<int>(1));
+
+			m_metaDataKeys.push_back( axisNameString + ".AxisTableSetNo1.axis");
+			m_metaDataValues.push_back(std::string());
 
 			m_metaDataKeys.push_back( axisNameString + ".AxisTableSetNo1.start");
 			m_metaDataValues.push_back(anyTypeToString<int>(1));
@@ -375,12 +377,13 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 
 			Vernissage::Session::AxisTableSets::const_iterator itAxisTabelSetsMap;
 			Vernissage::Session::TableSet::const_iterator itAxisTableSetsMapStruct;
+
 			index=0;
 			for( itAxisTabelSetsMap = axisTableSetsMap.begin(); itAxisTabelSetsMap != axisTableSetsMap.end(); itAxisTabelSetsMap++ ){
 				for(itAxisTableSetsMapStruct= itAxisTabelSetsMap->second.begin(); itAxisTableSetsMapStruct != itAxisTabelSetsMap->second.end(); itAxisTableSetsMapStruct++){
 
 				index++; // 1-based index
-				baseName = axisNameString + ".AxisTableSetNo" + anyTypeToString<int>(index);
+				baseName = axisNameString + ".AxisTableSetNo" + anyTypeToString<int>(index) + ".axis";
 				m_metaDataKeys.push_back(baseName);
 				m_metaDataValues.push_back(WStringToString(itAxisTabelSetsMap->first));
 
@@ -394,6 +397,10 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 				m_metaDataValues.push_back(anyTypeToString<int>(itAxisTableSetsMapStruct->stop));
 				}
 			}
+
+			m_metaDataKeys.push_back( axisNameString + ".AxisTableSet.count");
+			m_metaDataValues.push_back(anyTypeToString<int>(index));
+
 		}
 		// END Vernissage::Session:AxisTableSet
 	}

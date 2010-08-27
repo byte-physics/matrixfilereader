@@ -268,7 +268,6 @@ std::string valueTypeToString(int idx){
 void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle){
 
 	std::string	waveNote = getStandardWaveNote(brickletID);
-	char buf[ARRAY_SIZE];
 
 	waveNote.append("rawMin="    + anyTypeToString<int>(rawMin)    + "\r");
 	waveNote.append("rawMax="	 + anyTypeToString<int>(rawMax)	 + "\r");

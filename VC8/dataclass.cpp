@@ -16,7 +16,9 @@ myData::myData():
 	m_dllStuff(NULL),
 	m_lastError(UNKNOWN_ERROR){
 
-	m_dllStuff = new DllStuff;
+		m_debug = debug_default_value;
+
+		m_dllStuff = new DllStuff;
 }
 
 myData::~myData(){

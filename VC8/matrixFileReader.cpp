@@ -351,6 +351,10 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
 	SET_ERROR(UNKNOWN_ERROR)
 
+	// save defaults
+	*p->endBrickletID   = -1;
+	*p->startBrickletID = -1;
+
 	if(!pMyData->resultFileOpen()){
 		SET_ERROR(NO_FILE_OPEN)
 		return 0;
@@ -397,12 +401,16 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 	}
 
 	if(oldNumberOfBricklets == numberOfBricklets){
-		*p->endBrickletID   = -1;
-		*p->startBrickletID = -1;
-		SET_ERROR(NO_NEW_BRICKLETS);
+		SET_ERROR(NO_NEW_BRICKLETS)
 		return 0;
 	}
 	// from here on we know that numberOfBricklets > oldNumberOfBricklets 
+
+	// happened once so be prepared
+	if(numberOfBricklets < oldNumberOfBricklets){
+		SET_ERROR(UNKNOWN_ERROR)
+		return 0;
+	}
 
 	*p->endBrickletID   = numberOfBricklets;
 	*p->startBrickletID = oldNumberOfBricklets+1;
@@ -599,11 +607,20 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
 		ret = createAndFillDataWave(newDataFolderHPtr,dataName,brickletID);
 
-		if(ret != 0){
+		if(ret == WAVE_EXIST){
+			SET_ERROR_MSG(ret,dataName)
+			return 0;
+		}
+		else if(ret == INTERNAL_ERROR_CONVERTING_DATA){
+			SET_ERROR(ret)
+			return 0;
+		}
+		else if(ret != SUCCESS){
 			SET_INTERNAL_ERROR(ret)
 			return 0;
 		}
 	}
+
 	SET_ERROR(SUCCESS)
 	return 0;
 }
@@ -687,7 +704,11 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
 		ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName,brickletID);
 
-		if(ret != 0){
+		if(ret == WAVE_EXIST){
+			SET_ERROR_MSG(ret,metaDataName)
+			return 0;
+		}
+		else if(ret != SUCCESS){
 			SET_INTERNAL_ERROR(ret)
 			return 0;
 		}
@@ -988,7 +1009,6 @@ static int getLastErrorMessage(getLastErrorMessageParams *p){
 
 // variable createDebugOutput(variable val);
 static int createDebugOutput(createDebugOutputParams *p){
-
 
 	if(p->val < 1e-5){
 		pMyData->setDebugging(false);

@@ -265,7 +265,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\error-codes.h"
+				RelativePath=".\error-codes.h"
 				>
 			</File>
 			<File

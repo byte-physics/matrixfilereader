@@ -11,9 +11,6 @@
 #include "globals.h"
 #include "utils.h"
 
-// TODO
-// check support for 3D data (gridded spectroscopy)
-
 int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
 
 	char buf[ARRAY_SIZE];
@@ -44,11 +41,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	double setScaleOffset=0.0;
 
-	std::vector<int>	rawMax(4),	rawMin(4);
-	std::vector<double> scaledMax(4), scaledMin(4);
-
-	int rawValue, rawMaxValue, rawMinValue;
-	double scaledMinValue, scaledMaxValue, scaledValue;
+	int rawValue;
+	double scaledValue;
 
 	std::vector<std::string>::const_iterator itWaveNames;
 
@@ -91,22 +85,28 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 		debugOutputToHistory(buf);
 	}
 
+	// store the extremal values for each wave
+	struct extrema{
+		int		rawMin;
+		int		rawMax;
+		double	physValRawMin;
+		double	physValRawMax;
+	} extremaData[3];
+
 	// set min and max values to safe values
-	for(i=0; i < rawMin.size(); i++){
-		rawMin[i]	= _I32_MAX;
-		rawMax[i]	= _I32_MIN;
-		scaledMin[i]= DBL_MAX;
-		scaledMax[i]= -DBL_MAX;
+	for(i=0; i < 4; i++){
+		extremaData[i].rawMin		 =  _I32_MAX;
+		extremaData[i].rawMax		 =  _I32_MIN;
+		extremaData[i].physValRawMin =  DBL_MAX;
+		extremaData[i].physValRawMax = -DBL_MAX;
 	}
-	rawMinValue = _I32_MAX;
-	rawMaxValue = _I32_MIN;
-	scaledMinValue = DBL_MAX;
-	scaledMaxValue = -DBL_MAX;
+
+	struct extrema *traceUpExtrema=NULL,*traceDownExtrema=NULL,*reTraceUpExtrema=NULL,*reTraceDownExtrema=NULL;
 
 	// get pointer to raw data
 	const int* pBuffer;
 	myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
-	rawBrickletDataPtr = (int *) pBuffer;
+	rawBrickletDataPtr = const_cast<int *> (pBuffer);
 
 	// create data for raw->scaled transformation
 	// the min and max values here are for the complete bricklet data and not only for one wave
@@ -115,8 +115,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	
 	xOne = myBricklet->getRawMin();
 	xTwo = myBricklet->getRawMax();
-	yOne = myBricklet->getScaledMin();
-	yTwo = myBricklet->getScaledMax();
+	yOne = myBricklet->getPhysValRawMin();
+	yTwo = myBricklet->getPhysValRawMax();
 
 	slope = (yOne - yTwo) / (xOne*1.0 - xTwo*1.0);
 	yIntercept = yOne - slope*xOne;
@@ -141,8 +141,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			
 			numPointsTriggerAxis = triggerAxis.clocks;
 			
-			if (triggerAxis.mirrored)
-			{
+			if (triggerAxis.mirrored){
 				numPointsTriggerAxis /= 2;
 			}
 			
@@ -174,22 +173,17 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 				waveData[i]	= scaledValue;
 
-				if(rawValue < rawMinValue){
-					rawMinValue = rawValue;
+				if(rawValue < extremaData[0].rawMin){
+					extremaData[0].rawMin		= rawValue;
+					extremaData[0].physValRawMin= scaledValue;
 				}
-				if(rawValue > rawMaxValue){
-					rawMaxValue = rawValue;
+				if(rawValue > extremaData[0].rawMax){
+					extremaData[0].rawMax		= rawValue;
+					extremaData[0].physValRawMax= scaledValue;
 				}
-				if(scaledValue < scaledMinValue){
-					scaledMinValue = scaledValue;
-				}
-				if(scaledValue > scaledMaxValue){
-					scaledMaxValue = scaledValue;
-				}
-			
 			}
 
-			setDataWaveNote(brickletID,rawMinValue,rawMaxValue,scaledMinValue,scaledMaxValue,waveHandle);
+			setDataWaveNote(brickletID,extremaData[0].rawMin,extremaData[0].rawMax,extremaData[0].physValRawMin,extremaData[0].physValRawMax,waveHandle);
 
 			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
@@ -221,7 +215,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			// Determine the length of one "line" of data
 			numPointsRootAxis = rootAxis.clocks;
-
 
 			if (rootAxis.mirrored)
 			{
@@ -301,33 +294,42 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 				triggerAxisBlockSize = 2*numPointsTriggerAxis;
 
-				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
-				reTraceUpDataPtr  = (double*) WaveData(waveHandleVector[1]);
-				traceDownDataPtr  = (double*) WaveData(waveHandleVector[2]);
-				reTraceDownDataPtr  = (double*) WaveData(waveHandleVector[3]);
+				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
+				traceUpExtrema	   = &extremaData[0];
+				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[1]);
+				reTraceUpExtrema   = &extremaData[1];
+				traceDownDataPtr   = (double*) WaveData(waveHandleVector[2]);
+				traceDownExtrema   = &extremaData[2];
+				reTraceDownDataPtr = (double*) WaveData(waveHandleVector[3]);
+				reTraceDownExtrema = &extremaData[3];
 			}
 			// only triggerAxis (X) is mirrored
 			else if(waveHandleVector.size() == 2 && triggerAxis.mirrored){
 
 				triggerAxisBlockSize = 2*numPointsTriggerAxis;
 
-				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
-				reTraceUpDataPtr  = (double*) WaveData(waveHandleVector[1]);			
+				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
+				traceUpExtrema	   = &extremaData[0];
+				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[1]);			
+				reTraceUpExtrema = &extremaData[1];
 			}
 			// only rootAxis (Y) is mirrored
 			else if(waveHandleVector.size() == 2 && rootAxis.mirrored){
 
 				triggerAxisBlockSize = numPointsTriggerAxis;
 				
-				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);
-				traceDownDataPtr  = (double*) WaveData(waveHandleVector[1]);			
+				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
+				traceUpExtrema	   = &extremaData[0];
+				traceDownDataPtr   = (double*) WaveData(waveHandleVector[1]);			
+				traceDownExtrema   = &extremaData[1];
 			}
 			// no mirroring
 			else if(waveHandleVector.size() == 1 && rootAxis.mirrored == false && triggerAxis.mirrored == false){
 
 				triggerAxisBlockSize = numPointsTriggerAxis;
 
-				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);			
+				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);			
+				traceUpExtrema	   = &extremaData[0];
 			}
 			else{
 				outputToHistory("BUG: createAndFillDataWave()...");
@@ -368,17 +370,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 								traceUpDataPtr[traceUpDataIndex] =  scaledValue;
 
-								if(rawValue < rawMin[0]){
-									rawMin[0] = rawValue;
+								if(rawValue < traceUpExtrema->rawMin){
+									traceUpExtrema->rawMin			= rawValue;
+									traceUpExtrema->physValRawMin	= scaledValue;
 								}
-								if(rawValue > rawMax[0]){
-									rawMax[0] = rawValue;
-								}
-								if(scaledValue < scaledMin[0]){
-									scaledMin[0] = scaledValue;
-								}
-								if(scaledValue > scaledMax[0]){
-									scaledMax[0] = scaledValue;
+								if(rawValue > traceUpExtrema->rawMax){
+									traceUpExtrema->rawMax			= rawValue;
+									traceUpExtrema->physValRawMax	= scaledValue;
 								}
 						}
 						else{
@@ -412,17 +410,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 								traceDownDataPtr[traceDownDataIndex] =  scaledValue;
 
-								if(rawValue < rawMin[1]){
-									rawMin[1] = rawValue;
+								if(rawValue < traceDownExtrema->rawMin){
+									traceDownExtrema->rawMin		= rawValue;
+									traceDownExtrema->physValRawMin = scaledValue;
 								}
-								if(rawValue > rawMax[1]){
-									rawMax[1] = rawValue;
-								}
-								if(scaledValue < scaledMin[1]){
-									scaledMin[1] = scaledValue;
-								}
-								if(scaledValue > scaledMax[1]){
-									scaledMax[1] = scaledValue;
+								if(rawValue > traceDownExtrema->rawMax){
+									traceDownExtrema->rawMax		= rawValue;
+									traceDownExtrema->physValRawMax = scaledValue;
 								}
 						}
 						else{
@@ -455,17 +449,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 								reTraceUpDataPtr[reTraceUpDataIndex] =  scaledValue;
 
-								if(rawValue < rawMin[2]){
-									rawMin[2] = rawValue;
+								if(rawValue < reTraceUpExtrema->rawMin){
+									reTraceUpExtrema->rawMin		= rawValue;
+									reTraceUpExtrema->physValRawMin = scaledValue;
 								}
-								if(rawValue > rawMax[2]){
-									rawMax[2] = rawValue;
-								}
-								if(scaledValue < scaledMin[2]){
-									scaledMin[2] = scaledValue;
-								}
-								if(scaledValue > scaledMax[2]){
-									scaledMax[2] = scaledValue;
+								if(rawValue > reTraceUpExtrema->rawMax){
+									reTraceUpExtrema->rawMax		= rawValue;
+									reTraceUpExtrema->physValRawMax = scaledValue;
 								}
 						}
 						else{
@@ -498,17 +488,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 								reTraceDownDataPtr[reTraceDownDataIndex] =  scaledValue;
 
-								if(rawValue < rawMin[3]){
-									rawMin[3] = rawValue;
+								if(rawValue < reTraceDownExtrema->rawMin){
+									reTraceDownExtrema->rawMin			= rawValue;
+									reTraceDownExtrema->physValRawMin	= scaledValue;
 								}
-								if(rawValue > rawMax[3]){
-									rawMax[3] = rawValue;
-								}
-								if(scaledValue < scaledMin[3]){
-									scaledMin[3] = scaledValue;
-								}
-								if(scaledValue > scaledMax[3]){
-									scaledMax[3] = scaledValue;
+								if(rawValue > reTraceDownExtrema->rawMax){
+									reTraceDownExtrema->rawMax			= rawValue;
+									reTraceDownExtrema->physValRawMax	= scaledValue;
 								}
 						}
 						else{
@@ -529,7 +515,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// unlock waves and set wave note
 			for(i=0; i < hStateVector.size(); i++){
 				HSetState(waveHandleVector[i],hStateVector[i]);
-				setDataWaveNote(brickletID,rawMin[i],rawMax[i],scaledMin[i],scaledMax[i],waveHandleVector[i]);
+				setDataWaveNote(brickletID,extremaData[i].rawMin,extremaData[i].rawMax,extremaData[i].physValRawMin,extremaData[i].physValRawMax,waveHandleVector[i]);
 
 				MDSetWaveScaling(waveHandleVector[i],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
 				MDSetWaveScaling(waveHandleVector[i],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
@@ -571,6 +557,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			double yAxisIncrement = yAxis.physicalIncrement;
 			
 			// normally we have table sets with some step width >1, so the physicalIncrement has to be multiplied by this factor
+			// Note: this approach assumes that all axis table sets have the same physical step width, this is at least the case for Matrix 2.2-1
 			if( ySet.size() > 0 && xSet.size() > 0 ){
 				xAxisIncrement *= xSet.begin()->step;
 				yAxisIncrement *= ySet.begin()->step;
@@ -707,7 +694,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			}
 
 			// dimensions of the cube
-
 			if(numPointsXAxisWithTableFWD != 0)
 				dimensionSizes[ROWS]	= numPointsXAxisWithTableFWD;
 			else{
@@ -795,45 +781,56 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				xAxisBlockSize	   = ( numPointsXAxisWithTableBWD + numPointsXAxisWithTableFWD ) * numPointsVAxis;
 
 				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
+				traceUpExtrema	   = &extremaData[0];
 				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[1]);
+				reTraceUpExtrema   = &extremaData[1];
 				traceDownDataPtr   = (double*) WaveData(waveHandleVector[2]);
+				traceDownExtrema   = &extremaData[2];
 				reTraceDownDataPtr = (double*) WaveData(waveHandleVector[3]);
-
+				reTraceDownExtrema = &extremaData[3];
 			}
 			else if(waveHandleVector.size() == 2 && numPointsXAxisWithTableBWD == 0){
 
 				xAxisBlockSize	   = numPointsXAxisWithTableFWD*numPointsVAxis;
 
 				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
+				traceUpExtrema	   = &extremaData[0];
 				traceDownDataPtr   = (double*) WaveData(waveHandleVector[1]);			
+				traceDownExtrema   = &extremaData[1];
 			}
 			else if(waveHandleVector.size() == 2 && numPointsXAxisWithTableFWD == 0){
 
 				xAxisBlockSize	   = numPointsXAxisWithTableBWD*numPointsVAxis;
 
-				reTraceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
-				reTraceDownDataPtr   = (double*) WaveData(waveHandleVector[1]);			
+				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[0]);
+				reTraceUpExtrema   = &extremaData[0];
+				reTraceDownDataPtr = (double*) WaveData(waveHandleVector[1]);			
+				reTraceDownExtrema = &extremaData[1];
 			}
 			else if(waveHandleVector.size() == 2 && numPointsYAxisWithTableDown == 0){
 
 				xAxisBlockSize	   = ( numPointsXAxisWithTableBWD + numPointsXAxisWithTableFWD ) * numPointsVAxis;
 
 				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);
+				traceUpExtrema	   = &extremaData[0];
 				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[1]);			
+				reTraceUpExtrema   = &extremaData[1];
 			}
 			// no mirroring and FWD
 			else if(waveHandleVector.size() == 1 && numPointsXAxisWithTableBWD == 0 && numPointsYAxisWithTableDown == 0){
 
 				xAxisBlockSize	   = numPointsXAxisWithTableFWD*numPointsVAxis;
 
-				traceUpDataPtr    = (double*) WaveData(waveHandleVector[0]);			
+				traceUpDataPtr     = (double*) WaveData(waveHandleVector[0]);			
+				traceUpExtrema	   = &extremaData[0];
 			}
 			// no mirroring and BWD
 			else if(waveHandleVector.size() == 1 && numPointsXAxisWithTableFWD == 0 && numPointsYAxisWithTableDown == 0){
 
 				xAxisBlockSize	   = numPointsXAxisWithTableBWD*numPointsVAxis;
 
-				reTraceUpDataPtr  = (double*) WaveData(waveHandleVector[0]);			
+				reTraceUpDataPtr   = (double*) WaveData(waveHandleVector[0]);			
+				reTraceUpExtrema   = &extremaData[0];
 			}
 			else{
 				outputToHistory("BUG: could not set wave pointers in createAndFillDataWave()...");
@@ -887,17 +884,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 									//	//debugOutputToHistory(buf);
 									//}
 
-									if(rawValue < rawMin[0]){
-										rawMin[0] = rawValue;
+									if(rawValue < traceUpExtrema->rawMin){
+										traceUpExtrema->rawMin			= rawValue;
+										traceUpExtrema->physValRawMin	= scaledValue;
 									}
-									if(rawValue > rawMax[0]){
-										rawMax[0] = rawValue;
-									}
-									if(scaledValue < scaledMin[0]){
-										scaledMin[0] = scaledValue;
-									}
-									if(scaledValue > scaledMax[0]){
-										scaledMax[0] = scaledValue;
+									if(rawValue > traceUpExtrema->rawMax){
+										traceUpExtrema->rawMax			= rawValue;
+										traceUpExtrema->physValRawMax	= scaledValue;
 									}
 							}
 							else{
@@ -929,18 +922,14 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 								traceDownDataPtr[traceDownDataIndex] =  scaledValue;
 
-								if(rawValue < rawMin[1]){
-									rawMin[1] = rawValue;
-								}
-								if(rawValue > rawMax[1]){
-									rawMax[1] = rawValue;
-								}
-								if(scaledValue < scaledMin[1]){
-									scaledMin[1] = scaledValue;
-								}
-								if(scaledValue > scaledMax[1]){
-									scaledMax[1] = scaledValue;
-								}
+									if(rawValue < traceDownExtrema->rawMin){
+										traceDownExtrema->rawMin		= rawValue;
+										traceDownExtrema->physValRawMin = scaledValue;
+									}
+									if(rawValue > traceDownExtrema->rawMax){
+										traceDownExtrema->rawMax		= rawValue;
+										traceDownExtrema->physValRawMax = scaledValue;
+									}
 						}
 						else{
 							debugOutputToHistory("Index out of range in traceDown");
@@ -979,17 +968,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								//	//debugOutputToHistory(buf);
 								//}
 
-								if(rawValue < rawMin[2]){
-									rawMin[2] = rawValue;
+								if(rawValue < reTraceUpExtrema->rawMin){
+									reTraceUpExtrema->rawMin		= rawValue;
+									reTraceUpExtrema->physValRawMin = scaledValue;
 								}
-								if(rawValue > rawMax[2]){
-									rawMax[2] = rawValue;
-								}
-								if(scaledValue < scaledMin[2]){
-									scaledMin[2] = scaledValue;
-								}
-								if(scaledValue > scaledMax[2]){
-									scaledMax[2] = scaledValue;
+								if(rawValue > reTraceUpExtrema->rawMax){
+									reTraceUpExtrema->rawMax		= rawValue;
+									reTraceUpExtrema->physValRawMax = scaledValue;
 								}
 						}
 						else{
@@ -1028,17 +1013,13 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								//	debugOutputToHistory(buf);
 								//}
 
-								if(rawValue < rawMin[3]){
-									rawMin[3] = rawValue;
+								if(rawValue < reTraceDownExtrema->rawMin){
+									reTraceDownExtrema->rawMin			= rawValue;
+									reTraceDownExtrema->physValRawMin	= scaledValue;
 								}
-								if(rawValue > rawMax[3]){
-									rawMax[3] = rawValue;
-								}
-								if(scaledValue < scaledMin[3]){
-									scaledMin[3] = scaledValue;
-								}
-								if(scaledValue > scaledMax[3]){
-									scaledMax[3] = scaledValue;
+								if(rawValue > reTraceDownExtrema->rawMax){
+									reTraceDownExtrema->rawMax			= rawValue;
+									reTraceDownExtrema->physValRawMax	= scaledValue;
 								}
 						}
 						else{
@@ -1060,7 +1041,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// unlock waves and set wave note
 			for(i=0; i < hStateVector.size(); i++){
 				HSetState(waveHandleVector[i],hStateVector[i]);
-				setDataWaveNote(brickletID,rawMin[i],rawMax[i],scaledMin[i],scaledMax[i],waveHandleVector[i]);
+				setDataWaveNote(brickletID,extremaData[i].rawMin,extremaData[i].rawMax,extremaData[i].physValRawMin,extremaData[i].physValRawMax,waveHandleVector[i]);
 
 				MDSetWaveScaling(waveHandleVector[i],ROWS,&xAxisIncrement,&setScaleOffset);
 				MDSetWaveScaling(waveHandleVector[i],COLUMNS,&yAxisIncrement,&setScaleOffset);

@@ -3,22 +3,15 @@
 
 #include "xopstandardheaders.h"
 
-
 #include "vernissage.h"
 
 #include "globals.h"
 #include "utils.h"
 
+myData::myData(): m_VernissageSession(NULL), m_dllStuff(NULL), m_lastError(UNKNOWN_ERROR){
 
-
-myData::myData():
-	m_VernissageSession(NULL),
-	m_dllStuff(NULL),
-	m_lastError(UNKNOWN_ERROR){
-
-		m_debug = debug_default_value;
-
-		m_dllStuff = new DllStuff;
+	m_debug = debug_default_value;
+	m_dllStuff = new DllStuff;
 }
 
 myData::~myData(){
@@ -57,7 +50,6 @@ void myData::closeSession(){
 	// erase filenames
 	m_resultFileName.erase();
 	m_resultFilePath.erase();
-
 }
 
 std::string myData::getVernissageVersion(){
@@ -71,18 +63,12 @@ std::string myData::getVernissageVersion(){
 
 bool myData::resultFileOpen(){
 
-	if(m_resultFileName.empty()){
-		return false;
-	}
-	else{
-		return true;
-	}
+	return !m_resultFileName.empty();
 }
 
 std::string myData::getDirPath(){
 
 	return m_resultFilePath;
-
 }
 
 std::string myData::getFileName(){
@@ -104,10 +90,10 @@ MyBricklet* myData::getMyBrickletObject(int brickletID){
 
 void myData::createMyBrickletObject(int brickletID, void *pBricklet){
 	
-/*	char buf[ARRAY_SIZE];
-	sprintf(buf,"setBrickletPointerMap brickletID=%d,pBricklet=%p\n",brickletID,pBricklet);
+	char buf[ARRAY_SIZE];
+	sprintf(buf,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
 	debugOutputToHistory(buf);
-*/
+
 	MyBricklet *bricklet = new MyBricklet(pBricklet,brickletID);
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
@@ -146,13 +132,13 @@ std::string myData::getLastErrorMessage(){
 		msg = "A strange and unknown error happened. It might be appropriate to file a bug report.";
 		break;
 	case ALREADY_FILE_OPEN:
-		msg = "It is already a file open and it can only be one file open at a time.";
+		msg = "A file is already file open and it can only be one file open at a time.";
 		break;
 	case EMPTY_RESULTFILE:
 		msg = "The result file is empty, so there is little one can do here...";
 		break;
 	case FILE_NOT_READABLE:
-		msg = "The file " + this->getLastErrorArgument() + " can not be opened for reading.";
+		msg = "The file " + this->getLastErrorArgument() + " can not be opened.";
 		break;
 	case NO_NEW_BRICKLETS:
 		msg = "There are no new bricklets in the result file.";
@@ -161,13 +147,13 @@ std::string myData::getLastErrorMessage(){
 		msg = "The paramter " + this->getLastErrorArgument() + " is missing or wrong. Please consult the documentation.";
 		break;
 	case INTERNAL_ERROR_CONVERTING_DATA:
-		msg = "The rawdata could not be interpreted. You can try using getRawBrickleData() instead. Please file also a bug report.";
+		msg = "The rawdata could not be interpreted. You can try using getRawBrickleData() instead and consulting the vernissage documentation. Please file also a bug report and attach your data.";
 		break;
 	case NO_FILE_OPEN:
-		msg = "There is no result file open at the moment.";
+		msg = "There is no result file open.";
 		break;
 	case INVALID_RANGE:
-		msg = "The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and startBrickletID must be smaller than endBrickletID.";
+		msg = "The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and startBrickletID may not be bigger than endBrickletID.";
 		break;
 	case NON_EXISTENT_BRICKLET:
 		msg = "The bricklet number " + this->getLastErrorArgument() + " does not exist.";

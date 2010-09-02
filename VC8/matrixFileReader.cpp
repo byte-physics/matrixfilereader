@@ -17,13 +17,11 @@
 #include "globals.h"
 #include "version.h"
 
-
-
 #include "Vernissage.h"
 
 #define SET_ERROR(A){ p->result = A; pMyData->setLastError(A); }
 #define SET_ERROR_MSG(A,B){ p->result = A; pMyData->setLastError(A,B); }
-#define SET_INTERNAL_ERROR(A) { SET_ERROR(UNKNOWN_ERROR); outputToHistory("BUG: xop internal error " # A ); } 
+#define SET_INTERNAL_ERROR(A) { SET_ERROR(UNKNOWN_ERROR); char buf[ARRAY_SIZE]; sprintf(buf,"BUG: xop internal error %d returned.",A); outputToHistory(buf);} 
 
 // variable closeResultFile()
 static int closeResultFile(closeResultFileParams *p){
@@ -48,6 +46,7 @@ static int closeResultFile(closeResultFileParams *p){
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	SET_ERROR(UNKNOWN_ERROR)
+
 	char buf[ARRAY_SIZE];
 	char dataWaveName[MAX_OBJ_NAME+1];
 	const int *pBuffer;
@@ -103,7 +102,8 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		SET_ERROR(UNKNOWN_ERROR)
 		return 0;
 	}
-	dimensionSizes[ROWS]=count; // create 1D wave with count points
+	 // create 1D wave with count points
+	dimensionSizes[ROWS]=count;
 
 	ret = MDMakeWave(&waveHandle,dataWaveName,NULL,dimensionSizes,NT_I32,noOverwrite);
 
@@ -129,7 +129,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	HSetState((Handle) waveHandle, hState);
 
-	setDataWaveNote(brickletID,myBricklet->getRawMin(),myBricklet->getRawMax(),myBricklet->getScaledMin(),myBricklet->getScaledMax(),waveHandle);
+	setDataWaveNote(brickletID,myBricklet->getRawMin(),myBricklet->getRawMax(),myBricklet->getPhysValRawMin(),myBricklet->getPhysValRawMax(),waveHandle);
 
 	SET_ERROR(SUCCESS)
 	return 0;
@@ -147,11 +147,6 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
 	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
-
-	if(p->totalNumberOfBricklets == NULL){
-		SET_ERROR_MSG(WRONG_PARAMETER,"totalNumberOfBricklets")
-		return 0;
-	}
 
 	*p->totalNumberOfBricklets = pSession->getBrickletCount();
 
@@ -391,6 +386,7 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 	for(i=1; i <= numberOfBricklets; i++ ){
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
+
 		myBricklet = pMyData->getMyBrickletObject(i);
 
 		if(myBricklet == NULL){// this is a new bricklet
@@ -808,10 +804,10 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
 	brickletMetaData = pSession->getMetaData(pBricklet);
 
-	keys.push_back("filePath");
+	keys.push_back("resultFilePath");
 	values.push_back(pMyData->getDirPath());
 
-	keys.push_back("fileName");
+	keys.push_back("resultFileName");
 	values.push_back(pMyData->getFileName());
 
 	keys.push_back("totalNumberOfBricklets");
@@ -1010,7 +1006,7 @@ static int getLastErrorMessage(getLastErrorMessageParams *p){
 // variable createDebugOutput(variable val);
 static int createDebugOutput(createDebugOutputParams *p){
 
-	if(p->val < 1e-5){
+	if(p->val < doubleEpsilon){
 		pMyData->setDebugging(false);
 	}
 	else{
@@ -1019,7 +1015,6 @@ static int createDebugOutput(createDebugOutputParams *p){
 
 	return 0;
 }
-
 
 static long RegisterFunction()
 {
@@ -1100,7 +1095,6 @@ static long RegisterFunction()
 	return returnValue;
 }
 
-
 /*	XOPEntry()
 
 	This is the entry point from the host application to the XOP for all messages after the
@@ -1162,7 +1156,7 @@ void doCleanup(){
 // must be zero or one, because it is double the checking is a bit more elaborate
 bool isValidSeparateFolderArg(double arg){
 
-	return ( fabs(arg - 0.0) < 1e-5 ||  fabs( arg - 1.0) < 1e-5 );
+	return ( fabs(arg - 0.0) < doubleEpsilon ||  fabs( arg - 1.0) < doubleEpsilon );
 }
 
 bool isValidBrickletRange(int startID, int endID,int numberOfBricklets){
@@ -1183,6 +1177,6 @@ bool isValidBrickletID(int brickletID, int numberOfBricklets){
 
 bool createSeparateFolders(double arg){
 	
-	return fabs(arg - 1.0) < 1e-5;
+	return fabs(arg - 1.0) < doubleEpsilon;
 
 }

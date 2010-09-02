@@ -26,8 +26,8 @@ public:
 	double		getMetaDataValueAsDouble(std::string key);
 	int getRawMax(){ return m_maxRawValue; };
 	int getRawMin(){ return m_minRawValue; };
-	double getScaledMax(){ return m_maxScaledValue; };
-	double getScaledMin(){ return m_minScaledValue; };
+	double getPhysValRawMax(){ return m_maxScaledValue; };
+	double getPhysValRawMin(){ return m_minScaledValue; };
 
 private:
 	void MyBricklet::loadBrickletMetaDataFromResultFile();

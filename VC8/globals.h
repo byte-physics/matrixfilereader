@@ -45,6 +45,8 @@ const char TRACE_DOWN_STRING[]		= "_TraceDown";
 const char RE_TRACE_UP_STRING[]		= "_ReTraceUp";
 const char RE_TRACE_DOWN_STRING[]	= "_ReTraceDown";
 
+// as all parameters to XOP functions are of type double one has to define an epsilon value when one compares them to a given int value
+const double doubleEpsilon = 1e-5;
 
 // number of key to reserve space for in the metadata std::vector
 const int  METADATA_RESERVE_SIZE	= 1000;

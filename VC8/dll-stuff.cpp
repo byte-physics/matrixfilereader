@@ -107,15 +107,15 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	std::string version = subKeyName;
 	m_vernissageVersion = version.substr(1,version.length()-1);
 
-	//if(m_vernissageVersion.compare("1.0") != 0 ){
-	//	sprintf(buf,"Vernissage version %s can not be used to due a bug in this version. Please install version 1.0 and try again.",m_vernissageVersion.c_str());
-	//	outputToHistory(buf);
-	//	return pSession;
-	//}
-	//else{
+	if(m_vernissageVersion.compare(properVernissageVersion) != 0 ){
+		sprintf(buf,"Vernissage version %s can not be used to due a bug in this version. Please install version 1.0 and try again.",m_vernissageVersion.c_str());
+		outputToHistory(buf);
+		return pSession;
+	}
+	else{
 		sprintf(buf,"Vernissage version %s",m_vernissageVersion.c_str());
 		debugOutputToHistory(buf);	
-	//}
+	}
 
 	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
 		dllName = *it;

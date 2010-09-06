@@ -136,12 +136,28 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	m_metaDataValues.push_back(anyTypeToString<int>(m_brickletID));
 
 	// resultfile name
-	m_metaDataKeys.push_back("fileName");
+	m_metaDataKeys.push_back("resultFileName");
 	m_metaDataValues.push_back(pMyData->getFileName());
 
 	// resultfile path
-	m_metaDataKeys.push_back("filePath");
+	m_metaDataKeys.push_back("resultDirPath");
 	m_metaDataValues.push_back(pMyData->getDirPath());
+
+	//// introduced with Vernissage 2.0
+	//m_metaDataKeys.push_back("sampleName");
+	//m_metaDataValues.push_back(WStringToString(m_VernissageSession->getSampleName(m_brickletPtr)));
+
+	//// dito
+	//m_metaDataKeys.push_back("dataSetName");
+	//m_metaDataKeys.push_back(WStringToString(m_VernissageSession->getDataSetName(m_brickletPtr)));
+
+	//// dito
+	//std::vector<std::wstring> dataComments = m_VernissageSession->getDataComments(m_brickletPtr);
+
+	//for(int i = 0; i < dataComments.size(); i++){
+	//	m_metaDataKeys.push_back("dataCommentsNo" + anyTypeToString(i+1));
+	//	m_metaDataKeys.push_back(WStringToString(dataComments[i]));
+	//}
 
 	// BEGIN m_VernissageSession->getBrickletMetaData
 	brickletMetaData = m_VernissageSession->getMetaData(m_brickletPtr);

@@ -297,12 +297,6 @@ static int openResultFile(openResultFileParams *p){
 	// dirPath c:\data
 	// fullPath c:\data\myName.test
 
-	sprintf(buf,"filename %s",fileName);
-	debugOutputToHistory(buf);
-
-	sprintf(buf,"dirPath %s",dirPath);
-	debugOutputToHistory(buf);
-
 	if( !FullPathPointsToFolder(dirPath) ){
 		SET_ERROR_MSG(FILE_NOT_READABLE,dirPath)
 		return 0;	
@@ -317,6 +311,12 @@ static int openResultFile(openResultFileParams *p){
 	if(dirPath[strlen(dirPath)-1] == '\\'){
 		dirPath[strlen(dirPath)-1] = '\0';
 	}
+
+	sprintf(buf,"filename %s",fileName);
+	debugOutputToHistory(buf);
+
+	sprintf(buf,"dirPath %s",dirPath);
+	debugOutputToHistory(buf);
 
 	// true -> result set will be added to the database
 	// false -> replaces the current results sets in the internal databse 

@@ -965,10 +965,10 @@ static int getLastErrorMessage(getLastErrorMessageParams *p){
 static int createDebugOutput(createDebugOutputParams *p){
 
 	if(p->val < doubleEpsilon){
-		pMyData->setDebugging(false);
+		pMyData->enableDebugging(false);
 	}
 	else{
-		pMyData->setDebugging(true);
+		pMyData->enableDebugging(true);
 	}
 
 	return 0;

@@ -1,0 +1,14 @@
+Requirements:
+- Igor Pro version 5.0.x or later
+- Omicron Vernissage version 1.0 (this exact version)
+- PDF Viewer for the documentation
+
+Installation:
+- Copy the file matrixFileReader.xop to the "Igor extensions" folder
+- Start Igor
+- Load the experiment matrixFileReader.pxp
+- Documentation is provided in matrixFileReader.pdf
+- Have fun!
+
+**Please** report all bugs and major/minor annoyances to (thomas dot braun ähht empa doott ch)!
+

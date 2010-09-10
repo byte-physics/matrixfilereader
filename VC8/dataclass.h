@@ -36,12 +36,27 @@ public:
 	int getLastError(){ return m_lastError; }
 	std::string getLastErrorArgument(){ return m_lastErrorArgument; }
 	std::string getLastErrorMessage();
+
+	// settings
+	// debug
 	bool debuggingEnabled(){ return m_debug; };
-	void setDebugging(bool value){ m_debug=value; };
+	void enableDebugging(bool value){ m_debug=value; };
+	
+	// double
+	bool doubleWaveEnabled(){ return m_doubleWave; };
+	bool enableDoubleWave(bool var){ m_doubleWave = var; };
+
+	// datafolder
+	bool datafolderEnabled(){ return m_datafolder; };
+	bool setUseDatafolders(bool var){ m_datafolder = var; };
+
+	// overwrite
+	bool overwriteEnabled(){ return m_overwrite; };
+	bool enableOverwrite(bool var){ m_overwrite = var; };
 
 private:
 
-	bool m_debug;
+	bool m_debug,m_doubleWave, m_datafolder, m_overwrite;
 	std::string m_resultFileName, m_resultFilePath;
 	Vernissage::Session *m_VernissageSession;
 	DllStuff *m_dllStuff;

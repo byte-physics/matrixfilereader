@@ -39,7 +39,7 @@ const char VTC_FORCECURVE_STRING[]	= "vtc_ForceCurve";
 const char VTC_1DPROFILE_STRING[]	= "vtc_1DProfile";
 const char VTC_INTERFEROMETER[]		= "vtc_Interferometer";
 
-// wave name suffixes for 2D data
+// wave name suffixes
 const char TRACE_UP_STRING[]		= "_TraceUp";
 const char TRACE_DOWN_STRING[]		= "_TraceDown";
 const char RE_TRACE_UP_STRING[]		= "_ReTraceUp";
@@ -50,5 +50,17 @@ const double doubleEpsilon = 1e-5;
 
 // number of key to reserve space for in the metadata std::vector
 const int  METADATA_RESERVE_SIZE	= 1000;
+
+// enable debugging by default for test versions
+const bool debug_default	= false;
+
+// by default create double waves
+const bool double_default = true;
+
+// by default use datafolders
+const bool datafolder_default = true;
+
+// by default create double waves
+const bool overwrite_default	= false;
 
 #endif // GLOBALVARIABLES_H

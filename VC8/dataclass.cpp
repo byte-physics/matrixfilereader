@@ -8,9 +8,8 @@
 #include "globals.h"
 #include "utils.h"
 
-myData::myData(): m_VernissageSession(NULL), m_dllStuff(NULL), m_lastError(UNKNOWN_ERROR){
+myData::myData(): m_VernissageSession(NULL), m_dllStuff(NULL), m_lastError(UNKNOWN_ERROR),m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default){
 
-	m_debug = debug_default_value;
 	m_dllStuff = new DllStuff;
 }
 

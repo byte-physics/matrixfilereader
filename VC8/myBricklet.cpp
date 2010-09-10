@@ -53,7 +53,7 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		sprintf(buf,"pBuffer=%d,count=%d",*pBuffer,count);
 		debugOutputToHistory(buf);
 
-		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise the getRaw* routines will call
+		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise the getRaw* routines will be called by
 		// loadbrickletContents implicitly which is quite expensive
 		m_minRawValue = m_VernissageSession->getRawMin(m_brickletPtr);
 		m_maxRawValue = m_VernissageSession->getRawMax(m_brickletPtr);

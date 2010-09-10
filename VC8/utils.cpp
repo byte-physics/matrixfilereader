@@ -1,8 +1,6 @@
 
 #include <string>
-#include <sys/stat.h>
-#include <limits.h>
-#include <float.h>
+#include <limits>
 
 #include "utils.h"
 
@@ -320,4 +318,21 @@ void mySetWaveNote(std::string waveNote, waveHndl waveHandle){
 	PutCStringInHandle(waveNote.c_str(),noteHandle);
 
 	SetWaveNote(waveHandle, noteHandle);
+}
+void waveClearNaN64(double *data, long size){
+
+	long i;
+	
+	for (i = 0; i < size; i++){
+		*data++ = DOUBLE_NAN;
+	}
+}
+
+void waveClearNaN32(float *data, long size){
+
+	long i;
+	
+	for (i = 0; i < size; i++){
+		*data++ = SINGLE_NAN;
+	}
 }

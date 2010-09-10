@@ -418,8 +418,6 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 // variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletData(getAllBrickletDataParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
-
 	if(!pMyData->resultFileOpen()){
 		SET_ERROR(NO_FILE_OPEN)
 		return 0;
@@ -435,16 +433,11 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
 	getRangeBrickletData(&rangeParams);
-	
-	SET_ERROR(rangeParams.result)
 	return 0;
 }
 
 // variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
-
-	SET_ERROR(UNKNOWN_ERROR)
-	int ret;
 
 	if(!pMyData->resultFileOpen()){
 		SET_ERROR(NO_FILE_OPEN)
@@ -460,21 +453,12 @@ static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 	rangeParams.endBrickletID = pSession->getBrickletCount();
 	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
-	ret = getRangeBrickletMetaData(&rangeParams);
-
-	SET_ERROR(rangeParams.result)
-	return ret;
+	getRangeBrickletMetaData(&rangeParams);
+	return 0;
 }
 
 // variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
 static int getBrickletData(getBrickletDataParams *p){
-
-	SET_ERROR(UNKNOWN_ERROR)
-
-	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
-		return 0;
-	}
 
 	getRangeBrickletDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
@@ -483,36 +467,12 @@ static int getBrickletData(getBrickletDataParams *p){
 	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
 	getRangeBrickletData(&rangeParams);
-	
-	SET_ERROR(rangeParams.result)
 	return 0;
 
 }
 
 // variable getBrickletMetaData(string metaData, variable brickletID)
 static int getBrickletMetaData(getBrickletMetaDataParams *p){
-
-	SET_ERROR(UNKNOWN_ERROR)
-
-	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
-		return 0;
-	}
-
-	Vernissage::Session *pSession = pMyData->getVernissageSession();
-	ASSERT_RETURN_ZERO(pSession);
-
-	const int numberOfBricklets = pSession->getBrickletCount();
-
-	if(numberOfBricklets == 0){
-		SET_ERROR(EMPTY_RESULTFILE)
-		return 0;
-	}
-
-	if(!isValidBrickletID(p->brickletID,numberOfBricklets)){
-		SET_ERROR_MSG(NON_EXISTENT_BRICKLET,anyTypeToString<int>(p->brickletID))
-		return 0;
-	}
 
 	getRangeBrickletMetaDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
@@ -521,8 +481,6 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 	rangeParams.separateFolderForEachBricklet=p->separateFolderForEachBricklet;
 
 	getRangeBrickletMetaData(&rangeParams);
-	
-	SET_ERROR(rangeParams.result)
 	return 0;
 }
 

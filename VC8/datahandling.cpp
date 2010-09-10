@@ -4,12 +4,17 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "float.h"
+#include <limits>
 
 #include "xopstandardheaders.h"
 
 #include "globals.h"
 #include "utils.h"
+
+//struct waveData{
+//	float* flt;
+//	double* dbl;
+//};
 
 int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
 
@@ -165,6 +170,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			hState = MoveLockHandle(waveHandle);
 
 			waveData = (double*) WaveData(waveHandle);
+			waveClearNaN64(waveData, waveSize);
 
 			for(i=0; i < numPointsTriggerAxis; i++){
 				
@@ -278,8 +284,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 				// lock wave and store state
 				hStateVector.push_back(MoveLockHandle(waveHandle));
-				// clear wave
-				MemClear((double*) WaveData(waveHandle), waveSize*sizeof(double));
+				waveData = (double*) WaveData(waveHandle);
+				waveClearNaN64(waveData, waveSize);
 			}
 
 			//// TraceUp aka Forward/Up
@@ -771,8 +777,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 				// lock wave and store state
 				hStateVector.push_back(MoveLockHandle(waveHandle));
-				// clear wave
-				MemClear((double*) WaveData(waveHandle), waveSize*sizeof(double));
+				waveData = (double*) WaveData(waveHandle);
+				waveClearNaN64(waveData, waveSize);
 			}
 
 			// set wave data pointers

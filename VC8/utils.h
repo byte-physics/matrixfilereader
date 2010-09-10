@@ -64,4 +64,7 @@ void mySetWaveNote(std::string waveNote, waveHndl waveHandle);
 
 std::string getStandardWaveNote(int brickletID);
 
+void waveClearNaN64(double *wavePtr, long length);
+void waveClearNaN32(double *wavePtr, long length);
+
 #endif // UTILS_H

@@ -51,16 +51,15 @@ const double doubleEpsilon = 1e-5;
 // number of key to reserve space for in the metadata std::vector
 const int  METADATA_RESERVE_SIZE	= 1000;
 
-// enable debugging by default for test versions
+// default values for the options
 const bool debug_default	= false;
-
-// by default create double waves
 const bool double_default = true;
-
-// by default use datafolders
 const bool datafolder_default = true;
-
-// by default create double waves
 const bool overwrite_default	= false;
+
+const char debug_option_name[] = "debug";
+const char folder_option_name[] = "folder";
+const char overwrite_option_name[] = "overwrite";
+const char double_option_name[] = "double";
 
 #endif // GLOBALVARIABLES_H

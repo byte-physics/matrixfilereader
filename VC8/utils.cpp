@@ -142,7 +142,6 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID){
 
 	long dimensionSizes[MAX_DIMENSIONS+1];
-	int overwrite=0;
 	waveHndl waveHandle;
 	int ret=-1;
 	char buf[ARRAY_SIZE];
@@ -181,7 +180,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 
 	dimensionSizes[COLUMNS]=2;
 	
-	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,overwrite);
+	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,pMyData->overwriteEnabledAsInt());
 
 	if(ret == NAME_WAV_CONFLICT){
 		sprintf(buf,"Wave %s already exists.",waveName);
@@ -319,6 +318,7 @@ void mySetWaveNote(std::string waveNote, waveHndl waveHandle){
 
 	SetWaveNote(waveHandle, noteHandle);
 }
+
 void waveClearNaN64(double *data, long size){
 
 	long i;
@@ -334,5 +334,42 @@ void waveClearNaN32(float *data, long size){
 	
 	for (i = 0; i < size; i++){
 		*data++ = SINGLE_NAN;
+	}
+}
+
+
+void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list){
+
+	if(stringChar == NULL || sepChar == NULL){
+		return;
+	}
+
+	list.clear();
+
+	char buf[ARRAY_SIZE];
+	int pos=-1;
+	int offset=0;
+
+	std::string string;
+	string = stringChar;
+
+	string.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
+
+	sprintf(buf,"keyList=%s",stringChar);
+	debugOutputToHistory(buf);
+
+
+	while( ( pos = string.find(sepChar,offset) ) != std::string::npos ){
+
+		if(pos == offset){// skip empty element
+			offset++;
+			continue;
+		}
+
+		list.push_back(string.substr(offset,pos-offset));
+		sprintf(buf,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
+		debugOutputToHistory(buf);
+
+		offset = pos+1;
 	}
 }

@@ -75,6 +75,43 @@ std::string myData::getFileName(){
 	return m_resultFileName;
 }
 
+void myData::setOption(std::string key, int value){
+
+	bool val = (value == 1) ? true : false;
+	char buf[ARRAY_SIZE];
+
+	if(key == debug_option_name){
+		enableDebugging(val);
+	}
+	else if(key == overwrite_option_name){
+		enableOverwrite(val);
+	}
+	else if(key == folder_option_name){
+		enableDatafolder(val);
+	}
+	else if(key == double_option_name){
+		enableDoubleWave(val);
+	}
+	else{
+		sprintf(buf,"wrong option key %s",key.c_str());
+		debugOutputToHistory(buf);
+	}
+}
+
+int myData::getIgorWaveType(){
+
+	int waveType;
+
+	if(m_doubleWave){
+		waveType = NT_FP64;
+	}
+	else{
+		waveType = NT_FP32;
+	}
+	return waveType;
+}
+
+
 MyBricklet* myData::getMyBrickletObject(int brickletID){
 
 	IntMyBrickletPtrMap::iterator it = m_brickletIDBrickletClassMap.find(brickletID);

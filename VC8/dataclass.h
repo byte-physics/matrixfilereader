@@ -36,23 +36,26 @@ public:
 	int getLastError(){ return m_lastError; }
 	std::string getLastErrorArgument(){ return m_lastErrorArgument; }
 	std::string getLastErrorMessage();
+	int getIgorWaveType();
 
 	// settings
+	void setOption(std::string key, int value);
 	// debug
 	bool debuggingEnabled(){ return m_debug; };
-	void enableDebugging(bool value){ m_debug=value; };
+	void enableDebugging(bool var){ m_debug=var; };
 	
 	// double
 	bool doubleWaveEnabled(){ return m_doubleWave; };
-	bool enableDoubleWave(bool var){ m_doubleWave = var; };
+	void enableDoubleWave(bool var){ m_doubleWave = var; };
 
 	// datafolder
 	bool datafolderEnabled(){ return m_datafolder; };
-	bool setUseDatafolders(bool var){ m_datafolder = var; };
+	void enableDatafolder(bool var){ m_datafolder = var; };
 
 	// overwrite
 	bool overwriteEnabled(){ return m_overwrite; };
-	bool enableOverwrite(bool var){ m_overwrite = var; };
+	int overwriteEnabledAsInt(){ return int(m_overwrite); };
+	void enableOverwrite(bool var){ m_overwrite = var; };
 
 private:
 

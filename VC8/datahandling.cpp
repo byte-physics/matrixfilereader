@@ -20,8 +20,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	bool isDoubleWaveType = pMyData->doubleWaveEnabled();
 
-	const int noOverwrite=0;
-
 	int dimension;
 	std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes;
 	Vernissage::Session *pSession;
@@ -141,7 +139,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			}
 			
 			dimensionSizes[ROWS] = numPointsTriggerAxis;
-			ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dataFolderHandle,dimensionSizes,getIgorWaveType(),noOverwrite);
+			ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dataFolderHandle,dimensionSizes,pMyData->getIgorWaveType(),pMyData->overwriteEnabledAsInt());
 
 			if(ret == NAME_WAV_CONFLICT){
 				sprintf(buf,"Wave %s already exists.",waveBaseName.c_str());
@@ -253,7 +251,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
-				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,getIgorWaveType(),noOverwrite);
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,pMyData->getIgorWaveType(),pMyData->overwriteEnabledAsInt());
 
 				if(ret == NAME_WAV_CONFLICT){
 					sprintf(buf,"Wave %s already exists.",itWaveNames->c_str());
@@ -719,7 +717,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// create waves
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
-				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,NT_FP64,noOverwrite);
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,pMyData->getIgorWaveType(),pMyData->overwriteEnabledAsInt());
 
 				if(ret == NAME_WAV_CONFLICT){
 					sprintf(buf,"Wave %s already exists.",itWaveNames->c_str());
@@ -1002,10 +1000,6 @@ void __forceinline setExtremaValue(extremaData *extrema,const int rawValue,const
 		extrema->rawMax		= rawValue;
 		extrema->physValRawMax = scaledValue;
 	}
-}
-
-int getIgorWaveType(){
-	return (pMyData->doubleWaveEnabled() ? NT_FP64 : NT_FP32);
 }
 
 void setWaveDataPtr(waveDataPtr &waveData,const waveHndl &waveHandle){

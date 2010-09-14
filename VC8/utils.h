@@ -67,4 +67,6 @@ std::string getStandardWaveNote(int brickletID);
 void waveClearNaN64(double *wavePtr, long length);
 void waveClearNaN32(float  *wavePtr, long length);
 
+void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
+
 #endif // UTILS_H

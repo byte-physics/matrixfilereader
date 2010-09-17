@@ -36,7 +36,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex, traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
 
-	struct waveDataPtr traceUpDataPtr,reTraceUpDataPtr, traceDownDataPtr,reTraceDownDataPtr,waveData = {NULL,NULL,false};
+	struct waveDataPtr traceUpDataPtr     = {NULL,NULL,false};
+	struct waveDataPtr reTraceUpDataPtr   = {NULL,NULL,false};
+	struct waveDataPtr traceDownDataPtr   = {NULL,NULL,false};
+	struct waveDataPtr reTraceDownDataPtr = {NULL,NULL,false};
+	struct waveDataPtr waveData           = {NULL,NULL,false};
 
 	double setScaleOffset=0.0;
 
@@ -335,6 +339,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			}
 
 			firstBlockOffset	 = numPointsRootAxis * triggerAxisBlockSize;
+
+			sprintf(buf,"traceUp: flt=%p, dbl=%p, moreData=%s",traceUpDataPtr.flt,traceUpDataPtr.dbl,traceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(buf);
+			sprintf(buf,"reTraceUp: flt=%p, dbl=%p, moreData=%s",reTraceUpDataPtr.flt,reTraceUpDataPtr.dbl,reTraceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(buf);
+			sprintf(buf,"traceDown: flt=%p, dbl=%p, moreData=%s",traceDownDataPtr.flt,traceDownDataPtr.dbl,traceDownDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(buf);
+			sprintf(buf,"reTraceDown: flt=%p, dbl=%p, moreData=%s",reTraceDownDataPtr.flt,reTraceDownDataPtr.dbl,reTraceDownDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(buf);
 
 			// See also Vernissage manual page 22f
 			// triggerAxisBlockSize: number of points in the raw data array which were acquired at the same root axis position
@@ -806,6 +819,15 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			firstBlockOffset = numPointsYAxisWithTableUp*xAxisBlockSize;
 
 			sprintf(buf,"xAxisBlockSize=%d,firstBlockOffset=%d",xAxisBlockSize,firstBlockOffset);
+			debugOutputToHistory(buf);
+
+			sprintf(buf,"traceUp: flt=%p, dbl=%p, moreData=%s",traceUpDataPtr.flt,traceUpDataPtr.dbl,traceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(buf);
+			sprintf(buf,"reTraceUp: flt=%p, dbl=%p, moreData=%s",reTraceUpDataPtr.flt,reTraceUpDataPtr.dbl,reTraceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(buf);
+			sprintf(buf,"traceDown: flt=%p, dbl=%p, moreData=%s",traceDownDataPtr.flt,traceDownDataPtr.dbl,traceDownDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(buf);
+			sprintf(buf,"reTraceDown: flt=%p, dbl=%p, moreData=%s",reTraceDownDataPtr.flt,reTraceDownDataPtr.dbl,reTraceDownDataPtr.moreData ? "true" : "false");
 			debugOutputToHistory(buf);
 
 			// COLUMNS

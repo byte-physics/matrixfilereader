@@ -62,4 +62,7 @@ const char folder_option_name[] = "folder";
 const char overwrite_option_name[] = "overwrite";
 const char double_option_name[] = "double";
 
+// only a few vernissage DLL version are bug-free enough to be used 
+const char properVernissageVersion[] ="1.0";
+
 #endif // GLOBALVARIABLES_H

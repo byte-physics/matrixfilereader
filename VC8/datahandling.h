@@ -17,7 +17,6 @@ struct extremaData{
 	double	physValRawMax;
 };
 
-
 void clearWave(waveHndl waveHandle,long waveSize);
 void setWaveDataPtr(waveDataPtr &waveData,const waveHndl &waveHandle);
 

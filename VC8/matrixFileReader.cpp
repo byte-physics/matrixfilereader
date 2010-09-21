@@ -19,17 +19,14 @@
 
 #include "Vernissage.h"
 
-#define SET_ERROR(A){ p->result = A; pMyData->setLastError(A); }
-#define SET_ERROR_MSG(A,B){ p->result = A; pMyData->setLastError(A,B); }
-#define SET_INTERNAL_ERROR(A) { SET_ERROR(UNKNOWN_ERROR); char buf[ARRAY_SIZE]; sprintf(buf,"BUG: xop internal error %d returned.",A); outputToHistory(buf);} 
 
 // variable closeResultFile()
 static int closeResultFile(closeResultFileParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -38,14 +35,14 @@ static int closeResultFile(closeResultFileParams *p){
 
 	pMyData->closeSession();
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
 // variable getBrickletRawData(variable brickletID, string dataWave)
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	char buf[ARRAY_SIZE];
 	char dataWaveName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1];
@@ -60,7 +57,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	waveHndl waveHandle;
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -71,12 +68,12 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	const int numberOfBricklets = pSession->getBrickletCount();
 
 	if( numberOfBricklets == 0){
-		SET_ERROR(EMPTY_RESULTFILE)
+		setError(&p->result,EMPTY_RESULTFILE);
 		return 0;
 	}
 
 	if( !isValidBrickletID(brickletID,numberOfBricklets) ){
-		SET_ERROR_MSG(NON_EXISTENT_BRICKLET,anyTypeToString<int>(brickletID))
+		setError(&p->result,NON_EXISTENT_BRICKLET,anyTypeToString<int>(brickletID));
 		return 0;
 	}
 
@@ -87,7 +84,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	{
 		ret = GetCStringFromHandle(p->waveName,dataWaveName,MAX_OBJ_NAME);
 		if(ret != 0){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
@@ -100,7 +97,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	if(count == 0){
 		outputToHistory("BUG: Could not load bricklet contents.");
-		SET_ERROR(UNKNOWN_ERROR)
+		setError(&p->result,UNKNOWN_ERROR);
 		return 0;
 	}
 	 // create 1D wave with count points
@@ -111,7 +108,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		ret = GetCurrentDataFolder(&parentDataFolderHPtr);
 
 		if(ret != 0){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 				return 0;
 		}
 		sprintf(dataFolderName,dataFolderFormat,brickletID);
@@ -119,7 +116,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 
 		// continue if the datafolder alrady exists, abort on all other errors
 		if( ret != 0 && ret != FOLDER_NAME_EXISTS ){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 				return 0;
 		}
 	}
@@ -129,12 +126,12 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	if(ret == NAME_WAV_CONFLICT){
 		sprintf(buf,"Wave %s already exists.",dataWaveName);
 		debugOutputToHistory(buf);
-		SET_ERROR_MSG(WAVE_EXIST,dataWaveName)
+		setError(&p->result,WAVE_EXIST,dataWaveName);
 		return 0;	
 	}
 
 	if(ret != 0 ){
-		SET_INTERNAL_ERROR(ret)
+		setInternalError(&p->result,ret);
 		return 0;
 	}
 
@@ -150,17 +147,17 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	setDataWaveNote(brickletID,myBricklet->getRawMin(),myBricklet->getRawMax(),myBricklet->getPhysValRawMin(),myBricklet->getPhysValRawMax(),waveHandle);
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
 // variable getNumberOfBricklets(variable *totalNumberOfBricklets)
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -169,75 +166,75 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
 	*p->totalNumberOfBricklets = pSession->getBrickletCount();
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
 // variable getResultFile(string *fileName,string *dirPath)
 static int getResultFile(getResultFileParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
-	//filename
+	//fileName
 	if(*p->fileName == NULL){
 		*p->fileName = NewHandle(0L);
 	}
 
 	int ret = PutCStringInHandle(pMyData->getFileName().c_str(), *p->fileName);
 	if( ret != 0 ){
-		SET_INTERNAL_ERROR(ret)
+		setInternalError(&p->result,ret);
 		return 0;
 	}
 
-	//dirname
+	//dirPath
 	if(*p->dirPath == NULL){
 		*p->dirPath = NewHandle(0L);
 	}
 
 	ret = PutCStringInHandle(pMyData->getDirPath().c_str(), *p->dirPath);
 	if( ret != 0 ){
-		SET_INTERNAL_ERROR(ret)
+		setInternalError(&p->result,ret);
 		return 0;
 	}
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
 // variable getVernissageVersion(double *vernissageVersion)
 static int getVernissageVersion(getVernissageVersionParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	*p->vernissageVersion = stringToAnyType<double>(pMyData->getVernissageVersion());
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
 // variable getXOPVersion(double *xopVersion)
 static int getXOPVersion(getXOPVersionParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	*p->xopVersion = stringToAnyType<double>(myXopVersion);
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
 // variable openResultFile(string absoluteFilePath, string fileName)
 static int openResultFile(openResultFileParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	char fullPath[MAX_PATH_LEN+1], fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1];
 	int ret = 0,i, pos, offset=0,count=0, maxCount=100;
@@ -245,7 +242,7 @@ static int openResultFile(openResultFileParams *p){
 	char buf[ARRAY_SIZE];
 
 	if(pMyData->resultFileOpen()){
-		SET_ERROR_MSG(ALREADY_FILE_OPEN,pMyData->getFileName())
+		setError(&p->result,ALREADY_FILE_OPEN,pMyData->getFileName());
 		return 0;
 	}
 
@@ -253,25 +250,25 @@ static int openResultFile(openResultFileParams *p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	if( GetHandleSize(p->absoluteFilePath) == 0L){
-		SET_ERROR_MSG(WRONG_PARAMETER,"absoluteFilePath")
+		setError(&p->result,WRONG_PARAMETER,"absoluteFilePath");
 		return 0;
 	}
 
 	if( GetHandleSize(p->fileName) != 0L){
 		ret = GetCStringFromHandle(p->fileName,fileName,MAX_PATH_LEN);
 		if( ret != 0 ){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 				return 0;
 		}
 
 		ret = GetCStringFromHandle(p->absoluteFilePath,dirPath,MAX_PATH_LEN);
 		if( ret != 0 ){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 		}
 
 		ret = MacToWinPath(dirPath);
 		if( ret != 0){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 		}
 		ConcatenatePaths(dirPath,fileName,fullPath);
@@ -281,19 +278,19 @@ static int openResultFile(openResultFileParams *p){
 
 		ret = GetCStringFromHandle(p->absoluteFilePath,fullPath,MAX_PATH_LEN);
 		if( ret != 0 ){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 		}
 
 		ret = MacToWinPath(fullPath);
 		if( ret != 0){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 		}
 
 		ret = GetDirectoryAndFileNameFromFullPath(fullPath,dirPath,fileName);
 		if( ret != 0){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 		}
 	}
@@ -304,12 +301,12 @@ static int openResultFile(openResultFileParams *p){
 	// fullPath c:\data\myName.test
 
 	if( !FullPathPointsToFolder(dirPath) ){
-		SET_ERROR_MSG(FILE_NOT_READABLE,dirPath)
+		setError(&p->result,FILE_NOT_READABLE,dirPath);
 		return 0;	
 	}
 
 	if( !FullPathPointsToFile(fullPath)){
-		SET_ERROR_MSG(FILE_NOT_READABLE,fullPath)
+		setError(&p->result,FILE_NOT_READABLE,fullPath);
 		return 0;	
 	}
 
@@ -330,7 +327,7 @@ static int openResultFile(openResultFileParams *p){
 
 	if(!loadSuccess){
 		outputToHistory("Could not load the result file");
-		SET_ERROR(UNKNOWN_ERROR)
+		setError(&p->result,UNKNOWN_ERROR);
 		return 0;
 	}
 
@@ -343,21 +340,21 @@ static int openResultFile(openResultFileParams *p){
 		pMyData->createMyBrickletObject(i,pBricklet);
 	}
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
 // variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID)
 static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	// save defaults
 	*p->endBrickletID   = -1;
 	*p->startBrickletID = -1;
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -379,7 +376,7 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 	if(!loadSuccess){
 		outputToHistory("Could not check for updates of the result file. Maybe it was moved?");
 		outputToHistory("Try closing and opening the result file again.");
-		SET_ERROR(UNKNOWN_ERROR)
+		setError(&p->result,UNKNOWN_ERROR);
 		return 0;
 	}
 
@@ -403,21 +400,21 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 	}
 
 	if(oldNumberOfBricklets == numberOfBricklets){
-		SET_ERROR(NO_NEW_BRICKLETS)
+		setError(&p->result,NO_NEW_BRICKLETS);
 		return 0;
 	}
 	// from here on we know that numberOfBricklets > oldNumberOfBricklets 
 
 	// happened once so be prepared
 	if(numberOfBricklets < oldNumberOfBricklets){
-		SET_ERROR(UNKNOWN_ERROR)
+		setError(&p->result,UNKNOWN_ERROR);
 		return 0;
 	}
 
 	*p->endBrickletID   = numberOfBricklets;
 	*p->startBrickletID = oldNumberOfBricklets+1;
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
@@ -425,7 +422,7 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 static int getAllBrickletData(getAllBrickletDataParams *p){
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -445,7 +442,7 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -496,10 +493,10 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	char buf[ARRAY_SIZE];
 	int brickletID=-1, ret=-1;
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -508,12 +505,12 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 
 	const int numberOfBricklets = pSession->getBrickletCount();
 	if(numberOfBricklets == 0){
-		SET_ERROR(EMPTY_RESULTFILE)
+		setError(&p->result,EMPTY_RESULTFILE);
 		return 0;
 	}
 
 	if(	!isValidBrickletRange(p->startBrickletID,p->endBrickletID,numberOfBricklets) ){
-			SET_ERROR(INVALID_RANGE)
+			setError(&p->result,INVALID_RANGE);
 			return 0;
 	}
 
@@ -525,7 +522,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	{
 		ret = GetCStringFromHandle(p->baseName,dataBaseName,MAX_OBJ_NAME);
 		if(ret != 0){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
@@ -543,7 +540,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 			ret = GetCurrentDataFolder(&parentDataFolderHPtr);
 
 			if(ret != 0){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 			}
 			sprintf(dataFolderName,dataFolderFormat,brickletID);
@@ -551,7 +548,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	
 			// continue if the datafolder alrady exists, abort on all other errors
 			if( ret != 0 && ret != FOLDER_NAME_EXISTS ){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 			}
 		}
@@ -559,20 +556,20 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 		ret = createAndFillDataWave(newDataFolderHPtr,dataName,brickletID);
 
 		if(ret == WAVE_EXIST){
-			SET_ERROR_MSG(ret,dataName)
+			setError(&p->result,ret,dataName);
 			return 0;
 		}
 		else if(ret == INTERNAL_ERROR_CONVERTING_DATA){
-			SET_ERROR(ret)
+			setError(&p->result,ret);
 			return 0;
 		}
 		else if(ret != SUCCESS){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
@@ -586,10 +583,10 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	char buf[ARRAY_SIZE];
 	int brickletID=-1, ret=-1;
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -598,12 +595,12 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
 	const int numberOfBricklets = pSession->getBrickletCount();
 	if(numberOfBricklets == 0){
-		SET_ERROR(EMPTY_RESULTFILE)
+		setError(&p->result,EMPTY_RESULTFILE);
 		return 0;
 	}
 
 	if( !isValidBrickletRange(p->startBrickletID,p->endBrickletID,numberOfBricklets) ){
-		SET_ERROR(INVALID_RANGE)
+		setError(&p->result,INVALID_RANGE);
 		return 0;
 	}
 
@@ -615,7 +612,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	{
 		ret = GetCStringFromHandle(p->baseName,metaDataBaseName,MAX_OBJ_NAME);
 		if(ret != 0){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
@@ -634,7 +631,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 			ret = GetCurrentDataFolder(&parentDataFolderHPtr);
 
 			if(ret != 0){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 			}
 			sprintf(dataFolderName,dataFolderFormat,brickletID);
@@ -642,7 +639,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	
 			// continue if the datafolder alrady exists, abort on all other errors
 			if( ret != 0 && ret != FOLDER_NAME_EXISTS ){
-				SET_INTERNAL_ERROR(ret)
+				setInternalError(&p->result,ret);
 				return 0;
 			}
 		}
@@ -651,15 +648,15 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 		ret = createAndFillTextWave(keys,values,newDataFolderHPtr,metaDataName,brickletID);
 
 		if(ret == WAVE_EXIST){
-			SET_ERROR_MSG(ret,metaDataName)
+			setError(&p->result,ret,metaDataName);
 			return 0;
 		}
 		else if(ret != SUCCESS){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
@@ -710,7 +707,7 @@ static int getBugReportTemplate(getBugReportTemplateParams *p){
 // variable getResultFileMetaData(string waveName)
 static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	char metaDataWaveName[MAX_OBJ_NAME+1];
 	std::vector<std::string> keys,values;
@@ -721,7 +718,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	Vernissage::Session::BrickletMetaData brickletMetaData;
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -734,7 +731,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	else{
 		ret = GetCStringFromHandle(p->waveName,metaDataWaveName,MAX_OBJ_NAME);
 		if(ret != 0){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
@@ -742,7 +739,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	const int numberOfBricklets = pSession->getBrickletCount();
 
 	if(numberOfBricklets == 0){
-		SET_ERROR(EMPTY_RESULTFILE)
+		setError(&p->result,EMPTY_RESULTFILE);
 		return 0;
 	}
 
@@ -786,16 +783,16 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	ret = createAndFillTextWave(keys,values,NULL,metaDataWaveName,0);
 
 	if(ret == WAVE_EXIST){
-		SET_ERROR_MSG(ret,metaDataWaveName)
+		setError(&p->result,ret,metaDataWaveName);
 		return 0;
 	}
 
 	if(ret != 0){
-		SET_INTERNAL_ERROR(ret)
+		setInternalError(&p->result,ret);
 		return 0;
 	}
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
@@ -803,7 +800,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 // variable createOverViewTable(string waveName, string keyList)
 static int createOverViewTable(createOverViewTableParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 	char buf[ARRAY_SIZE], keyListChar[ARRAY_SIZE+1];
 	int pos, offset, ret=-1,count=0, countMax=1000;
 	std::string keyList, key, value;
@@ -818,7 +815,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	int i, j;
 
 	if(!pMyData->resultFileOpen()){
-		SET_ERROR(NO_FILE_OPEN)
+		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
 
@@ -827,19 +824,19 @@ static int createOverViewTable(createOverViewTableParams *p){
 
 	const int numberOfBricklets = pSession->getBrickletCount();
 	if(numberOfBricklets == 0){
-		SET_ERROR(EMPTY_RESULTFILE)
+		setError(&p->result,EMPTY_RESULTFILE);
 		return 0;
 	}
 
 	// check keyList parameter
 	if( p->keyList == NULL || GetHandleSize(p->keyList) == 0L ){
-		SET_ERROR_MSG(WRONG_PARAMETER,"keyList")
+		setError(&p->result,WRONG_PARAMETER,"keyList");
 		return 0;
 	}
 	else{
 		ret = GetCStringFromHandle(p->keyList,keyListChar,ARRAY_SIZE);
 		if(ret != 0){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
@@ -848,7 +845,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	splitString(keyListChar,sepChar,keys);
 
 	if( keys.size() == 0 ){
-		SET_ERROR_MSG(WRONG_PARAMETER,"keyList")
+		setError(&p->result,WRONG_PARAMETER,"keyList");
 		return 0;
 	}
 
@@ -859,7 +856,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	else{
 		ret = GetCStringFromHandle(p->waveName,waveName,MAX_OBJ_NAME);
 		if(ret != 0){
-			SET_INTERNAL_ERROR(ret)
+			setInternalError(&p->result,ret);
 			return 0;
 		}
 	}
@@ -871,12 +868,12 @@ static int createOverViewTable(createOverViewTableParams *p){
 	if(ret == NAME_WAV_CONFLICT){
 		sprintf(buf,"Wave %s already exists.",waveName);
 		debugOutputToHistory(buf);
-		SET_ERROR_MSG(WAVE_EXIST,waveName)
+		setError(&p->result,WAVE_EXIST,waveName);
 		return 0;
 	}
 
 	if(ret != 0 ){
-		SET_INTERNAL_ERROR(ret)
+		setInternalError(&p->result,ret);
 		return 0;
 	}
 
@@ -902,14 +899,14 @@ static int createOverViewTable(createOverViewTableParams *p){
 	ret = stringVectorToTextWave(textWaveContents,waveHandle);
 
 	if(ret != 0){
-		SET_INTERNAL_ERROR(ret)
+		setInternalError(&p->result,ret);
 		return 0;
 	}
 
 	// brickletID equals 0 because the wave note is for a resultfile kind wave
 	setOtherWaveNote(0,waveHandle);
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
@@ -963,7 +960,7 @@ static int readXOPSettings(readXOPSettingsParams *p){
 // variable writeXOPSettings(string config)
 static int writeXOPSettings(writeXOPSettingsParams *p){
 
-	SET_ERROR(UNKNOWN_ERROR)
+	setError(&p->result,UNKNOWN_ERROR);
 
 	char configChar[ARRAY_SIZE];
 	int ret;
@@ -979,13 +976,13 @@ static int writeXOPSettings(writeXOPSettingsParams *p){
 	validOptions.push_back(double_option_name);
 
 	if(*p->config == NULL || GetHandleSize(p->config) == 0L){
-		SET_ERROR_MSG(WRONG_PARAMETER,"config")
+		setError(&p->result,WRONG_PARAMETER,"config");
 		return 0;
 	}
 
 	ret = GetCStringFromHandle(p->config,configChar,ARRAY_SIZE);
 	if(ret != 0){
-		SET_INTERNAL_ERROR(ret)
+		setInternalError(&p->result,ret);
 		return 0;
 	}
 
@@ -1002,7 +999,7 @@ static int writeXOPSettings(writeXOPSettingsParams *p){
 		splitString(const_cast<char*>(optionString.c_str()),optionSepChar,splittedOption);
 
 		if(splittedOption.size() != 2){
-			SET_ERROR_MSG(WRONG_PARAMETER,"config")
+			setError(&p->result,WRONG_PARAMETER,"config");
 			return 0;
 		}
 
@@ -1018,13 +1015,13 @@ static int writeXOPSettings(writeXOPSettingsParams *p){
 		}
 
 		if(!isValidKey){
-			SET_ERROR_MSG(WRONG_PARAMETER,"config")
+			setError(&p->result,WRONG_PARAMETER,"config");
 			return 0;
 		}
 		
 		// check if the value is either 1 or 0
 		if(value != 0 && value != 1){
-			SET_ERROR_MSG(WRONG_PARAMETER,"config")
+			setError(&p->result,WRONG_PARAMETER,"config");
 			return 0;
 		}
 
@@ -1032,7 +1029,7 @@ static int writeXOPSettings(writeXOPSettingsParams *p){
 		pMyData->setOption(key, value);
 	}
 
-	SET_ERROR(SUCCESS)
+	setError(&p->result,SUCCESS);
 	return 0;
 }
 
@@ -1186,4 +1183,22 @@ bool isValidBrickletRange(int startID, int endID,int numberOfBricklets){
 bool isValidBrickletID(int brickletID, int numberOfBricklets){
 
 	return brickletID >= 1 && brickletID <= numberOfBricklets;
+}
+
+void setInternalError(double *result, int errorValue){
+	
+	char buf[ARRAY_SIZE];
+
+	*result = errorValue;
+	pMyData->setLastError(errorValue);
+
+	sprintf(buf,"BUG: xop internal error %d returned.",errorValue);
+	outputToHistory(buf);
+}
+
+void setError(double *result, int errorValue, std::string msgArgument){
+
+	*result = errorValue;
+	pMyData->setLastError(errorValue,msgArgument);
+
 }

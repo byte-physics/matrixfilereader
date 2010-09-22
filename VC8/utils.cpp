@@ -42,21 +42,22 @@ std::wstring CharPtrToWString(char* cStr){
 
 void debugOutputToHistory(const char* str){
 
-	if(pMyData->debuggingEnabled()){
-
-		ASSERT_RETURN_VOID(str);
-
-		char buf[ARRAY_SIZE];
-		sprintf(buf,debugOutputFormat,str);
-		XOPNotice(buf);
+	if(!pMyData->debuggingEnabled()){
+		return;
 	}
+
+	ASSERT_RETURN_VOID(str);
+	char buf[ARRAY_SIZE];
+
+	sprintf(buf,debugOutputFormat,str);
+	XOPNotice(buf);
 }
 
 void outputToHistory(const char *str){
 
 	ASSERT_RETURN_VOID(str);
-
 	char buf[ARRAY_SIZE];
+	
 	sprintf(buf,outputFormat,str);
 	XOPNotice(buf);
 }
@@ -66,7 +67,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	ASSERT_RETURN_MINUSONE(stringVector.size());
 
 	std::vector<long int> stringSizes;
-	char buf[ARRAY_SIZE];
+	
 	int lockStateWave, ret, i;
 
 	long int offset;
@@ -88,8 +89,8 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 		return NOMEM;
 	}
 
-	//sprintf(buf,"totalSize of strings %d",GetHandleSize(textHandle));
-	//debugOutputToHistory(buf);
+	//sprintf(pMyData->outputBuffer,"totalSize of strings %d",GetHandleSize(textHandle));
+	//debugOutputToHistory(pMyData->outputBuffer);
 
 	for(i=0; i < numEntriesPlusOne; i++){
 
@@ -99,16 +100,16 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 		else{ // and of all the others
 			offset+=stringSizes[i-1];
 		}
-		//sprintf(buf,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
-		//debugOutputToHistory(buf);
+		//sprintf(pMyData->outputBuffer,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
+		//debugOutputToHistory(pMyData->outputBuffer);
 
 		// write offsets
 		memcpy(*textHandle+i*sizeof(long),&offset,sizeof(long));
 
 		if(i < stringVector.size()){
 
-			//sprintf(buf,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
-			//debugOutputToHistory(buf);
+			//sprintf(pMyData->outputBuffer,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
+			//debugOutputToHistory(pMyData->outputBuffer);
 
 			// write strings
 			memcpy(*textHandle+offset,stringVector[i].c_str(),stringSizes[i]);
@@ -128,8 +129,8 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	lockStateWave=MoveLockHandle(waveHandle);
 	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
-	//sprintf(buf,"SetTextWaveData returned %d",ret);
-	//debugOutputToHistory(buf);
+	//sprintf(pMyData->outputBuffer,"SetTextWaveData returned %d",ret);
+	//debugOutputToHistory(pMyData->outputBuffer);
 
 	// release waveHandle lock
 	HSetState(waveHandle, lockStateWave);
@@ -144,7 +145,8 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	long dimensionSizes[MAX_DIMENSIONS+1];
 	waveHndl waveHandle;
 	int ret=-1;
-	char buf[ARRAY_SIZE];
+	
+	
 	std::vector<std::string> allColumns;
 
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
@@ -154,26 +156,26 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		dimensionSizes[ROWS] = firstColumn.size();
 	}
 	else if(firstColumn.size() == 0 || secondColumn.size() == 0 ){
-		sprintf(buf,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(pMyData->outputBuffer);
 		return UNKNOWN_ERROR;
 	}
 	else{
-		sprintf(buf,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(pMyData->outputBuffer);
 		
 		std::vector<std::string>::const_iterator it;
 
 		outputToHistory("keys are:");
 		for(it= firstColumn.begin(); it != firstColumn.end(); it++){
-			sprintf(buf,"_%s_",it->c_str());
-			outputToHistory(buf);
+			sprintf(pMyData->outputBuffer,"_%s_",it->c_str());
+			outputToHistory(pMyData->outputBuffer);
 		}
 
 		outputToHistory("values are:");
 		for(it= secondColumn.begin(); it != secondColumn.end(); it++){
-			sprintf(buf,"_%s_",it->c_str());
-			outputToHistory(buf);
+			sprintf(pMyData->outputBuffer,"_%s_",it->c_str());
+			outputToHistory(pMyData->outputBuffer);
 		}
 		return UNKNOWN_ERROR;
 	}
@@ -183,14 +185,14 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,pMyData->overwriteEnabledAsInt());
 
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(buf,"Wave %s already exists.",waveName);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Wave %s already exists.",waveName);
+		debugOutputToHistory(pMyData->outputBuffer);
 		return WAVE_EXIST;
 	}
 
 	if(ret != 0 ){
-		sprintf(buf,"Error %d in creating wave %s.",ret, waveName);
-		outputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Error %d in creating wave %s.",ret, waveName);
+		outputToHistory(pMyData->outputBuffer);
 		return UNKNOWN_ERROR;
 	}
 
@@ -205,8 +207,8 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	ret = stringVectorToTextWave(allColumns,waveHandle);
 
 	if(ret != 0){
-		sprintf(buf,"stringVectorToTextWave returned %d",ret);
-		outputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"stringVectorToTextWave returned %d",ret);
+		outputToHistory(pMyData->outputBuffer);
 		return ret;
 	}
 	setOtherWaveNote(brickletID,waveHandle);
@@ -216,7 +218,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 
 std::string viewTypeCodeToString(int idx){
 
-	char buf[ARRAY_SIZE];
+	
 	std::vector<std::string> names;
 
 	names.push_back(VTC_OTHER_STRING);
@@ -230,37 +232,14 @@ std::string viewTypeCodeToString(int idx){
 	names.push_back(VTC_INTERFEROMETER);
 
 	if(idx < 0 || idx >= names.size()){
-		sprintf(buf,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
-		outputToHistory(buf);
-		return 0;
+		sprintf(pMyData->outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+		debugOutputToHistory(pMyData->outputBuffer);
+		return std::string();
 	}
 	else{
 		return names.at(idx);
 	}
 }
-
-std::string valueTypeToString(int idx){
-
-	char buf[ARRAY_SIZE];
-	std::vector<std::string> names;
-
-	names.push_back(VT_SPECIAL_STRING);
-	names.push_back(VT_INTEGER_STRING);
-	names.push_back(VT_DOUBLE_STRING);
-	names.push_back(VT_BOOLEAN_STRING);
-	names.push_back(VT_ENUM_STRING);
-	names.push_back(VT_STRING_STRING);
-
-	if(idx < 0 || idx >= names.size()){
-		sprintf(buf,"BUG: valueTypeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
-		outputToHistory(buf);
-		return 0;
-	}
-	else{
-		return names.at(idx);
-	}
-}
-
 
 void setDataWaveNote(int brickletID, int rawMin, int rawMax, double physicalValueOfRawMin, double physicalValueOfRawMax, waveHndl waveHandle){
 
@@ -308,13 +287,23 @@ std::string getStandardWaveNote(int brickletID){
 
 void mySetWaveNote(std::string waveNote, waveHndl waveHandle){
 
+	
+
 	if(waveNote.empty()){
 		outputToHistory("BUG: got empty waveNote in myData::setWaveNote.");
 		return;
 	}
 
 	Handle noteHandle  = NewHandle(waveNote.size()) ;
-	PutCStringInHandle(waveNote.c_str(),noteHandle);
+	if(MemError() || noteHandle == NULL){
+		return;
+	}
+	int ret = PutCStringInHandle(waveNote.c_str(),noteHandle);
+	if(ret != 0){
+		sprintf(pMyData->outputBuffer,"internal error %d, aborting",ret);
+		outputToHistory(pMyData->outputBuffer);
+		return;
+	}
 
 	SetWaveNote(waveHandle, noteHandle);
 }
@@ -346,7 +335,7 @@ void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list
 
 	list.clear();
 
-	char buf[ARRAY_SIZE];
+	
 	int pos=-1;
 	int offset=0;
 
@@ -355,8 +344,8 @@ void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list
 
 	string.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
 
-	sprintf(buf,"keyList=%s",stringChar);
-	debugOutputToHistory(buf);
+	sprintf(pMyData->outputBuffer,"keyList=%s",stringChar);
+	debugOutputToHistory(pMyData->outputBuffer);
 
 
 	while( ( pos = string.find(sepChar,offset) ) != std::string::npos ){
@@ -367,8 +356,8 @@ void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list
 		}
 
 		list.push_back(string.substr(offset,pos-offset));
-		sprintf(buf,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
+		debugOutputToHistory(pMyData->outputBuffer);
 
 		offset = pos+1;
 	}

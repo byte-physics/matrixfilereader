@@ -78,7 +78,7 @@ std::string myData::getFileName(){
 void myData::setOption(std::string key, int value){
 
 	bool val = (value == 1) ? true : false;
-	char buf[ARRAY_SIZE];
+	
 
 	if(key == debug_option_name){
 		enableDebugging(val);
@@ -93,8 +93,8 @@ void myData::setOption(std::string key, int value){
 		enableDoubleWave(val);
 	}
 	else{
-		sprintf(buf,"wrong option key %s",key.c_str());
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"wrong option key %s",key.c_str());
+		debugOutputToHistory(pMyData->outputBuffer);
 	}
 }
 
@@ -126,17 +126,15 @@ MyBricklet* myData::getMyBrickletObject(int brickletID){
 
 void myData::createMyBrickletObject(int brickletID, void *pBricklet){
 	
-	char buf[ARRAY_SIZE];
-	sprintf(buf,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
-	debugOutputToHistory(buf);
+	
+	sprintf(pMyData->outputBuffer,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
+	debugOutputToHistory(pMyData->outputBuffer);
 
 	MyBricklet *bricklet = new MyBricklet(pBricklet,brickletID);
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
 
 void myData::setLastError(int errorCode, std::string argument){
-	
-	char buf[ARRAY_SIZE];
 
 	if(errorCode < SUCCESS || errorCode > WAVE_EXIST){
 		outputToHistory("BUG: errorCode is out of range");
@@ -151,8 +149,8 @@ void myData::setLastError(int errorCode, std::string argument){
 	else{
 		m_lastErrorArgument = argument;
 	}
-	sprintf(buf,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
-	debugOutputToHistory(buf);
+	sprintf(pMyData->outputBuffer,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
+	debugOutputToHistory(pMyData->outputBuffer);
 }
 
 std::string myData::getLastErrorMessage(){

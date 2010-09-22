@@ -43,8 +43,7 @@ static int closeResultFile(closeResultFileParams *p){
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
 	setError(&p->result,UNKNOWN_ERROR);
-
-	char buf[ARRAY_SIZE];
+	
 	char dataWaveName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1];
 	const int *pBuffer;
 	int* dataPtr = NULL;
@@ -124,8 +123,8 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	ret = MDMakeWave(&waveHandle,dataWaveName,newDataFolderHPtr,dimensionSizes,NT_I32,pMyData->overwriteEnabledAsInt());
 
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(buf,"Wave %s already exists.",dataWaveName);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Wave %s already exists.",dataWaveName);
+		debugOutputToHistory(pMyData->outputBuffer);
 		setError(&p->result,WAVE_EXIST,dataWaveName);
 		return 0;	
 	}
@@ -183,6 +182,9 @@ static int getResultFile(getResultFileParams *p){
 	//fileName
 	if(*p->fileName == NULL){
 		*p->fileName = NewHandle(0L);
+		if(MemError() || *p->fileName == NULL){
+			return NOMEM;
+		}
 	}
 
 	int ret = PutCStringInHandle(pMyData->getFileName().c_str(), *p->fileName);
@@ -194,6 +196,9 @@ static int getResultFile(getResultFileParams *p){
 	//dirPath
 	if(*p->dirPath == NULL){
 		*p->dirPath = NewHandle(0L);
+		if(MemError() || *p->dirPath == NULL){
+			return NOMEM;
+		}
 	}
 
 	ret = PutCStringInHandle(pMyData->getDirPath().c_str(), *p->dirPath);
@@ -239,8 +244,7 @@ static int openResultFile(openResultFileParams *p){
 	char fullPath[MAX_PATH_LEN+1], fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1];
 	int ret = 0,i, pos, offset=0,count=0, maxCount=100;
 	void* pContext  = NULL, *pBricklet = NULL;
-	char buf[ARRAY_SIZE];
-
+	
 	if(pMyData->resultFileOpen()){
 		setError(&p->result,ALREADY_FILE_OPEN,pMyData->getFileName());
 		return 0;
@@ -315,11 +319,11 @@ static int openResultFile(openResultFileParams *p){
 		dirPath[strlen(dirPath)-1] = '\0';
 	}
 
-	sprintf(buf,"filename %s",fileName);
-	debugOutputToHistory(buf);
+	sprintf(pMyData->outputBuffer,"filename %s",fileName);
+	debugOutputToHistory(pMyData->outputBuffer);
 
-	sprintf(buf,"dirPath %s",dirPath);
-	debugOutputToHistory(buf);
+	sprintf(pMyData->outputBuffer,"dirPath %s",dirPath);
+	debugOutputToHistory(pMyData->outputBuffer);
 
 	// true -> result set will be added to the database
 	// false -> replaces the current results sets in the internal databse 
@@ -383,7 +387,6 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 	// starting from here we have to
 	// - update the pBricklet pointers in the MyBricklet objects
 	// - compare old to new totalNumberOfBricklets
-
 	const int numberOfBricklets = pSession->getBrickletCount();
 
 	for(i=1; i <= numberOfBricklets; i++ ){
@@ -490,7 +493,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	std::vector<std::string> keys,values;
 	char dataBaseName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1], dataName[MAX_OBJ_NAME+1];
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
-	char buf[ARRAY_SIZE];
+	
 	int brickletID=-1, ret=-1;
 
 	setError(&p->result,UNKNOWN_ERROR);
@@ -538,11 +541,11 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 		if( pMyData->datafolderEnabled() ){
 
 			ret = GetCurrentDataFolder(&parentDataFolderHPtr);
-
 			if(ret != 0){
 				setInternalError(&p->result,ret);
 				return 0;
 			}
+
 			sprintf(dataFolderName,dataFolderFormat,brickletID);
 			ret = NewDataFolder(parentDataFolderHPtr, dataFolderName, &newDataFolderHPtr);
 	
@@ -554,7 +557,6 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 		}
 
 		ret = createAndFillDataWave(newDataFolderHPtr,dataName,brickletID);
-
 		if(ret == WAVE_EXIST){
 			setError(&p->result,ret,dataName);
 			return 0;
@@ -580,7 +582,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	std::vector<std::string> keys,values;
 	char metaDataBaseName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1], metaDataName[MAX_OBJ_NAME+1];
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
-	char buf[ARRAY_SIZE];
+	
 	int brickletID=-1, ret=-1;
 
 	setError(&p->result,UNKNOWN_ERROR);
@@ -664,6 +666,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 static int getBugReportTemplate(getBugReportTemplateParams *p){
 	
 	std::string str;
+	
 
 	// get windows version
 	// see http://msdn.microsoft.com/en-us/library/ms724451%28VS.85%29.aspx
@@ -698,7 +701,16 @@ static int getBugReportTemplate(getBugReportTemplateParams *p){
 	str.append("####\r");
 
 	p->result = NewHandle(str.size());
-	PutCStringInHandle(str.c_str(),p->result);
+	if(MemError() || p->result == NULL){
+		return NOMEM;
+	}
+
+	int ret = PutCStringInHandle(str.c_str(),p->result);
+	if(ret != 0){
+		sprintf(pMyData->outputBuffer,"internal error %d, aborting",ret);
+		outputToHistory(pMyData->outputBuffer);
+		return 0;
+	}
 
 	outputToHistory(str.c_str());
 	return 0;
@@ -713,7 +725,7 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 	std::vector<std::string> keys,values;
 	char buf[ARRAY_SIZE];
 	int ret;
-	void *pBricklet;
+	void *pBricklet = NULL;
 	tm ctime;
 	Vernissage::Session::BrickletMetaData brickletMetaData;
 
@@ -866,8 +878,8 @@ static int createOverViewTable(createOverViewTableParams *p){
 	ret = MDMakeWave(&waveHandle,waveName,NULL,dimensionSizes,TEXT_WAVE_TYPE,pMyData->overwriteEnabledAsInt());
 
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(buf,"Wave %s already exists.",waveName);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Wave %s already exists.",waveName);
+		debugOutputToHistory(pMyData->outputBuffer);
 		setError(&p->result,WAVE_EXIST,waveName);
 		return 0;
 	}
@@ -883,16 +895,16 @@ static int createOverViewTable(createOverViewTableParams *p){
 
 		key = keys.at(j);
 		MDSetDimensionLabel(waveHandle,COLUMNS,j,const_cast<char *> (key.c_str()));
-		sprintf(buf,"key=%s",key.c_str());
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"key=%s",key.c_str());
+		debugOutputToHistory(pMyData->outputBuffer);
 
 		for(i=1; i <= numberOfBricklets; i++){
 			myBricklet = pMyData->getMyBrickletObject(i);
 			value = myBricklet->getMetaDataValueAsString(key);
 			textWaveContents.push_back(value);
 
-			sprintf(buf,"   value=%s",value.c_str());
-			debugOutputToHistory(buf);
+			sprintf(pMyData->outputBuffer,"   value=%s",value.c_str());
+			debugOutputToHistory(pMyData->outputBuffer);
 		}
 	}
 
@@ -920,18 +932,28 @@ static int getLastError(getLastErrorParams *p){
 // string getLastErrorMessage()
 static int getLastErrorMessage(getLastErrorMessageParams *p){
 
-	std::string lastErrorMsg = pMyData->getLastErrorMessage();
-	p->result = NewHandle(lastErrorMsg.size());
 	
-	PutCStringInHandle(lastErrorMsg.c_str(),p->result);
 
+	std::string lastErrorMsg = pMyData->getLastErrorMessage();
+	
+	p->result = NewHandle(lastErrorMsg.size());
+	if(MemError() || p->result == NULL){
+		return NOMEM;
+	}
+	
+	int ret = PutCStringInHandle(lastErrorMsg.c_str(),p->result);
+	if(ret != 0){
+		sprintf(pMyData->outputBuffer,"internal error %d, aborting",ret);
+		outputToHistory(pMyData->outputBuffer);
+		return 0;
+	}
 	return 0;
 }
 
 // string readXOPSettings();
 static int readXOPSettings(readXOPSettingsParams *p){
 
-	char buf[ARRAY_SIZE];
+	
 	std::string config;
 	std::stringstream stream;
 
@@ -943,16 +965,15 @@ static int readXOPSettings(readXOPSettingsParams *p){
 	config = stream.str();
 
 	p->result = NewHandle(config.size());
-
-	if(p->result == NULL){
-		return NOMEM;
+	if(MemError() || p->result == NULL){
+			return NOMEM;
 	}
 
 	int ret = PutCStringInHandle(config.c_str(), p->result);
-
-	if( ret != 0 ){
-		sprintf(buf,"internal error %d",ret);
-		outputToHistory(buf);
+	if(ret != 0){
+		sprintf(pMyData->outputBuffer,"internal error %d, aborting",ret);
+		outputToHistory(pMyData->outputBuffer);
+		return 0;
 	}
 	return 0;
 }
@@ -1187,13 +1208,11 @@ bool isValidBrickletID(int brickletID, int numberOfBricklets){
 
 void setInternalError(double *result, int errorValue){
 	
-	char buf[ARRAY_SIZE];
-
 	*result = errorValue;
 	pMyData->setLastError(errorValue);
 
-	sprintf(buf,"BUG: xop internal error %d returned.",errorValue);
-	outputToHistory(buf);
+	sprintf(pMyData->outputBuffer,"BUG: xop internal error %d returned.",errorValue);
+	outputToHistory(pMyData->outputBuffer);
 }
 
 void setError(double *result, int errorValue, std::string msgArgument){

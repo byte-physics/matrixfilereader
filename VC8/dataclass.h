@@ -8,6 +8,7 @@
 #include "dll-stuff.h"
 #include "myBricklet.h"
 #include "xopstandardheaders.h"
+#include "globals.h"
 
 typedef	std::map<int, MyBricklet*, std::less<int>>		IntMyBrickletPtrMap;
 
@@ -57,6 +58,9 @@ public:
 	int overwriteEnabledAsInt(){ return int(m_overwrite); };
 	void enableOverwrite(bool var){ m_overwrite = var; };
 
+	// variables
+	char outputBuffer[ARRAY_SIZE];
+
 private:
 
 	bool m_debug,m_doubleWave, m_datafolder, m_overwrite;
@@ -67,5 +71,8 @@ private:
 	std::string m_lastErrorArgument;
 	IntMyBrickletPtrMap		m_brickletIDBrickletClassMap;
 };
+
+// declare global object pMyData
+extern myData *pMyData;
 
 #endif // DATACLASS_H

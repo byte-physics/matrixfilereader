@@ -34,11 +34,11 @@ DllStuff::~DllStuff(){
 Vernissage::Session* DllStuff::createSessionObject(){
 
 	Vernissage::Session *pSession=NULL;
-
+	
 	HMODULE module;
 	BOOL result;
 	char data[16383];
-	char buf[ARRAY_SIZE];
+	
 	DWORD dataLength = (DWORD) sizeof(data)/sizeof(char);
 	HKEY hKey, hregBaseKey;
 	std::string regKey;
@@ -61,8 +61,8 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	result = RegEnumKeyEx(hregBaseKey,subKeyIndex, subKeyName, &subKeyLength,NULL,NULL,NULL,NULL);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(buf,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
+		debugOutputToHistory(pMyData->outputBuffer);
 		return pSession;
 	}
 
@@ -71,14 +71,14 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	regKey += subKeyName;
 	regKey += "\\Main";
 
-	sprintf(buf,"Checking registry key %s",regKey.c_str());
-	debugOutputToHistory(buf);
+	sprintf(pMyData->outputBuffer,"Checking registry key %s",regKey.c_str());
+	debugOutputToHistory(pMyData->outputBuffer);
 		
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regKey.c_str(),0,KEY_READ,&hKey);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(buf,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
+		debugOutputToHistory(pMyData->outputBuffer);
 		return pSession;
 	}
 
@@ -88,15 +88,15 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	RegCloseKey(hregBaseKey);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(buf,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
+		debugOutputToHistory(pMyData->outputBuffer);
 		return pSession;
 	}
 
 	std::string dllDirectory (data);
 	dllDirectory.append("\\Bin");
-	sprintf(buf, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
-	debugOutputToHistory(buf);
+	sprintf(pMyData->outputBuffer, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
+	debugOutputToHistory(pMyData->outputBuffer);
 	result = SetDllDirectory((LPCSTR) dllDirectory.c_str());
 
 	if(!result){
@@ -108,13 +108,13 @@ Vernissage::Session* DllStuff::createSessionObject(){
 	m_vernissageVersion = version.substr(1,version.length()-1);
 
 	if(m_vernissageVersion.compare(properVernissageVersion) != 0 ){
-		sprintf(buf,"Vernissage version %s can not be used to due a bug in this version. Please install version 1.0 and try again.",m_vernissageVersion.c_str());
-		outputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"Vernissage version %s can not be used to due a bug in this version. Please install version 1.0 and try again.",m_vernissageVersion.c_str());
+		outputToHistory(pMyData->outputBuffer);
 		return pSession;
 	}
 	else{
-		sprintf(buf,"Vernissage version %s",m_vernissageVersion.c_str());
-		debugOutputToHistory(buf);	
+		sprintf(pMyData->outputBuffer,"Vernissage version %s",m_vernissageVersion.c_str());
+		debugOutputToHistory(pMyData->outputBuffer);	
 	}
 
 	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
@@ -122,12 +122,12 @@ Vernissage::Session* DllStuff::createSessionObject(){
 		module = LoadLibrary( (LPCSTR) dllName.c_str());
 
 		if(module != NULL){
-			sprintf(buf,"Successfully loaded DLL %s",dllName.c_str());
-			debugOutputToHistory(buf);
+			sprintf(pMyData->outputBuffer,"Successfully loaded DLL %s",dllName.c_str());
+			debugOutputToHistory(pMyData->outputBuffer);
 		}
 		else{
-			sprintf(buf,"Something went wrong loading the DLL %s",dllName.c_str());
-			debugOutputToHistory(buf);
+			sprintf(pMyData->outputBuffer,"Something went wrong loading the DLL %s",dllName.c_str());
+			debugOutputToHistory(pMyData->outputBuffer);
 			return pSession;
 		}
 	}

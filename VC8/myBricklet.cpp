@@ -1,10 +1,7 @@
 #include "myBricklet.h"
 
 #include "globals.h"
-// #include <algorithm>
 #include "utils.h"
-
-
 
 MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 
@@ -26,7 +23,7 @@ MyBricklet::~MyBricklet(void)
 
 void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
-	char buf[ARRAY_SIZE];
+	
 	
 	ASSERT_RETURN_VOID(pBuffer);
 	ASSERT_RETURN_VOID(m_VernissageSession);
@@ -36,22 +33,22 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 	if(m_rawBufferContents != NULL){
 		debugOutputToHistory("myData::getBrickletContentsBuffer Using cached values");
 
-		sprintf(buf,"before: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"before: pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(pMyData->outputBuffer);
 
 		*pBuffer = m_rawBufferContents;
 		count    = m_rawBufferContentsSize;
 
-		sprintf(buf,"after: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"after: pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(pMyData->outputBuffer);
 	}
 	else{ // we are called the first time
 		
 		// load raw data into vernissage DLL
 		m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
 
-		sprintf(buf,"pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(pMyData->outputBuffer);
 
 		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise the getRaw* routines will be called by
 		// loadbrickletContents implicitly which is quite expensive
@@ -61,8 +58,8 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		m_minScaledValue = m_VernissageSession->toPhysical(m_minRawValue, m_brickletPtr);
 		m_maxScaledValue = m_VernissageSession->toPhysical(m_maxRawValue, m_brickletPtr);
 
-		sprintf(buf,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_minRawValue,m_maxRawValue,m_minScaledValue,m_maxScaledValue);
-		debugOutputToHistory(buf);
+		sprintf(pMyData->outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_minRawValue,m_maxRawValue,m_minScaledValue,m_maxScaledValue);
+		debugOutputToHistory(pMyData->outputBuffer);
 
 		// copy the raw data to our own cache
 		m_rawBufferContentsSize = count;
@@ -83,7 +80,7 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 void MyBricklet::getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values){
 
-	char buf[ARRAY_SIZE];
+	
 
 	if(m_metaDataKeys.size() == 0 ||  m_metaDataValues.size() == 0){
 
@@ -421,8 +418,8 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 		// END Vernissage::Session:AxisTableSet
 	}
 
-	sprintf(buf,"Loaded %d keys and %d values as brickletMetaData",m_metaDataKeys.size(), m_metaDataValues.size());
-	debugOutputToHistory(buf);
+	sprintf(pMyData->outputBuffer,"Loaded %d keys and %d values as brickletMetaData",m_metaDataKeys.size(), m_metaDataValues.size());
+	debugOutputToHistory(pMyData->outputBuffer);
 
 	if(m_metaDataKeys.size() != m_metaDataValues.size()){
 		outputToHistory("BUG: key value lists don't have the same size, aborting");
@@ -435,7 +432,7 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 // the idea here is to first get the root and triggerAxis for the Bricklet
 // Then we know the starting point of the axis hierachy (rootAxis) and the endpoint (triggerAxis)
 // In this way we can then traverse from the endpoint (triggerAxis) to the starting point (rootAxis) and record all axis names
-// In more than 99% of the cases this routine will return one or two axes
+// In more than 99% of the cases this routine will return one to three axes
 // The value of maxRuns is strictly speaking wrong becase the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
 // The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName" 
 std::vector<std::wstring> MyBricklet::generateAllAxesVector(){
@@ -443,7 +440,7 @@ std::vector<std::wstring> MyBricklet::generateAllAxesVector(){
 	std::wstring axisName, rootAxis, triggerAxis;
 	std::vector<std::wstring> allAxes;
 
-	char buf[ARRAY_SIZE];
+	
 
 	int numRuns=0,maxRuns=100, index;
 
@@ -459,7 +456,7 @@ std::vector<std::wstring> MyBricklet::generateAllAxesVector(){
 
 		numRuns++;
 		if(numRuns > maxRuns){
-			outputToHistory("Found more than 100 axes in the axis hierachy. This is highliy unlikely and therefore a bug in this XOP or in Vernissage.");
+			outputToHistory("Found more than 100 axes in the axis hierachy. This is highly unlikely and therefore a bug in this XOP or in Vernissage.");
 			break;
 		}
 	}
@@ -479,7 +476,6 @@ double MyBricklet::getMetaDataValueAsDouble(std::string key){
 std::string MyBricklet::getMetaDataValueAsString(std::string key){
 
 	std::string value;
-	char buf[ARRAY_SIZE];
 
 	if(key.size() == 0){
 		outputToHistory("BUG: getMetaDataValueAsString called with empty parameter");
@@ -487,7 +483,6 @@ std::string MyBricklet::getMetaDataValueAsString(std::string key){
 	}
 
 	if(m_metaDataKeys.size() == 0 || m_metaDataValues.size() == 0){
-
 		loadBrickletMetaDataFromResultFile();
 	}
 
@@ -497,14 +492,5 @@ std::string MyBricklet::getMetaDataValueAsString(std::string key){
 			break;
 		}
 	}
-
-	// crashes
-	//std::vector<std::string>::iterator it = std::find(m_metaDataKeys.begin(), m_metaDataKeys.end(), key);
-	//if(it != m_metaDataValues.end()){ // we found it
-		//sprintf(buf,"column of key %s found",*it);
-		//debugOutputToHistory(buf);
-		//value = m_metaDataValues.at(it-m_metaDataKeys.begin());
-	//}
-
 	return value;
 }

@@ -56,7 +56,6 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
-std::string valueTypeToString(int idx);
 
 void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle);
 void setOtherWaveNote(int brickletID,waveHndl waveHandle);

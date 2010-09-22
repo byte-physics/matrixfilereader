@@ -2,12 +2,11 @@
 #ifndef GLOBALVARIABLES_H
 #define GLOBALVARIABLES_H
 
-#define ARRAY_SIZE 1000
+const int ARRAY_SIZE = 1000;
 
 #include "error-codes.h"
 
 #include "dataclass.h"
-extern myData *pMyData;
 
 // format string for wavenames in igor
 

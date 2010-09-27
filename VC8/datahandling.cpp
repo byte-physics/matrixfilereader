@@ -27,12 +27,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	Vernissage::Session::AxisDescriptor triggerAxis, rootAxis;
 	int numPointsTriggerAxis=-1, numPointsRootAxis=-1, ret=-1, i, j,k;
 	std::vector<waveHndl> waveHandleVector;
-	std::vector<int> hStateVector;
 	waveHndl waveHandle;
 	std::vector<std::string> waveNameVector;
 
 	int *rawBrickletDataPtr = NULL;
-	int hState, rawBrickletSize=0, waveSize=0, firstBlockOffset=0, triggerAxisBlockSize=0;
+	int rawBrickletSize=0, waveSize=0, firstBlockOffset=0, triggerAxisBlockSize=0;
 
 	int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex, traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
 
@@ -159,8 +158,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			ASSERT_RETURN_MINUSONE(waveHandle);
 
-			hState = MoveLockHandle(waveHandle);
-
 			clearWave(waveHandle,waveSize);
 			setWaveDataPtr(waveData,waveHandle);
 
@@ -187,8 +184,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
 			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(myBricklet->getMetaDataValueAsString("channelUnit").c_str()));			
 	
-			HSetState(waveHandle,hState);
-		
 			break;
 
 		case 2:
@@ -272,10 +267,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				ASSERT_RETURN_MINUSONE(waveHandle);
 
 				waveHandleVector.push_back(waveHandle);
-
-				// lock wave and store state
-				hStateVector.push_back(MoveLockHandle(waveHandle));
-
 				clearWave(waveHandle,waveSize);
 			}
 
@@ -491,9 +482,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				}
 			}
 
-			// unlock waves and set wave note
-			for(i=0; i < hStateVector.size(); i++){
-				HSetState(waveHandleVector[i],hStateVector[i]);
+			// Set wave note and dimension units
+			for(i=0; i < waveHandleVector.size(); i++){
 				setDataWaveNote(brickletID,extremaData[i].rawMin,extremaData[i].rawMax,extremaData[i].physValRawMin,extremaData[i].physValRawMax,waveHandleVector[i]);
 
 				MDSetWaveScaling(waveHandleVector[i],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
@@ -747,9 +737,6 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				ASSERT_RETURN_MINUSONE(waveHandle);
 
 				waveHandleVector.push_back(waveHandle);
-
-				// lock wave and store state
-				hStateVector.push_back(MoveLockHandle(waveHandle));
 				clearWave(waveHandle,waveSize);
 			}
 
@@ -966,9 +953,8 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			} // for ROWS
 		} // for COLUMNS
 
-			// unlock waves and set wave note
-			for(i=0; i < hStateVector.size(); i++){
-				HSetState(waveHandleVector[i],hStateVector[i]);
+			// set wave note and dimension units
+			for(i=0; i < waveHandleVector.size(); i++){
 				setDataWaveNote(brickletID,extremaData[i].rawMin,extremaData[i].rawMax,extremaData[i].physValRawMin,extremaData[i].physValRawMax,waveHandleVector[i]);
 
 				MDSetWaveScaling(waveHandleVector[i],ROWS,&xAxisIncrement,&setScaleOffset);

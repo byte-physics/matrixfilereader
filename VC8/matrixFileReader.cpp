@@ -48,7 +48,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	const int *pBuffer;
 	int* dataPtr = NULL;
 	MyBricklet* myBricklet = NULL;
-	int count=0,ret, brickletID, hState;
+	int count=0,ret, brickletID;
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
 
 	long dimensionSizes[MAX_DIMENSIONS+1];
@@ -134,15 +134,9 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 		return 0;
 	}
 
-	// lock wave
-	hState=MoveLockHandle(waveHandle);
-
 	dataPtr = (int*) WaveData(waveHandle);
-
 	// copy data fast :)
 	memcpy(dataPtr,pBuffer,count*sizeof(int));
-
-	HSetState((Handle) waveHandle, hState);
 
 	setDataWaveNote(brickletID,myBricklet->getRawMin(),myBricklet->getRawMax(),myBricklet->getPhysValRawMin(),myBricklet->getPhysValRawMax(),waveHandle);
 

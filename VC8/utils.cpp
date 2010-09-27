@@ -68,7 +68,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 
 	std::vector<long int> stringSizes;
 	
-	int lockStateWave, ret, i;
+	int ret, i;
 
 	long int offset;
 	long int totalSize=0;
@@ -125,16 +125,10 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	//...
 	int mode=2;
 
-	// acquire waveHandle lock
-	lockStateWave=MoveLockHandle(waveHandle);
 	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
 	//sprintf(pMyData->outputBuffer,"SetTextWaveData returned %d",ret);
 	//debugOutputToHistory(pMyData->outputBuffer);
-
-	// release waveHandle lock
-	HSetState(waveHandle, lockStateWave);
-
 	DisposeHandle(textHandle);
 
 	return ret;

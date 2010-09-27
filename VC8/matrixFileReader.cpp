@@ -236,7 +236,7 @@ static int openResultFile(openResultFileParams *p){
 	setError(&p->result,UNKNOWN_ERROR);
 
 	char fullPath[MAX_PATH_LEN+1], fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1];
-	int ret = 0,i, pos, offset=0,count=0, maxCount=100;
+	int ret = 0,i, offset=0,count=0, maxCount=100;
 	void* pContext  = NULL, *pBricklet = NULL;
 	
 	if(pMyData->resultFileOpen()){
@@ -525,7 +525,7 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 	}
 
 	// now we got a valid baseName
-	for(brickletID=p->startBrickletID; brickletID <= p->endBrickletID; brickletID++){
+	for(brickletID=int(p->startBrickletID); brickletID <= int(p->endBrickletID); brickletID++){
 
 		myBricklet = pMyData->getMyBrickletObject(brickletID);
 		ASSERT_RETURN_ZERO(myBricklet);
@@ -614,7 +614,7 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 	}
 	// now we got a valid baseName
 
-	for(brickletID=p->startBrickletID; brickletID <= p->endBrickletID; brickletID++){
+	for(brickletID=int(p->startBrickletID); brickletID <= int(p->endBrickletID); brickletID++){
 
 
 		myBricklet = pMyData->getMyBrickletObject(brickletID);
@@ -807,8 +807,8 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 static int createOverViewTable(createOverViewTableParams *p){
 
 	setError(&p->result,UNKNOWN_ERROR);
-	char buf[ARRAY_SIZE], keyListChar[ARRAY_SIZE+1];
-	int pos, offset, ret=-1,count=0, countMax=1000;
+	char keyListChar[ARRAY_SIZE+1];
+	int ret=-1,count=0, countMax=1000;
 	std::string keyList, key, value;
 	waveHndl waveHandle;
 	long dimensionSizes[MAX_DIMENSIONS+1];
@@ -818,7 +818,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	std::vector<std::string> keys, textWaveContents;
 	char waveName[MAX_OBJ_NAME+1];
 	MyBricklet *myBricklet=NULL;
-	int i, j;
+	unsigned int i, j;
 
 	if(!pMyData->resultFileOpen()){
 		setError(&p->result,NO_FILE_OPEN);
@@ -828,7 +828,7 @@ static int createOverViewTable(createOverViewTableParams *p){
 	Vernissage::Session *pSession = pMyData->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
-	const int numberOfBricklets = pSession->getBrickletCount();
+	const unsigned int numberOfBricklets = pSession->getBrickletCount();
 	if(numberOfBricklets == 0){
 		setError(&p->result,EMPTY_RESULTFILE);
 		return 0;
@@ -1156,26 +1156,26 @@ static void XOPEntry(void)
 */
 
 
-HOST_IMPORT void
+HOST_IMPORT int
 main(IORecHandle ioRecHandle)
 {	
 	XOPInit(ioRecHandle);							/* do standard XOP initialization */
 	SetXOPEntry(XOPEntry);							/* set entry point for future calls */
 
-	if (igorVersion < 504){
-		SetXOPResult(REQUIRES_IGOR_504);
-		return;
+	if (igorVersion < 620){
+		SetXOPResult(REQUIRES_IGOR_620);
+		return EXIT_FAILURE;
 	}
 
 	pMyData = new myData();
 	if(pMyData == NULL){ // out of memory
 		SetXOPResult(OUT_OF_MEMORY);
-		return;
+		return EXIT_FAILURE;
 	}
 
 	SetXOPResult(0L);
 
-	return;
+	return EXIT_SUCCESS;
 }
 
 void doCleanup(){
@@ -1185,7 +1185,7 @@ void doCleanup(){
 	closeResultFile(&p);
 }
 
-bool isValidBrickletRange(int startID, int endID,int numberOfBricklets){
+bool isValidBrickletRange(double startID, double endID,int numberOfBricklets){
 
 	// brickletIDs are 1-based
 	return ( startID <=  endID

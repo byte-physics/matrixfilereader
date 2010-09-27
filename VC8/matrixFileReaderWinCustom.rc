@@ -4,11 +4,11 @@
 	resources that IGOR looks for in an XOP module.
 */
 
-#include "C:\Documents and Settings\brt127\My Documents\gitRepo\Coding\XOP Toolkit 5\IgorXOPs5\XOPSupport\XOPResources.h"			// Defines XOP-specific symbols.
+#include "C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport\XOPResources.h"			// Defines XOP-specific symbols.
 
 1100 STR#					// Custom error messages
 BEGIN
-	"MatrixFileReader requires Igor 5.04 or later.\0",			
+	"MatrixFileReader requires Igor 6.20 or later.\0",			
 	"Out of memory. Bad luck...\0",
 	// You can add error messages here.
 	

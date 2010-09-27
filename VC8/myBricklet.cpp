@@ -440,9 +440,7 @@ std::vector<std::wstring> MyBricklet::generateAllAxesVector(){
 	std::wstring axisName, rootAxis, triggerAxis;
 	std::vector<std::wstring> allAxes;
 
-	
-
-	int numRuns=0,maxRuns=100, index;
+	int numRuns=0,maxRuns=100;
 
 	rootAxis= m_VernissageSession->getRootAxisName(m_brickletPtr);
 	triggerAxis = m_VernissageSession->getTriggerAxisName(m_brickletPtr);
@@ -486,7 +484,7 @@ std::string MyBricklet::getMetaDataValueAsString(std::string key){
 		loadBrickletMetaDataFromResultFile();
 	}
 
-	for(int i=0; i < m_metaDataKeys.size(); i++){
+	for(unsigned int i=0; i < m_metaDataKeys.size(); i++){
 		if( m_metaDataKeys[i] == key){
 			value = m_metaDataValues[i];
 			break;

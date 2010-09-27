@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_V1.1\src\Incl&quot;;&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_V1.1\src\Incl&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -81,7 +81,7 @@
 				OutputFile="matrixFileReader.xop"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport\VC8&quot;;&quot;..\..\..\XOP Toolkit 5\IgorXOPs5\XOPSupport&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport\VC8&quot;"
 				IgnoreDefaultLibraryNames=""
 				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"
 				ImportLibrary=".\Release/matrixFileReader.lib"

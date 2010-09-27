@@ -68,13 +68,14 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 
 	std::vector<long int> stringSizes;
 	
-	int ret, i;
+	int ret;
+	unsigned int i;
 
 	long int offset;
 	long int totalSize=0;
 
 	// number of 32-bit integers (aka long int) is one more compared to the number of strings
-	const long int numEntriesPlusOne = stringVector.size()+1;
+	const unsigned long int numEntriesPlusOne = stringVector.size()+1;
 
 	std::vector<std::string>::const_iterator it;
 	for(it = stringVector.begin(); it != stringVector.end(); it++){
@@ -225,7 +226,7 @@ std::string viewTypeCodeToString(int idx){
 	names.push_back(VTC_1DPROFILE_STRING);
 	names.push_back(VTC_INTERFEROMETER);
 
-	if(idx < 0 || idx >= names.size()){
+	if(idx < 0 || idx >= int(names.size())){
 		sprintf(pMyData->outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
 		debugOutputToHistory(pMyData->outputBuffer);
 		return std::string();

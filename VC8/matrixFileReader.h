@@ -4,17 +4,17 @@
 
 /* custom error codes */
 
-#define REQUIRES_IGOR_504	FIRST_XOP_ERR + 1
+#define REQUIRES_IGOR_620	FIRST_XOP_ERR + 1
 #define OUT_OF_MEMORY		FIRST_XOP_ERR + 2
 
 /* Prototypes */
-HOST_IMPORT void main(IORecHandle ioRecHandle);
+HOST_IMPORT int main(IORecHandle ioRecHandle);
 
 static void XOPEntry();
 static long RegisterFunction();
 void doCleanup();
 
-bool isValidBrickletRange(int startID, int endID, int numberOfBricklets);
+bool isValidBrickletRange(double startID, double endID, int numberOfBricklets);
 bool isValidBrickletID(int brickletID, int numberOfBricklets);
 
 void setError(double *result, int errorValue, std::string msgArgument = std::string());

@@ -1,14 +1,10 @@
-
-#ifndef DATACLASS_H
-#define DATACLASS_H
+#pragma once
 
 #include <map>
-#include <ctime>
 
 #include "dll-stuff.h"
-#include "myBricklet.h"
-#include "xopstandardheaders.h"
 #include "globals.h"
+#include "myBricklet.h"
 
 typedef	std::map<int, MyBricklet*, std::less<int>>		IntMyBrickletPtrMap;
 
@@ -74,5 +70,3 @@ private:
 
 // declare global object pMyData
 extern myData *pMyData;
-
-#endif // DATACLASS_H

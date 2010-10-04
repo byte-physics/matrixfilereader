@@ -1,4 +1,6 @@
 
+#include "header.h"
+
 #include "datahandling.h"
 
 #include <string>
@@ -6,10 +8,8 @@
 #include <vector>
 #include <limits>
 
-#include "xopstandardheaders.h"
-
-#include "globals.h"
 #include "utils.h"
+#include "dataclass.h"
 
 //Macro version of fillWave(const waveDataPtr &waveData,const int index, const double value,const bool isDoubleWaveType){
 //#define fillWave(A,B,C,D){	if(D){ A.dbl[B] = C;} else{	A.flt[B]	= (float) C; } }
@@ -102,6 +102,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	// get pointer to raw data
 	const int* pBuffer;
 	myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
+	if(rawBrickletSize == 0 || pBuffer == NULL){
+		outputToHistory("Could not load bricklet contents.");
+		return UNKNOWN_ERROR;
+	}
+
 	rawBrickletDataPtr = const_cast<int *> (pBuffer);
 
 	// create data for raw->scaled transformation

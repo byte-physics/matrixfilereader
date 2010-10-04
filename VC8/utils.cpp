@@ -1,18 +1,12 @@
 
-#include <string>
-#include <limits>
+#include "header.h"
 
+#include <string>
+
+#include "dataclass.h"
 #include "utils.h"
 
-#include "xopstandardheaders.h"
-#include "dataclass.h"
-
-#include "globals.h"
-
-
-
 // Taken from http://www.codeguru.com/forum/archive/index.php/t-193852.html
-
 std::wstring StringToWString(const std::string& s)
 {
 	std::wstring temp(s.length(),L' ');
@@ -141,9 +135,6 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	waveHndl waveHandle;
 	int ret=-1;
 	
-	
-	std::vector<std::string> allColumns;
-
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
 	// create 2D textwave with firstColumn.size() rows and 2 columns
@@ -196,6 +187,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	// copy the strings of both columns into a new vector
 	// so that they are then 1D
 	// first firstColumn, then secondColumn
+	std::vector<std::string> allColumns(firstColumn.size() + secondColumn.size());
 	allColumns.insert(allColumns.begin(),firstColumn.begin(),firstColumn.end());
 	allColumns.insert(allColumns.end(),secondColumn.begin(),secondColumn.end());
 
@@ -257,8 +249,6 @@ void setOtherWaveNote(int brickletID, waveHndl waveHandle){
 	mySetWaveNote(waveNote,waveHandle);
 }
 
-
-
 std::string getStandardWaveNote(int brickletID){
 
 	std::string waveNote;
@@ -282,7 +272,6 @@ std::string getStandardWaveNote(int brickletID){
 
 void mySetWaveNote(std::string waveNote, waveHndl waveHandle){
 
-	
 
 	if(waveNote.empty()){
 		outputToHistory("BUG: got empty waveNote in myData::setWaveNote.");
@@ -330,7 +319,6 @@ void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list
 
 	list.clear();
 
-	
 	int pos=-1;
 	int offset=0;
 

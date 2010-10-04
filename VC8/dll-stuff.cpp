@@ -1,29 +1,36 @@
 
+#include "header.h"
+
 #include "dll-stuff.h"
 
 #include <vector>
 #include <string>
 
-#include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
-
-#include "globals.h"
 #include "utils.h"
+#include "dataclass.h"
 
 DllStuff::DllStuff():
 	m_foundationModule(NULL),
 	m_pGetSessionFunc(NULL),
 	m_pReleaseSessionFunc(NULL),
 	m_vernissageVersion("0.00"){
-
 }
 
 DllStuff::~DllStuff(){
 
-	ASSERT_RETURN_VOID(m_pReleaseSessionFunc);
-	(*m_pReleaseSessionFunc) ();
+}
+
+void DllStuff::closeSession(){
+
+	if(m_pReleaseSessionFunc != NULL){
+		(*m_pReleaseSessionFunc) ();
+	}
 	
-	// FIXME this does not return
-	// FreeLibrary(foundationModule);
+	FreeLibrary(this->m_foundationModule);
+	m_foundationModule = NULL;
+	m_vernissageVersion = "0.0";
+	m_pReleaseSessionFunc = NULL;
+	m_pGetSessionFunc = NULL;
 }
 
 // check the registry for the path to the Vernissage DLLs and return (as pointer in the argument) a pointer to the loaded Foundation.dll

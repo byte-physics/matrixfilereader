@@ -1,6 +1,7 @@
 /*	TODO author affiliation, license
 
 */
+#include "header.h"
 
 #include "matrixFileReader.h"
 
@@ -8,17 +9,9 @@
 #include <string>
 #include <math.h>
 
-#include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
-
-#include "dataclass.h"
 #include "utils.h"
 #include "datahandling.h"
-
-#include "globals.h"
-#include "version.h"
-
-#include "Vernissage.h"
-
+#include "dataclass.h"
 
 // variable closeResultFile()
 static int closeResultFile(closeResultFileParams *p){
@@ -29,10 +22,6 @@ static int closeResultFile(closeResultFileParams *p){
 		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
-
-	Vernissage::Session *pSession = pMyData->getVernissageSession();
-	ASSERT_RETURN_ZERO(pSession);
-
 	pMyData->closeSession();
 
 	setError(&p->result,SUCCESS);
@@ -92,10 +81,9 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 	ASSERT_RETURN_ZERO(myBricklet);
 
 	myBricklet->getBrickletContentsBuffer(&pBuffer,count);
-	ASSERT_RETURN_ZERO(pBuffer);
 
-	if(count == 0){
-		outputToHistory("BUG: Could not load bricklet contents.");
+	if(count == 0 || pBuffer == NULL){
+		outputToHistory("Could not load bricklet contents.");
 		setError(&p->result,UNKNOWN_ERROR);
 		return 0;
 	}
@@ -1167,9 +1155,12 @@ main(IORecHandle ioRecHandle)
 		return EXIT_FAILURE;
 	}
 
-	pMyData = new myData();
-	if(pMyData == NULL){ // out of memory
+	try{
+		pMyData = new myData();
+	}
+	catch(CException *e){
 		SetXOPResult(OUT_OF_MEMORY);
+		e->Delete();
 		return EXIT_FAILURE;
 	}
 

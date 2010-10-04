@@ -1,18 +1,9 @@
+#pragma once
 
+#include "header.h"
 
-#ifndef UTILS_H
-#define UTILS_H
-
-#include <string>
 #include <sstream>
-#include <vector>
-#include "float.h"
-
-#include "xopstandardheaders.h"
-
-#include "globals.h"
-
-#include "version.h"
+#include <limits>
 
 // formatStrings
 const char outputFormat[]			= "%s\r";	//  outputToHistory
@@ -21,10 +12,10 @@ const char debugOutputFormat[]		= "DEBUG: %s\r"; // debugOutputToHistory
 std::wstring StringToWString(const std::string& s);
 std::string WStringToString(const std::wstring& s);
 
-#define ASSERT(A,B) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL. You might want to drop the author a note :)\r"); return B; } }
-#define ASSERT_RETURN_ZERO(A) { ASSERT(A,0)}
-#define ASSERT_RETURN_MINUSONE(A) { ASSERT(A,-1)}
-#define ASSERT_RETURN_VOID(A) { ASSERT(A,)}
+#define MYASSERT(A,B) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL. You might want to drop the author a note :)\r"); return B; } }
+#define ASSERT_RETURN_ZERO(A) { MYASSERT(A,0)}
+#define ASSERT_RETURN_MINUSONE(A) { MYASSERT(A,-1)}
+#define ASSERT_RETURN_VOID(A) { MYASSERT(A,)}
 
 std::wstring CharPtrToWString(char* cStr);
 
@@ -67,5 +58,3 @@ void waveClearNaN64(double *wavePtr, long length);
 void waveClearNaN32(float  *wavePtr, long length);
 
 void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
-
-#endif // UTILS_H

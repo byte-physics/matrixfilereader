@@ -1,9 +1,7 @@
 /** @file error-codes.h
  *
  */
-
-#ifndef ERROR_CODES_H
-#define ERROR_CODES_H
+#pragma once
 
 /** @var  errorCode
  * @brief The error codes returned from the functions. It might be handy to define a struct in Igor which hold these values.
@@ -23,6 +21,3 @@ enum errorCode{
 	NON_EXISTENT_BRICKLET=512,
 	WAVE_EXIST=1024
 };
-
-
-#endif // ERROR_CODES_H

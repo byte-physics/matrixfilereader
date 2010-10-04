@@ -1,16 +1,20 @@
 
+#include "header.h"
+
 #include "dataclass.h"
-
-#include "xopstandardheaders.h"
-
-#include "vernissage.h"
-
-#include "globals.h"
+#include "dll-stuff.h"
 #include "utils.h"
 
 myData::myData(): m_VernissageSession(NULL), m_dllStuff(NULL), m_lastError(UNKNOWN_ERROR),m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default){
 
-	m_dllStuff = new DllStuff;
+	try{
+		m_dllStuff = new DllStuff;
+	}
+	catch( CException* e ){
+		XOPNotice("Out of memory in myData constructor");
+		e->Delete();
+		return;
+	}
 }
 
 myData::~myData(){
@@ -49,6 +53,9 @@ void myData::closeSession(){
 	// erase filenames
 	m_resultFileName.erase();
 	m_resultFilePath.erase();
+
+	m_dllStuff->closeSession();
+	m_VernissageSession = NULL;
 }
 
 std::string myData::getVernissageVersion(){
@@ -56,8 +63,11 @@ std::string myData::getVernissageVersion(){
 	if(m_VernissageSession == NULL){
 		this->getVernissageSession();
 	}
-
-	return m_dllStuff->getVernissageVersion();
+	if(m_dllStuff != NULL){
+		return m_dllStuff->getVernissageVersion();
+	}
+	else
+		return std::string();
 }
 
 bool myData::resultFileOpen(){
@@ -126,11 +136,19 @@ MyBricklet* myData::getMyBrickletObject(int brickletID){
 
 void myData::createMyBrickletObject(int brickletID, void *pBricklet){
 	
-	
 	sprintf(pMyData->outputBuffer,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
 	debugOutputToHistory(pMyData->outputBuffer);
+	
+	MyBricklet *bricklet = NULL;
+	try{
+		bricklet = new MyBricklet(pBricklet,brickletID);
+	}
+	catch(CException *e){
+		XOPNotice("Out of memory in createMyBrickletObject");
+		e->Delete();
+		return;
+	}
 
-	MyBricklet *bricklet = new MyBricklet(pBricklet,brickletID);
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
 

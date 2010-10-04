@@ -46,8 +46,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_V1.1\src\Incl&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_T2.0_8\src\Incl&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -368,6 +367,10 @@
 			</File>
 			<File
 				RelativePath=".\globals.h"
+				>
+			</File>
+			<File
+				RelativePath=".\header.h"
 				>
 			</File>
 			<File

@@ -1,8 +1,6 @@
+#pragma once
 
-#ifndef DATAHANDLING_H
-#define DATAHANDLING_H
-
-#include "xopstandardheaders.h"
+#include "header.h"
 
 struct waveDataPtr{
 	float* flt;
@@ -24,5 +22,3 @@ void __forceinline fillWave(const waveDataPtr &waveData,const int index, const d
 void __forceinline setExtremaValue(extremaData *extrema,const int rawValue,const double scaledValue);
 
 int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveName, int brickletID);
-
-#endif DATAHANDLING_H

@@ -1,15 +1,25 @@
+
+#include "header.h"
+
 #include "myBricklet.h"
 
-#include "globals.h"
+#include "dataclass.h"
 #include "utils.h"
 
 MyBricklet::MyBricklet(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 
-	ASSERT_RETURN_VOID(pMyData);
 	m_VernissageSession = pMyData->getVernissageSession();
+	ASSERT_RETURN_VOID(m_VernissageSession);
 
-	m_metaDataKeys.reserve(METADATA_RESERVE_SIZE);
-	m_metaDataValues.reserve(METADATA_RESERVE_SIZE);
+	try{
+		m_metaDataKeys.reserve(METADATA_RESERVE_SIZE);
+		m_metaDataValues.reserve(METADATA_RESERVE_SIZE);
+	}
+	catch(CException *e){
+			XOPNotice("Out of memory in MyBricklet constructor");
+			e->Delete();
+			return;
+	}
 }
 
 MyBricklet::~MyBricklet(void)
@@ -23,8 +33,6 @@ MyBricklet::~MyBricklet(void)
 
 void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
-	
-	
 	ASSERT_RETURN_VOID(pBuffer);
 	ASSERT_RETURN_VOID(m_VernissageSession);
 	count=0;
@@ -63,11 +71,15 @@ void MyBricklet::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 		// copy the raw data to our own cache
 		m_rawBufferContentsSize = count;
-		m_rawBufferContents = new int[m_rawBufferContentsSize];
-		if(m_rawBufferContents == NULL){
-			outputToHistory("Out of memory");
+		try{
+			m_rawBufferContents = new int[m_rawBufferContentsSize];
+		}
+		catch(CException* e){
+			e->Delete();
+			outputToHistory("Out of memory in getBrickletContentsBuffer()");
 			*pBuffer = NULL;
 			count=0;
+			m_VernissageSession->unloadBrickletContents(m_brickletPtr);
 			return;
 		}
 		memcpy(m_rawBufferContents,*pBuffer,sizeof(int)*m_rawBufferContentsSize);
@@ -140,21 +152,21 @@ void MyBricklet::loadBrickletMetaDataFromResultFile(){
 	m_metaDataKeys.push_back("resultDirPath");
 	m_metaDataValues.push_back(pMyData->getDirPath());
 
-	//// introduced with Vernissage 2.0
-	//m_metaDataKeys.push_back("sampleName");
-	//m_metaDataValues.push_back(WStringToString(m_VernissageSession->getSampleName(m_brickletPtr)));
+	// introduced with Vernissage 2.0
+	m_metaDataKeys.push_back("sampleName");
+	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getSampleName(m_brickletPtr)));
 
-	//// dito
-	//m_metaDataKeys.push_back("dataSetName");
-	//m_metaDataKeys.push_back(WStringToString(m_VernissageSession->getDataSetName(m_brickletPtr)));
+	// dito
+	m_metaDataKeys.push_back("dataSetName");
+	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getDataSetName(m_brickletPtr)));
 
-	//// dito
-	//std::vector<std::wstring> dataComments = m_VernissageSession->getDataComments(m_brickletPtr);
+	// dito
+	std::vector<std::wstring> dataComments = m_VernissageSession->getDataComments(m_brickletPtr);
 
-	//for(int i = 0; i < dataComments.size(); i++){
-	//	m_metaDataKeys.push_back("dataCommentsNo" + anyTypeToString(i+1));
-	//	m_metaDataKeys.push_back(WStringToString(dataComments[i]));
-	//}
+	for(unsigned int i = 0; i < dataComments.size(); i++){
+		m_metaDataKeys.push_back("dataCommentNo" + anyTypeToString(i+1));
+		m_metaDataValues.push_back(WStringToString(dataComments[i]));
+	}
 
 	// BEGIN m_VernissageSession->getBrickletMetaData
 	brickletMetaData = m_VernissageSession->getMetaData(m_brickletPtr);

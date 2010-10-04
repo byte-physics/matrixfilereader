@@ -1,12 +1,6 @@
-
-#ifndef GLOBALVARIABLES_H
-#define GLOBALVARIABLES_H
+#pragma once
 
 const int ARRAY_SIZE = 1000;
-
-#include "error-codes.h"
-
-#include "dataclass.h"
 
 // format string for wavenames in igor
 
@@ -62,6 +56,4 @@ const char overwrite_option_name[] = "overwrite";
 const char double_option_name[] = "double";
 
 // only a few vernissage DLL version are bug-free enough to be used 
-const char properVernissageVersion[] ="1.0";
-
-#endif // GLOBALVARIABLES_H
+const char properVernissageVersion[] ="2.0";

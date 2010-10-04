@@ -1,5 +1,6 @@
+#pragma once
 
-#include "XOPStandardHeaders.h"			// Include ANSI headers, Mac headers, IgorXOP.h, XOP.h and XOPSupport.h
+#include "header.h"
 #include <string>
 
 /* custom error codes */

@@ -200,22 +200,3 @@ typedef struct openResultFileParams openResultFileParams;
 #pragma pack()
 
 static int openResultFile(openResultFileParams *p);
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct readXOPSettingsParams{
-	Handle  result;
-};
-typedef struct readXOPSettingsParams readXOPSettingsParams;
-#pragma pack()
-
-static int readXOPSettings(readXOPSettingsParams *p);
-#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct writeXOPSettingsParams{
-	Handle  config;
-	double  result;
-};
-typedef struct writeXOPSettingsParams writeXOPSettingsParams;
-#pragma pack()
-
-static int writeXOPSettings(writeXOPSettingsParams *p);
-
-

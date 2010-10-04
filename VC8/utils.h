@@ -58,3 +58,5 @@ void waveClearNaN64(double *wavePtr, long length);
 void waveClearNaN32(float  *wavePtr, long length);
 
 void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
+
+bool doubleToBool(double value);

@@ -345,3 +345,17 @@ void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list
 		offset = pos+1;
 	}
 }
+
+bool doubleToBool(double value){
+	
+	bool result;
+
+	if( value < doubleEpsilon){
+		result = false;
+	}
+	else{
+		result = true;
+	}
+
+	return result;
+}

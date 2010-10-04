@@ -169,18 +169,5 @@ BEGIN
 		HSTRING_TYPE,			// parameter 2
 	0,
 
-	// string readXOPSettings()
-	"readXOPSettings\0",
-	F_UTIL | F_EXTERNAL,			// Function category,
-	HSTRING_TYPE,				// Return value type.
-	0,
-
-	// variable writeXOPSettings(string config)
-	"writeXOPSettings\0",
-	F_UTIL | F_EXTERNAL,			// Function category,
-	NT_FP64,				// Return value type.
-		HSTRING_TYPE,			// parameter 1
-	0,
-
 	0,								// NOTE: 0 required to terminate the resource.
 END

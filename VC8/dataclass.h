@@ -27,6 +27,7 @@ public:
 	Vernissage::Session* getVernissageSession();
 	std::string getVernissageVersion();
 	void closeSession();
+	void closeResultFile();
 	MyBricklet* getMyBrickletObject(int brickletID);
 	void createMyBrickletObject(int brickletID, void *pBricklet);
 	void setLastError(int errorCode, std::string argument = std::string());
@@ -35,8 +36,7 @@ public:
 	std::string getLastErrorMessage();
 	int getIgorWaveType();
 
-	// settings
-	void setOption(std::string key, int value);
+	void readSettings();
 	// debug
 	bool debuggingEnabled(){ return m_debug; };
 	void enableDebugging(bool var){ m_debug=var; };

@@ -50,10 +50,10 @@ const bool double_default = true;
 const bool datafolder_default = true;
 const bool overwrite_default	= false;
 
-const char debug_option_name[] = "debug";
-const char folder_option_name[] = "folder";
-const char overwrite_option_name[] = "overwrite";
-const char double_option_name[] = "double";
+const char debug_option_name[] = "V_MatrixFileReaderDebug";
+const char datafolder_option_name[] = "V_MatrixFileReaderFolder";
+const char overwrite_option_name[] = "V_MatrixFileReaderOverwrite";
+const char double_option_name[] = "V_MatrixFileReaderDouble";
 
 // only a few vernissage DLL version are bug-free enough to be used 
 const char properVernissageVersion[] ="2.0";

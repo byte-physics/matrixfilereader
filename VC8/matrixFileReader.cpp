@@ -16,13 +16,14 @@
 // variable closeResultFile()
 static int closeResultFile(closeResultFileParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
 		setError(&p->result,NO_FILE_OPEN);
 		return 0;
 	}
-	pMyData->closeSession();
+	pMyData->closeResultFile();
 
 	setError(&p->result,SUCCESS);
 	return 0;
@@ -31,6 +32,7 @@ static int closeResultFile(closeResultFileParams *p){
 // variable getBrickletRawData(variable brickletID, string dataWave)
 static int getBrickletRawData(getBrickletRawDataParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 	
 	char dataWaveName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1];
@@ -135,6 +137,7 @@ static int getBrickletRawData(getBrickletRawDataParams *p){
 // variable getNumberOfBricklets(variable *totalNumberOfBricklets)
 static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
@@ -154,6 +157,7 @@ static int getNumberOfBricklets(getNumberOfBrickletsParams *p){
 // variable getResultFile(string *fileName,string *dirPath)
 static int getResultFile(getResultFileParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	if(!pMyData->resultFileOpen()){
@@ -196,6 +200,7 @@ static int getResultFile(getResultFileParams *p){
 // variable getVernissageVersion(double *vernissageVersion)
 static int getVernissageVersion(getVernissageVersionParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	Vernissage::Session *pSession = pMyData->getVernissageSession();
@@ -210,6 +215,7 @@ static int getVernissageVersion(getVernissageVersionParams *p){
 // variable getXOPVersion(double *xopVersion)
 static int getXOPVersion(getXOPVersionParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	*p->xopVersion = stringToAnyType<double>(myXopVersion);
@@ -221,6 +227,7 @@ static int getXOPVersion(getXOPVersionParams *p){
 // variable openResultFile(string absoluteFilePath, string fileName)
 static int openResultFile(openResultFileParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	char fullPath[MAX_PATH_LEN+1], fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1];
@@ -333,6 +340,7 @@ static int openResultFile(openResultFileParams *p){
 // variable checkForNewBricklets(variable *startBrickletID,variable *endBrickletID)
 static int checkForNewBricklets(checkForNewBrickletsParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	// save defaults
@@ -406,6 +414,8 @@ static int checkForNewBricklets(checkForNewBrickletsParams *p){
 // variable getAllBrickletData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletData(getAllBrickletDataParams *p){
 
+	pMyData->readSettings();
+
 	if(!pMyData->resultFileOpen()){
 		setError(&p->result,NO_FILE_OPEN);
 		return 0;
@@ -425,6 +435,8 @@ static int getAllBrickletData(getAllBrickletDataParams *p){
 
 // variable getAllBrickletMetaData(string baseName, variable separateFolderForEachBricklet)
 static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
+	
+	pMyData->readSettings();
 
 	if(!pMyData->resultFileOpen()){
 		setError(&p->result,NO_FILE_OPEN);
@@ -445,6 +457,8 @@ static int getAllBrickletMetaData(getAllBrickletMetaDataParams *p){
 
 // variable getBrickletData(string baseName, variable separateFolderForEachBricklet, variable brickletID)
 static int getBrickletData(getBrickletDataParams *p){
+	
+	pMyData->readSettings();
 
 	getRangeBrickletDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
@@ -459,6 +473,8 @@ static int getBrickletData(getBrickletDataParams *p){
 // variable getBrickletMetaData(string metaData, variable brickletID)
 static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
+	pMyData->readSettings();
+
 	getRangeBrickletMetaDataParams rangeParams;
 	rangeParams.baseName = p->baseName;
 	rangeParams.startBrickletID = p->brickletID;
@@ -470,6 +486,8 @@ static int getBrickletMetaData(getBrickletMetaDataParams *p){
 
 // variable getRangeBrickletData(string baseName, variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletData(getRangeBrickletDataParams *p){
+
+	pMyData->readSettings();
 
 	MyBricklet* myBricklet = NULL;
 	std::vector<std::string> keys,values;
@@ -560,6 +578,8 @@ static int getRangeBrickletData(getRangeBrickletDataParams *p){
 // variable getRangeBrickletMetaData(string baseName,variable separateFolderForEachBricklet, variable startBrickletID, variable endBrickletID)
 static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 
+	pMyData->readSettings();
+
 	MyBricklet* myBricklet = NULL;
 	std::vector<std::string> keys,values;
 	char metaDataBaseName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1], metaDataName[MAX_OBJ_NAME+1];
@@ -647,9 +667,10 @@ static int getRangeBrickletMetaData(getRangeBrickletMetaDataParams *p){
 // string getBugReportTemplate();
 static int getBugReportTemplate(getBugReportTemplateParams *p){
 	
+	pMyData->readSettings();
+
 	std::string str;
 	
-
 	// get windows version
 	// see http://msdn.microsoft.com/en-us/library/ms724451%28VS.85%29.aspx
     OSVERSIONINFO osvi;
@@ -701,6 +722,7 @@ static int getBugReportTemplate(getBugReportTemplateParams *p){
 // variable getResultFileMetaData(string waveName)
 static int getResultFileMetaData(getResultFileMetaDataParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
 
 	char metaDataWaveName[MAX_OBJ_NAME+1];
@@ -794,7 +816,9 @@ static int getResultFileMetaData(getResultFileMetaDataParams *p){
 // variable createOverViewTable(string waveName, string keyList)
 static int createOverViewTable(createOverViewTableParams *p){
 
+	pMyData->readSettings();
 	setError(&p->result,UNKNOWN_ERROR);
+
 	char keyListChar[ARRAY_SIZE+1];
 	int ret=-1,count=0, countMax=1000;
 	std::string keyList, key, value;
@@ -906,6 +930,8 @@ static int createOverViewTable(createOverViewTableParams *p){
 
 // variable getLastError()
 static int getLastError(getLastErrorParams *p){
+	
+	pMyData->readSettings();
 
 	p->result = pMyData->getLastError();
 	return 0;
@@ -913,9 +939,8 @@ static int getLastError(getLastErrorParams *p){
 
 // string getLastErrorMessage()
 static int getLastErrorMessage(getLastErrorMessageParams *p){
-
 	
-
+	pMyData->readSettings();
 	std::string lastErrorMsg = pMyData->getLastErrorMessage();
 	
 	p->result = NewHandle(lastErrorMsg.size());
@@ -929,110 +954,6 @@ static int getLastErrorMessage(getLastErrorMessageParams *p){
 		outputToHistory(pMyData->outputBuffer);
 		return 0;
 	}
-	return 0;
-}
-
-// string readXOPSettings();
-static int readXOPSettings(readXOPSettingsParams *p){
-
-	
-	std::string config;
-	std::stringstream stream;
-
-	stream << debug_option_name << "=" << pMyData->debuggingEnabled() << ";";
-	stream << folder_option_name << "=" << pMyData->datafolderEnabled() << ";";
-	stream << overwrite_option_name << "=" << pMyData->overwriteEnabled() << ";";
-	stream << double_option_name << "=" << pMyData->doubleWaveEnabled();
-
-	config = stream.str();
-
-	p->result = NewHandle(config.size());
-	if(MemError() || p->result == NULL){
-			return NOMEM;
-	}
-
-	int ret = PutCStringInHandle(config.c_str(), p->result);
-	if(ret != 0){
-		sprintf(pMyData->outputBuffer,"internal error %d, aborting",ret);
-		outputToHistory(pMyData->outputBuffer);
-		return 0;
-	}
-	return 0;
-}
-
-// variable writeXOPSettings(string config)
-static int writeXOPSettings(writeXOPSettingsParams *p){
-
-	setError(&p->result,UNKNOWN_ERROR);
-
-	char configChar[ARRAY_SIZE];
-	int ret;
-	bool isValidKey;
-	int value;
-
-	std::vector<std::string> configList, splittedOption, validOptions;
-	std::string optionString, key;
-
-	validOptions.push_back(debug_option_name);
-	validOptions.push_back(folder_option_name);
-	validOptions.push_back(overwrite_option_name);
-	validOptions.push_back(double_option_name);
-
-	if(*p->config == NULL || GetHandleSize(p->config) == 0L){
-		setError(&p->result,WRONG_PARAMETER,"config");
-		return 0;
-	}
-
-	ret = GetCStringFromHandle(p->config,configChar,ARRAY_SIZE);
-	if(ret != 0){
-		setInternalError(&p->result,ret);
-		return 0;
-	}
-
-	// an option string looks like "key1=value1;key2=value2"
-	char listSepChar[] = ";";
-	char optionSepChar[] = "=";
-
-	splitString(configChar,listSepChar,configList);
-
-	std::vector<std::string>::const_iterator it, itValidOptions;
-	for(it = configList.begin(); it != configList.end(); it++){
-		optionString = *it;
-
-		splitString(const_cast<char*>(optionString.c_str()),optionSepChar,splittedOption);
-
-		if(splittedOption.size() != 2){
-			setError(&p->result,WRONG_PARAMETER,"config");
-			return 0;
-		}
-
-		key   = splittedOption[0];
-		value = stringToAnyType<int>(splittedOption[1]);
-
-		// check if the key is in the list of valid keys
-		isValidKey = false;
-		for(itValidOptions = validOptions.begin(); itValidOptions != validOptions.end(); itValidOptions++){
-			if( *itValidOptions == key ){
-				isValidKey = true;
-			}
-		}
-
-		if(!isValidKey){
-			setError(&p->result,WRONG_PARAMETER,"config");
-			return 0;
-		}
-		
-		// check if the value is either 1 or 0
-		if(value != 0 && value != 1){
-			setError(&p->result,WRONG_PARAMETER,"config");
-			return 0;
-		}
-
-		// now we got a valid key/value pair
-		pMyData->setOption(key, value);
-	}
-
-	setError(&p->result,SUCCESS);
 	return 0;
 }
 
@@ -1104,13 +1025,6 @@ static long RegisterFunction()
 		case 18:						
 			returnValue = (long) openResultFile;
 			break;
-		case 19:						
-			returnValue = (long) readXOPSettings;
-			break;
-		case 20:						
-			returnValue = (long) writeXOPSettings;
-			break;
-
 	}
 	return returnValue;
 }
@@ -1171,9 +1085,12 @@ main(IORecHandle ioRecHandle)
 
 void doCleanup(){
 
-	// in case the user has forgotten to close the session
+	// in case the user has forgotten to close the result file
 	closeResultFileParams p;
 	closeResultFile(&p);
+	
+	// close the session and unload the DLL
+	pMyData->closeSession();
 }
 
 bool isValidBrickletRange(double startID, double endID,int numberOfBricklets){

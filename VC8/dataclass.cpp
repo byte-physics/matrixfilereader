@@ -34,7 +34,7 @@ Vernissage::Session* myData::getVernissageSession(){
 	}
 }
 
-void myData::closeSession(){
+void myData::closeResultFile(){
 
 	//unload bricklets
 	IntMyBrickletPtrMap::const_iterator it;
@@ -53,7 +53,11 @@ void myData::closeSession(){
 	// erase filenames
 	m_resultFileName.erase();
 	m_resultFilePath.erase();
+}
 
+void myData::closeSession(){
+	
+	this->closeResultFile();
 	m_dllStuff->closeSession();
 	m_VernissageSession = NULL;
 }
@@ -83,29 +87,6 @@ std::string myData::getDirPath(){
 std::string myData::getFileName(){
 
 	return m_resultFileName;
-}
-
-void myData::setOption(std::string key, int value){
-
-	bool val = (value == 1) ? true : false;
-	
-
-	if(key == debug_option_name){
-		enableDebugging(val);
-	}
-	else if(key == overwrite_option_name){
-		enableOverwrite(val);
-	}
-	else if(key == folder_option_name){
-		enableDatafolder(val);
-	}
-	else if(key == double_option_name){
-		enableDoubleWave(val);
-	}
-	else{
-		sprintf(pMyData->outputBuffer,"wrong option key %s",key.c_str());
-		debugOutputToHistory(pMyData->outputBuffer);
-	}
 }
 
 int myData::getIgorWaveType(){
@@ -219,4 +200,77 @@ std::string myData::getLastErrorMessage(){
 	}
 
 	return msg;
+}
+
+void myData::readSettings(){
+
+	double realPart, complexPart;
+	int ret;
+	bool setting,debugEnabled=false;
+
+	// we need to check that here to get consistent output, changing debugging with these settings otherwise interferes with the output
+	if(debuggingEnabled()){
+		debugEnabled = true;
+		outputToHistory("Various Settings");
+	}
+
+	// overwrite setting
+	ret = FetchNumVar(overwrite_option_name,&realPart,&complexPart);
+	if(ret == -1){// variable does not exist
+		enableOverwrite(overwrite_default);
+		sprintf(pMyData->outputBuffer,"DEBUG: overwrite=%d (default)",overwrite_default);
+	}
+	else{
+		setting = doubleToBool(realPart);
+		enableOverwrite(setting);
+		sprintf(pMyData->outputBuffer,"DEBUG: overwrite=%d",setting);
+	}
+	if(debugEnabled){
+		outputToHistory(pMyData->outputBuffer);
+	}
+
+	// debug setting
+	ret = FetchNumVar(debug_option_name,&realPart,&complexPart);
+	if(ret == -1){// variable does not exist
+		enableDebugging(debug_default);
+		sprintf(pMyData->outputBuffer,"DEBUG: debug=%d (default)",debug_default);
+	}
+	else{
+		setting = doubleToBool(realPart);
+		enableDebugging(setting);
+		sprintf(pMyData->outputBuffer,"DEBUG: debug=%d",setting);
+	}
+	if(debugEnabled){
+		outputToHistory(pMyData->outputBuffer);
+	}
+
+	// double setting
+	ret = FetchNumVar(double_option_name,&realPart,&complexPart);
+	if(ret == -1){// variable does not exist
+		enableDoubleWave(double_default);
+		sprintf(pMyData->outputBuffer,"DEBUG: double=%d (default)",double_default);
+	}
+	else{
+		setting = doubleToBool(realPart);
+		enableDoubleWave(setting);
+		sprintf(pMyData->outputBuffer,"DEBUG: double=%d",setting);
+	}
+	if(debugEnabled){
+		outputToHistory(pMyData->outputBuffer);
+	}
+
+	// folder setting
+	ret = FetchNumVar(datafolder_option_name,&realPart,&complexPart);
+	if(ret == -1){// variable does not exist
+		enableDatafolder(datafolder_default);
+		sprintf(pMyData->outputBuffer,"DEBUG: datafolder=%d (default)",datafolder_default);
+	}
+	else{
+		setting = doubleToBool(realPart);
+		enableDatafolder(setting);
+		sprintf(pMyData->outputBuffer,"DEBUG: datafolder=%d",setting);
+	}
+	if(debugEnabled){
+		outputToHistory(pMyData->outputBuffer);
+	}
 }

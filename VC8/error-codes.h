@@ -6,7 +6,7 @@
 /** @var  errorCode
  * @brief The error codes returned from the functions. It might be handy to define a struct in Igor which hold these values.
  */
-// If this enum is changed, change also myData::setLastError(...)
+// If this enum is changed, change also GlobalData::setLastError(...)
 enum errorCode{
 	SUCCESS =0,
 	UNKNOWN_ERROR=1,

@@ -5,12 +5,12 @@
 typedef Vernissage::Session * (*GetSessionFunc) ();
 typedef void (*ReleaseSessionFunc) ();
 
-class DllStuff{
+class DLLHandler{
 
 	public:
 		// de/-constructors
-		DllStuff();
-		~DllStuff();
+		DLLHandler();
+		~DLLHandler();
 
 		// functions
 		Vernissage::Session* createSessionObject();

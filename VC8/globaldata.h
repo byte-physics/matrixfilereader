@@ -2,18 +2,18 @@
 
 #include <map>
 
-#include "dll-stuff.h"
-#include "globals.h"
-#include "myBricklet.h"
+#include "dllhandler.h"
+#include "constants.h"
+#include "brickletClass.h"
 
-typedef	std::map<int, MyBricklet*, std::less<int>>		IntMyBrickletPtrMap;
+typedef	std::map<int, BrickletClass*, std::less<int>>		IntBrickletClassPtrMap;
 
-class myData{
+class GlobalData{
 
 public:
 	// constructors/deconstructors
-	myData();
-	~myData();
+	GlobalData();
+	~GlobalData();
 	
 public:
 	// functions
@@ -22,51 +22,55 @@ public:
 	std::string getFileName();
 	std::string getDirPath();
 	void setResultFile(char *dirPath, char *fileName){ this->setResultFile(std::string(dirPath),std::string(fileName));}
-	void setResultFile( std::string dirPath, std::string fileName){ m_resultFilePath = dirPath; m_resultFileName = fileName;}
+	void setResultFile( std::string dirPath, std::string fileName);
 	bool resultFileOpen();
 	Vernissage::Session* getVernissageSession();
 	std::string getVernissageVersion();
 	void closeSession();
 	void closeResultFile();
-	MyBricklet* getMyBrickletObject(int brickletID);
-	void createMyBrickletObject(int brickletID, void *pBricklet);
-	void setLastError(int errorCode, std::string argument = std::string());
+	BrickletClass* getBrickletClassObject(int brickletID);
+	void createBrickletClassObject(int brickletID, void *pBricklet);
+	void setError(double *functionReturnValue, int errorCode, std::string msgArgument = std::string());
+	void setInternalError(double *functionReturnValue, int errorCode);
 	int getLastError(){ return m_lastError; }
-	std::string getLastErrorArgument(){ return m_lastErrorArgument; }
 	std::string getLastErrorMessage();
-	int getIgorWaveType();
 
 	void readSettings();
 	// debug
 	bool debuggingEnabled(){ return m_debug; };
-	void enableDebugging(bool var){ m_debug=var; };
 	
 	// double
 	bool doubleWaveEnabled(){ return m_doubleWave; };
-	void enableDoubleWave(bool var){ m_doubleWave = var; };
+	int getIgorWaveType();
 
 	// datafolder
 	bool datafolderEnabled(){ return m_datafolder; };
-	void enableDatafolder(bool var){ m_datafolder = var; };
 
 	// overwrite
 	bool overwriteEnabled(){ return m_overwrite; };
 	int overwriteEnabledAsInt(){ return int(m_overwrite); };
-	void enableOverwrite(bool var){ m_overwrite = var; };
 
 	// variables
 	char outputBuffer[ARRAY_SIZE];
 
 private:
-
 	bool m_debug,m_doubleWave, m_datafolder, m_overwrite;
 	std::string m_resultFileName, m_resultFilePath;
 	Vernissage::Session *m_VernissageSession;
-	DllStuff *m_dllStuff;
+	DLLHandler *m_DLLHandler;
 	int m_lastError;
 	std::string m_lastErrorArgument;
-	IntMyBrickletPtrMap		m_brickletIDBrickletClassMap;
+	IntBrickletClassPtrMap		m_brickletIDBrickletClassMap;
+
+	void GlobalData::setLastError(int errorCode, std::string argument = std::string());
+	std::string getLastErrorArgument(){ return m_lastErrorArgument;}
+
+	void enableDatafolder(bool var){ m_datafolder = var; };
+	void enableDoubleWave(bool var){ m_doubleWave = var; };
+	void enableDebugging(bool var){ m_debug=var; };
+	void enableOverwrite(bool var){ m_overwrite = var; };
+
 };
 
-// declare global object pMyData
-extern myData *pMyData;
+// declare global object globDataPtr
+extern GlobalData *globDataPtr;

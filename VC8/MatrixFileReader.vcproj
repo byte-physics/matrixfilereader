@@ -316,31 +316,27 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\dataclass.cpp"
+				RelativePath=".\brickletClass.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\datahandling.cpp"
+				RelativePath=".\brickletconverter.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dll-stuff.cpp"
+				RelativePath=".\dllhandler.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\globals.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\matrixFileReader.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\myBricklet.cpp"
+				RelativePath=".\globaldata.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\xopinterface.cpp"
 				>
 			</File>
 		</Filter>
@@ -349,15 +345,19 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\dataclass.h"
+				RelativePath=".\brickletClass.h"
 				>
 			</File>
 			<File
-				RelativePath=".\datahandling.h"
+				RelativePath=".\brickletconverter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\dll-stuff.h"
+				RelativePath=".\constants.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dllhandler.h"
 				>
 			</File>
 			<File
@@ -365,19 +365,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\globals.h"
+				RelativePath=".\globaldata.h"
 				>
 			</File>
 			<File
 				RelativePath=".\header.h"
-				>
-			</File>
-			<File
-				RelativePath=".\matrixFileReader.h"
-				>
-			</File>
-			<File
-				RelativePath=".\myBricklet.h"
 				>
 			</File>
 			<File
@@ -386,6 +378,14 @@
 			</File>
 			<File
 				RelativePath=".\version.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xopinterface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xopinterfacestandard.h"
 				>
 			</File>
 		</Filter>

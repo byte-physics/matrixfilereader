@@ -1,6 +1,6 @@
 #include "header.h"
 
 #include "globals.h"
-#include "dataclass.h"
+#include "globaldata.h"
 
-myData *pMyData;
+GlobalData *globDataPtr;

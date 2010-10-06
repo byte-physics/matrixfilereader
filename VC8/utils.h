@@ -40,7 +40,6 @@ T stringToAnyType(std::string str){
 	return t;
 }
 
-
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
 
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID);
@@ -60,3 +59,6 @@ void waveClearNaN32(float  *wavePtr, long length);
 void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
 
 bool doubleToBool(double value);
+
+bool isValidBrickletRange(double startID, double endID, int numberOfBricklets);
+bool isValidBrickletID(int brickletID, int numberOfBricklets);

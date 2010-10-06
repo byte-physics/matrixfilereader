@@ -9,6 +9,6 @@
 
 #include "vernissage.h"
 
-#include "globals.h"
+#include "constants.h"
 #include "error-codes.h"
 #include "version.h"

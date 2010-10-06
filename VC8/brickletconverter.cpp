@@ -1,7 +1,7 @@
 
 #include "header.h"
 
-#include "datahandling.h"
+#include "brickletconverter.h"
 
 #include <string>
 #include <sstream>
@@ -9,16 +9,78 @@
 #include <limits>
 
 #include "utils.h"
-#include "dataclass.h"
+#include "globaldata.h"
 
-//Macro version of fillWave(const waveDataPtr &waveData,const int index, const double value,const bool isDoubleWaveType){
-//#define fillWave(A,B,C,D){	if(D){ A.dbl[B] = C;} else{	A.flt[B]	= (float) C; } }
+namespace {
 
-int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
+	struct waveDataPtr{
+		float* flt;
+		double* dbl;
+		bool moreData;
+	};
 
-	
+	struct extremaData{
+		int		rawMin;
+		int		rawMax;
+		double	physValRawMin;
+		double	physValRawMax;
+	};
 
-	bool isDoubleWaveType = pMyData->doubleWaveEnabled();
+	//Macro version of fillWave(const waveDataPtr &waveData,const int index, const double value,const bool isDoubleWaveType){
+	//#define fillWave(A,B,C,D){	if(D){ A.dbl[B] = C;} else{	A.flt[B]	= (float) C; } }
+
+	void clearWave(waveHndl waveHandle,long waveSize){
+
+		waveDataPtr  waveData;
+
+		if(globDataPtr->doubleWaveEnabled()){
+			waveData.dbl = (double*) WaveData(waveHandle);
+			waveClearNaN64(waveData.dbl, waveSize);
+		}
+		else{
+			waveData.flt = (float*) WaveData(waveHandle);
+			waveClearNaN32(waveData.flt, waveSize);
+		}
+	}
+
+	void __forceinline fillWave(const waveDataPtr &waveData,const int index, const double value,const bool isDoubleWaveType){
+
+		if(isDoubleWaveType){
+			waveData.dbl[index] = value;
+		}
+		else{
+			waveData.flt[index]	= (float) value;
+		}
+	}
+
+	void __forceinline setExtremaValue(extremaData *extrema,const int rawValue,const double scaledValue){
+
+		if(rawValue < extrema->rawMin){
+			extrema->rawMin		= rawValue;
+			extrema->physValRawMin = scaledValue;
+		}
+		if(rawValue > extrema->rawMax){
+			extrema->rawMax		= rawValue;
+			extrema->physValRawMax = scaledValue;
+		}
+	}
+
+	void setWaveDataPtr(waveDataPtr &waveData,const waveHndl &waveHandle){
+
+		if(globDataPtr->doubleWaveEnabled()){
+			waveData.dbl = (double*) WaveData(waveHandle);
+		}
+		else{
+			waveData.flt = (float*) WaveData(waveHandle);
+		}
+		waveData.moreData = true;
+	}
+
+}
+
+int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
+
+	bool isDoubleWaveType = globDataPtr->doubleWaveEnabled();
 
 	int dimension;
 	std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes;
@@ -53,38 +115,38 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	std::string waveBaseName(waveBaseNameChar);
 
-	MyBricklet *myBricklet = pMyData->getMyBrickletObject(brickletID);
+	BrickletClass *BrickletClass = globDataPtr->getBrickletClassObject(brickletID);
 
-	ASSERT_RETURN_MINUSONE(myBricklet);
-	void *pBricklet = myBricklet->getBrickletPointer();
+	ASSERT_RETURN_MINUSONE(BrickletClass);
+	void *pBricklet = BrickletClass->getBrickletPointer();
 
 	ASSERT_RETURN_MINUSONE(pBricklet);
-	pSession = pMyData->getVernissageSession();
+	pSession = globDataPtr->getVernissageSession();
 
 	ASSERT_RETURN_MINUSONE(pSession);
 
-	dimension = myBricklet->getMetaDataValueAsInt("dimension");
-	myBricklet->getAxes(allAxes);
-	myBricklet->getViewTypeCodes(viewTypeCodes);
+	dimension = BrickletClass->getMetaDataValueAsInt("dimension");
+	BrickletClass->getAxes(allAxes);
+	BrickletClass->getViewTypeCodes(viewTypeCodes);
 
-	sprintf(pMyData->outputBuffer,"### BrickletID %d ###",brickletID);
-	debugOutputToHistory(pMyData->outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"### BrickletID %d ###",brickletID);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	sprintf(pMyData->outputBuffer,"dimension %d",dimension);
-	debugOutputToHistory(pMyData->outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"dimension %d",dimension);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCodes;
 	for(itViewTypeCodes = viewTypeCodes.begin(); itViewTypeCodes != viewTypeCodes.end(); itViewTypeCodes++){
-		sprintf(pMyData->outputBuffer,"viewType %s",viewTypeCodeToString(*itViewTypeCodes).c_str());
-		debugOutputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"viewType %s",viewTypeCodeToString(*itViewTypeCodes).c_str());
+		debugOutputToHistory(globDataPtr->outputBuffer);
 	}
 	
 	debugOutputToHistory("Axis order is from triggerAxis to rootAxis");
 
 	std::vector<std::string>::const_iterator itAllAxes;	
 	for(itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
-		sprintf(pMyData->outputBuffer,"Axis %s",itAllAxes->c_str());
-		debugOutputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"Axis %s",itAllAxes->c_str());
+		debugOutputToHistory(globDataPtr->outputBuffer);
 	}
 
 	extremaData extremaData[3];
@@ -101,7 +163,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 	// get pointer to raw data
 	const int* pBuffer;
-	myBricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
+	BrickletClass->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
 	if(rawBrickletSize == 0 || pBuffer == NULL){
 		outputToHistory("Could not load bricklet contents.");
 		return UNKNOWN_ERROR;
@@ -114,23 +176,23 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 	int xOne, xTwo;
 	double yOne, yTwo, slope, yIntercept;
 	
-	xOne = myBricklet->getRawMin();
-	xTwo = myBricklet->getRawMax();
-	yOne = myBricklet->getPhysValRawMin();
-	yTwo = myBricklet->getPhysValRawMax();
+	xOne = BrickletClass->getRawMin();
+	xTwo = BrickletClass->getRawMax();
+	yOne = BrickletClass->getPhysValRawMin();
+	yTwo = BrickletClass->getPhysValRawMax();
 
 	slope = (yOne - yTwo) / (xOne*1.0 - xTwo*1.0);
 	yIntercept = yOne - slope*xOne;
 
-	sprintf(pMyData->outputBuffer,"raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%g,yTwo=%g",xOne,xTwo,yOne,yTwo);
-	debugOutputToHistory(pMyData->outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%g,yTwo=%g",xOne,xTwo,yOne,yTwo);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	sprintf(pMyData->outputBuffer,"raw->scaled transformation: slope=%g,yIntercept=%g",slope,yIntercept);
-	debugOutputToHistory(pMyData->outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"raw->scaled transformation: slope=%g,yIntercept=%g",slope,yIntercept);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	if( dimension < 1 || dimension > 3 ){
-		sprintf(pMyData->outputBuffer,"Dimension %d can not be handled. Please file a bug report and attach the measured data.",dimension);
-		outputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"Dimension %d can not be handled. Please file a bug report and attach the measured data.",dimension);
+		outputToHistory(globDataPtr->outputBuffer);
 		return INTERNAL_ERROR_CONVERTING_DATA;
 	}
 
@@ -147,17 +209,17 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			}
 			
 			dimensionSizes[ROWS] = numPointsTriggerAxis;
-			ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dataFolderHandle,dimensionSizes,pMyData->getIgorWaveType(),pMyData->overwriteEnabledAsInt());
+			ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dataFolderHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 
 			if(ret == NAME_WAV_CONFLICT){
-				sprintf(pMyData->outputBuffer,"Wave %s already exists.",waveBaseName.c_str());
-				debugOutputToHistory(pMyData->outputBuffer);
+				sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveBaseName.c_str());
+				debugOutputToHistory(globDataPtr->outputBuffer);
 				return WAVE_EXIST;
 			}
 
 			if(ret != 0 ){
-				sprintf(pMyData->outputBuffer,"Error %d in creating wave %s.",ret, waveBaseName.c_str());
-				outputToHistory(pMyData->outputBuffer);
+				sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, waveBaseName.c_str());
+				outputToHistory(globDataPtr->outputBuffer);
 				return UNKNOWN_ERROR;
 			}
 
@@ -187,7 +249,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
 			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
-			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(myBricklet->getMetaDataValueAsString("channelUnit").c_str()));			
+			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));			
 	
 			break;
 
@@ -221,11 +283,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				numPointsRootAxis/= 2;
 			}
 
-			sprintf(pMyData->outputBuffer,"numPointsRootAxis=%d",numPointsRootAxis);
-			debugOutputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"numPointsRootAxis=%d",numPointsRootAxis);
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
-			sprintf(pMyData->outputBuffer,"numPointsTriggerAxis=%d",numPointsTriggerAxis);
-			debugOutputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"numPointsTriggerAxis=%d",numPointsTriggerAxis);
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
 			dimensionSizes[ROWS] = numPointsTriggerAxis;
 			dimensionSizes[COLUMNS] = numPointsRootAxis;
@@ -255,17 +317,17 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
-				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,pMyData->getIgorWaveType(),pMyData->overwriteEnabledAsInt());
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 
 				if(ret == NAME_WAV_CONFLICT){
-					sprintf(pMyData->outputBuffer,"Wave %s already exists.",itWaveNames->c_str());
-					debugOutputToHistory(pMyData->outputBuffer);
+					sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",itWaveNames->c_str());
+					debugOutputToHistory(globDataPtr->outputBuffer);
 					return WAVE_EXIST;
 				}
 
 				if(ret != 0 ){
-					sprintf(pMyData->outputBuffer,"Error %d in creating wave %s.",ret, itWaveNames->c_str());
-					outputToHistory(pMyData->outputBuffer);
+					sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, itWaveNames->c_str());
+					outputToHistory(globDataPtr->outputBuffer);
 					return UNKNOWN_ERROR;
 				}
 
@@ -336,14 +398,14 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			firstBlockOffset	 = numPointsRootAxis * triggerAxisBlockSize;
 
-			sprintf(pMyData->outputBuffer,"traceUp: flt=%p, dbl=%p, moreData=%s",traceUpDataPtr.flt,traceUpDataPtr.dbl,traceUpDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
-			sprintf(pMyData->outputBuffer,"reTraceUp: flt=%p, dbl=%p, moreData=%s",reTraceUpDataPtr.flt,reTraceUpDataPtr.dbl,reTraceUpDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
-			sprintf(pMyData->outputBuffer,"traceDown: flt=%p, dbl=%p, moreData=%s",traceDownDataPtr.flt,traceDownDataPtr.dbl,traceDownDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
-			sprintf(pMyData->outputBuffer,"reTraceDown: flt=%p, dbl=%p, moreData=%s",reTraceDownDataPtr.flt,reTraceDownDataPtr.dbl,reTraceDownDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"traceUp: flt=%p, dbl=%p, moreData=%s",traceUpDataPtr.flt,traceUpDataPtr.dbl,traceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"reTraceUp: flt=%p, dbl=%p, moreData=%s",reTraceUpDataPtr.flt,reTraceUpDataPtr.dbl,reTraceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"traceDown: flt=%p, dbl=%p, moreData=%s",traceDownDataPtr.flt,traceDownDataPtr.dbl,traceDownDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"reTraceDown: flt=%p, dbl=%p, moreData=%s",reTraceDownDataPtr.flt,reTraceDownDataPtr.dbl,reTraceDownDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
 			// See also Vernissage manual page 22f
 			// triggerAxisBlockSize: number of points in the raw data array which were acquired at the same root axis position
@@ -381,11 +443,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 						else{
 							debugOutputToHistory("Index out of range in traceUp");
 
-							sprintf(pMyData->outputBuffer,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
-							sprintf(pMyData->outputBuffer,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
 							traceUpDataPtr.moreData = false;
 						}
@@ -413,11 +475,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 						else{
 							debugOutputToHistory("Index out of range in traceDown");
 
-							sprintf(pMyData->outputBuffer,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
-							sprintf(pMyData->outputBuffer,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
 							traceDownDataPtr.moreData = false;
 						}
@@ -444,11 +506,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 						else{
 							debugOutputToHistory("Index out of range in reTraceUp");
 
-							sprintf(pMyData->outputBuffer,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
-							sprintf(pMyData->outputBuffer,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
 							reTraceUpDataPtr.moreData = false;
 						}
@@ -475,11 +537,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 						else{
 							debugOutputToHistory("Index out of range in reTraceDown");
 
-							sprintf(pMyData->outputBuffer,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
-							sprintf(pMyData->outputBuffer,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
 							reTraceDownDataPtr.moreData = false;
 						}
@@ -496,7 +558,7 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(triggerAxis.physicalUnit).c_str())));
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(rootAxis.physicalUnit).c_str()));
-				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(myBricklet->getMetaDataValueAsString("channelUnit").c_str()));
+				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
 			}
 
 			break;
@@ -646,25 +708,25 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			// END Borrowed from SCALA exporter plugin
 
-			sprintf(pMyData->outputBuffer,"V Axis: total=%d",numPointsVAxis);
-			debugOutputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"V Axis: total=%d",numPointsVAxis);
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
-			sprintf(pMyData->outputBuffer,"X Axis # points with tableSet: Total=%d, Forward=%d, Backward=%d",
+			sprintf(globDataPtr->outputBuffer,"X Axis # points with tableSet: Total=%d, Forward=%d, Backward=%d",
 				numPointsXAxisWithTableBoth,numPointsXAxisWithTableFWD,numPointsXAxisWithTableBWD);
-			debugOutputToHistory(pMyData->outputBuffer);
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
-			sprintf(pMyData->outputBuffer,"Y Axis # points with tableSet: Total=%d, Up=%d, Down=%d",
+			sprintf(globDataPtr->outputBuffer,"Y Axis # points with tableSet: Total=%d, Up=%d, Down=%d",
 				numPointsYAxisWithTableBoth,numPointsYAxisWithTableUp,numPointsYAxisWithTableDown);
-			debugOutputToHistory(pMyData->outputBuffer);
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
 			// FIXME Theoretical the sizes of the cubes could be different but we are igoring that for now
 			if(numPointsXAxisWithTableBWD != 0 && numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableFWD != numPointsXAxisWithTableBWD){
-				sprintf(pMyData->outputBuffer,"BUG: Number of X axis points is different in forward and backward direction. Keep fingers crossed.");
-				outputToHistory(pMyData->outputBuffer);
+				sprintf(globDataPtr->outputBuffer,"BUG: Number of X axis points is different in forward and backward direction. Keep fingers crossed.");
+				outputToHistory(globDataPtr->outputBuffer);
 			}
 			if(numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableDown != 0 && numPointsYAxisWithTableUp != numPointsYAxisWithTableDown){
-				sprintf(pMyData->outputBuffer,"BUG: Number of Y axis points is different in up and down direction. Keep fingers crossed.");
-				outputToHistory(pMyData->outputBuffer);
+				sprintf(globDataPtr->outputBuffer,"BUG: Number of Y axis points is different in up and down direction. Keep fingers crossed.");
+				outputToHistory(globDataPtr->outputBuffer);
 			}
 
 			// dimensions of the cube
@@ -681,9 +743,9 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 
 			waveSize = dimensionSizes[ROWS]*dimensionSizes[COLUMNS]*dimensionSizes[LAYERS];
 
-			sprintf(pMyData->outputBuffer,"dimensions of the cube: rows=%d,cols=%d,layers=%d",
+			sprintf(globDataPtr->outputBuffer,"dimensions of the cube: rows=%d,cols=%d,layers=%d",
 				dimensionSizes[ROWS],dimensionSizes[COLUMNS],dimensionSizes[LAYERS]);
-			debugOutputToHistory(pMyData->outputBuffer);
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
 			// 4 cubes, TraceUp, TraceDown, ReTraceUp, ReTraceDown
 			if(	numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableBWD != 0 &&
@@ -725,17 +787,17 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// create waves
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
-				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,pMyData->getIgorWaveType(),pMyData->overwriteEnabledAsInt());
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 
 				if(ret == NAME_WAV_CONFLICT){
-					sprintf(pMyData->outputBuffer,"Wave %s already exists.",itWaveNames->c_str());
-					debugOutputToHistory(pMyData->outputBuffer);
+					sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",itWaveNames->c_str());
+					debugOutputToHistory(globDataPtr->outputBuffer);
 					return WAVE_EXIST;
 				}
 
 				if(ret != 0 ){
-					sprintf(pMyData->outputBuffer,"Error %d in creating wave %s.",ret, itWaveNames->c_str());
-					outputToHistory(pMyData->outputBuffer);
+					sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, itWaveNames->c_str());
+					outputToHistory(globDataPtr->outputBuffer);
 					return UNKNOWN_ERROR;
 				}
 
@@ -810,17 +872,17 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 			// data index to the start of the TraceDown data (this is the same for all combinations as xAxisBlockSize is set apropriately), in case traceDown does not exist this is no problem
 			firstBlockOffset = numPointsYAxisWithTableUp*xAxisBlockSize;
 
-			sprintf(pMyData->outputBuffer,"xAxisBlockSize=%d,firstBlockOffset=%d",xAxisBlockSize,firstBlockOffset);
-			debugOutputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"xAxisBlockSize=%d,firstBlockOffset=%d",xAxisBlockSize,firstBlockOffset);
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
-			sprintf(pMyData->outputBuffer,"traceUp: flt=%p, dbl=%p, moreData=%s",traceUpDataPtr.flt,traceUpDataPtr.dbl,traceUpDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
-			sprintf(pMyData->outputBuffer,"reTraceUp: flt=%p, dbl=%p, moreData=%s",reTraceUpDataPtr.flt,reTraceUpDataPtr.dbl,reTraceUpDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
-			sprintf(pMyData->outputBuffer,"traceDown: flt=%p, dbl=%p, moreData=%s",traceDownDataPtr.flt,traceDownDataPtr.dbl,traceDownDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
-			sprintf(pMyData->outputBuffer,"reTraceDown: flt=%p, dbl=%p, moreData=%s",reTraceDownDataPtr.flt,reTraceDownDataPtr.dbl,reTraceDownDataPtr.moreData ? "true" : "false");
-			debugOutputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"traceUp: flt=%p, dbl=%p, moreData=%s",traceUpDataPtr.flt,traceUpDataPtr.dbl,traceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"reTraceUp: flt=%p, dbl=%p, moreData=%s",reTraceUpDataPtr.flt,reTraceUpDataPtr.dbl,reTraceUpDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"traceDown: flt=%p, dbl=%p, moreData=%s",traceDownDataPtr.flt,traceDownDataPtr.dbl,traceDownDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"reTraceDown: flt=%p, dbl=%p, moreData=%s",reTraceDownDataPtr.flt,reTraceDownDataPtr.dbl,reTraceDownDataPtr.moreData ? "true" : "false");
+			debugOutputToHistory(globDataPtr->outputBuffer);
 
 			// COLUMNS
 			for(i = 0; i < dimensionSizes[COLUMNS]; i++){
@@ -848,11 +910,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 							else{
 								debugOutputToHistory("Index out of range in traceUp");
 
-								sprintf(pMyData->outputBuffer,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
-								debugOutputToHistory(pMyData->outputBuffer);
+								sprintf(globDataPtr->outputBuffer,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
+								debugOutputToHistory(globDataPtr->outputBuffer);
 
-								sprintf(pMyData->outputBuffer,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
-								debugOutputToHistory(pMyData->outputBuffer);
+								sprintf(globDataPtr->outputBuffer,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
+								debugOutputToHistory(globDataPtr->outputBuffer);
 
 								traceUpDataPtr.moreData = false;
 							}
@@ -878,11 +940,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 						else{
 							debugOutputToHistory("Index out of range in traceDown");
 
-							sprintf(pMyData->outputBuffer,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
-							sprintf(pMyData->outputBuffer,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
 							traceDownDataPtr.moreData = false;
 						}
@@ -908,11 +970,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 						else{
 							debugOutputToHistory("Index out of range in reTraceUp");
 
-							sprintf(pMyData->outputBuffer,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
-							sprintf(pMyData->outputBuffer,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
 							reTraceUpDataPtr.moreData = false;
 						}
@@ -937,19 +999,19 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 								setExtremaValue(reTraceDownExtrema,rawValue,scaledValue);
 
 								//if(k < 10 && i < 2 && j < 2){
-								//	sprintf(pMyData->outputBuffer,"j(rows)=%d,i(cols)=%d,k(layers)=%d,reTraceDownRawBrickletIndex=%d,reTraceDownDataIndex=%d,rawValue=%d,scaledValue=%g",
+								//	sprintf(globDataPtr->outputBuffer,"j(rows)=%d,i(cols)=%d,k(layers)=%d,reTraceDownRawBrickletIndex=%d,reTraceDownDataIndex=%d,rawValue=%d,scaledValue=%g",
 								//		j,i,k,reTraceDownRawBrickletIndex,reTraceDownDataIndex,rawValue,scaledValue);
-								//	debugOutputToHistory(pMyData->outputBuffer);
+								//	debugOutputToHistory(globDataPtr->outputBuffer);
 								//}
 						}
 						else{
 							debugOutputToHistory("Index out of range in reTraceDown");
 
-							sprintf(pMyData->outputBuffer,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
-							sprintf(pMyData->outputBuffer,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(pMyData->outputBuffer);
+							sprintf(globDataPtr->outputBuffer,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
+							debugOutputToHistory(globDataPtr->outputBuffer);
 
 							reTraceDownDataPtr.moreData = false;
 						}
@@ -970,59 +1032,11 @@ int createAndFillDataWave(DataFolderHandle dataFolderHandle, const char *waveBas
 				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(xAxis.physicalUnit).c_str())));
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(yAxis.physicalUnit).c_str()));
 				MDSetWaveUnits(waveHandleVector[i],LAYERS,const_cast<char *>(WStringToString(specAxis.physicalUnit).c_str()));
-				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(myBricklet->getMetaDataValueAsString("channelUnit").c_str()));
+				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
 			}
 
 			break;
 	}
 
 	return SUCCESS;
-}
-
-void clearWave(waveHndl waveHandle,long waveSize){
-
-	waveDataPtr  waveData;
-
-	if(pMyData->doubleWaveEnabled()){
-		waveData.dbl = (double*) WaveData(waveHandle);
-		waveClearNaN64(waveData.dbl, waveSize);
-	}
-	else{
-		waveData.flt = (float*) WaveData(waveHandle);
-		waveClearNaN32(waveData.flt, waveSize);
-	}
-}
-
-void __forceinline fillWave(const waveDataPtr &waveData,const int index, const double value,const bool isDoubleWaveType){
-
-	if(isDoubleWaveType){
-		waveData.dbl[index] = value;
-	}
-	else{
-		waveData.flt[index]	= (float) value;
-	}
-}
-
-void __forceinline setExtremaValue(extremaData *extrema,const int rawValue,const double scaledValue){
-
-	if(rawValue < extrema->rawMin){
-		extrema->rawMin		= rawValue;
-		extrema->physValRawMin = scaledValue;
-	}
-	if(rawValue > extrema->rawMax){
-		extrema->rawMax		= rawValue;
-		extrema->physValRawMax = scaledValue;
-	}
-}
-
-void setWaveDataPtr(waveDataPtr &waveData,const waveHndl &waveHandle){
-
-	if(pMyData->doubleWaveEnabled()){
-		waveData.dbl = (double*) WaveData(waveHandle);
-	}
-	else{
-		waveData.flt = (float*) WaveData(waveHandle);
-	}
-
-	waveData.moreData = true;
 }

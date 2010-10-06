@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "dataclass.h"
+#include "globaldata.h"
 #include "utils.h"
 
 // Taken from http://www.codeguru.com/forum/archive/index.php/t-193852.html
@@ -36,7 +36,7 @@ std::wstring CharPtrToWString(char* cStr){
 
 void debugOutputToHistory(const char* str){
 
-	if(!pMyData->debuggingEnabled()){
+	if(!globDataPtr->debuggingEnabled()){
 		return;
 	}
 
@@ -84,8 +84,8 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 		return NOMEM;
 	}
 
-	//sprintf(pMyData->outputBuffer,"totalSize of strings %d",GetHandleSize(textHandle));
-	//debugOutputToHistory(pMyData->outputBuffer);
+	//sprintf(globDataPtr->outputBuffer,"totalSize of strings %d",GetHandleSize(textHandle));
+	//debugOutputToHistory(globDataPtr->outputBuffer);
 
 	for(i=0; i < numEntriesPlusOne; i++){
 
@@ -95,16 +95,16 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 		else{ // and of all the others
 			offset+=stringSizes[i-1];
 		}
-		//sprintf(pMyData->outputBuffer,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
-		//debugOutputToHistory(pMyData->outputBuffer);
+		//sprintf(globDataPtr->outputBuffer,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
+		//debugOutputToHistory(globDataPtr->outputBuffer);
 
 		// write offsets
 		memcpy(*textHandle+i*sizeof(long),&offset,sizeof(long));
 
 		if(i < stringVector.size()){
 
-			//sprintf(pMyData->outputBuffer,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
-			//debugOutputToHistory(pMyData->outputBuffer);
+			//sprintf(globDataPtr->outputBuffer,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
+			//debugOutputToHistory(globDataPtr->outputBuffer);
 
 			// write strings
 			memcpy(*textHandle+offset,stringVector[i].c_str(),stringSizes[i]);
@@ -122,8 +122,8 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 
 	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
-	//sprintf(pMyData->outputBuffer,"SetTextWaveData returned %d",ret);
-	//debugOutputToHistory(pMyData->outputBuffer);
+	//sprintf(globDataPtr->outputBuffer,"SetTextWaveData returned %d",ret);
+	//debugOutputToHistory(globDataPtr->outputBuffer);
 	DisposeHandle(textHandle);
 
 	return ret;
@@ -142,43 +142,43 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		dimensionSizes[ROWS] = firstColumn.size();
 	}
 	else if(firstColumn.size() == 0 || secondColumn.size() == 0 ){
-		sprintf(pMyData->outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(globDataPtr->outputBuffer);
 		return UNKNOWN_ERROR;
 	}
 	else{
-		sprintf(pMyData->outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(globDataPtr->outputBuffer);
 		
 		std::vector<std::string>::const_iterator it;
 
 		outputToHistory("keys are:");
 		for(it= firstColumn.begin(); it != firstColumn.end(); it++){
-			sprintf(pMyData->outputBuffer,"_%s_",it->c_str());
-			outputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"_%s_",it->c_str());
+			outputToHistory(globDataPtr->outputBuffer);
 		}
 
 		outputToHistory("values are:");
 		for(it= secondColumn.begin(); it != secondColumn.end(); it++){
-			sprintf(pMyData->outputBuffer,"_%s_",it->c_str());
-			outputToHistory(pMyData->outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"_%s_",it->c_str());
+			outputToHistory(globDataPtr->outputBuffer);
 		}
 		return UNKNOWN_ERROR;
 	}
 
 	dimensionSizes[COLUMNS]=2;
 	
-	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,pMyData->overwriteEnabledAsInt());
+	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,globDataPtr->overwriteEnabledAsInt());
 
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(pMyData->outputBuffer,"Wave %s already exists.",waveName);
-		debugOutputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveName);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 		return WAVE_EXIST;
 	}
 
 	if(ret != 0 ){
-		sprintf(pMyData->outputBuffer,"Error %d in creating wave %s.",ret, waveName);
-		outputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, waveName);
+		outputToHistory(globDataPtr->outputBuffer);
 		return UNKNOWN_ERROR;
 	}
 
@@ -194,8 +194,8 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	ret = stringVectorToTextWave(allColumns,waveHandle);
 
 	if(ret != 0){
-		sprintf(pMyData->outputBuffer,"stringVectorToTextWave returned %d",ret);
-		outputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"stringVectorToTextWave returned %d",ret);
+		outputToHistory(globDataPtr->outputBuffer);
 		return ret;
 	}
 	setOtherWaveNote(brickletID,waveHandle);
@@ -219,8 +219,8 @@ std::string viewTypeCodeToString(int idx){
 	names.push_back(VTC_INTERFEROMETER);
 
 	if(idx < 0 || idx >= int(names.size())){
-		sprintf(pMyData->outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
-		debugOutputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 		return std::string();
 	}
 	else{
@@ -253,8 +253,8 @@ std::string getStandardWaveNote(int brickletID){
 
 	std::string waveNote;
 
-	waveNote.append("resultFileName=" + pMyData->getFileName() + "\r");
-	waveNote.append("resultFilePath=" + pMyData->getDirPath() + "\r");
+	waveNote.append("resultFileName=" + globDataPtr->getFileName() + "\r");
+	waveNote.append("resultFilePath=" + globDataPtr->getDirPath() + "\r");
 
 	// we pass brickletID=0 for waveNotes concerning the resultFileMetaData wave
 	if(brickletID > 0){
@@ -265,7 +265,7 @@ std::string getStandardWaveNote(int brickletID){
 	}
 
 	waveNote.append("xopVersion=" + std::string(myXopVersion) + "\r");
-	waveNote.append("vernissageVersion=" + pMyData->getVernissageVersion() + "\r");
+	waveNote.append("vernissageVersion=" + globDataPtr->getVernissageVersion() + "\r");
 
 	return waveNote;
 }
@@ -274,7 +274,7 @@ void mySetWaveNote(std::string waveNote, waveHndl waveHandle){
 
 
 	if(waveNote.empty()){
-		outputToHistory("BUG: got empty waveNote in myData::setWaveNote.");
+		outputToHistory("BUG: got empty waveNote in GlobalData::setWaveNote.");
 		return;
 	}
 
@@ -284,8 +284,8 @@ void mySetWaveNote(std::string waveNote, waveHndl waveHandle){
 	}
 	int ret = PutCStringInHandle(waveNote.c_str(),noteHandle);
 	if(ret != 0){
-		sprintf(pMyData->outputBuffer,"internal error %d, aborting",ret);
-		outputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"internal error %d, aborting",ret);
+		outputToHistory(globDataPtr->outputBuffer);
 		return;
 	}
 
@@ -327,8 +327,8 @@ void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list
 
 	string.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
 
-	sprintf(pMyData->outputBuffer,"keyList=%s",stringChar);
-	debugOutputToHistory(pMyData->outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"keyList=%s",stringChar);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 
 	while( ( pos = string.find(sepChar,offset) ) != std::string::npos ){
@@ -339,8 +339,8 @@ void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list
 		}
 
 		list.push_back(string.substr(offset,pos-offset));
-		sprintf(pMyData->outputBuffer,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
-		debugOutputToHistory(pMyData->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 
 		offset = pos+1;
 	}
@@ -358,4 +358,19 @@ bool doubleToBool(double value){
 	}
 
 	return result;
+}
+
+bool isValidBrickletRange(double startID, double endID,int numberOfBricklets){
+
+	// brickletIDs are 1-based
+	return ( startID <=  endID
+		&& startID >=  1
+		&& endID   >=  1
+		&& startID <= numberOfBricklets
+		&& endID   <= numberOfBricklets );
+}
+
+bool isValidBrickletID(int brickletID, int numberOfBricklets){
+
+	return brickletID >= 1 && brickletID <= numberOfBricklets;
 }

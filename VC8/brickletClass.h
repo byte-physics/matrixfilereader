@@ -5,11 +5,11 @@
 
 #include "header.h"
 
-class MyBricklet
+class BrickletClass
 {
 public:
-	MyBricklet(void* pBricklet,int brickletID);
-	~MyBricklet(void);
+	BrickletClass(void* pBricklet,int brickletID);
+	~BrickletClass(void);
 
 public:
 	void* getBrickletPointer(){ return m_brickletPtr;};
@@ -30,7 +30,7 @@ public:
 	double getPhysValRawMin(){ return m_minScaledValue; };
 
 private:
-	void MyBricklet::loadBrickletMetaDataFromResultFile();
+	void BrickletClass::loadBrickletMetaDataFromResultFile();
 
 private:
 	void *m_brickletPtr;

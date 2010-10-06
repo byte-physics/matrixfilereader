@@ -1,43 +1,50 @@
 
 #include "header.h"
 
-#include "dataclass.h"
-#include "dll-stuff.h"
+#include "globaldata.h"
+#include "dllhandler.h"
 #include "utils.h"
 
-myData::myData(): m_VernissageSession(NULL), m_dllStuff(NULL), m_lastError(UNKNOWN_ERROR),m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default){
+GlobalData *globDataPtr;
+
+GlobalData::GlobalData(): m_VernissageSession(NULL), m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default){
 
 	try{
-		m_dllStuff = new DllStuff;
+		m_DLLHandler = new DLLHandler;
 	}
 	catch( CException* e ){
-		XOPNotice("Out of memory in myData constructor");
+		XOPNotice("Out of memory in GlobalData constructor");
 		e->Delete();
 		return;
 	}
 }
 
-myData::~myData(){
-
-	delete m_dllStuff;
-	m_dllStuff = NULL;
+void GlobalData::setResultFile(std::string dirPath, std::string fileName){
+	
+	if(this->resultFileOpen()){
+		outputToHistory("BUG: there is already a result file open, please close that first");
+		return;
+	}
+	
+	m_resultFilePath = dirPath;
+	m_resultFileName = fileName;
 }
 
-Vernissage::Session* myData::getVernissageSession(){
+Vernissage::Session* GlobalData::getVernissageSession(){
 
 	if(m_VernissageSession != NULL){
 		return m_VernissageSession;
 	}
 	else{
-		m_VernissageSession = m_dllStuff->createSessionObject();
+		m_VernissageSession = m_DLLHandler->createSessionObject();
 		return m_VernissageSession;
 	}
 }
 
-void myData::closeResultFile(){
+void GlobalData::closeResultFile(){
 
 	//unload bricklets
-	IntMyBrickletPtrMap::const_iterator it;
+	IntBrickletClassPtrMap::const_iterator it;
 	for(it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++){
 		delete it->second;
 	}
@@ -55,41 +62,41 @@ void myData::closeResultFile(){
 	m_resultFilePath.erase();
 }
 
-void myData::closeSession(){
+void GlobalData::closeSession(){
 	
 	this->closeResultFile();
-	m_dllStuff->closeSession();
+	m_DLLHandler->closeSession();
 	m_VernissageSession = NULL;
 }
 
-std::string myData::getVernissageVersion(){
+std::string GlobalData::getVernissageVersion(){
 
 	if(m_VernissageSession == NULL){
 		this->getVernissageSession();
 	}
-	if(m_dllStuff != NULL){
-		return m_dllStuff->getVernissageVersion();
+	if(m_DLLHandler != NULL){
+		return m_DLLHandler->getVernissageVersion();
 	}
 	else
 		return std::string();
 }
 
-bool myData::resultFileOpen(){
+bool GlobalData::resultFileOpen(){
 
 	return !m_resultFileName.empty();
 }
 
-std::string myData::getDirPath(){
+std::string GlobalData::getDirPath(){
 
 	return m_resultFilePath;
 }
 
-std::string myData::getFileName(){
+std::string GlobalData::getFileName(){
 
 	return m_resultFileName;
 }
 
-int myData::getIgorWaveType(){
+int GlobalData::getIgorWaveType(){
 
 	int waveType;
 
@@ -103,9 +110,9 @@ int myData::getIgorWaveType(){
 }
 
 
-MyBricklet* myData::getMyBrickletObject(int brickletID){
+BrickletClass* GlobalData::getBrickletClassObject(int brickletID){
 
-	IntMyBrickletPtrMap::iterator it = m_brickletIDBrickletClassMap.find(brickletID);
+	IntBrickletClassPtrMap::iterator it = m_brickletIDBrickletClassMap.find(brickletID);
 
 	if(it != m_brickletIDBrickletClassMap.end()){ // we found the element
 		return it->second;
@@ -115,17 +122,17 @@ MyBricklet* myData::getMyBrickletObject(int brickletID){
 	}
 }
 
-void myData::createMyBrickletObject(int brickletID, void *pBricklet){
+void GlobalData::createBrickletClassObject(int brickletID, void *pBricklet){
 	
-	sprintf(pMyData->outputBuffer,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
-	debugOutputToHistory(pMyData->outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 	
-	MyBricklet *bricklet = NULL;
+	BrickletClass *bricklet = NULL;
 	try{
-		bricklet = new MyBricklet(pBricklet,brickletID);
+		bricklet = new BrickletClass(pBricklet,brickletID);
 	}
 	catch(CException *e){
-		XOPNotice("Out of memory in createMyBrickletObject");
+		XOPNotice("Out of memory in createBrickletClassObject");
 		e->Delete();
 		return;
 	}
@@ -133,7 +140,24 @@ void myData::createMyBrickletObject(int brickletID, void *pBricklet){
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
 
-void myData::setLastError(int errorCode, std::string argument){
+
+void GlobalData::setInternalError(double *result, int errorValue){
+	
+	*result = errorValue;
+	setLastError(errorValue);
+
+	sprintf(globDataPtr->outputBuffer,"BUG: xop internal error %d returned.",errorValue);
+	outputToHistory(globDataPtr->outputBuffer);
+}
+
+void GlobalData::setError(double *result, int errorValue, std::string msgArgument){
+
+	*result = errorValue;
+	setLastError(errorValue,msgArgument);
+
+}
+
+void GlobalData::setLastError(int errorCode, std::string argument){
 
 	if(errorCode < SUCCESS || errorCode > WAVE_EXIST){
 		outputToHistory("BUG: errorCode is out of range");
@@ -148,11 +172,11 @@ void myData::setLastError(int errorCode, std::string argument){
 	else{
 		m_lastErrorArgument = argument;
 	}
-	sprintf(pMyData->outputBuffer,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
-	debugOutputToHistory(pMyData->outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
+	debugOutputToHistory(globDataPtr->outputBuffer);
 }
 
-std::string myData::getLastErrorMessage(){
+std::string GlobalData::getLastErrorMessage(){
 
 	std::string msg;
 
@@ -202,7 +226,7 @@ std::string myData::getLastErrorMessage(){
 	return msg;
 }
 
-void myData::readSettings(){
+void GlobalData::readSettings(){
 
 	double realPart, complexPart;
 	int ret;
@@ -218,59 +242,59 @@ void myData::readSettings(){
 	ret = FetchNumVar(overwrite_option_name,&realPart,&complexPart);
 	if(ret == -1){// variable does not exist
 		enableOverwrite(overwrite_default);
-		sprintf(pMyData->outputBuffer,"DEBUG: overwrite=%d (default)",overwrite_default);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: overwrite=%d (default)",overwrite_default);
 	}
 	else{
 		setting = doubleToBool(realPart);
 		enableOverwrite(setting);
-		sprintf(pMyData->outputBuffer,"DEBUG: overwrite=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: overwrite=%d",setting);
 	}
 	if(debugEnabled){
-		outputToHistory(pMyData->outputBuffer);
+		outputToHistory(globDataPtr->outputBuffer);
 	}
 
 	// debug setting
 	ret = FetchNumVar(debug_option_name,&realPart,&complexPart);
 	if(ret == -1){// variable does not exist
 		enableDebugging(debug_default);
-		sprintf(pMyData->outputBuffer,"DEBUG: debug=%d (default)",debug_default);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: debug=%d (default)",debug_default);
 	}
 	else{
 		setting = doubleToBool(realPart);
 		enableDebugging(setting);
-		sprintf(pMyData->outputBuffer,"DEBUG: debug=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: debug=%d",setting);
 	}
 	if(debugEnabled){
-		outputToHistory(pMyData->outputBuffer);
+		outputToHistory(globDataPtr->outputBuffer);
 	}
 
 	// double setting
 	ret = FetchNumVar(double_option_name,&realPart,&complexPart);
 	if(ret == -1){// variable does not exist
 		enableDoubleWave(double_default);
-		sprintf(pMyData->outputBuffer,"DEBUG: double=%d (default)",double_default);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: double=%d (default)",double_default);
 	}
 	else{
 		setting = doubleToBool(realPart);
 		enableDoubleWave(setting);
-		sprintf(pMyData->outputBuffer,"DEBUG: double=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: double=%d",setting);
 	}
 	if(debugEnabled){
-		outputToHistory(pMyData->outputBuffer);
+		outputToHistory(globDataPtr->outputBuffer);
 	}
 
 	// folder setting
 	ret = FetchNumVar(datafolder_option_name,&realPart,&complexPart);
 	if(ret == -1){// variable does not exist
 		enableDatafolder(datafolder_default);
-		sprintf(pMyData->outputBuffer,"DEBUG: datafolder=%d (default)",datafolder_default);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: datafolder=%d (default)",datafolder_default);
 	}
 	else{
 		setting = doubleToBool(realPart);
 		enableDatafolder(setting);
-		sprintf(pMyData->outputBuffer,"DEBUG: datafolder=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: datafolder=%d",setting);
 	}
 	if(debugEnabled){
-		outputToHistory(pMyData->outputBuffer);
+		outputToHistory(globDataPtr->outputBuffer);
 	}
 }

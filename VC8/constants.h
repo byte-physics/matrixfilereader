@@ -8,7 +8,7 @@ const char brickletDataDefault[]	 = "brickletData";
 const char brickletMetaDefault[]	 = "brickletMetaData";
 const char resultMetaDefault[]		 = "resultFileMetaData";
 const char overViewTableDefault[]	 = "overViewTable";
-const char rawBrickletFormatString[] = "brickletRawData_%04d";
+const char brickletRawDefault[] = "brickletRawData";
 const char brickletMetaDataFormat[]	 = "%s_%04d";
 const char brickletDataFormat[]		 = "%s_%04d";
 const char dataFolderFormat[]		 = "X_%04d";
@@ -57,3 +57,5 @@ const char double_option_name[] = "V_MatrixFileReaderDouble";
 
 // only a few vernissage DLL version are bug-free enough to be used 
 const char properVernissageVersion[] ="2.0";
+
+const char keyList_default[] = "brickletID;scanCycleCount;runCycleCount;sequenceID;dimension;channelName";

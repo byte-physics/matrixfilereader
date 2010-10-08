@@ -1,7 +1,6 @@
-#pragma once
-
 #include "header.h"
-#include <string>
+
+#include "operationstructs.h"
 
 /* custom error codes */
 
@@ -11,4 +10,6 @@
 /* Prototypes */
 HOST_IMPORT int main(IORecHandle ioRecHandle);
 static void XOPEntry();
-//static long RegisterFunction();
+
+// Operation template: GetResultFileMetaData /N=string:waveName
+

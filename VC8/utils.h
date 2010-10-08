@@ -42,7 +42,7 @@ T stringToAnyType(std::string str){
 
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
 
-int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID);
+int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves);
 
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
@@ -56,9 +56,17 @@ std::string getStandardWaveNote(int brickletID);
 void waveClearNaN64(double *wavePtr, long length);
 void waveClearNaN32(float  *wavePtr, long length);
 
-void splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
+void  splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
+void  splitString(std::string &str, char *sepChar, std::vector<std::string> &list);
+
+void joinString(std::vector<std::string> &list,const char *sepChar, std::string &joinedList);
 
 bool doubleToBool(double value);
 
 bool isValidBrickletRange(double startID, double endID, int numberOfBricklets);
 bool isValidBrickletID(int brickletID, int numberOfBricklets);
+
+std::string getFullWavePath(DataFolderHandle df, waveHndl wv);
+int createRawDataWave(DataFolderHandle dataFolderHandle,char *waveName, int brickletID, std::string &fullPathOfCreatedWaves);
+
+void convertHandleToString(Handle strHandle,std::string &str);

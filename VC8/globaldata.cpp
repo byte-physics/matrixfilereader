@@ -141,23 +141,15 @@ void GlobalData::createBrickletClassObject(int brickletID, void *pBricklet){
 }
 
 
-void GlobalData::setInternalError(double *result, int errorValue){
-	
-	*result = errorValue;
-	setLastError(errorValue);
+void GlobalData::setInternalError(int errorValue){
+
+	setError(errorValue);
 
 	sprintf(globDataPtr->outputBuffer,"BUG: xop internal error %d returned.",errorValue);
 	outputToHistory(globDataPtr->outputBuffer);
 }
 
-void GlobalData::setError(double *result, int errorValue, std::string msgArgument){
-
-	*result = errorValue;
-	setLastError(errorValue,msgArgument);
-
-}
-
-void GlobalData::setLastError(int errorCode, std::string argument){
+void GlobalData::setError(int errorCode, std::string argument){
 
 	if(errorCode < SUCCESS || errorCode > WAVE_EXIST){
 		outputToHistory("BUG: errorCode is out of range");
@@ -166,6 +158,8 @@ void GlobalData::setLastError(int errorCode, std::string argument){
 	}
 
 	m_lastError = errorCode;
+	SetOperationNumVar("V_flag",double(errorCode));
+
 	if(argument.size() == 0){
 		m_lastErrorArgument = "(missing argument)";
 	}
@@ -235,7 +229,7 @@ void GlobalData::readSettings(){
 	// we need to check that here to get consistent output, changing debugging with these settings otherwise interferes with the output
 	if(debuggingEnabled()){
 		debugEnabled = true;
-		outputToHistory("Various Settings");
+		outputToHistory("DEBUG: Various Settings");
 	}
 
 	// overwrite setting

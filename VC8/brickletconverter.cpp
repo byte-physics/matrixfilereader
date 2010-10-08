@@ -78,7 +78,7 @@ namespace {
 
 }
 
-int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID){
+int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID, std::string &fullPathOfCreatedWave){
 
 	bool isDoubleWaveType = globDataPtr->doubleWaveEnabled();
 
@@ -249,8 +249,9 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
 			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
-			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));			
-	
+			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
+			fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
+
 			break;
 
 		case 2:
@@ -559,6 +560,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(triggerAxis.physicalUnit).c_str())));
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(rootAxis.physicalUnit).c_str()));
 				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
+				fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
 			}
 
 			break;
@@ -1033,6 +1035,8 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(yAxis.physicalUnit).c_str()));
 				MDSetWaveUnits(waveHandleVector[i],LAYERS,const_cast<char *>(WStringToString(specAxis.physicalUnit).c_str()));
 				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
+
+				fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
 			}
 
 			break;

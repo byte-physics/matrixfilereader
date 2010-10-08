@@ -30,8 +30,8 @@ public:
 	void closeResultFile();
 	BrickletClass* getBrickletClassObject(int brickletID);
 	void createBrickletClassObject(int brickletID, void *pBricklet);
-	void setError(double *functionReturnValue, int errorCode, std::string msgArgument = std::string());
-	void setInternalError(double *functionReturnValue, int errorCode);
+	void setError(int errorCode, std::string msgArgument = std::string());
+	void setInternalError(int errorCode);
 	int getLastError(){ return m_lastError; }
 	std::string getLastErrorMessage();
 
@@ -62,7 +62,7 @@ private:
 	std::string m_lastErrorArgument;
 	IntBrickletClassPtrMap		m_brickletIDBrickletClassMap;
 
-	void GlobalData::setLastError(int errorCode, std::string argument = std::string());
+	void setLastError(int errorCode, std::string argument = std::string());
 	std::string getLastErrorArgument(){ return m_lastErrorArgument;}
 
 	void enableDatafolder(bool var){ m_datafolder = var; };

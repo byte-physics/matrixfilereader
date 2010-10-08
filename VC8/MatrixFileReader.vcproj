@@ -332,11 +332,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils.cpp"
+				RelativePath=".\operationsinterface.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\xopinterface.cpp"
+				RelativePath=".\utils.cpp"
 				>
 			</File>
 		</Filter>
@@ -373,19 +373,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\operationsinterface.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utils.h"
 				>
 			</File>
 			<File
 				RelativePath=".\version.h"
-				>
-			</File>
-			<File
-				RelativePath=".\xopinterface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\xopinterfacestandard.h"
 				>
 			</File>
 		</Filter>

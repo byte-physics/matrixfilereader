@@ -1,4 +1,3 @@
-
 #include "header.h"
 
 #include "globaldata.h"
@@ -7,7 +6,7 @@
 
 GlobalData *globDataPtr;
 
-GlobalData::GlobalData(): m_VernissageSession(NULL), m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default){
+GlobalData::GlobalData(): m_VernissageSession(NULL), m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default),m_errorToHistory(false){
 
 	try{
 		m_DLLHandler = new DLLHandler;
@@ -19,14 +18,20 @@ GlobalData::GlobalData(): m_VernissageSession(NULL), m_DLLHandler(NULL), m_lastE
 	}
 }
 
-void GlobalData::setResultFile(std::string dirPath, std::string fileName){
+GlobalData::~GlobalData(){
+
+	delete m_DLLHandler;
+	m_DLLHandler = NULL;
+}
+
+void GlobalData::setResultFile(std::wstring dirPath, std::wstring fileName){
 	
 	if(this->resultFileOpen()){
 		outputToHistory("BUG: there is already a result file open, please close that first");
 		return;
 	}
 	
-	m_resultFilePath = dirPath;
+	m_resultDirPath = dirPath;
 	m_resultFileName = fileName;
 }
 
@@ -43,23 +48,22 @@ Vernissage::Session* GlobalData::getVernissageSession(){
 
 void GlobalData::closeResultFile(){
 
-	//unload bricklets
+	//delete BrickletClass objects
 	IntBrickletClassPtrMap::const_iterator it;
 	for(it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++){
 		delete it->second;
 	}
+	// empty bricklet map
+	m_brickletIDBrickletClassMap.clear();
 
 	// remove opened result set from internal database
 	if(m_VernissageSession){
 		m_VernissageSession->eraseResultSets();
 	}
 
-	// empty bricklet map
-	m_brickletIDBrickletClassMap.clear();
-
 	// erase filenames
 	m_resultFileName.erase();
-	m_resultFilePath.erase();
+	m_resultDirPath.erase();
 }
 
 void GlobalData::closeSession(){
@@ -88,13 +92,22 @@ bool GlobalData::resultFileOpen(){
 
 std::string GlobalData::getDirPath(){
 
-	return m_resultFilePath;
+	return WStringToString(m_resultDirPath);
+}
+std::string GlobalData::getFileName(){
+
+	return WStringToString(m_resultFileName);
 }
 
-std::string GlobalData::getFileName(){
+std::wstring GlobalData::getDirPathWString(){
+
+	return m_resultDirPath;
+}
+std::wstring GlobalData::getFileNameWString(){
 
 	return m_resultFileName;
 }
+
 
 int GlobalData::getIgorWaveType(){
 
@@ -140,13 +153,26 @@ void GlobalData::createBrickletClassObject(int brickletID, void *pBricklet){
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 }
 
-
 void GlobalData::setInternalError(int errorValue){
 
-	setError(errorValue);
+	char errorMessage[256];
+	int ret;
 
 	sprintf(globDataPtr->outputBuffer,"BUG: xop internal error %d returned.",errorValue);
-	outputToHistory(globDataPtr->outputBuffer);
+	debugOutputToHistory(globDataPtr->outputBuffer);
+
+	ret = GetIgorErrorMessage(errorValue,errorMessage);
+	if(ret == 0){
+		outputToHistory(errorMessage);		
+	}
+}
+
+void GlobalData::initialize(int calledFromMacro,int calledFromFunction){
+
+	this->readSettings();
+	m_errorToHistory = false;	// otherwise the setError in the next line causes the error message to be printout
+	this->setError(UNKNOWN_ERROR);
+	m_errorToHistory = ( calledFromMacro == 0 && calledFromFunction == 0 );
 }
 
 void GlobalData::setError(int errorCode, std::string argument){
@@ -158,7 +184,7 @@ void GlobalData::setError(int errorCode, std::string argument){
 	}
 
 	m_lastError = errorCode;
-	SetOperationNumVar("V_flag",double(errorCode));
+	SetOperationNumVar(V_flag,double(errorCode));
 
 	if(argument.size() == 0){
 		m_lastErrorArgument = "(missing argument)";
@@ -168,13 +194,21 @@ void GlobalData::setError(int errorCode, std::string argument){
 	}
 	sprintf(globDataPtr->outputBuffer,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
 	debugOutputToHistory(globDataPtr->outputBuffer);
+	
+	if(m_errorToHistory && errorCode != SUCCESS){
+		outputToHistory(getLastErrorMessage().c_str());
+	}
 }
 
 std::string GlobalData::getLastErrorMessage(){
+	return getErrorMessage(getLastError());
+}
+
+std::string GlobalData::getErrorMessage(int errorCode){
 
 	std::string msg;
 
-	switch(m_lastError){
+	switch(errorCode){
 
 	case SUCCESS:
 		msg = "No error, everything went nice and smoothly.";

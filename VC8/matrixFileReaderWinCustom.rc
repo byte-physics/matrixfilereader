@@ -54,5 +54,7 @@ BEGIN
 	XOPOp | utilOp | compilableOp,
 	"CheckForNewBricklets\0",
 	XOPOp | utilOp | compilableOp,
+	"GetXOPErrorMessage\0",
+	XOPOp | utilOp | compilableOp,
 	"\0"							// NOTE: 0 required to terminate the resource.
 END

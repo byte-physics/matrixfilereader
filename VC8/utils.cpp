@@ -436,7 +436,7 @@ int createRawDataWave(DataFolderHandle dataFolderHandle,char *waveName, int bric
 
 	if(count == 0 || pBuffer == NULL){
 		outputToHistory("Could not load bricklet contents.");
-		globDataPtr->setError(UNKNOWN_ERROR);
+		
 		return 0;
 	}
 	// create 1D wave with count points

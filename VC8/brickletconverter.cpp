@@ -250,7 +250,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 			
 			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
 			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
-			fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
+			fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandle));
 
 			break;
 

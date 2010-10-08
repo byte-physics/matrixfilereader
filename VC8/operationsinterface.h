@@ -10,6 +10,3 @@
 /* Prototypes */
 HOST_IMPORT int main(IORecHandle ioRecHandle);
 static void XOPEntry();
-
-// Operation template: GetResultFileMetaData /N=string:waveName
-

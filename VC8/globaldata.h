@@ -19,10 +19,11 @@ public:
 	// functions
 
 	// return the filename and the dirPath of the currently loaded result set
+	std::wstring getFileNameWString();
+	std::wstring getDirPathWString();
 	std::string getFileName();
 	std::string getDirPath();
-	void setResultFile(char *dirPath, char *fileName){ this->setResultFile(std::string(dirPath),std::string(fileName));}
-	void setResultFile( std::string dirPath, std::string fileName);
+	void setResultFile( std::wstring dirPath, std::wstring fileName);
 	bool resultFileOpen();
 	Vernissage::Session* getVernissageSession();
 	std::string getVernissageVersion();
@@ -34,6 +35,9 @@ public:
 	void setInternalError(int errorCode);
 	int getLastError(){ return m_lastError; }
 	std::string getLastErrorMessage();
+	std::string getErrorMessage(int errorCode);
+
+	void initialize(int calledFromMacro,int calledFromFunction);
 
 	void readSettings();
 	// debug
@@ -55,9 +59,10 @@ public:
 
 private:
 	bool m_debug,m_doubleWave, m_datafolder, m_overwrite;
-	std::string m_resultFileName, m_resultFilePath;
+	std::wstring m_resultFileName, m_resultDirPath;
 	Vernissage::Session *m_VernissageSession;
 	DLLHandler *m_DLLHandler;
+	bool m_errorToHistory;
 	int m_lastError;
 	std::string m_lastErrorArgument;
 	IntBrickletClassPtrMap		m_brickletIDBrickletClassMap;

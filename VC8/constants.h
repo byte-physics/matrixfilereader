@@ -59,3 +59,17 @@ const char double_option_name[] = "V_MatrixFileReaderDouble";
 const char properVernissageVersion[] ="2.0";
 
 const char keyList_default[] = "brickletID;scanCycleCount;runCycleCount;sequenceID;dimension;channelName";
+
+// runTime variables
+const char V_flag[]				= "V_flag";
+const char V_startBrickletID[]	= "V_startBrickletID";
+const char V_endBrickletID[]	= "V_endBrickletID";
+const char V_count[]			= "V_count";
+const char V_XOPversion[]		= "V_XOPversion";
+const char V_DLLversion[]		= "V_DLLversion";
+
+const char S_fileName[]			= "S_fileName";
+const char S_dirPath[]			= "S_dirPath";
+const char S_value[]			= "S_value";
+const char S_waveNameList[]		= "S_waveNameList";
+const char S_errorMessage[]		= "S_errorMessage";

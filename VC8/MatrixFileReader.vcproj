@@ -377,6 +377,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\operationstructs.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utils.h"
 				>
 			</File>

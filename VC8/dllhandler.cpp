@@ -16,6 +16,8 @@ DLLHandler::DLLHandler():
 	m_vernissageVersion("0.00"){
 }
 
+DLLHandler::~DLLHandler(){};
+
 void DLLHandler::closeSession(){
 
 	if(m_pReleaseSessionFunc != NULL){

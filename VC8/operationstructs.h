@@ -1,4 +1,28 @@
+#pragma once
+
 #include "header.h"
+
+// Operation template: GetXOPErrorMessage [number:errorCode]
+
+// Runtime param structure for GetXOPErrorMessage operation.
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct GetXOPErrorMessageRuntimeParams {
+	// Flag parameters.
+
+	// Main parameters.
+
+	// Parameters for simple main group #0.
+	int errorCodeEncountered;
+	double errorCode;						// Optional parameter.
+	int errorCodeParamsSet[1];
+
+	// These are postamble fields that Igor sets.
+	int calledFromFunction;					// 1 if called from a user function, 0 otherwise.
+	int calledFromMacro;					// 1 if called from a macro, 0 otherwise.
+};
+typedef struct GetXOPErrorMessageRuntimeParams GetXOPErrorMessageRuntimeParams;
+typedef struct GetXOPErrorMessageRuntimeParams* GetXOPErrorMessageRuntimeParamsPtr;
+#pragma pack()	// All structures passed to Igor are two-byte aligned.
 
 // Runtime param structure for GetResultFileMetaData operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.

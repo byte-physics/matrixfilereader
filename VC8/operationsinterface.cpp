@@ -102,7 +102,7 @@ static int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
 static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
-	SetOperationStrVar(S_waveNameList,"");
+	SetOperationStrVar(S_waveNames,"");
 
 	std::string waveName, fullPathOfCreatedWaves;
 	std::vector<std::string> keys,values;
@@ -138,7 +138,7 @@ static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
 		}
 	}
 	else{
-		waveName = overViewTableDefault;
+		waveName = resultMetaDefault;
 	}
 
 	bricklet = globDataPtr->getBrickletClassObject(numberOfBricklets);
@@ -191,7 +191,7 @@ static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
 		return 0;
 	}
 
-	SetOperationStrVar(S_waveNameList,fullPathOfCreatedWaves.c_str());
+	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
 	globDataPtr->setError(SUCCESS);
 	return 0;
 }
@@ -199,7 +199,7 @@ static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
 static int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
-	SetOperationStrVar(S_waveNameList,"");
+	SetOperationStrVar(S_waveNames,"");
 
 	int ret=-1;
 	std::string keyList, key, value, waveName;
@@ -312,14 +312,13 @@ static int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 		return 0;
 	}
 
-	SetOperationStrVar(S_waveNameList,getFullWavePath(parentDataFolderHPtr,waveHandle).c_str());
+	SetOperationStrVar(S_waveNames,getFullWavePath(parentDataFolderHPtr,waveHandle).c_str());
 	globDataPtr->setError(SUCCESS);
 	return 0;
 }
 
 static int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_value,"");
 
 	std::string str;
@@ -427,7 +426,7 @@ static int ExecuteGetBrickletRawData(GetBrickletMetaDataRuntimeParamsPtr p){
 static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
-	SetOperationStrVar(S_waveNameList,"");
+	SetOperationStrVar(S_waveNames,"");
 
 	const char *sepChar = ";";
 	std::string fullPathOfCreatedWaves, baseName;
@@ -562,7 +561,7 @@ static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		SpinProcess();
 	}
 
-	ret = SetOperationStrVar(S_waveNameList,fullPathOfCreatedWaves.c_str());
+	ret = SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
 	if(ret != 0){
 		globDataPtr->setInternalError(ret);
 		return 0;
@@ -585,7 +584,6 @@ static int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p)
 	}
 	outputToHistory(errorMessage.c_str());
 
-	globDataPtr->setError(SUCCESS);
 	return 0;
 }
 
@@ -609,7 +607,6 @@ static int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
 
 static int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
 
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationNumVar(V_DLLversion,0);
 
 	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
@@ -620,8 +617,6 @@ static int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
 }
 
 static int ExecuteGetMtrxFileReaderVersion(GetMtrxFileReaderVersionRuntimeParamsPtr p){
-
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
 	SetOperationNumVar(V_XOPversion,stringToAnyType<double>(myXopVersion));
 	return 0;
@@ -760,7 +755,7 @@ static int RegisterGetResultFileMetaData(void){
 	// NOTE: If you change this template, you must change the GetResultFileMetaDataRuntimeParams structure as well.
 	cmdTemplate = "GetResultFileMetaData /N=string:waveName";
 	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNameList;
+	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetResultFileMetaDataRuntimeParams), (void*)ExecuteGetResultFileMetaData, 0);
 }
 
@@ -856,7 +851,7 @@ static int RegisterGetBrickletData(void){
 	// NOTE: If you change this template, you must change the GetBrickletDataRuntimeParams structure as well.
 	cmdTemplate = "GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
 	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNameList;
+	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletDataRuntimeParams), (void*)ExecuteGetBrickletData, 0);
 }
 
@@ -868,7 +863,7 @@ static int RegisterGetBrickletMetaData(void){
 	// NOTE: If you change this template, you must change the GetBrickletMetaDataRuntimeParams structure as well.
 	cmdTemplate = "GetBrickletMetaData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
 	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNameList;
+	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletMetaDataRuntimeParams), (void*)ExecuteGetBrickletMetaData, 0);
 }
 
@@ -880,7 +875,7 @@ static int RegisterGetBrickletRawData(void){
 	// NOTE: If you change this template, you must change the GetBrickletRawDataRuntimeParams structure as well.
 	cmdTemplate = "GetBrickletRawData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
 	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNameList;
+	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletRawDataRuntimeParams), (void*)ExecuteGetBrickletRawData, 0);
 }
 
@@ -904,7 +899,7 @@ static int RegisterCreateOverviewTable(void){
 	// NOTE: If you change this template, you must change the CreateOverviewTableRuntimeParams structure as well.
 	cmdTemplate = "CreateOverviewTable /N=string:waveName /KEYS=string:keyList";
 	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNameList;
+	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(CreateOverviewTableRuntimeParams), (void*)ExecuteCreateOverviewTable, 0);
 }
 

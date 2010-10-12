@@ -8,10 +8,10 @@ const char brickletDataDefault[]	 = "brickletData";
 const char brickletMetaDefault[]	 = "brickletMetaData";
 const char resultMetaDefault[]		 = "resultFileMetaData";
 const char overViewTableDefault[]	 = "overViewTable";
-const char brickletRawDefault[] = "brickletRawData";
-const char brickletMetaDataFormat[]	 = "%s_%04d";
-const char brickletDataFormat[]		 = "%s_%04d";
-const char dataFolderFormat[]		 = "X_%04d";
+const char brickletRawDefault[]		 = "brickletRawData";
+const char brickletMetaDataFormat[]	 = "%s_%05d";
+const char brickletDataFormat[]		 = "%s_%05d";
+const char dataFolderFormat[]		 = "X_%05d";
 
 // value types from element instance parameters
 const char VT_SPECIAL_STRING[] = "vt_Special";
@@ -71,5 +71,5 @@ const char V_DLLversion[]		= "V_DLLversion";
 const char S_fileName[]			= "S_fileName";
 const char S_dirPath[]			= "S_dirPath";
 const char S_value[]			= "S_value";
-const char S_waveNameList[]		= "S_waveNameList";
+const char S_waveNames[]		= "S_waveNames";
 const char S_errorMessage[]		= "S_errorMessage";

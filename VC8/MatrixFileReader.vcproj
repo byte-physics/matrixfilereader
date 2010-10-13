@@ -46,11 +46,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_T2.0_8\src\Incl&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;"
+				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_T2.0_8\src\Incl&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\IgorXOPs6\XOPSupport&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Release/matrixFileReader.pch"
 				AssemblerListingLocation=".\Release/"
@@ -67,7 +66,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="..\..\XOPSupport"
+				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -75,11 +74,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="version.lib igor.lib XOPSupport.lib"
+				AdditionalDependencies="version.lib XOPSupport.lib igor.lib"
 				OutputFile="matrixFileReader.xop"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport\VC8&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\IgorXOPs6\XOPSupport\VC8&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\IgorXOPs6\XOPSupport&quot;"
 				IgnoreDefaultLibraryNames=""
 				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"
 				ImportLibrary=".\Release/matrixFileReader.lib"

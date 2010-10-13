@@ -550,7 +550,7 @@ static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 			globDataPtr->setError(ret,waveName);
 			return 0;
 		}
-		else if(ret == INTERNAL_ERROR_CONVERTING_DATA){
+		else if(ret == INTERNAL_ERROR_CONVERTING_DATA || ret == UNKNOWN_ERROR){
 			globDataPtr->setError(ret);
 			return 0;
 		}

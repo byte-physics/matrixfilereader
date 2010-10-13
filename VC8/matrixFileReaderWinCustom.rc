@@ -4,7 +4,7 @@
 	resources that IGOR looks for in an XOP module.
 */
 
-#include "C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport\XOPResources.h"			// Defines XOP-specific symbols.
+#include "C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\IgorXOPs6\XOPSupport\XOPResources.h"			// Defines XOP-specific symbols.
 
 1100 STR#					// Custom error messages
 BEGIN

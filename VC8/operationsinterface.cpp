@@ -3,8 +3,6 @@
 #include "operationstructs.h"
 #include "operationsinterface.h"
 
-#include "xopinterfacestandard.h"
-
 #include <algorithm>
 #include <string>
 #include <math.h>
@@ -13,10 +11,21 @@
 #include "brickletconverter.h"
 #include "globaldata.h"
 
-enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4};
+namespace{
+	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4};
+}
 
-static int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
+#define BEGIN_OUTER_CATCH	try{
+#define END_OUTER_CATCH		}\
+							catch(...){\
+								sprintf(globDataPtr->outputBuffer,"Unexpected exception caught in line %s, function %s,  file %s\r", __LINE__, __FUNCTION__, __FILE__);\
+								XOPNotice(globDataPtr->outputBuffer);\
+								globDataPtr->setError(UNKNOWN_ERROR);\
+								return 0;\
+							}
 
+int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
 	void* pContext  = NULL, *pBricklet = NULL;
@@ -77,7 +86,7 @@ static int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
 		return 0;
 	}
 
-	// from here on we know that numberOfBricklets > oldNumberOfBricklets 
+	// from here on we know that numberOfBricklets >= oldNumberOfBricklets 
 	if(oldNumberOfBricklets == numberOfBricklets){
 		globDataPtr->setError(NO_NEW_BRICKLETS);
 		return 0;
@@ -95,12 +104,13 @@ static int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
 		return 0;
 	}
 
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
 }
 
-static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
-
+int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
@@ -123,11 +133,6 @@ static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
 
 	const int numberOfBricklets = pSession->getBrickletCount();
 
-	if(numberOfBricklets == 0){
-		globDataPtr->setError(EMPTY_RESULTFILE);
-		return 0;
-	}
-
 	// check waveName parameter
 	if (p->NFlagEncountered){
 		if( GetHandleSize(p->waveName) == 0L ){
@@ -141,16 +146,6 @@ static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
 		waveName = resultMetaDefault;
 	}
 
-	bricklet = globDataPtr->getBrickletClassObject(numberOfBricklets);
-	ASSERT_RETURN_ZERO(bricklet);	
-	pBricklet  = bricklet->getBrickletPointer();
-	ASSERT_RETURN_ZERO(pBricklet);
-
-	// use the timestamp of the last bricklet as dateOfLastChange
-	ctime = pSession->getCreationTimestamp(pBricklet);
-
-	brickletMetaData = pSession->getMetaData(pBricklet);
-
 	keys.push_back("resultFilePath");
 	values.push_back(globDataPtr->getDirPath());
 
@@ -160,24 +155,55 @@ static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
 	keys.push_back("totalNumberOfBricklets");
 	values.push_back(anyTypeToString<int>(numberOfBricklets));
 
-	keys.push_back("dateOfLastChange");
-	sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
-	values.push_back(buf);
+	if(numberOfBricklets > 0){
+		bricklet = globDataPtr->getBrickletClassObject(numberOfBricklets);
+		ASSERT_RETURN_ZERO(bricklet);	
+		pBricklet  = bricklet->getBrickletPointer();
+		ASSERT_RETURN_ZERO(pBricklet);
 
-	keys.push_back("timeStampOfLastChange");
-	values.push_back(anyTypeToString<time_t>(mktime(&ctime)));
+		// use the timestamp of the last bricklet as dateOfLastChange
+		ctime = pSession->getCreationTimestamp(pBricklet);
 
-	keys.push_back("BrickletMetaData.fileCreatorName");
-	values.push_back(WStringToString(brickletMetaData.fileCreatorName));
+		brickletMetaData = pSession->getMetaData(pBricklet);
 
-	keys.push_back("BrickletMetaData.fileCreatorVersion");
-	values.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
+		keys.push_back("dateOfLastChange");
+		sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
+		values.push_back(buf);
 
-	keys.push_back("BrickletMetaData.userName");
-	values.push_back(WStringToString(brickletMetaData.userName));
+		keys.push_back("timeStampOfLastChange");
+		values.push_back(anyTypeToString<time_t>(mktime(&ctime)));
 
-	keys.push_back("BrickletMetaData.accountName");
-	values.push_back(WStringToString(brickletMetaData.accountName));
+		keys.push_back("BrickletMetaData.fileCreatorName");
+		values.push_back(WStringToString(brickletMetaData.fileCreatorName));
+
+		keys.push_back("BrickletMetaData.fileCreatorVersion");
+		values.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
+
+		keys.push_back("BrickletMetaData.userName");
+		values.push_back(WStringToString(brickletMetaData.userName));
+
+		keys.push_back("BrickletMetaData.accountName");
+		values.push_back(WStringToString(brickletMetaData.accountName));
+	}
+	else{
+		keys.push_back("dateOfLastChange");
+		values.push_back("");
+
+		keys.push_back("timeStampOfLastChange");
+		values.push_back("");
+
+		keys.push_back("BrickletMetaData.fileCreatorName");
+		values.push_back("");
+
+		keys.push_back("BrickletMetaData.fileCreatorVersion");
+		values.push_back("");
+
+		keys.push_back("BrickletMetaData.userName");
+		values.push_back("");
+
+		keys.push_back("BrickletMetaData.accountName");
+		values.push_back("");
+	}
 
 	// brickletID=0 because we are handling resultfile metadata
 	ret = createAndFillTextWave(keys,values,NULL,waveName.c_str(),0,fullPathOfCreatedWaves);
@@ -192,12 +218,13 @@ static int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
 	}
 
 	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
 }
 
-static int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
-
+int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
@@ -208,7 +235,7 @@ static int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	BrickletClass *bricklet=NULL;
 	int i, j;
 
-	long dimensionSizes[MAX_DIMENSIONS+1];
+	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
 	std::vector<std::string> keys, textWaveContents;
@@ -313,12 +340,13 @@ static int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	}
 
 	SetOperationStrVar(S_waveNames,getFullWavePath(parentDataFolderHPtr,waveHandle).c_str());
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
 }
 
-static int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
-
+int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	SetOperationStrVar(S_value,"");
 
 	std::string str;
@@ -358,12 +386,12 @@ static int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	SetOperationStrVar(S_value,str.c_str());
 
 	outputToHistory(str.c_str());
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
 }
 
-
-static int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
+int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
@@ -379,11 +407,15 @@ static int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
 	params.RFlagEncountered		= p->RFlagEncountered;
 	params.RFlagParamsSet[0]	= p->RFlagParamsSet[0];
 	params.RFlagParamsSet[1]	= p->RFlagParamsSet[1];
+
+	params.SFlagEncountered		= p->SFlagEncountered;
+	params.SFlagParamsSet[0]	= p->SFlagParamsSet[0];
+	params.SFlagParamsSet[1]	= p->SFlagParamsSet[1];
 
 	return GenericGetBricklet(&params,CONVERTED_DATA);
 }
 
-static int ExecuteGetBrickletMetaData(GetBrickletDataRuntimeParamsPtr p){
+int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
@@ -399,11 +431,15 @@ static int ExecuteGetBrickletMetaData(GetBrickletDataRuntimeParamsPtr p){
 	params.RFlagEncountered		= p->RFlagEncountered;
 	params.RFlagParamsSet[0]	= p->RFlagParamsSet[0];
 	params.RFlagParamsSet[1]	= p->RFlagParamsSet[1];
+
+	params.SFlagEncountered		= 0;
+	params.SFlagParamsSet[0]	= 0;
+	params.SFlagParamsSet[1]	= 0;
 
 	return GenericGetBricklet(&params,META_DATA);
 }
 
-static int ExecuteGetBrickletRawData(GetBrickletMetaDataRuntimeParamsPtr p){
+int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
@@ -420,11 +456,15 @@ static int ExecuteGetBrickletRawData(GetBrickletMetaDataRuntimeParamsPtr p){
 	params.RFlagParamsSet[0]	= p->RFlagParamsSet[0];
 	params.RFlagParamsSet[1]	= p->RFlagParamsSet[1];
 
+	params.SFlagEncountered		= 0;
+	params.SFlagParamsSet[0]	= 0;
+	params.SFlagParamsSet[1]	= 0;
+
 	return GenericGetBricklet(&params,RAW_DATA);
 }
 
-static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
-
+int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
+	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
@@ -436,6 +476,7 @@ static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
 	int brickletID=-1, ret=-1;
 	int startBrickletID=-1, endBrickletID=-1;
+	double resampleSize=0;
 
 	if(!globDataPtr->resultFileOpen()){
 		globDataPtr->setError(NO_FILE_OPEN);
@@ -494,12 +535,21 @@ static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				break;
 			case CONVERTED_DATA:
 				baseName = brickletDataDefault;
+				if(p->SFlagEncountered){
+					if(p->size < 50 || p->size > 500){
+						globDataPtr->setError(WRONG_PARAMETER,"size");
+						return 0;
+					}
+					else{
+						resampleSize = p->size;
+					}
+				}
 				break;
 			case META_DATA:
 				baseName = brickletMetaDefault;
 				break;
 			default:
-				outputToHistory("Error in calling GenericGetBricklet");
+				outputToHistory("BUG: Error in GenericGetBricklet");
 				return 0;
 				break;
 		}
@@ -534,16 +584,20 @@ static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				ret = createRawDataWave(newDataFolderHPtr,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			case CONVERTED_DATA:
-				ret = createWaves(newDataFolderHPtr,waveName,brickletID,fullPathOfCreatedWaves);		
+				ret = createWaves(newDataFolderHPtr,waveName,brickletID,resampleSize,fullPathOfCreatedWaves);		
 				break;
 			case META_DATA:
 				bricklet->getBrickletMetaData(keys,values);
 				ret = createAndFillTextWave(keys,values,newDataFolderHPtr,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			default:
-				outputToHistory("Error in calling GenericGetBricklet");
+				outputToHistory("Error in GenericGetBricklet");
 				return 0;
 				break;
+		}
+
+		if(!globDataPtr->dataCacheEnabled()){
+			bricklet->clearCache();
 		}
 
 		if(ret == WAVE_EXIST){
@@ -558,7 +612,10 @@ static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 			globDataPtr->setInternalError(ret);
 			return 0;
 		}
-		SpinProcess();
+		//check for user abort
+		if( SpinProcess() != 0 ){
+			break;
+		}
 	}
 
 	ret = SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
@@ -567,12 +624,12 @@ static int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		return 0;
 	}
 
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
 }
 
-static int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p)
-{
+int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
 	std::string errorMessage;
 
 	// return requested error message
@@ -583,11 +640,10 @@ static int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p)
 		errorMessage = globDataPtr->getLastErrorMessage();
 	}
 	outputToHistory(errorMessage.c_str());
-
 	return 0;
 }
 
-static int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
+int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
 
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_fileName,"");
@@ -601,32 +657,33 @@ static int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
 	SetOperationStrVar(S_fileName,globDataPtr->getFileName().c_str());
 	SetOperationStrVar(S_dirPath,globDataPtr->getDirPath().c_str());
 
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
 	return 0;
 }
 
-static int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
-
+int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	SetOperationNumVar(V_DLLversion,0);
 
 	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	SetOperationNumVar(V_DLLversion,stringToAnyType<double>(globDataPtr->getVernissageVersion()));
+	END_OUTER_CATCH
 	return 0;
 }
 
-static int ExecuteGetMtrxFileReaderVersion(GetMtrxFileReaderVersionRuntimeParamsPtr p){
+int ExecuteGetVersion(GetVersionRuntimeParamsPtr p){
 
 	SetOperationNumVar(V_XOPversion,stringToAnyType<double>(myXopVersion));
 	return 0;
 }
 
-static int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
-
+int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
-	char fullPath[MAX_PATH_LEN+1], fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1], fileNameOrPath[MAX_PATH_LEN+1];
+	char fullPath[MAX_PATH_LEN+1]="", fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1], fileNameOrPath[MAX_PATH_LEN+1];
 	int ret = 0,i, offset=0,count=0, maxCount=100;
 	void* pContext  = NULL, *pBricklet = NULL;
 	bool loadSuccess;
@@ -641,22 +698,32 @@ static int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		return 0;
 	}
 
-	// check for empty mandatory parameters
-	if(!p->fileNameOrPathEncountered || p->fileNameOrPath == NULL || GetHandleSize(p->fileNameOrPath) == 0L){
-		globDataPtr->setError(WRONG_PARAMETER,"fileNameOrPath");
-		return 0;
-	}
+	if(p->fileNameOrPathEncountered && p->fileNameOrPathParamsSet[0] \
+		&& p->fileNameOrPath != NULL && GetHandleSize(p->fileNameOrPath) != 0L){
 
-	ret = GetCStringFromHandle(p->fileNameOrPath,fileNameOrPath,MAX_PATH_LEN);
-	if( ret != 0 ){
-		globDataPtr->setInternalError(ret);
-		return 0;
+			ret = GetCStringFromHandle(p->fileNameOrPath,fileNameOrPath,MAX_PATH_LEN);
+			if( ret != 0 ){
+				globDataPtr->setInternalError(ret);
+				return 0;
+			}
+			ret = GetFullPathFromSymbolicPathAndFilePath(p->pathName,fileNameOrPath,fullPath);
+			if( ret != 0){
+				globDataPtr->setInternalError(ret);
+				return 0;
+			}
 	}
+	else{
+		// an empty or missing fileNameOrPath parameter result in an openfile dialog being displayed
 
-	ret = GetFullPathFromSymbolicPathAndFilePath(p->pathName,fileNameOrPath,fullPath);
-	if( ret != 0){
-		globDataPtr->setInternalError(ret);
-		return 0;
+		ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(globDataPtr->openDlgFileIndex), globDataPtr->openDlgInitialDir, fullPath);
+		if(ret == -1){ //the user cancelled the dialog
+			globDataPtr->setError(WRONG_PARAMETER,"fileNameOrPath");
+			return 0;
+		}
+		else if(ret != 0){
+			globDataPtr->setInternalError(ret);
+			return 0;
+		}
 	}
 
 	ret = GetDirectoryAndFileNameFromFullPath(fullPath,dirPath,fileName);
@@ -709,15 +776,24 @@ static int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	for(i=1; i <= pSession->getBrickletCount(); i++ ){
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
-		globDataPtr->createBrickletClassObject(i,pBricklet);
+		try{
+			globDataPtr->createBrickletClassObject(i,pBricklet);
+		}
+		catch(CMemoryException *e){
+			e->Delete();
+			sprintf(globDataPtr->outputBuffer,"Could not reserve memory for brickletID %d, giving up",i);
+			outputToHistory(globDataPtr->outputBuffer);
+			break;
+		}
 	}
 
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
 }
 
-static int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
-
+int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
 	if(!globDataPtr->resultFileOpen()){
@@ -729,12 +805,13 @@ static int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
 	ASSERT_RETURN_ZERO(pSession);
 
 	SetOperationNumVar(V_count,pSession->getBrickletCount());
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
 }
 
-static int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p){
-
+int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p){
+	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
 	if(!globDataPtr->resultFileOpen()){
@@ -743,176 +820,9 @@ static int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p){
 	}
 	globDataPtr->closeResultFile();
 
-	globDataPtr->setError(SUCCESS);
+	globDataPtr->finalize();
+	END_OUTER_CATCH
 	return 0;
-}
-
-static int RegisterGetResultFileMetaData(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetResultFileMetaDataRuntimeParams structure as well.
-	cmdTemplate = "GetResultFileMetaData /N=string:waveName";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNames;
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetResultFileMetaDataRuntimeParams), (void*)ExecuteGetResultFileMetaData, 0);
-}
-
-static int RegisterGetMtrxFileReaderVersion(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetMtrxFileReaderVersionRuntimeParams structure as well.
-	cmdTemplate = "GetMtrxFileReaderVersion";
-	runtimeNumVarList = V_XOPversion;
-	runtimeStrVarList = "";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetMtrxFileReaderVersionRuntimeParams), (void*)ExecuteGetMtrxFileReaderVersion, 0);
-}
-
-static int RegisterGetVernissageVersion(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetVernissageVersionRuntimeParams structure as well.
-	cmdTemplate = "GetVernissageVersion";
-	runtimeNumVarList = V_DLLversion;
-	runtimeStrVarList = "";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetVernissageVersionRuntimeParams), (void*)ExecuteGetVernissageVersion, 0);
-}
-
-static int RegisterGetXOPErrorMessage(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetXOPErrorMessageRuntimeParams structure as well.
-	cmdTemplate = "GetXOPErrorMessage [number:errorCode]";
-	runtimeNumVarList = "";
-	runtimeStrVarList = "";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetXOPErrorMessageRuntimeParams), (void*)ExecuteGetXOPErrorMessage, 0);
-}
-
-static int RegisterOpenResultFile(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the OpenResultFileRuntimeParams structure as well.
-	cmdTemplate = "OpenResultFile /K /P=name:pathName string:fileNameOrPath";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = "";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(OpenResultFileRuntimeParams), (void*)ExecuteOpenResultFile, 0);
-}
-
-static int RegisterCloseResultFile(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the CloseResultFileRuntimeParams structure as well.
-	cmdTemplate = "CloseResultFile";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = "";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(CloseResultFileRuntimeParams), (void*)ExecuteCloseResultFile, 0);
-}
-
-static int RegisterGetBrickletCount(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetBrickletCountRuntimeParams structure as well.
-	cmdTemplate = "GetBrickletCount";
-	runtimeNumVarList = "V_flag;V_count";
-	runtimeStrVarList = "";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletCountRuntimeParams), (void*)ExecuteGetBrickletCount, 0);
-}
-
-static int RegisterGetResultFileName(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetResultFileNameRuntimeParams structure as well.
-	cmdTemplate = "GetResultFileName";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = "S_fileName;S_dirPath";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetResultFileNameRuntimeParams), (void*)ExecuteGetResultFileName, 0);
-}
-
-static int RegisterGetBrickletData(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetBrickletDataRuntimeParams structure as well.
-	cmdTemplate = "GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNames;
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletDataRuntimeParams), (void*)ExecuteGetBrickletData, 0);
-}
-
-static int RegisterGetBrickletMetaData(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetBrickletMetaDataRuntimeParams structure as well.
-	cmdTemplate = "GetBrickletMetaData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNames;
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletMetaDataRuntimeParams), (void*)ExecuteGetBrickletMetaData, 0);
-}
-
-static int RegisterGetBrickletRawData(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetBrickletRawDataRuntimeParams structure as well.
-	cmdTemplate = "GetBrickletRawData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNames;
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletRawDataRuntimeParams), (void*)ExecuteGetBrickletRawData, 0);
-}
-
-static int RegisterGetReportTemplate(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the GetReportTemplateRuntimeParams structure as well.
-	cmdTemplate = "GetReportTemplate";
-	runtimeNumVarList = "";
-	runtimeStrVarList = S_value;
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetReportTemplateRuntimeParams), (void*)ExecuteGetReportTemplate, 0);
-}
-
-static int RegisterCreateOverviewTable(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the CreateOverviewTableRuntimeParams structure as well.
-	cmdTemplate = "CreateOverviewTable /N=string:waveName /KEYS=string:keyList";
-	runtimeNumVarList = V_flag;
-	runtimeStrVarList = S_waveNames;
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(CreateOverviewTableRuntimeParams), (void*)ExecuteCreateOverviewTable, 0);
-}
-
-static int RegisterCheckForNewBricklets(void){
-	const char* cmdTemplate;
-	const char* runtimeNumVarList;
-	const char* runtimeStrVarList;
-
-	// NOTE: If you change this template, you must change the CheckForNewBrickletsRuntimeParams structure as well.
-	cmdTemplate = "CheckForNewBricklets";
-	runtimeNumVarList = "V_flag;V_startBrickletID;V_endBrickletID";
-	runtimeStrVarList = "";
-	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(CheckForNewBrickletsRuntimeParams), (void*)ExecuteCheckForNewBricklets, 0);
 }
 
 /*	XOPEntry()
@@ -920,10 +830,11 @@ static int RegisterCheckForNewBricklets(void){
 This is the entry point from the host application to the XOP for all messages after the
 INIT message.
 */
-static void XOPEntry(void){	
+void XOPEntry(void){	
 	long result = 0;
 
-	switch (GetXOPMessage()) {
+	try{
+		switch (GetXOPMessage()) {
 		case CLEANUP:
 			// in case the user has forgotten to close the result file
 			if(globDataPtr->resultFileOpen()){
@@ -934,6 +845,10 @@ static void XOPEntry(void){
 			delete globDataPtr;
 			globDataPtr = NULL;
 			break;
+		}
+	}
+	catch(...){
+		XOPNotice("Unexpected exception in XOPEntry");
 	}
 	SetXOPResult(result);
 }
@@ -959,9 +874,8 @@ HOST_IMPORT int main(IORecHandle ioRecHandle){
 	try{
 		globDataPtr = new GlobalData();
 	}
-	catch(CException *e){
+	catch(...){
 		SetXOPResult(OUT_OF_MEMORY);
-		e->Delete();
 		return EXIT_FAILURE;
 	}
 

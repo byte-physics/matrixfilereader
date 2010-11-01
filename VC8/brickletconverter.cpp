@@ -78,7 +78,7 @@ namespace {
 
 }
 
-int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID, std::string &fullPathOfCreatedWave){
+int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID, double resampleSize, std::string &fullPathOfCreatedWave){
 
 	bool isDoubleWaveType = globDataPtr->doubleWaveEnabled();
 
@@ -110,7 +110,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 	std::vector<std::string>::const_iterator itWaveNames;
 
-	long dimensionSizes[MAX_DIMENSIONS+1];
+	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
 	std::string waveBaseName(waveBaseNameChar);
@@ -163,11 +163,15 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 	// get pointer to raw data
 	const int* pBuffer;
+
 	BrickletClass->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
-	if(rawBrickletSize == 0 || pBuffer == NULL){
+	if(rawBrickletSize == 0 || &pBuffer == NULL){
 		outputToHistory("Could not load bricklet contents.");
 		return UNKNOWN_ERROR;
 	}
+
+	sprintf(globDataPtr->outputBuffer,"pBuffer=%p,count=%d",&pBuffer,rawBrickletSize);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	rawBrickletDataPtr = const_cast<int *> (pBuffer);
 
@@ -243,7 +247,6 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 					extremaData[0].physValRawMax= scaledValue;
 				}
 			}
-
 			setDataWaveNote(brickletID,extremaData[0].rawMin,extremaData[0].rawMax,extremaData[0].physValRawMin,extremaData[0].physValRawMax,waveHandle);
 
 			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
@@ -251,6 +254,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
 			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
 			fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandle));
+			waveHandle = NULL;
 
 			break;
 
@@ -561,6 +565,12 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(rootAxis.physicalUnit).c_str()));
 				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
 				fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
+
+				if( resampleSize =! 0 && ( dimensionSizes[ROWS] > resampleSize || dimensionSizes[COLUMNS] > resampleSize ) ){
+					dimensionSizes[ROWS]    = (CountInt) resampleSize;
+					dimensionSizes[COLUMNS] = (CountInt) resampleSize;
+					MDChangeWave(waveHandleVector[i],globDataPtr->getIgorWaveType(),dimensionSizes);
+				}
 			}
 
 			break;

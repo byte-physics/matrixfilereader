@@ -11,7 +11,7 @@ GlobalData::GlobalData(): m_VernissageSession(NULL), m_DLLHandler(NULL), m_lastE
 	try{
 		m_DLLHandler = new DLLHandler;
 	}
-	catch( CException* e ){
+	catch( CMemoryException* e ){
 		XOPNotice("Out of memory in GlobalData constructor");
 		e->Delete();
 		return;
@@ -78,6 +78,7 @@ std::string GlobalData::getVernissageVersion(){
 	if(m_VernissageSession == NULL){
 		this->getVernissageSession();
 	}
+
 	if(m_DLLHandler != NULL){
 		return m_DLLHandler->getVernissageVersion();
 	}
@@ -137,20 +138,19 @@ BrickletClass* GlobalData::getBrickletClassObject(int brickletID){
 
 void GlobalData::createBrickletClassObject(int brickletID, void *pBricklet){
 	
-	sprintf(globDataPtr->outputBuffer,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
-	debugOutputToHistory(globDataPtr->outputBuffer);
-	
 	BrickletClass *bricklet = NULL;
 	try{
 		bricklet = new BrickletClass(pBricklet,brickletID);
 	}
-	catch(CException *e){
-		XOPNotice("Out of memory in createBrickletClassObject");
-		e->Delete();
-		return;
+	catch(CMemoryException *e){
+		XOPNotice("Out of memory in createBrickletClassObject\r");
+		throw e;
 	}
 
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
+
+	sprintf(globDataPtr->outputBuffer,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 }
 
 void GlobalData::setInternalError(int errorValue){
@@ -164,6 +164,22 @@ void GlobalData::setInternalError(int errorValue){
 	ret = GetIgorErrorMessage(errorValue,errorMessage);
 	if(ret == 0){
 		outputToHistory(errorMessage);		
+	}
+}
+
+void GlobalData::finalize(){
+	this->setError(SUCCESS);
+
+	if(dataCacheEnabled()){
+		return;
+	}
+
+	BrickletClass *bricklet = NULL;
+	for(int i=0; i <= m_VernissageSession->getBrickletCount(); i++){
+
+		bricklet = globDataPtr->getBrickletClassObject(i);
+		ASSERT_RETURN_VOID(bricklet);
+		bricklet->clearCache();
 	}
 }
 
@@ -321,6 +337,21 @@ void GlobalData::readSettings(){
 		setting = doubleToBool(realPart);
 		enableDatafolder(setting);
 		sprintf(globDataPtr->outputBuffer,"DEBUG: datafolder=%d",setting);
+	}
+	if(debugEnabled){
+		outputToHistory(globDataPtr->outputBuffer);
+	}
+
+	// cache setting
+	ret = FetchNumVar(cache_option_name,&realPart,&complexPart);
+	if(ret == -1){// variable does not exist
+		enableDataCaching(cache_default);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: cache=%d (default)",cache_default);
+	}
+	else{
+		setting = doubleToBool(realPart);
+		enableDataCaching(setting);
+		sprintf(globDataPtr->outputBuffer,"DEBUG: cache=%d",setting);
 	}
 	if(debugEnabled){
 		outputToHistory(globDataPtr->outputBuffer);

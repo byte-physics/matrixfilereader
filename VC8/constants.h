@@ -45,15 +45,17 @@ const double doubleEpsilon = 1e-5;
 const int  METADATA_RESERVE_SIZE	= 1000;
 
 // default values for the options
-const bool debug_default	= false;
-const bool double_default = true;
-const bool datafolder_default = true;
+const bool debug_default		= false;
+const bool double_default		= true;
+const bool datafolder_default	= true;
 const bool overwrite_default	= false;
+const bool cache_default		= true;
 
-const char debug_option_name[] = "V_MatrixFileReaderDebug";
+const char debug_option_name[]		= "V_MatrixFileReaderDebug";
 const char datafolder_option_name[] = "V_MatrixFileReaderFolder";
-const char overwrite_option_name[] = "V_MatrixFileReaderOverwrite";
-const char double_option_name[] = "V_MatrixFileReaderDouble";
+const char overwrite_option_name[]	= "V_MatrixFileReaderOverwrite";
+const char double_option_name[]		= "V_MatrixFileReaderDouble";
+const char cache_option_name[]		= "V_MatrixFileReaderCache";
 
 // only a few vernissage DLL version are bug-free enough to be used 
 const char properVernissageVersion[] ="2.0";
@@ -73,3 +75,7 @@ const char S_dirPath[]			= "S_dirPath";
 const char S_value[]			= "S_value";
 const char S_waveNames[]		= "S_waveNames";
 const char S_errorMessage[]		= "S_errorMessage";
+
+const char filterStr[] = "Matrix result files (*.mtrx)\0*.mtrx\0All Files (*.*)\0*.*\0\0";
+const char dlgPrompt[] = "Looking for a MATRIX result file";
+

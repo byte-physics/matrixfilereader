@@ -14,6 +14,7 @@ class DLLHandler{
 
 		// functions
 		Vernissage::Session* createSessionObject();
+		void setLibraryPath();
 		void closeSession();
 		std::string getVernissageVersion(){ return m_vernissageVersion;};
 

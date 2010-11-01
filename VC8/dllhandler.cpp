@@ -31,16 +31,8 @@ void DLLHandler::closeSession(){
 	m_pGetSessionFunc = NULL;
 }
 
-// check the registry for the path to the Vernissage DLLs and return (as pointer in the argument) a pointer to the loaded Foundation.dll
-// Remarks:
-// - Only one vernissage version can be installed at a time, so we take the one which is referenced in the regsitry
-// - The length of the arrays is taken from "Registry Element Size Limits"@MSDN
-// - The registry key looks like "HKEY_LOCAL_MACHINE\SOFTWARE\Omicron NanoTechnology\Vernissage\V1.0\Main"
-Vernissage::Session* DLLHandler::createSessionObject(){
+void DLLHandler::setLibraryPath(){
 
-	Vernissage::Session *pSession=NULL;
-	
-	HMODULE module;
 	BOOL result;
 	char data[16383];
 	
@@ -51,16 +43,12 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 	DWORD subKeyLength = (DWORD) sizeof(subKeyName)/sizeof(WCHAR);
 	int subKeyIndex=0;
 	std::string regBaseKeyName = "SOFTWARE\\Omicron NanoTechnology\\Vernissage";
-	std::string dllName;
-
-	std::vector<std::string> dllNames;
-	dllNames.push_back("Foundation.dll");
 
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regBaseKeyName.c_str(),0,KEY_READ,&hregBaseKey);
 
 	if(result != ERROR_SUCCESS){
-		debugOutputToHistory("Opening the registry key failed. Is Vernissage installed?");
-		return pSession;
+		outputToHistory("Opening a registry key failed. Is Vernissage installed?");
+		return;
 	}
 
 	result = RegEnumKeyEx(hregBaseKey,subKeyIndex, subKeyName, &subKeyLength,NULL,NULL,NULL,NULL);
@@ -68,7 +56,7 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 	if(result != ERROR_SUCCESS){
 		sprintf(globDataPtr->outputBuffer,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
 		debugOutputToHistory(globDataPtr->outputBuffer);
-		return pSession;
+		return;
 	}
 
 	regKey  = regBaseKeyName;
@@ -84,7 +72,7 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 	if(result != ERROR_SUCCESS){
 		sprintf(globDataPtr->outputBuffer,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
 		debugOutputToHistory(globDataPtr->outputBuffer);
-		return pSession;
+		return;
 	}
 
 	result = RegQueryValueEx(hKey,"InstallDirectory",NULL,NULL,(LPBYTE) data,&dataLength);
@@ -95,7 +83,20 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 	if(result != ERROR_SUCCESS){
 		sprintf(globDataPtr->outputBuffer,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
 		debugOutputToHistory(globDataPtr->outputBuffer);
-		return pSession;
+		return;
+	}
+
+	std::string version = subKeyName;
+	m_vernissageVersion = version.substr(1,version.length()-1);
+
+	if(m_vernissageVersion.compare(properVernissageVersion) != 0 ){
+		sprintf(globDataPtr->outputBuffer,"Vernissage version %s can not be used to due a bug in this version. Please install version %s and try again.",m_vernissageVersion.c_str(),properVernissageVersion);
+		outputToHistory(globDataPtr->outputBuffer);
+		return;
+	}
+	else{
+		sprintf(globDataPtr->outputBuffer,"Vernissage version %s",m_vernissageVersion.c_str());
+		debugOutputToHistory(globDataPtr->outputBuffer);	
 	}
 
 	std::string dllDirectory (data);
@@ -106,21 +107,26 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 
 	if(!result){
 		debugOutputToHistory("Error setting DLL load path");
-		return pSession;
+		return;
 	}
+}
 
-	std::string version = subKeyName;
-	m_vernissageVersion = version.substr(1,version.length()-1);
+// FIXME
+// check the registry for the path to the Vernissage DLLs and return (as pointer in the argument) a pointer to the loaded Foundation.dll
+// Remarks:
+// - Only one vernissage version can be installed at a time, so we take the one which is referenced in the regsitry
+// - The length of the arrays is taken from "Registry Element Size Limits"@MSDN
+// - The registry key looks like "HKEY_LOCAL_MACHINE\SOFTWARE\Omicron NanoTechnology\Vernissage\V1.0\Main"
+Vernissage::Session* DLLHandler::createSessionObject(){
 
-	if(m_vernissageVersion.compare(properVernissageVersion) != 0 ){
-		sprintf(globDataPtr->outputBuffer,"Vernissage version %s can not be used to due a bug in this version. Please install version 1.0 and try again.",m_vernissageVersion.c_str());
-		outputToHistory(globDataPtr->outputBuffer);
-		return pSession;
-	}
-	else{
-		sprintf(globDataPtr->outputBuffer,"Vernissage version %s",m_vernissageVersion.c_str());
-		debugOutputToHistory(globDataPtr->outputBuffer);	
-	}
+	Vernissage::Session *pSession=NULL;
+	HMODULE module;
+	std::string dllName;
+
+	std::vector<std::string> dllNames;
+	dllNames.push_back("Foundation.dll");
+
+	setLibraryPath();
 
 	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
 		dllName = *it;

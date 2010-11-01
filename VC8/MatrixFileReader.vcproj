@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="MatrixFileReader"
 	ProjectGUID="{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}"
 	RootNamespace="XFUNC1"
@@ -46,7 +46,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\VernissageSDK_T2.0_8\src\Incl&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\IgorXOPs6\XOPSupport&quot;"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -74,11 +74,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="version.lib XOPSupport.lib igor.lib"
+				AdditionalDependencies="Version.lib"
 				OutputFile="matrixFileReader.xop"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\IgorXOPs6\XOPSupport\VC8&quot;;&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\IgorXOPs6\XOPSupport&quot;"
+				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""
 				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"
 				ImportLibrary=".\Release/matrixFileReader.lib"
@@ -106,7 +106,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy *.xop &quot;..\..\..\..\..\WaveMetrics\Igor Pro 6 User Files\Igor Extensions&quot;"
+				CommandLine="copy *.xop &quot;I:\Dokumente und Einstellungen\thomas\Eigene Dateien\WaveMetrics\Igor Pro 6 User Files\Igor Extensions&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -332,6 +332,10 @@
 			</File>
 			<File
 				RelativePath=".\operationsinterface.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsregister.cpp"
 				>
 			</File>
 			<File

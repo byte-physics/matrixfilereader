@@ -131,7 +131,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
-	long dimensionSizes[MAX_DIMENSIONS+1];
+	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	waveHndl waveHandle;
 	int ret=-1;
 	
@@ -425,7 +425,7 @@ int createRawDataWave(DataFolderHandle dataFolderHandle,char *waveName, int bric
 	const int *pBuffer;
 	int* dataPtr = NULL;
 	int count=0,ret;
-	long dimensionSizes[MAX_DIMENSIONS+1];
+	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 	waveHndl waveHandle;
 

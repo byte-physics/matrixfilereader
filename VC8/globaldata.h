@@ -38,6 +38,7 @@ public:
 	std::string getErrorMessage(int errorCode);
 
 	void initialize(int calledFromMacro,int calledFromFunction);
+	void finalize();
 
 	void readSettings();
 	// debug
@@ -54,18 +55,23 @@ public:
 	bool overwriteEnabled(){ return m_overwrite; };
 	int overwriteEnabledAsInt(){ return int(m_overwrite); };
 
+	// cache
+	bool dataCacheEnabled(){ return m_datacache; };
+
 	// variables
 	char outputBuffer[ARRAY_SIZE];
+	int  openDlgFileIndex;
+	char openDlgInitialDir[MAX_PATH_LEN+1];
 
 private:
-	bool m_debug,m_doubleWave, m_datafolder, m_overwrite;
+	bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
 	std::wstring m_resultFileName, m_resultDirPath;
 	Vernissage::Session *m_VernissageSession;
 	DLLHandler *m_DLLHandler;
 	bool m_errorToHistory;
 	int m_lastError;
 	std::string m_lastErrorArgument;
-	IntBrickletClassPtrMap		m_brickletIDBrickletClassMap;
+	IntBrickletClassPtrMap m_brickletIDBrickletClassMap;
 
 	void setLastError(int errorCode, std::string argument = std::string());
 	std::string getLastErrorArgument(){ return m_lastErrorArgument;}
@@ -74,6 +80,7 @@ private:
 	void enableDoubleWave(bool var){ m_doubleWave = var; };
 	void enableDebugging(bool var){ m_debug=var; };
 	void enableOverwrite(bool var){ m_overwrite = var; };
+	void enableDataCaching(bool var){m_datacache = var; };
 
 };
 

@@ -16,6 +16,7 @@ public:
 	// resetting *pBricklet is only needed after the same result file is loaded again to check for new bricklets
 	void setBrickletPointer(void* pBricklet){ m_brickletPtr = pBricklet;};
 
+	void  clearCache(void);
 	void  getBrickletContentsBuffer(const int** pBuffer, int &count);
 	void  getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values);
 	std::vector<std::wstring> generateAllAxesVector();

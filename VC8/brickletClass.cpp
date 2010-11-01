@@ -10,25 +10,25 @@ BrickletClass::BrickletClass(void* pBricklet,int brickletID):m_brickletPtr(pBric
 
 	m_VernissageSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_VOID(m_VernissageSession);
-
-	try{
-		m_metaDataKeys.reserve(METADATA_RESERVE_SIZE);
-		m_metaDataValues.reserve(METADATA_RESERVE_SIZE);
-	}
-	catch(CException *e){
-			XOPNotice("Out of memory in BrickletClass constructor");
-			e->Delete();
-			return;
-	}
 }
 
-BrickletClass::~BrickletClass(void)
-{
-		if(m_rawBufferContents != NULL){
-			debugOutputToHistory("Deleting raw bricklet data");
-			delete[] m_rawBufferContents;
-			m_rawBufferContents=NULL;
-		}
+BrickletClass::~BrickletClass(void){
+	this->clearCache();
+}
+
+void BrickletClass::clearCache(void){
+
+	if(m_rawBufferContents != NULL){
+		sprintf(globDataPtr->outputBuffer,"Deleting raw data from bricklet %d",m_brickletID);
+		debugOutputToHistory(globDataPtr->outputBuffer);
+		delete[] m_rawBufferContents;
+		m_rawBufferContents=NULL;
+		m_rawBufferContentsSize=0;
+	}
+
+	// resize to zero elements, clear() would only delete them, but not reduce the memory consumption
+	m_metaDataKeys.resize(0);
+	m_metaDataValues.resize(0);
 }
 
 void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
@@ -51,9 +51,27 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		debugOutputToHistory(globDataPtr->outputBuffer);
 	}
 	else{ // we are called the first time
-		
-		// load raw data into vernissage DLL
-		m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
+
+		try{
+			// load raw data from vernissage DLL
+			m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
+		}
+		catch(...){
+			sprintf(globDataPtr->outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
+			outputToHistory(globDataPtr->outputBuffer);
+			*pBuffer = NULL;
+			count = 0;
+			return;	
+		}
+
+		if(*pBuffer == NULL || count == 0){
+			sprintf(globDataPtr->outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
+			outputToHistory(globDataPtr->outputBuffer);
+			m_VernissageSession->unloadBrickletContents(m_brickletPtr);
+			*pBuffer = NULL;
+			count=0;
+			return;
+		}
 
 		sprintf(globDataPtr->outputBuffer,"pBuffer=%d,count=%d",*pBuffer,count);
 		debugOutputToHistory(globDataPtr->outputBuffer);
@@ -74,7 +92,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		try{
 			m_rawBufferContents = new int[m_rawBufferContentsSize];
 		}
-		catch(CException* e){
+		catch(CMemoryException* e){
 			e->Delete();
 			outputToHistory("Out of memory in getBrickletContentsBuffer()");
 			*pBuffer = NULL;
@@ -92,12 +110,13 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 void BrickletClass::getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values){
 
-	
-
 	if(m_metaDataKeys.size() == 0 ||  m_metaDataValues.size() == 0){
 
+		m_metaDataKeys.reserve(METADATA_RESERVE_SIZE);
+		m_metaDataValues.reserve(METADATA_RESERVE_SIZE);
 		loadBrickletMetaDataFromResultFile();
-
+		m_metaDataKeys.resize(m_metaDataKeys.size());
+		m_metaDataValues.resize(m_metaDataValues.size());
 	}
 
 	keys = m_metaDataKeys;

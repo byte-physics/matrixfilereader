@@ -2,9 +2,9 @@
 
 #include "header.h"
 
-// Operation template: GetXOPErrorMessage [number:errorCode]
+// Operation template: MFR_GetXOPErrorMessage [number:errorCode]
 
-// Runtime param structure for GetXOPErrorMessage operation.
+// Runtime param structure for MFR_GetXOPErrorMessage operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetXOPErrorMessageRuntimeParams {
 	// Flag parameters.
@@ -24,7 +24,7 @@ typedef struct GetXOPErrorMessageRuntimeParams GetXOPErrorMessageRuntimeParams;
 typedef struct GetXOPErrorMessageRuntimeParams* GetXOPErrorMessageRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Runtime param structure for GetResultFileMetaData operation.
+// Runtime param structure for MFR_GetResultFileMetaData operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetResultFileMetaDataRuntimeParams {
 	// Flag parameters.
@@ -45,9 +45,9 @@ typedef struct GetResultFileMetaDataRuntimeParams* GetResultFileMetaDataRuntimeP
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
 
-// Operation template: CreateOverviewTable /N=string:waveName /KEYS=string:keyList
+// Operation template: MFR_CreateOverviewTable /N=string:waveName /KEYS=string:keyList
 
-// Runtime param structure for CreateOverviewTable operation.
+// Runtime param structure for MFR_CreateOverviewTable operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct CreateOverviewTableRuntimeParams {
 	// Flag parameters.
@@ -72,9 +72,9 @@ typedef struct CreateOverviewTableRuntimeParams CreateOverviewTableRuntimeParams
 typedef struct CreateOverviewTableRuntimeParams* CreateOverviewTableRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: OpenResultFile /C /P=name:pathName string:fileNameOrPath
+// Operation template: MFR_OpenResultFile /C /P=name:pathName [string:fileNameOrPath]
 
-// Runtime param structure for OpenResultFile operation.
+// Runtime param structure for MFR_OpenResultFile operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct OpenResultFileRuntimeParams {
 	// Flag parameters.
@@ -92,7 +92,7 @@ struct OpenResultFileRuntimeParams {
 
 	// Parameters for simple main group #0.
 	int fileNameOrPathEncountered;
-	Handle fileNameOrPath;
+	Handle fileNameOrPath;					// Optional parameter.
 	int fileNameOrPathParamsSet[1];
 
 	// These are postamble fields that Igor sets.
@@ -104,9 +104,9 @@ typedef struct OpenResultFileRuntimeParams* OpenResultFileRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
 
-// Operation template: CloseResultFile
+// Operation template: MFR_CloseResultFile
 
-// Runtime param structure for CloseResultFile operation.
+// Runtime param structure for MFR_CloseResultFile operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct CloseResultFileRuntimeParams {
 	// Flag parameters.
@@ -121,9 +121,9 @@ typedef struct CloseResultFileRuntimeParams CloseResultFileRuntimeParams;
 typedef struct CloseResultFileRuntimeParams* CloseResultFileRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetBrickletCount
+// Operation template: MFR_GetBrickletCount
 
-// Runtime param structure for GetBrickletCount operation.
+// Runtime param structure for MFR_GetBrickletCount operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetBrickletCountRuntimeParams {
 	// Flag parameters.
@@ -138,9 +138,9 @@ typedef struct GetBrickletCountRuntimeParams GetBrickletCountRuntimeParams;
 typedef struct GetBrickletCountRuntimeParams* GetBrickletCountRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetResultFileName
+// Operation template: MFR_GetResultFileName
 
-// Runtime param structure for GetResultFileName operation.
+// Runtime param structure for MFR_GetResultFileName operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetResultFileNameRuntimeParams {
 	// Flag parameters.
@@ -155,11 +155,11 @@ typedef struct GetResultFileNameRuntimeParams GetResultFileNameRuntimeParams;
 typedef struct GetResultFileNameRuntimeParams* GetResultFileNameRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetMtrxFileReaderVersion
+// Operation template: MFR_GetVersion
 
-// Runtime param structure for GetMtrxFileReaderVersion operation.
+// Runtime param structure for MFR_GetVersion operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
-struct GetMtrxFileReaderVersionRuntimeParams {
+struct GetVersionRuntimeParams {
 	// Flag parameters.
 
 	// Main parameters.
@@ -168,13 +168,13 @@ struct GetMtrxFileReaderVersionRuntimeParams {
 	int calledFromFunction;					// 1 if called from a user function, 0 otherwise.
 	int calledFromMacro;					// 1 if called from a macro, 0 otherwise.
 };
-typedef struct GetMtrxFileReaderVersionRuntimeParams GetMtrxFileReaderVersionRuntimeParams;
-typedef struct GetMtrxFileReaderVersionRuntimeParams* GetMtrxFileReaderVersionRuntimeParamsPtr;
+typedef struct GetVersionRuntimeParams GetVersionRuntimeParams;
+typedef struct GetVersionRuntimeParams* GetVersionRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetVernissageVersion
+// Operation template: MFR_GetVernissageVersion
 
-// Runtime param structure for GetVernissageVersion operation.
+// Runtime param structure for MFR_GetVernissageVersion operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetVernissageVersionRuntimeParams {
 	// Flag parameters.
@@ -189,11 +189,9 @@ typedef struct GetVernissageVersionRuntimeParams GetVernissageVersionRuntimePara
 typedef struct GetVernissageVersionRuntimeParams* GetVernissageVersionRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetBrickletData /R=(number:startBrickletID,number:endBrickletID) /N=string:baseName
+// Operation template: MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:size /N=string:baseName
 
-// Operation template: GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName
-
-// Runtime param structure for GetBrickletData operation.
+// Runtime param structure for MFR_GetBrickletData operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetBrickletDataRuntimeParams {
 	// Flag parameters.
@@ -203,6 +201,11 @@ struct GetBrickletDataRuntimeParams {
 	double startBrickletID;
 	double endBrickletID;					// Optional parameter.
 	int RFlagParamsSet[2];
+
+	// Parameters for /S flag group.
+	int SFlagEncountered;
+	double size;
+	int SFlagParamsSet[1];
 
 	// Parameters for /N flag group.
 	int NFlagEncountered;
@@ -219,9 +222,9 @@ typedef struct GetBrickletDataRuntimeParams GetBrickletDataRuntimeParams;
 typedef struct GetBrickletDataRuntimeParams* GetBrickletDataRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetBrickletMetaData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName
+// Operation template: MFR_GetBrickletMetaData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName
 
-// Runtime param structure for GetBrickletMetaData operation.
+// Runtime param structure for MFR_GetBrickletMetaData operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetBrickletMetaDataRuntimeParams {
 	// Flag parameters.
@@ -247,7 +250,7 @@ typedef struct GetBrickletMetaDataRuntimeParams GetBrickletMetaDataRuntimeParams
 typedef struct GetBrickletMetaDataRuntimeParams* GetBrickletMetaDataRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Runtime param structure for GetBrickletMetaData operation.
+// Runtime param structure for GenericGetBricklet function
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GenericGetBrickletParams {
 	// Flag parameters.
@@ -257,6 +260,11 @@ struct GenericGetBrickletParams {
 	double startBrickletID;
 	double endBrickletID;					// Optional parameter.
 	int RFlagParamsSet[2];
+
+	// Parameters for /S flag group.
+	int SFlagEncountered;
+	double size;
+	int SFlagParamsSet[1];
 
 	// Parameters for /N flag group.
 	int NFlagEncountered;
@@ -273,9 +281,9 @@ typedef struct GenericGetBrickletParams GenericGetBrickletParams;
 typedef struct GenericGetBrickletParams* GenericGetBrickletParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetBrickletRawData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName
+// Operation template: MFR_GetBrickletRawData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName
 
-// Runtime param structure for GetBrickletRawData operation.
+// Runtime param structure for MFR_GetBrickletRawData operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetBrickletRawDataRuntimeParams {
 	// Flag parameters.
@@ -301,9 +309,9 @@ typedef struct GetBrickletRawDataRuntimeParams GetBrickletRawDataRuntimeParams;
 typedef struct GetBrickletRawDataRuntimeParams* GetBrickletRawDataRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: GetReportTemplate
+// Operation template: MFR_GetReportTemplate
 
-// Runtime param structure for GetReportTemplate operation.
+// Runtime param structure for MFR_GetReportTemplate operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct GetReportTemplateRuntimeParams {
 	// Flag parameters.
@@ -320,9 +328,9 @@ typedef struct GetReportTemplateRuntimeParams* GetReportTemplateRuntimeParamsPtr
 
 int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData);
 
-// Operation template: CheckForNewBricklets
+// Operation template: MFR_CheckForNewBricklets
 
-// Runtime param structure for CheckForNewBricklets operation.
+// Runtime param structure for MFR_CheckForNewBricklets operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
 struct CheckForNewBrickletsRuntimeParams {
 	// Flag parameters.

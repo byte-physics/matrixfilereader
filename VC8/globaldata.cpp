@@ -167,19 +167,17 @@ void GlobalData::setInternalError(int errorValue){
 	}
 }
 
-void GlobalData::finalize(){
-	this->setError(SUCCESS);
+void GlobalData::finalize(bool clearCache /* = false */, int errorCode /* = SUCCESS */ ){
+	this->setError(errorCode);
 
-	if(dataCacheEnabled()){
-		return;
-	}
-
-	BrickletClass *bricklet = NULL;
-	for(int i=0; i <= m_VernissageSession->getBrickletCount(); i++){
-
-		bricklet = globDataPtr->getBrickletClassObject(i);
-		ASSERT_RETURN_VOID(bricklet);
-		bricklet->clearCache();
+	if(!dataCacheEnabled() && clearCache){
+		BrickletClass *bricklet = NULL;
+		const int totalBrickletCount = m_VernissageSession->getBrickletCount();
+		for(int i=1; i <= totalBrickletCount; i++){
+			bricklet = globDataPtr->getBrickletClassObject(i);
+			ASSERT_RETURN_VOID(bricklet);
+			bricklet->clearCache();
+		}
 	}
 }
 

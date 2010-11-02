@@ -38,7 +38,7 @@ public:
 	std::string getErrorMessage(int errorCode);
 
 	void initialize(int calledFromMacro,int calledFromFunction);
-	void finalize();
+	void finalize(bool clearCache = false, int errorCode = SUCCESS);
 
 	void readSettings();
 	// debug

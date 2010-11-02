@@ -73,7 +73,11 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 
 	std::vector<std::string>::const_iterator it;
 	for(it = stringVector.begin(); it != stringVector.end(); it++){
-		stringSizes.push_back(it->size());
+		try{
+			stringSizes.push_back(it->size());
+		}catch(...){
+			return NOMEM;
+		}
 		totalSize += it->size();
 	}
 
@@ -138,13 +142,13 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
 	// create 2D textwave with firstColumn.size() rows and 2 columns
-	if(firstColumn.size() == secondColumn.size() ){
-		dimensionSizes[ROWS] = firstColumn.size();
-	}
-	else if(firstColumn.size() == 0 || secondColumn.size() == 0 ){
+	if(firstColumn.size() == 0 || secondColumn.size() == 0 ){
 		sprintf(globDataPtr->outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
 		outputToHistory(globDataPtr->outputBuffer);
 		return UNKNOWN_ERROR;
+	}
+	else if(firstColumn.size() == secondColumn.size() ){
+		dimensionSizes[ROWS] = firstColumn.size();
 	}
 	else{
 		sprintf(globDataPtr->outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
@@ -175,8 +179,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		debugOutputToHistory(globDataPtr->outputBuffer);
 		return WAVE_EXIST;
 	}
-
-	if(ret != 0 ){
+	else if(ret != 0 ){
 		sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, waveName);
 		outputToHistory(globDataPtr->outputBuffer);
 		return UNKNOWN_ERROR;
@@ -187,8 +190,14 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	// copy the strings of both columns into a new vector
 	// so that they are then 1D
 	// first firstColumn, then secondColumn
-	std::vector<std::string> allColumns;
-	allColumns.reserve(firstColumn.size() + secondColumn.size());
+	try{
+		std::vector<std::string> allColumns;
+		allColumns.reserve(firstColumn.size() + secondColumn.size());
+	}
+	catch(...){
+		XOPNotice("Out of memory in createAndFillTextWave()\r");
+		return UNKNOWN_ERROR;
+	}
 	allColumns.insert(allColumns.begin(),firstColumn.begin(),firstColumn.end());
 	allColumns.insert(allColumns.end(),secondColumn.begin(),secondColumn.end());
 

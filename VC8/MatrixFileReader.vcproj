@@ -48,6 +48,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
+				GeneratePreprocessedFile="0"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"

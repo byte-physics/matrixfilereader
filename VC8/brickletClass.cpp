@@ -111,10 +111,17 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 void BrickletClass::getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values){
 
 	if(m_metaDataKeys.size() == 0 ||  m_metaDataValues.size() == 0){
-
-		m_metaDataKeys.reserve(METADATA_RESERVE_SIZE);
-		m_metaDataValues.reserve(METADATA_RESERVE_SIZE);
+		try{
+			m_metaDataKeys.reserve(METADATA_RESERVE_SIZE);
+			m_metaDataValues.reserve(METADATA_RESERVE_SIZE);
+		}
+		catch(CMemoryException *e){
+			XOPNotice("Out of memory in getBrickletMetaData()");
+			keys.clear();
+			values.clear();
+		}
 		loadBrickletMetaDataFromResultFile();
+		// shrink both vectors to their actual size
 		m_metaDataKeys.resize(m_metaDataKeys.size());
 		m_metaDataValues.resize(m_metaDataValues.size());
 	}
@@ -449,7 +456,7 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 		// END Vernissage::Session:AxisTableSet
 	}
 
-	sprintf(globDataPtr->outputBuffer,"Loaded %d keys and %d values as brickletMetaData",m_metaDataKeys.size(), m_metaDataValues.size());
+	sprintf(globDataPtr->outputBuffer,"Loaded %d keys and %d values as brickletMetaData for bricklet %d",m_metaDataKeys.size(), m_metaDataValues.size(),m_brickletID);
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	if(m_metaDataKeys.size() != m_metaDataValues.size()){

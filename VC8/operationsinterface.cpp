@@ -18,7 +18,7 @@ namespace{
 #define BEGIN_OUTER_CATCH	try{
 #define END_OUTER_CATCH		}\
 							catch(...){\
-								sprintf(globDataPtr->outputBuffer,"Unexpected exception caught in line %s, function %s,  file %s\r", __LINE__, __FUNCTION__, __FILE__);\
+								sprintf(globDataPtr->outputBuffer,"Unexpected exception caught in line %d, function %s,  file %s\r", __LINE__, __FUNCTION__, __FILE__);\
 								XOPNotice(globDataPtr->outputBuffer);\
 								globDataPtr->setError(UNKNOWN_ERROR);\
 								return 0;\
@@ -218,7 +218,8 @@ int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 	}
 
 	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
-	globDataPtr->finalize();
+	bool clearCache=true;
+	globDataPtr->finalize(clearCache);
 	END_OUTER_CATCH
 	return 0;
 }
@@ -340,7 +341,8 @@ int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	}
 
 	SetOperationStrVar(S_waveNames,getFullWavePath(parentDataFolderHPtr,waveHandle).c_str());
-	globDataPtr->finalize();
+	bool clearCache=true;
+	globDataPtr->finalize(clearCache);
 	END_OUTER_CATCH
 	return 0;
 }
@@ -602,15 +604,15 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 
 		if(ret == WAVE_EXIST){
 			globDataPtr->setError(ret,waveName);
-			return 0;
+			break;
 		}
 		else if(ret == INTERNAL_ERROR_CONVERTING_DATA || ret == UNKNOWN_ERROR){
 			globDataPtr->setError(ret);
-			return 0;
+			break;
 		}
 		else if(ret != SUCCESS){
 			globDataPtr->setInternalError(ret);
-			return 0;
+			break;
 		}
 		//check for user abort
 		if( SpinProcess() != 0 ){
@@ -618,13 +620,10 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		}
 	}
 
-	ret = SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
-	if(ret != 0){
-		globDataPtr->setInternalError(ret);
-		return 0;
-	}
+	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
 
-	globDataPtr->finalize();
+	bool clearCache=true;
+	globDataPtr->finalize(clearCache,ret);
 	END_OUTER_CATCH
 	return 0;
 }

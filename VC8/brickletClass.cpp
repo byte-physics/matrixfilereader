@@ -117,6 +117,7 @@ void BrickletClass::getBrickletMetaData(std::vector<std::string> &keys, std::vec
 		}
 		catch(CMemoryException *e){
 			XOPNotice("Out of memory in getBrickletMetaData()");
+			e->Delete();
 			keys.clear();
 			values.clear();
 		}

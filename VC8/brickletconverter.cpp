@@ -78,7 +78,7 @@ namespace {
 
 }
 
-int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID, double resampleSize, std::string &fullPathOfCreatedWave){
+int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID, int resampleSize, std::string &fullPathOfCreatedWave){
 
 	bool isDoubleWaveType = globDataPtr->doubleWaveEnabled();
 
@@ -91,6 +91,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 	std::vector<waveHndl> waveHandleVector;
 	waveHndl waveHandle;
 	std::vector<std::string> waveNameVector;
+	std::string waveNote;
 
 	int *rawBrickletDataPtr = NULL;
 	int rawBrickletSize=0, waveSize=0, firstBlockOffset=0, triggerAxisBlockSize=0;
@@ -110,8 +111,14 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 	std::vector<std::string>::const_iterator itWaveNames;
 
-	CountInt dimensionSizes[MAX_DIMENSIONS+1];
+	CountInt dimensionSizes[MAX_DIMENSIONS+1], interpolatedDimSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
+	MemClear(interpolatedDimSizes, sizeof(interpolatedDimSizes));
+
+	char cmd[ARRAY_SIZE];
+	char dataFolderPath[MAXCMDLEN+1];
+	int numDimensions;
+	double physIncrement;
 
 	std::string waveBaseName(waveBaseNameChar);
 
@@ -254,6 +261,8 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
 			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
 			fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandle));
+			fullPathOfCreatedWave.append(";");
+
 			waveHandle = NULL;
 
 			break;
@@ -422,7 +431,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 			// data layout of igor waves in memory (Igor XOP Manual p. 238)
 			// - the wave is linear in the memory
 			// - going along the arrray will first fill the first column from row 0 to end and then the second column and so on
-
+	
 			// COLUMNS
 			for(i = 0; i < numPointsRootAxis; i++){
 
@@ -554,23 +563,67 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 				}
 			}
 
-			// Set wave note and dimension units
 			for(i=0; i < waveHandleVector.size(); i++){
-				setDataWaveNote(brickletID,extremaData[i].rawMin,extremaData[i].rawMax,extremaData[i].physValRawMin,extremaData[i].physValRawMax,waveHandleVector[i]);
+				if( resampleSize != 0 ){
+					sprintf(globDataPtr->outputBuffer,"Resizing wave number %d with %d",i,resampleSize);
+					debugOutputToHistory(globDataPtr->outputBuffer);
 
-				MDSetWaveScaling(waveHandleVector[i],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
-				MDSetWaveScaling(waveHandleVector[i],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
+					ret = GetDataFolderNameOrPath(dataFolderHandle, 3, dataFolderPath);
+					if(ret != 0){
+						return ret;
+					}							
+					// The "ImageInterpolate [...] Pixelate" command is used here
+					sprintf(cmd,"ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s",\
+						resampleSize,resampleSize,dataFolderPath,getFullWavePath(dataFolderHandle,waveHandleVector[i]).c_str());
+					if(globDataPtr->debuggingEnabled()){
+						debugOutputToHistory(cmd);
+					}
+					ret = XOPSilentCommand(cmd);
+					if(ret != 0){
+						sprintf(globDataPtr->outputBuffer,"The command _%s_ failed to execute. So the XOP has to be fixed...",cmd);
+						outputToHistory(globDataPtr->outputBuffer);
+						continue;
+					}
+
+					// kill the un-interpolated wave and invalidate waveHandeVector[i]
+					ret = KillWave(waveHandleVector[i]);
+					waveHandleVector[i] = NULL;
+					if(ret != 0){
+						return ret;
+					}
+					ret = RenameDataFolderObject(dataFolderHandle,WAVE_OBJECT,"M_PixelatedImage",waveNameVector[i].c_str());
+					if(ret != 0){
+						return ret;
+					}
+					waveHandleVector[i] = FetchWaveFromDataFolder(dataFolderHandle,waveNameVector[i].c_str());
+					ASSERT_RETURN_ZERO(waveHandleVector[i]);
+					MDGetWaveDimensions(waveHandleVector[i],&numDimensions,interpolatedDimSizes);
+				}
+		
+				// Set wave note
+				setDataWaveNote(brickletID,extremaData[i].rawMin,extremaData[i].rawMax,extremaData[i].physValRawMin,extremaData[i].physValRawMax,waveHandleVector[i]);
+				
+				// add info about resampling to the wave note, also the wave scaling changes
+				if( resampleSize != 0 ){
+					waveNote  = std::string("resampleSize=") + anyTypeToString<int>(resampleSize) + std::string("\r");
+					appendToWaveNote(waveNote,waveHandleVector[i]);
+
+					physIncrement = triggerAxis.physicalIncrement*double(dimensionSizes[ROWS])/double(interpolatedDimSizes[ROWS]);
+					MDSetWaveScaling(waveHandleVector[i],ROWS,&physIncrement,&setScaleOffset);
+
+					physIncrement = rootAxis.physicalIncrement*double(dimensionSizes[COLUMNS])/double(interpolatedDimSizes[COLUMNS]);
+					MDSetWaveScaling(waveHandleVector[i],COLUMNS,&physIncrement,&setScaleOffset);
+				}
+				else{// original image
+					MDSetWaveScaling(waveHandleVector[i],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
+					MDSetWaveScaling(waveHandleVector[i],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
+				}
 
 				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(triggerAxis.physicalUnit).c_str())));
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(rootAxis.physicalUnit).c_str()));
 				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
 				fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
-
-				if( resampleSize =! 0 && ( dimensionSizes[ROWS] > resampleSize || dimensionSizes[COLUMNS] > resampleSize ) ){
-					dimensionSizes[ROWS]    = (CountInt) resampleSize;
-					dimensionSizes[COLUMNS] = (CountInt) resampleSize;
-					MDChangeWave(waveHandleVector[i],globDataPtr->getIgorWaveType(),dimensionSizes);
-				}
+				fullPathOfCreatedWave.append(";");
 			}
 
 			break;
@@ -1047,6 +1100,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
 
 				fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
+				fullPathOfCreatedWave.append(";");
 			}
 
 			break;

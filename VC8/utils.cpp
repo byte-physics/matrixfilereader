@@ -136,6 +136,7 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
 	CountInt dimensionSizes[MAX_DIMENSIONS+1];
+	std::vector<std::string> allColumns;
 	waveHndl waveHandle;
 	int ret=-1;
 	
@@ -191,7 +192,6 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	// so that they are then 1D
 	// first firstColumn, then secondColumn
 	try{
-		std::vector<std::string> allColumns;
 		allColumns.reserve(firstColumn.size() + secondColumn.size());
 	}
 	catch(...){
@@ -210,6 +210,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	}
 	setOtherWaveNote(brickletID,waveHandle);
 	fullPathOfCreatedWaves.append(getFullWavePath(dataFolderHandle,waveHandle));
+	fullPathOfCreatedWaves.append(";");
 
 	return 0;
 }
@@ -249,7 +250,9 @@ void setDataWaveNote(int brickletID, int rawMin, int rawMax, double physicalValu
 	waveNote.append("physicalValueOfRawMin=" + anyTypeToString<double>(physicalValueOfRawMin) + "\r");
 	waveNote.append("physicalValueOfRawMax=" + anyTypeToString<double>(physicalValueOfRawMax) + "\r");
 
-	mySetWaveNote(waveNote,waveHandle);
+	//clear the wave note
+	SetWaveNote(waveHandle,NULL);
+	appendToWaveNote(waveNote,waveHandle);
 }
 
 
@@ -257,7 +260,9 @@ void setOtherWaveNote(int brickletID, waveHndl waveHandle){
 
 	std::string waveNote = getStandardWaveNote(brickletID);
 
-	mySetWaveNote(waveNote,waveHandle);
+	//clear the wave note
+	SetWaveNote(waveHandle,NULL);
+	appendToWaveNote(waveNote,waveHandle);
 }
 
 std::string getStandardWaveNote(int brickletID){
@@ -281,26 +286,33 @@ std::string getStandardWaveNote(int brickletID){
 	return waveNote;
 }
 
-void mySetWaveNote(std::string waveNote, waveHndl waveHandle){
-
+void appendToWaveNote(std::string waveNote, waveHndl waveHandle){
 
 	if(waveNote.empty()){
-		outputToHistory("BUG: got empty waveNote in GlobalData::setWaveNote.");
+		outputToHistory("BUG: got empty waveNote in GlobalData::appendToWaveNote.");
 		return;
 	}
 
-	Handle noteHandle  = NewHandle(waveNote.size()) ;
-	if(MemError() || noteHandle == NULL){
+	int ret;
+	Handle newNoteHandle, oldNoteHandle;
+	std::string oldNote;
+
+	oldNoteHandle = WaveNote(waveHandle);
+	convertHandleToString(oldNoteHandle,oldNote);
+	waveNote += oldNote;
+
+	newNoteHandle = NewHandle(waveNote.size()) ;
+	if(MemError() || newNoteHandle   == NULL){
 		return;
 	}
-	int ret = PutCStringInHandle(waveNote.c_str(),noteHandle);
+
+	ret = PutCStringInHandle(waveNote.c_str(),newNoteHandle  );
 	if(ret != 0){
 		sprintf(globDataPtr->outputBuffer,"internal error %d, aborting",ret);
 		outputToHistory(globDataPtr->outputBuffer);
 		return;
 	}
-
-	SetWaveNote(waveHandle, noteHandle);
+	SetWaveNote(waveHandle, newNoteHandle);
 }
 
 void waveClearNaN64(double *data, long size){
@@ -423,8 +435,6 @@ std::string getFullWavePath(DataFolderHandle df, waveHndl wv){
 	WaveName(wv,waveName);
 	fullPath.append(dataFolderPath);
 	fullPath.append(waveName);
-	fullPath.append(";");
-	
 	return fullPath;
 }
 
@@ -469,6 +479,7 @@ int createRawDataWave(DataFolderHandle dataFolderHandle,char *waveName, int bric
 
 	setDataWaveNote(brickletID,bricklet->getRawMin(),bricklet->getRawMax(),bricklet->getPhysValRawMin(),bricklet->getPhysValRawMax(),waveHandle);
 	fullPathOfCreatedWaves.append(getFullWavePath(dataFolderHandle, waveHandle));
+	fullPathOfCreatedWaves.append(";");
 	return ret;
 }
 
@@ -477,25 +488,18 @@ void convertHandleToString(Handle strHandle,std::string &str){
 	str.clear();
 	int handleSize;
 
+	// for both cases we return an empty string
 	if(strHandle == NULL || GetHandleSize(strHandle) == 0L){
 		return;
 	}
 
 	handleSize = GetHandleSize(strHandle);
-	str = std::string(*strHandle,handleSize);
+
+	try{
+		str = std::string(*strHandle,handleSize);
+	}
+	catch(...){
+		XOPNotice("Out of memory in convertHandleToString");
+		str.clear();
+	}
 }
-
-	//char *strChar = NULL;
-	//strChar = (char*) malloc( (handleSize+1)*sizeof(char));
-
-	//if(strChar == NULL){
-	//	outputToHistory("Out of memory in convertHandleToString");
-	//	return;
-	//}
-
-	//memcpy(strChar,*strHandle,handleSize);
-	//strChar[handleSize] = '\0';
-	//
-	//str = strChar;
-	//delete strChar;
-	//strChar = NULL;

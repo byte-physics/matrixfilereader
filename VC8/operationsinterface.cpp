@@ -373,9 +373,12 @@ int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 
 #if defined(_MSC_VER)
 	str.append("Visual Studio version: " + anyTypeToString<int>(_MSC_VER) + "\r");
+#elif defined(__GNUC__)
+	str.append("GCC version: " __VERSION__ "\r");
 #else
-	str.append("BUG: Unknown compiler\r");
+	str.append("Unknown compiler version\r");
 #endif
+
 	str.append("Igor Pro Version: " + anyTypeToString<int>(igorVersion) + "\r");
 	str.append("Vernissage version: " + globDataPtr->getVernissageVersion() + "\r");
 	str.append("XOP version: " + std::string(myXopVersion) + "\r");
@@ -397,22 +400,22 @@ int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
-	params.baseName				= p->baseName;
 	params.calledFromFunction	= p->calledFromFunction;
 	params.calledFromMacro		= p->calledFromMacro;
-	params.startBrickletID		= p->startBrickletID;
-	params.endBrickletID		= p->endBrickletID;
 
 	params.NFlagEncountered		= p->NFlagEncountered;
 	params.NFlagParamsSet[0]	= p->NFlagParamsSet[0];
+	params.baseName				= p->baseName;
 
 	params.RFlagEncountered		= p->RFlagEncountered;
 	params.RFlagParamsSet[0]	= p->RFlagParamsSet[0];
 	params.RFlagParamsSet[1]	= p->RFlagParamsSet[1];
+	params.startBrickletID		= p->startBrickletID;
+	params.endBrickletID		= p->endBrickletID;
 
 	params.SFlagEncountered		= p->SFlagEncountered;
 	params.SFlagParamsSet[0]	= p->SFlagParamsSet[0];
-	params.SFlagParamsSet[1]	= p->SFlagParamsSet[1];
+	params.size					= p->size;
 
 	return GenericGetBricklet(&params,CONVERTED_DATA);
 }
@@ -421,22 +424,22 @@ int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
-	params.baseName				= p->baseName;
 	params.calledFromFunction	= p->calledFromFunction;
 	params.calledFromMacro		= p->calledFromMacro;
-	params.startBrickletID		= p->startBrickletID;
-	params.endBrickletID		= p->endBrickletID;
 
 	params.NFlagEncountered		= p->NFlagEncountered;
 	params.NFlagParamsSet[0]	= p->NFlagParamsSet[0];
+	params.baseName				= p->baseName;
 
 	params.RFlagEncountered		= p->RFlagEncountered;
 	params.RFlagParamsSet[0]	= p->RFlagParamsSet[0];
 	params.RFlagParamsSet[1]	= p->RFlagParamsSet[1];
+	params.startBrickletID		= p->startBrickletID;
+	params.endBrickletID		= p->endBrickletID;
 
 	params.SFlagEncountered		= 0;
 	params.SFlagParamsSet[0]	= 0;
-	params.SFlagParamsSet[1]	= 0;
+	params.size					= 0.0;
 
 	return GenericGetBricklet(&params,META_DATA);
 }
@@ -445,22 +448,22 @@ int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
-	params.baseName				= p->baseName;
 	params.calledFromFunction	= p->calledFromFunction;
 	params.calledFromMacro		= p->calledFromMacro;
-	params.startBrickletID		= p->startBrickletID;
-	params.endBrickletID		= p->endBrickletID;
 
 	params.NFlagEncountered		= p->NFlagEncountered;
 	params.NFlagParamsSet[0]	= p->NFlagParamsSet[0];
+	params.baseName				= p->baseName;
 
 	params.RFlagEncountered		= p->RFlagEncountered;
 	params.RFlagParamsSet[0]	= p->RFlagParamsSet[0];
 	params.RFlagParamsSet[1]	= p->RFlagParamsSet[1];
+	params.startBrickletID		= p->startBrickletID;
+	params.endBrickletID		= p->endBrickletID;
 
 	params.SFlagEncountered		= 0;
 	params.SFlagParamsSet[0]	= 0;
-	params.SFlagParamsSet[1]	= 0;
+	params.size					= 0.0;
 
 	return GenericGetBricklet(&params,RAW_DATA);
 }
@@ -478,7 +481,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
 	int brickletID=-1, ret=-1;
 	int startBrickletID=-1, endBrickletID=-1;
-	double resampleSize=0;
+	int resampleSize;
 
 	if(!globDataPtr->resultFileOpen()){
 		globDataPtr->setError(NO_FILE_OPEN);
@@ -537,15 +540,6 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				break;
 			case CONVERTED_DATA:
 				baseName = brickletDataDefault;
-				if(p->SFlagEncountered){
-					if(p->size < 50 || p->size > 500){
-						globDataPtr->setError(WRONG_PARAMETER,"size");
-						return 0;
-					}
-					else{
-						resampleSize = p->size;
-					}
-				}
 				break;
 			case META_DATA:
 				baseName = brickletMetaDefault;
@@ -556,6 +550,18 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				break;
 		}
 	}
+
+	resampleSize = 0;
+	// check for possible resample flag in case we are dealing with converted data
+	if( p->SFlagEncountered ){
+		resampleSize = int( floor(p->size) );
+		if(resampleSize <= 1){
+			globDataPtr->setError(WRONG_PARAMETER,"size");
+			return 0;
+		}
+	}
+	sprintf(globDataPtr->outputBuffer,"resampleSize=%d",resampleSize);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	// now we got a valid baseName
 	for(brickletID=startBrickletID; brickletID <= endBrickletID; brickletID++){

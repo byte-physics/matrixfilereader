@@ -49,7 +49,7 @@ std::string viewTypeCodeToString(int idx);
 
 void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle);
 void setOtherWaveNote(int brickletID,waveHndl waveHandle);
-void mySetWaveNote(std::string waveNote, waveHndl waveHandle);
+void appendToWaveNote(std::string waveNote, waveHndl waveHandle);
 
 std::string getStandardWaveNote(int brickletID);
 

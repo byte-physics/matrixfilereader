@@ -12,9 +12,10 @@ const char debugOutputFormat[]		= "DEBUG: %s\r"; // debugOutputToHistory
 std::wstring StringToWString(const std::string& s);
 std::string WStringToString(const std::wstring& s);
 
-#define MYASSERT(A,B) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL. You might want to drop the author a note :)\r"); return B; } }
+#define MYASSERT(A,B) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL.\r"); return B; } }
 #define ASSERT_RETURN_ZERO(A) { MYASSERT(A,0)}
 #define ASSERT_RETURN_MINUSONE(A) { MYASSERT(A,-1)}
+#define ASSERT_RETURN_ONE(A) { MYASSERT(A,1)}
 #define ASSERT_RETURN_VOID(A) { MYASSERT(A,)}
 
 std::wstring CharPtrToWString(char* cStr);
@@ -47,7 +48,9 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
 
-void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle);
+void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle, int pixelSize = 1);
+void setDataWaveNote(int brickletID, extremaData &extremaData,waveHndl waveHandle, int pixelSize = 1);
+
 void setOtherWaveNote(int brickletID,waveHndl waveHandle);
 void appendToWaveNote(std::string waveNote, waveHndl waveHandle);
 

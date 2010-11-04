@@ -189,7 +189,7 @@ typedef struct GetVernissageVersionRuntimeParams GetVernissageVersionRuntimePara
 typedef struct GetVernissageVersionRuntimeParams* GetVernissageVersionRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:size /N=string:baseName
+// Operation template: MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:pixelSize /N=string:baseName
 
 // Runtime param structure for MFR_GetBrickletData operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
@@ -204,7 +204,7 @@ struct GetBrickletDataRuntimeParams {
 
 	// Parameters for /S flag group.
 	int SFlagEncountered;
-	double size;
+	double pixelSize;
 	int SFlagParamsSet[1];
 
 	// Parameters for /N flag group.
@@ -263,7 +263,7 @@ struct GenericGetBrickletParams {
 
 	// Parameters for /S flag group.
 	int SFlagEncountered;
-	double size;
+	double pixelSize;
 	int SFlagParamsSet[1];
 
 	// Parameters for /N flag group.

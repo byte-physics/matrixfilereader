@@ -105,7 +105,7 @@ int RegisterGetBrickletData(void){
 	const char* runtimeStrVarList;
 
 	// NOTE: If you change this template, you must change the GetBrickletDataRuntimeParams structure as well.
-	cmdTemplate = "MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:size /N=string:baseName";
+	cmdTemplate = "MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:pixelSize /N=string:baseName";
 	runtimeNumVarList = V_flag;
 	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletDataRuntimeParams), (void*)ExecuteGetBrickletData, 0);

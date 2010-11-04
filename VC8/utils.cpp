@@ -240,7 +240,7 @@ std::string viewTypeCodeToString(int idx){
 	}
 }
 
-void setDataWaveNote(int brickletID, int rawMin, int rawMax, double physicalValueOfRawMin, double physicalValueOfRawMax, waveHndl waveHandle){
+void setDataWaveNote(int brickletID, int rawMin, int rawMax, double physicalValueOfRawMin, double physicalValueOfRawMax, waveHndl waveHandle, int pixelSize /* = 1 */){
 
 	std::string	waveNote = getStandardWaveNote(brickletID);
 
@@ -249,13 +249,16 @@ void setDataWaveNote(int brickletID, int rawMin, int rawMax, double physicalValu
 	
 	waveNote.append("physicalValueOfRawMin=" + anyTypeToString<double>(physicalValueOfRawMin) + "\r");
 	waveNote.append("physicalValueOfRawMax=" + anyTypeToString<double>(physicalValueOfRawMax) + "\r");
+	waveNote.append("pixelSize=" + anyTypeToString<int>(pixelSize) + "\r");
 
 	//clear the wave note
 	SetWaveNote(waveHandle,NULL);
 	appendToWaveNote(waveNote,waveHandle);
 }
 
-
+void setDataWaveNote(int brickletID, extremaData &extremaData, waveHndl waveHandle, int pixelSize /* = 1 */){
+	setDataWaveNote(brickletID,extremaData.rawMin,extremaData.rawMax,extremaData.physValRawMin,extremaData.physValRawMax,waveHandle,pixelSize);
+}
 void setOtherWaveNote(int brickletID, waveHndl waveHandle){
 
 	std::string waveNote = getStandardWaveNote(brickletID);
@@ -294,19 +297,19 @@ void appendToWaveNote(std::string waveNote, waveHndl waveHandle){
 	}
 
 	int ret;
-	Handle newNoteHandle, oldNoteHandle;
-	std::string oldNote;
+	Handle newNoteHandle, existingNoteHandle;
+	std::string existingNote;
 
-	oldNoteHandle = WaveNote(waveHandle);
-	convertHandleToString(oldNoteHandle,oldNote);
-	waveNote += oldNote;
+	existingNoteHandle = WaveNote(waveHandle);
+	convertHandleToString(existingNoteHandle,existingNote);
+	existingNote += waveNote;
 
-	newNoteHandle = NewHandle(waveNote.size()) ;
+	newNoteHandle = NewHandle(existingNote.size()) ;
 	if(MemError() || newNoteHandle   == NULL){
 		return;
 	}
 
-	ret = PutCStringInHandle(waveNote.c_str(),newNoteHandle  );
+	ret = PutCStringInHandle(existingNote.c_str(),newNoteHandle);
 	if(ret != 0){
 		sprintf(globDataPtr->outputBuffer,"internal error %d, aborting",ret);
 		outputToHistory(globDataPtr->outputBuffer);
@@ -476,7 +479,6 @@ int createRawDataWave(DataFolderHandle dataFolderHandle,char *waveName, int bric
 
 	dataPtr = (int*) WaveData(waveHandle);
 	memcpy(dataPtr,pBuffer,count*sizeof(int));
-
 	setDataWaveNote(brickletID,bricklet->getRawMin(),bricklet->getRawMax(),bricklet->getPhysValRawMin(),bricklet->getPhysValRawMax(),waveHandle);
 	fullPathOfCreatedWaves.append(getFullWavePath(dataFolderHandle, waveHandle));
 	fullPathOfCreatedWaves.append(";");

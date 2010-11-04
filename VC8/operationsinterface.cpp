@@ -415,7 +415,7 @@ int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
 
 	params.SFlagEncountered		= p->SFlagEncountered;
 	params.SFlagParamsSet[0]	= p->SFlagParamsSet[0];
-	params.size					= p->size;
+	params.pixelSize					= p->pixelSize;
 
 	return GenericGetBricklet(&params,CONVERTED_DATA);
 }
@@ -439,7 +439,7 @@ int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p){
 
 	params.SFlagEncountered		= 0;
 	params.SFlagParamsSet[0]	= 0;
-	params.size					= 0.0;
+	params.pixelSize			= 0.0;
 
 	return GenericGetBricklet(&params,META_DATA);
 }
@@ -463,7 +463,7 @@ int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 
 	params.SFlagEncountered		= 0;
 	params.SFlagParamsSet[0]	= 0;
-	params.size					= 0.0;
+	params.pixelSize			= 0.0;
 
 	return GenericGetBricklet(&params,RAW_DATA);
 }
@@ -481,7 +481,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
 	int brickletID=-1, ret=-1;
 	int startBrickletID=-1, endBrickletID=-1;
-	int resampleSize;
+	int pixelSize;
+	bool resampleData;
 
 	if(!globDataPtr->resultFileOpen()){
 		globDataPtr->setError(NO_FILE_OPEN);
@@ -551,16 +552,17 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		}
 	}
 
-	resampleSize = 0;
+	pixelSize=1;
 	// check for possible resample flag in case we are dealing with converted data
 	if( p->SFlagEncountered ){
-		resampleSize = int( floor(p->size) );
-		if(resampleSize <= 1){
-			globDataPtr->setError(WRONG_PARAMETER,"size");
+		resampleData=true;
+		pixelSize = int( floor(p->pixelSize) );
+		if(pixelSize < 2 || pixelSize > maximum_pixelSize){
+			globDataPtr->setError(WRONG_PARAMETER,"pixelSize");
 			return 0;
 		}
 	}
-	sprintf(globDataPtr->outputBuffer,"resampleSize=%d",resampleSize);
+	sprintf(globDataPtr->outputBuffer,"pixelSize=%d",pixelSize);
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	// now we got a valid baseName
@@ -592,7 +594,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				ret = createRawDataWave(newDataFolderHPtr,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			case CONVERTED_DATA:
-				ret = createWaves(newDataFolderHPtr,waveName,brickletID,resampleSize,fullPathOfCreatedWaves);		
+				ret = createWaves(newDataFolderHPtr,waveName,brickletID,resampleData,pixelSize,fullPathOfCreatedWaves);		
 				break;
 			case META_DATA:
 				bricklet->getBrickletMetaData(keys,values);

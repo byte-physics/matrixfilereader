@@ -27,11 +27,11 @@ namespace {
 		waveDataPtr  waveData;
 
 		if(globDataPtr->doubleWaveEnabled()){
-			waveData.dbl = (double*) WaveData(waveHandle);
+			waveData.dbl = getWaveDataPtr<double>(waveHandle);
 			waveClearNaN64(waveData.dbl, waveSize);
 		}
 		else{
-			waveData.flt = (float*) WaveData(waveHandle);
+			waveData.flt = getWaveDataPtr<float>(waveHandle);
 			waveClearNaN32(waveData.flt, waveSize);
 		}
 	}
@@ -42,7 +42,7 @@ namespace {
 			waveData.dbl[index] = value;
 		}
 		else{
-			waveData.flt[index]	= (float) value;
+			waveData.flt[index]	= static_cast<float>(value);
 		}
 	}
 
@@ -58,20 +58,33 @@ namespace {
 		}
 	}
 
-	void setWaveDataPtr(waveDataPtr &waveData,const waveHndl &waveHandle){
+	// the NULL check prevents crashes in case we get NULL from waveData
+	void setWaveDataPtr(waveDataPtr &waveData,const waveHndl &waveH){
 
 		if(globDataPtr->doubleWaveEnabled()){
-			waveData.dbl = (double*) WaveData(waveHandle);
+			waveData.dbl = getWaveDataPtr<double>(waveH);
+			if(waveData.dbl == NULL){
+				XOPNotice("BUG: setWaveDataPtr(...) waveData.dbl is NULL, this should not happen...");
+				waveData.moreData = false;		
+			}
+			else{
+				waveData.moreData = true;
+			}
 		}
 		else{
-			waveData.flt = (float*) WaveData(waveHandle);
+			waveData.flt = getWaveDataPtr<float>(waveH);
+			if(waveData.flt == NULL){
+				XOPNotice("BUG: setWaveDataPtr(...) waveData.flt is NULL, this should not happen...");
+				waveData.moreData = false;		
+			}
+			else{
+				waveData.moreData = true;
+			}
 		}
-		waveData.moreData = true;
 	}
-
 }
 
-int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar, int brickletID, bool resampleData, int pixelSize, std::string &fullPathOfCreatedWave){
+int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int brickletID, bool resampleData, int pixelSize, std::string &fullPathOfCreatedWave){
 
 	bool isDoubleWaveType = globDataPtr->doubleWaveEnabled();
 
@@ -115,19 +128,19 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 	std::string waveBaseName(waveBaseNameChar);
 
-	BrickletClass *BrickletClass = globDataPtr->getBrickletClassObject(brickletID);
+	BrickletClass *bricklet = globDataPtr->getBrickletClassObject(brickletID);
 
-	ASSERT_RETURN_ONE(BrickletClass);
-	void *pBricklet = BrickletClass->getBrickletPointer();
+	ASSERT_RETURN_ONE(bricklet);
+	void *pBricklet = bricklet->getBrickletPointer();
 
 	ASSERT_RETURN_ONE(pBricklet);
 	pSession = globDataPtr->getVernissageSession();
 
 	ASSERT_RETURN_ONE(pSession);
 
-	dimension = BrickletClass->getMetaDataValueAsInt("dimension");
-	BrickletClass->getAxes(allAxes);
-	BrickletClass->getViewTypeCodes(viewTypeCodes);
+	dimension = bricklet->getMetaDataValueAsInt("dimension");
+	bricklet->getAxes(allAxes);
+	bricklet->getViewTypeCodes(viewTypeCodes);
 
 	sprintf(globDataPtr->outputBuffer,"### BrickletID %d ###",brickletID);
 	debugOutputToHistory(globDataPtr->outputBuffer);
@@ -161,10 +174,9 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 	struct extremaData *traceUpExtrema=NULL,*traceDownExtrema=NULL,*reTraceUpExtrema=NULL,*reTraceDownExtrema=NULL;
 
-	// get pointer to raw data
+	// pointer to raw data
 	const int* pBuffer;
-
-	BrickletClass->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
+	bricklet->getBrickletContentsBuffer(&pBuffer,rawBrickletSize);
 	if(rawBrickletSize == 0 || &pBuffer == NULL){
 		outputToHistory("Could not load bricklet contents.");
 		return UNKNOWN_ERROR;
@@ -174,16 +186,17 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	rawBrickletDataPtr = const_cast<int *> (pBuffer);
+	ASSERT_RETURN_ONE(rawBrickletDataPtr);
 
 	// create data for raw->scaled transformation
 	// the min and max values here are for the complete bricklet data and not only for one wave
 	int xOne, xTwo;
 	double yOne, yTwo, slope, yIntercept;
 	
-	xOne = BrickletClass->getRawMin();
-	xTwo = BrickletClass->getRawMax();
-	yOne = BrickletClass->getPhysValRawMin();
-	yTwo = BrickletClass->getPhysValRawMax();
+	xOne = bricklet->getRawMin();
+	xTwo = bricklet->getRawMax();
+	yOne = bricklet->getPhysValRawMin();
+	yTwo = bricklet->getPhysValRawMax();
 
 	slope = (yOne - yTwo) / (xOne*1.0 - xTwo*1.0);
 	yIntercept = yOne - slope*xOne;
@@ -205,34 +218,35 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 		case 1:
 
 			triggerAxis = pSession->getAxisDescriptor(pBricklet,pSession->getTriggerAxisName(pBricklet));
-			
 			numPointsTriggerAxis = triggerAxis.clocks;
 			
 			if (triggerAxis.mirrored){
 				numPointsTriggerAxis /= 2;
 			}
-			
 			dimensionSizes[ROWS] = numPointsTriggerAxis;
-			ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dataFolderHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 
+			ret = MDMakeWave(&waveHandle, waveBaseName.c_str(),dfHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 			if(ret == NAME_WAV_CONFLICT){
 				sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveBaseName.c_str());
 				debugOutputToHistory(globDataPtr->outputBuffer);
 				return WAVE_EXIST;
 			}
-
-			if(ret != 0 ){
+			else if(ret != 0 ){
 				sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, waveBaseName.c_str());
 				outputToHistory(globDataPtr->outputBuffer);
 				return UNKNOWN_ERROR;
 			}
 
 			ASSERT_RETURN_ONE(waveHandle);
-
 			clearWave(waveHandle,waveSize);
 			setWaveDataPtr(waveData,waveHandle);
 
-			for(i=0; i < numPointsTriggerAxis; i++){
+			// this is false if we got a NULL pointer from setWaveDataPtr
+			if(!waveData.moreData){
+				return UNKNOWN_ERROR;
+			}
+
+			for(i=0; i < numPointsTriggerAxis ; i++){
 				
 				rawValue	= rawBrickletDataPtr[i];
 				scaledValue = rawValue*slope + yIntercept;
@@ -252,8 +266,8 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
 			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
-			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
-			fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandle));
+			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(bricklet->getMetaDataValueAsString("channelUnit").c_str()));
+			fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandle));
 			fullPathOfCreatedWave.append(";");
 
 			waveHandle = NULL;
@@ -324,22 +338,20 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
-				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dfHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 
 				if(ret == NAME_WAV_CONFLICT){
 					sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",itWaveNames->c_str());
 					debugOutputToHistory(globDataPtr->outputBuffer);
 					return WAVE_EXIST;
 				}
-
-				if(ret != 0 ){
+				else if(ret != 0 ){
 					sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, itWaveNames->c_str());
 					outputToHistory(globDataPtr->outputBuffer);
 					return UNKNOWN_ERROR;
 				}
 
 				ASSERT_RETURN_ONE(waveHandle);
-
 				waveHandleVector.push_back(waveHandle);
 				clearWave(waveHandle,waveSize);
 			}
@@ -399,7 +411,7 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 				traceUpExtrema	   = &extremaData[0];
 			}
 			else{
-				outputToHistory("BUG: createAndFillDataWave()...");
+				outputToHistory("BUG: createWaves()...");
 				return UNKNOWN_ERROR;
 			}
 
@@ -557,17 +569,17 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 			for(i=0; i < waveHandleVector.size(); i++){
 				if( resampleData ){
-					sprintf(globDataPtr->outputBuffer,"Reasmpling wave number %d with pixelSize=%d",i,pixelSize);
+					sprintf(globDataPtr->outputBuffer,"Resampling wave %s with pixelSize=%d",waveNameVector[i].c_str(),pixelSize);
 					debugOutputToHistory(globDataPtr->outputBuffer);
 
 					// flag=3 results in the full path being returned including a trailing colon
-					ret = GetDataFolderNameOrPath(dataFolderHandle, 3, dataFolderPath);
+					ret = GetDataFolderNameOrPath(dfHandle, 3, dataFolderPath);
 					if(ret != 0){
 						return ret;
 					}							
 					// The "ImageInterpolate [...] Pixelate" command is used here
 					sprintf(cmd,"ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s",\
-						pixelSize,pixelSize,dataFolderPath,getFullWavePath(dataFolderHandle,waveHandleVector[i]).c_str());
+						pixelSize,pixelSize,dataFolderPath,getFullWavePath(dfHandle,waveHandleVector[i]).c_str());
 					if(globDataPtr->debuggingEnabled()){
 						debugOutputToHistory(cmd);
 					}
@@ -584,12 +596,12 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 					if(ret != 0){
 						return ret;
 					}
-					// rename wave from M_PixelatedImage to waveNameVector[i] both sitting in dataFolderHandle
-					ret = RenameDataFolderObject(dataFolderHandle,WAVE_OBJECT,"M_PixelatedImage",waveNameVector[i].c_str());
+					// rename wave from M_PixelatedImage to waveNameVector[i] both sitting in dfHandle
+					ret = RenameDataFolderObject(dfHandle,WAVE_OBJECT,"M_PixelatedImage",waveNameVector[i].c_str());
 					if(ret != 0){
 						return ret;
 					}
-					waveHandleVector[i] = FetchWaveFromDataFolder(dataFolderHandle,waveNameVector[i].c_str());
+					waveHandleVector[i] = FetchWaveFromDataFolder(dfHandle,waveNameVector[i].c_str());
 					ASSERT_RETURN_ONE(waveHandleVector[i]);
 					// get wave dimensions; needed for setScale below
 					MDGetWaveDimensions(waveHandleVector[i],&numDimensions,interpolatedDimSizes);
@@ -613,8 +625,8 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 
 				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(triggerAxis.physicalUnit).c_str())));
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(rootAxis.physicalUnit).c_str()));
-				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
-				fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
+				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(bricklet->getMetaDataValueAsString("channelUnit").c_str()));
+				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[i]));
 				fullPathOfCreatedWave.append(";");
 			}
 			break;
@@ -843,22 +855,19 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 			// create waves
 			for(itWaveNames = waveNameVector.begin(); itWaveNames != waveNameVector.end(); itWaveNames++){
 
-				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dataFolderHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
+				ret = MDMakeWave(&waveHandle, itWaveNames->c_str(),dfHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 
 				if(ret == NAME_WAV_CONFLICT){
 					sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",itWaveNames->c_str());
 					debugOutputToHistory(globDataPtr->outputBuffer);
 					return WAVE_EXIST;
 				}
-
-				if(ret != 0 ){
+				else if(ret != 0 ){
 					sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, itWaveNames->c_str());
 					outputToHistory(globDataPtr->outputBuffer);
 					return UNKNOWN_ERROR;
 				}
-
 				ASSERT_RETURN_ONE(waveHandle);
-
 				waveHandleVector.push_back(waveHandle);
 				clearWave(waveHandle,waveSize);
 			}
@@ -1088,9 +1097,9 @@ int createWaves(DataFolderHandle dataFolderHandle, const char *waveBaseNameChar,
 				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(xAxis.physicalUnit).c_str())));
 				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(yAxis.physicalUnit).c_str()));
 				MDSetWaveUnits(waveHandleVector[i],LAYERS,const_cast<char *>(WStringToString(specAxis.physicalUnit).c_str()));
-				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(BrickletClass->getMetaDataValueAsString("channelUnit").c_str()));
+				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(bricklet->getMetaDataValueAsString("channelUnit").c_str()));
 
-				fullPathOfCreatedWave.append(getFullWavePath(dataFolderHandle,waveHandleVector[i]));
+				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[i]));
 				fullPathOfCreatedWave.append(";");
 			}
 

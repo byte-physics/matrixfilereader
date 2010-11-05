@@ -41,6 +41,22 @@ T stringToAnyType(std::string str){
 	return t;
 }
 
+template <class T> T* getWaveDataPtr(waveHndl waveH){
+	int accessMode = kMDWaveAccessMode0;
+	int ret=-1;
+	BCInt dataOffset;
+	T *dataPtr;
+
+	ret = MDAccessNumericWaveData(waveH, accessMode, &dataOffset);
+	if(ret != 0 ){
+		// throw here someting if you want to have it more C++-ish
+		return NULL;
+	}
+
+	dataPtr = reinterpret_cast<T*>( reinterpret_cast<char*>(*waveH) + dataOffset );
+	return dataPtr;
+}
+
 int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
 
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves);

@@ -475,9 +475,9 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 
 	const char *sepChar = ";";
 	std::string fullPathOfCreatedWaves, baseName;
-	std::vector<std::string> keys,values;
+	std::vector<std::string> keys, values;
 	BrickletClass *bricklet = NULL;
-	char waveName[MAX_OBJ_NAME+1], dataFolderName[MAX_OBJ_NAME+1];
+	char waveName[ARRAY_SIZE], dataFolderName[MAX_OBJ_NAME+1];
 	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
 	int brickletID=-1, ret=-1;
 	int startBrickletID=-1, endBrickletID=-1;
@@ -555,23 +555,36 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	pixelSize=1;
 	// check for possible resample flag in case we are dealing with converted data
 	if( p->SFlagEncountered ){
-		resampleData=true;
+		resampleData = true;
 		pixelSize = int( floor(p->pixelSize) );
 		if(pixelSize < 2 || pixelSize > maximum_pixelSize){
 			globDataPtr->setError(WRONG_PARAMETER,"pixelSize");
 			return 0;
 		}
 	}
+	else{
+		resampleData = false;
+	}
 	sprintf(globDataPtr->outputBuffer,"pixelSize=%d",pixelSize);
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	// now we got a valid baseName
 	for(brickletID=startBrickletID; brickletID <= endBrickletID; brickletID++){
 
 		bricklet = globDataPtr->getBrickletClassObject(brickletID);
 		ASSERT_RETURN_ZERO(bricklet);
 
+		// check the length of the wave baseName
+		// if we don't do it here we can not know an upper limit for char waveName[]
+		// if it is too long we abort
+		ret = CheckName(NULL,WAVE_OBJECT,baseName.c_str());
+		if(ret == NAME_TOO_LONG){
+			globDataPtr->setInternalError(ret);
+			return ret;
+		}
+
 		sprintf(waveName,brickletDataFormat,baseName.c_str(),brickletID);
+
+		// datafolder handling
 		if( globDataPtr->datafolderEnabled() ){
 
 			ret = GetCurrentDataFolder(&parentDataFolderHPtr);
@@ -589,6 +602,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				return 0;
 			}
 		}
+		
 		switch(typeOfData){
 			case RAW_DATA:
 				ret = createRawDataWave(newDataFolderHPtr,waveName,brickletID,fullPathOfCreatedWaves);
@@ -605,23 +619,23 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				return 0;
 				break;
 		}
-
 		if(!globDataPtr->dataCacheEnabled()){
 			bricklet->clearCache();
 		}
 
 		if(ret == WAVE_EXIST){
 			globDataPtr->setError(ret,waveName);
-			break;
+			return 0;
 		}
 		else if(ret == INTERNAL_ERROR_CONVERTING_DATA || ret == UNKNOWN_ERROR){
 			globDataPtr->setError(ret);
-			break;
+			return 0;
 		}
 		else if(ret != SUCCESS){
 			globDataPtr->setInternalError(ret);
-			break;
+			return 0;
 		}
+
 		//check for user abort
 		if( SpinProcess() != 0 ){
 			break;

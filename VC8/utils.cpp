@@ -58,10 +58,10 @@ void outputToHistory(const char *str){
 
 int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &waveHandle){
 
-	ASSERT_RETURN_MINUSONE(stringVector.size());
+	ASSERT_RETURN_ONE(stringVector.size());
 
 	std::vector<long int> stringSizes;
-	
+
 	int ret;
 	unsigned int i;
 
@@ -135,11 +135,10 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
-	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	std::vector<std::string> allColumns;
 	waveHndl waveHandle;
 	int ret=-1;
-	
+	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
 	// create 2D textwave with firstColumn.size() rows and 2 columns
@@ -154,20 +153,6 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	else{
 		sprintf(globDataPtr->outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
 		outputToHistory(globDataPtr->outputBuffer);
-		
-		std::vector<std::string>::const_iterator it;
-
-		outputToHistory("keys are:");
-		for(it= firstColumn.begin(); it != firstColumn.end(); it++){
-			sprintf(globDataPtr->outputBuffer,"_%s_",it->c_str());
-			outputToHistory(globDataPtr->outputBuffer);
-		}
-
-		outputToHistory("values are:");
-		for(it= secondColumn.begin(); it != secondColumn.end(); it++){
-			sprintf(globDataPtr->outputBuffer,"_%s_",it->c_str());
-			outputToHistory(globDataPtr->outputBuffer);
-		}
 		return UNKNOWN_ERROR;
 	}
 
@@ -185,8 +170,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		outputToHistory(globDataPtr->outputBuffer);
 		return UNKNOWN_ERROR;
 	}
-
-	ASSERT_RETURN_MINUSONE(waveHandle);
+	ASSERT_RETURN_ONE(waveHandle);
 
 	// copy the strings of both columns into a new vector
 	// so that they are then 1D
@@ -321,7 +305,9 @@ void appendToWaveNote(std::string waveNote, waveHndl waveHandle){
 void waveClearNaN64(double *data, long size){
 
 	long i;
-	
+
+	ASSERT_RETURN_VOID(data);
+
 	for (i = 0; i < size; i++){
 		*data++ = DOUBLE_NAN;
 	}
@@ -330,6 +316,8 @@ void waveClearNaN64(double *data, long size){
 void waveClearNaN32(float *data, long size){
 
 	long i;
+
+	ASSERT_RETURN_VOID(data);
 	
 	for (i = 0; i < size; i++){
 		*data++ = SINGLE_NAN;
@@ -441,9 +429,8 @@ std::string getFullWavePath(DataFolderHandle df, waveHndl wv){
 	return fullPath;
 }
 
-int createRawDataWave(DataFolderHandle dataFolderHandle,char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
+int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
-	char dataWaveName[MAX_OBJ_NAME+1];
 	const int *pBuffer;
 	int* dataPtr = NULL;
 	int count=0,ret;
@@ -458,29 +445,31 @@ int createRawDataWave(DataFolderHandle dataFolderHandle,char *waveName, int bric
 
 	if(count == 0 || pBuffer == NULL){
 		outputToHistory("Could not load bricklet contents.");
-		
 		return 0;
 	}
 	// create 1D wave with count points
 	dimensionSizes[ROWS]=count;
 
-	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,NT_I32,globDataPtr->overwriteEnabledAsInt());
-
+	ret = MDMakeWave(&waveHandle,waveName,dfHandle,dimensionSizes,NT_I32,globDataPtr->overwriteEnabledAsInt());
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",dataWaveName);
+		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveName);
 		debugOutputToHistory(globDataPtr->outputBuffer);
-		globDataPtr->setError(WAVE_EXIST,dataWaveName);
 		return WAVE_EXIST;	
 	}
-	if(ret != 0 ){
-		globDataPtr->setInternalError(ret);
+	else if(ret != 0 ){
 		return ret;
 	}
 
-	dataPtr = (int*) WaveData(waveHandle);
+	ASSERT_RETURN_ONE(waveHandle);
+	dataPtr = getWaveDataPtr<int>(waveHandle);
+	ASSERT_RETURN_ONE(dataPtr);
+	ASSERT_RETURN_ONE(pBuffer);
+
 	memcpy(dataPtr,pBuffer,count*sizeof(int));
+	
 	setDataWaveNote(brickletID,bricklet->getRawMin(),bricklet->getRawMax(),bricklet->getPhysValRawMin(),bricklet->getPhysValRawMax(),waveHandle);
-	fullPathOfCreatedWaves.append(getFullWavePath(dataFolderHandle, waveHandle));
+	
+	fullPathOfCreatedWaves.append(getFullWavePath(dfHandle, waveHandle));
 	fullPathOfCreatedWaves.append(";");
 	return ret;
 }
@@ -494,7 +483,6 @@ void convertHandleToString(Handle strHandle,std::string &str){
 	if(strHandle == NULL || GetHandleSize(strHandle) == 0L){
 		return;
 	}
-
 	handleSize = GetHandleSize(strHandle);
 
 	try{

@@ -4,7 +4,7 @@
 	resources that IGOR looks for in an XOP module.
 */
 
-#include "IgorXOPs6-Beta-100819\XOPSupport\XOPResources.h"			// Defines XOP-specific symbols.
+#include "XOP_Toolkit_6/IgorXOPs6/XOPSupport/XOPResources.h"			// Defines XOP-specific symbols.
 
 1100 STR#					// Custom error messages
 BEGIN

@@ -576,10 +576,12 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 					ret = GetDataFolderNameOrPath(dfHandle, 3, dataFolderPath);
 					if(ret != 0){
 						return ret;
-					}							
+					}
 					// The "ImageInterpolate [...] Pixelate" command is used here
 					sprintf(cmd,"ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s",\
-						pixelSize,pixelSize,dataFolderPath,getFullWavePath(dfHandle,waveHandleVector[i]).c_str());
+						pixelSize,pixelSize,dataFolderPath,dataFolderPath);
+					// quote waveName properly, it might be a liberal name
+					CatPossiblyQuotedName(cmd,waveNameVector[i].c_str());
 					if(globDataPtr->debuggingEnabled()){
 						debugOutputToHistory(cmd);
 					}

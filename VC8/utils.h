@@ -41,6 +41,7 @@ T stringToAnyType(std::string str){
 	return t;
 }
 
+// be sure to check the return value for NULL
 template <class T> T* getWaveDataPtr(waveHndl waveH){
 	int accessMode = kMDWaveAccessMode0;
 	int ret=-1;

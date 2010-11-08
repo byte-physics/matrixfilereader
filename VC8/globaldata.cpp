@@ -198,7 +198,7 @@ void GlobalData::setError(int errorCode, std::string argument){
 	}
 
 	m_lastError = errorCode;
-	SetOperationNumVar(V_flag,double(errorCode));
+	SetOperationNumVar(V_flag,static_cast<double>(errorCode));
 
 	if(argument.size() == 0){
 		m_lastErrorArgument = "(missing argument)";

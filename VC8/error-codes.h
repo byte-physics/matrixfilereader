@@ -1,23 +1,17 @@
-/** @file error-codes.h
- *
- */
 #pragma once
 
-/** @var  errorCode
- * @brief The error codes returned from the functions. It might be handy to define a struct in Igor which hold these values.
- */
-// If this enum is changed, change also GlobalData::setLastError(...)
+// If this enum is changed, check GlobalData::setError(...)
 enum errorCode{
 	SUCCESS =0,
-	UNKNOWN_ERROR=1,
-	ALREADY_FILE_OPEN=2,
-	EMPTY_RESULTFILE=4,
-	FILE_NOT_READABLE=8,
-	NO_NEW_BRICKLETS=16,
-	WRONG_PARAMETER=32,
-	INTERNAL_ERROR_CONVERTING_DATA=64,
-	NO_FILE_OPEN=128,
-	INVALID_RANGE=256,  
-	NON_EXISTENT_BRICKLET=512,
-	WAVE_EXIST=1024
+	UNKNOWN_ERROR=10001,
+	ALREADY_FILE_OPEN=10002,
+	EMPTY_RESULTFILE=10004,
+	FILE_NOT_READABLE=10008,
+	NO_NEW_BRICKLETS=10016,
+	WRONG_PARAMETER=10032,
+	INTERNAL_ERROR_CONVERTING_DATA=10064,
+	NO_FILE_OPEN=10128,
+	INVALID_RANGE=10256,  
+	NON_EXISTENT_BRICKLET=10512,
+	WAVE_EXIST=11024
 };

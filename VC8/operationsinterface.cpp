@@ -24,7 +24,7 @@ namespace{
 								return 0;\
 							}
 
-int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
+extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
@@ -109,7 +109,7 @@ int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
+extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
@@ -224,7 +224,7 @@ int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
+extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
@@ -347,7 +347,7 @@ int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
+extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	SetOperationStrVar(S_value,"");
 
@@ -396,7 +396,7 @@ int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
+extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
@@ -444,7 +444,7 @@ int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p){
 	return GenericGetBricklet(&params,META_DATA);
 }
 
-int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
+extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 
 	GenericGetBrickletParams params;
 
@@ -650,7 +650,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	return 0;
 }
 
-int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
+extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
 	std::string errorMessage;
 
 	// return requested error message
@@ -664,7 +664,7 @@ int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
+extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
 
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_fileName,"");
@@ -682,7 +682,7 @@ int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
+extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	SetOperationNumVar(V_DLLversion,0);
 
@@ -694,13 +694,13 @@ int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteGetVersion(GetVersionRuntimeParamsPtr p){
+extern "C" int ExecuteGetVersion(GetVersionRuntimeParamsPtr p){
 
 	SetOperationNumVar(V_XOPversion,stringToAnyType<double>(myXopVersion));
 	return 0;
 }
 
-int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
+extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
@@ -813,7 +813,7 @@ int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
+extern "C" int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
@@ -831,7 +831,7 @@ int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
 	return 0;
 }
 
-int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p){
+extern "C" int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
@@ -851,20 +851,20 @@ int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p){
 This is the entry point from the host application to the XOP for all messages after the
 INIT message.
 */
-void XOPEntry(void){	
-	long result = 0;
+extern "C" void XOPEntry(void){
+	XOPIORecResult result = 0;
 
 	try{
 		switch (GetXOPMessage()) {
-		case CLEANUP:
-			// in case the user has forgotten to close the result file
-			if(globDataPtr->resultFileOpen()){
-				globDataPtr->closeResultFile();
-			}
-			// close the session and unload the DLL
-			globDataPtr->closeSession();
-			delete globDataPtr;
-			globDataPtr = NULL;
+			case CLEANUP:
+				// in case the user has forgotten to close the result file
+				if(globDataPtr->resultFileOpen()){
+					globDataPtr->closeResultFile();
+				}
+				// close the session and unload the DLL
+				globDataPtr->closeSession();
+				delete globDataPtr;
+				globDataPtr = NULL;
 			break;
 		}
 	}
@@ -874,15 +874,14 @@ void XOPEntry(void){
 	SetXOPResult(result);
 }
 
-/*	main(ioRecHandle)
+/*	XOPMain(ioRecHandle)
 
 This is the initial entry point at which the host application calls XOP.
 The message sent by the host must be INIT.
-main() does any necessary initialization and then sets the XOPEntry field of the
-ioRecHandle to the address to be called for future messages.
+
 */
 
-HOST_IMPORT int main(IORecHandle ioRecHandle){	
+HOST_IMPORT int XOPMain(IORecHandle ioRecHandle){	
 	XOPInit(ioRecHandle);							/* do standard XOP initialization */
 	SetXOPEntry(XOPEntry);							/* set entry point for future calls */
 	int errorCode;

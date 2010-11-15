@@ -1,0 +1,14 @@
+    Copyright (C) 2009-2010, Thomas Braun, thomas <dot> braun <aeht> virtuell <minus> zuhause <dot> de
+
+    The "MatrixFileReader XOP" is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License along with this program; if not, see <http://www.gnu.org/licenses>.
+
+
+    Additional permission under GNU GPL version 3 section 7
+
+    The "MatrixFileReader XOP" may be (dynamically or statically) linked against the following non-free libraries:
+	- XOPSupport.lib, XOPSupport64.lib, Igor.lib, Igor64.lib and possible other libraries required, to get it running with "Igor Pro" from WaveMetrics Incorporated, Portland, USA.
+	- Libraries included with Vernissage from Omicron NanoTechnology GmbH, Taunusstein, Germany.

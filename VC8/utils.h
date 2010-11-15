@@ -23,8 +23,6 @@ std::wstring CharPtrToWString(char* cStr);
 void debugOutputToHistory(const char *str);
 void outputToHistory(const char *str);
 
-// taken from http://rhyous.com/2009/10/01/how-to-convert-an-int-to-a-string-in-c/
-
 template <class T>
 std::string anyTypeToString(const T& t){
 	std::stringstream ss;

@@ -4,11 +4,12 @@ Requirements:
 - Windows XP SP1 or later
 
 Installation:
-- Copy or link "matrixFileReader.xop" to the "Igor extensions" folder
-- Copy or link "matrixfilereader Help.ihf" to the "Igor Help files" folder
-- Install Vernissage 2.0 if necessary
+- Install the "Microsoft Visual C++ 2005 Redistributable Package (x86)" located at http://www.microsoft.com/downloads/details.aspx?displaylang=de&FamilyID=32BC1BEE-A3F9-4C13-9C99-220B62A191EE
+- Copy or link "matrixFileReader.xop" to the "Igor extensions" folder (My Documents\WaveMetrics\Igor Pro 6 User Files\Igor extensions)
+- Copy or link "matrixfilereader Help.ihf" to the "Igor Help files" folder (My Documents\WaveMetrics\Igor Pro 6 User Files\Igor extensions\Igor Help files)
+- Install Vernissage 2.0 from the MATRIX CD accompanying your machine
 - Start Igor
-- Load the experiment matrixFileReader.pxp
+- Load the example experiment matrixFileReader.pxp
 - Have fun!
 
 **Please** report all bugs and major/minor annoyances to (thomas dot braun ähht virtuell-zuhause doott de)!

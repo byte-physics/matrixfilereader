@@ -1,0 +1,22 @@
+diff --git a/Coding/matrix-file-reader/igor-xop/VC8/XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.vcproj b/Coding/matrix-file-reader/igor-xop/VC8/XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.vcproj
+index 69114c8..eec02e4 100644
+--- a/Coding/matrix-file-reader/igor-xop/VC8/XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.vcproj
++++ b/Coding/matrix-file-reader/igor-xop/VC8/XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.vcproj
+@@ -46,7 +46,7 @@
+ 				AdditionalIncludeDirectories=""
+ 				PreprocessorDefinitions="WIN32;_WIN32_WINNT=0x0500;WINVER=0x0500;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
+ 				StringPooling="true"
+-				RuntimeLibrary="0"
++				RuntimeLibrary="2"
+ 				StructMemberAlignment="0"
+ 				EnableFunctionLevelLinking="false"
+ 				UsePrecompiledHeader="0"
+@@ -75,6 +75,8 @@
+ 				Name="VCLibrarianTool"
+ 				OutputFile="XOPSupport.lib"
+ 				SuppressStartupBanner="true"
++				IgnoreAllDefaultLibraries="true"
++				IgnoreDefaultLibraryNames=""
+ 			/>
+ 			<Tool
+ 				Name="VCALinkTool"

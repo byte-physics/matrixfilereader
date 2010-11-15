@@ -6,7 +6,6 @@
 #include "globaldata.h"
 #include "utils.h"
 
-// Taken from http://www.codeguru.com/forum/archive/index.php/t-193852.html
 std::wstring StringToWString(const std::string& s)
 {
 	std::wstring temp(s.length(),L' ');
@@ -21,8 +20,6 @@ std::string WStringToString(const std::wstring& s)
 	std::copy(s.begin(), s.end(), temp.begin());
 	return temp;
 }
-
-// till here
 
 std::wstring CharPtrToWString(char* cStr){
 
@@ -351,7 +348,6 @@ void splitString(std::string &string, char *sepChar, std::vector<std::string> &l
 
 	sprintf(globDataPtr->outputBuffer,"keyList=%s",string.c_str());
 	debugOutputToHistory(globDataPtr->outputBuffer);
-
 
 	while( ( pos = string.find(sepChar,offset) ) != std::string::npos ){
 

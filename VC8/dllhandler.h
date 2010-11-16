@@ -1,3 +1,9 @@
+/*
+	The file dllhandler.h is part of the "MatrixFileReader XOP".
+	It is licensed under the LGPLv3 with additional permissions,
+	see License.txt	in the source folder for details.
+*/
+
 #pragma once
 
 #include "header.h"
@@ -24,5 +30,4 @@ class DLLHandler{
 		ReleaseSessionFunc  m_pReleaseSessionFunc;
 		HMODULE m_foundationModule;
 		std::string m_vernissageVersion;
-
 };

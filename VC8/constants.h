@@ -1,3 +1,9 @@
+/*
+	The file constants.h is part of the "MatrixFileReader XOP".
+	It is licensed under the LGPLv3 with additional permissions,
+	see License.txt	in the source folder for details.
+*/
+
 #pragma once
 
 // hold information about extrema values of waves
@@ -65,7 +71,7 @@ const char overwrite_option_name[]	= "V_MatrixFileReaderOverwrite";
 const char double_option_name[]		= "V_MatrixFileReaderDouble";
 const char cache_option_name[]		= "V_MatrixFileReaderCache";
 
-// only a few vernissage DLL version are bug-free enough to be used 
+// only one vernissage can be supported at a time
 const char properVernissageVersion[] ="2.0";
 
 const char keyList_default[] = "brickletID;scanCycleCount;runCycleCount;sequenceID;dimension;channelName";

@@ -76,7 +76,7 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="version.lib"
-				OutputFile="matrixFileReader.xop"
+				OutputFile="Release\matrixfilereader.xop"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""
@@ -109,7 +109,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy *.xop &quot;I:\Dokumente und Einstellungen\thomas\Eigene Dateien\WaveMetrics\Igor Pro 6 User Files\Igor Extensions&quot;"
+				CommandLine="copyfiles.bat"
 			/>
 		</Configuration>
 		<Configuration
@@ -318,7 +318,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\brickletClass.cpp"
+				RelativePath=".\brickletclass.cpp"
 				>
 			</File>
 			<File
@@ -351,7 +351,7 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\brickletClass.h"
+				RelativePath=".\brickletclass.h"
 				>
 			</File>
 			<File
@@ -367,7 +367,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\error-codes.h"
+				RelativePath=".\errorcodes.h"
 				>
 			</File>
 			<File
@@ -400,32 +400,20 @@
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
 			<File
-				RelativePath=".\matrixFileReader.rc"
+				RelativePath=".\custom.rc"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
+					ExcludedFromBuild="true"
 					>
 					<Tool
 						Name="VCResourceCompilerTool"
-						AdditionalIncludeDirectories="..\..\XOPSupport;\IgorXOPs5A\XFUNC1;$(NoInherit)"
 					/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						AdditionalIncludeDirectories="$(NoInherit)"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release Vernissage 2.0|Win32"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-						AdditionalIncludeDirectories="..\..\XOPSupport;\IgorXOPs5A\XFUNC1;$(NoInherit)"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\matrixfilereader.rc"
+				>
 			</File>
 		</Filter>
 	</Files>

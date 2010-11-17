@@ -1,8 +1,8 @@
 This is a step-by-step manual to compile the MatrixFileReader XOP.
 
 Requirements:
-- Visual Studio 2005 (it is not advised to try a different version. If you have to switch you need a different Vernissage SDK/DLLs)
-- Windows XP SP1 or later
+- Visual Studio 2005 (it is not advised to try a different version. If you have to switch you need a different Vernissage SDK)
+- Windows XP SP2 or later
 - Vernissage 2.0 SDK (at least the T10 preview version, included)
 - XOP Toolkit 6 (included)
 - Igor 6.20 or later

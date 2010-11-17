@@ -1,10 +1,10 @@
 Requirements:
-- Igor Pro version 6.2.x or later
+- Igor Pro version 6.2.1 or later
 - Omicron Vernissage version 2.0 (this exact version)
 - Windows XP SP2 or later
 
 Installation:
-1.) Install Igor 6.2.x if necessary
+1.) Install Igor 6.2.1 or later if necessary
 2.) Start Igor, this will create a folder called WaveMetrics in "My Documents"
 3.) Install Vernissage 2.0 from the MATRIX CD accompanying your STM
 4.) Install "Microsoft Visual C++ 2005 SP1 Redistributable Package (x86)"

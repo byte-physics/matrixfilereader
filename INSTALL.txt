@@ -1,0 +1,19 @@
+Requirements:
+- Igor Pro version 6.2.x or later
+- Omicron Vernissage version 2.0 (this exact version)
+- Windows XP SP2 or later
+
+Installation:
+1.) Install Igor 6.2.x if necessary
+2.) Start Igor, this will create a folder called WaveMetrics in "My Documents"
+3.) Install Vernissage 2.0 from the MATRIX CD accompanying your STM
+4.) Install "Microsoft Visual C++ 2005 SP1 Redistributable Package (x86)"
+ from http://www.microsoft.com/downloads/details.aspx?familyid=200B2FD9-AE1A-4A14-984D-389C36F85647&displaylang=de
+5.) a.) Copy "matrixfilereader.xop" to "My Documents\WaveMetrics\Igor Pro 6 User Files\Igor extensions"
+    b.) Copy "matrixfilereader Help.ihf" to "My Documents\WaveMetrics\Igor Pro 6 User Files\Igor Help files"
+    c.) Copy everything in procedures to "My Documents\WaveMetrics\Igor Pro 6 User Files\User Procedures"
+6.) Start Igor
+7.) Load the experiment template matrixfilereader.pxt which adds a new menu item called MatrixFileReader.
+
+**Please** report all bugs and major/minor annoyances to (thomas <dot> braun <ähht> virtuell <minus> zuhause <dottt> de)!
+

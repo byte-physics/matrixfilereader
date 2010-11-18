@@ -6,4 +6,5 @@
 
 #pragma once
 
-const char myXopVersion[]		= "0.07";
+#define MatrixFileReader_XOP_VERSION 0,0,7,0
+#define MatrixFileReader_XOP_VERSION_STR "0.07\0"

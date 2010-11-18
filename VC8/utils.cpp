@@ -269,7 +269,7 @@ std::string getStandardWaveNote(int brickletID){
 		waveNote.append("brickletID=\r");
 	}
 
-	waveNote.append("xopVersion=" + std::string(myXopVersion) + "\r");
+	waveNote.append("xopVersion=" + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
 	waveNote.append("vernissageVersion=" + globDataPtr->getVernissageVersion() + "\r");
 
 	return waveNote;

@@ -387,7 +387,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 
 	str.append("Igor Pro Version: " + anyTypeToString<int>(igorVersion) + "\r");
 	str.append("Vernissage version: " + globDataPtr->getVernissageVersion() + "\r");
-	str.append("XOP version: " + std::string(myXopVersion) + "\r");
+	str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
 	str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
 	str.append("\r");
 	str.append("Your Name:\r");
@@ -702,7 +702,7 @@ extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr 
 
 extern "C" int ExecuteGetVersion(GetVersionRuntimeParamsPtr p){
 
-	SetOperationNumVar(V_XOPversion,stringToAnyType<double>(myXopVersion));
+	SetOperationNumVar(V_XOPversion,stringToAnyType<double>(MatrixFileReader_XOP_VERSION_STR));
 	return 0;
 }
 

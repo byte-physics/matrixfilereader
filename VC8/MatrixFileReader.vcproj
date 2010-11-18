@@ -342,6 +342,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\preferences.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\utils.cpp"
 				>
 			</File>
@@ -384,6 +388,10 @@
 			</File>
 			<File
 				RelativePath=".\operationstructs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\preferences.h"
 				>
 			</File>
 			<File

@@ -26,7 +26,7 @@ std::string WStringToString(const std::wstring& s);
 
 std::wstring CharPtrToWString(char* cStr);
 
-void debugOutputToHistory(const char *str);
+void debugOutputToHistory(const char *str, bool silent = false);
 void outputToHistory(const char *str);
 
 template <class T>

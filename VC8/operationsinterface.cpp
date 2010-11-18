@@ -16,6 +16,7 @@
 #include "utils.h"
 #include "brickletconverter.h"
 #include "globaldata.h"
+#include "preferences.h"
 
 namespace{
 	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4};
@@ -740,8 +741,10 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 			}
 	}
 	else{
-		// an empty or missing fileNameOrPath parameter result in an openfile dialog being displayed
+		sprintf(globDataPtr->outputBuffer,"dir=%s,index=%d",globDataPtr->openDlgInitialDir,globDataPtr->openDlgFileIndex);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 
+		// an empty or missing fileNameOrPath parameter result in an openfile dialog being displayed
 		ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(globDataPtr->openDlgFileIndex), globDataPtr->openDlgInitialDir, fullPath);
 		if(ret == -1){ //the user cancelled the dialog
 			globDataPtr->setError(WRONG_PARAMETER,"fileNameOrPath");
@@ -758,6 +761,10 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		globDataPtr->setInternalError(ret);
 		return 0;
 	}
+
+	// store the last used directory in globDataPtr->openDlgInitialDir
+	strncpy(globDataPtr->openDlgInitialDir,dirPath,MAX_PATH_LEN+1);
+	globDataPtr->openDlgInitialDir[MAX_PATH_LEN]='\0';
 
 	// from here on we have
 	// filename : myName.test
@@ -863,6 +870,7 @@ extern "C" void XOPEntry(void){
 	try{
 		switch (GetXOPMessage()) {
 			case CLEANUP:
+				saveXOPPreferences();
 				// in case the user has forgotten to close the result file
 				if(globDataPtr->resultFileOpen()){
 					globDataPtr->closeResultFile();
@@ -904,6 +912,9 @@ HOST_IMPORT int XOPMain(IORecHandle ioRecHandle){
 		SetXOPResult(OUT_OF_MEMORY);
 		return EXIT_FAILURE;
 	}
+
+	// load preferences from file
+	loadXOPPreferences();
 
 	if (errorCode = RegisterOpenResultFile()) {
 		SetXOPResult(errorCode);

@@ -12,7 +12,10 @@
 
 GlobalData *globDataPtr;
 
-GlobalData::GlobalData(): m_VernissageSession(NULL), m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default),m_errorToHistory(false){
+GlobalData::GlobalData(): m_VernissageSession(NULL),
+	m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),
+	m_debug(debug_default),m_doubleWave(double_default), m_overwrite(overwrite_default),m_datafolder(datafolder_default),m_datacache(cache_default),
+	m_errorToHistory(false){
 
 	try{
 		m_DLLHandler = new DLLHandler;

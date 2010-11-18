@@ -36,7 +36,7 @@ std::wstring CharPtrToWString(char* cStr){
 	return StringToWString(str);
 }
 
-void debugOutputToHistory(const char* str){
+void debugOutputToHistory(const char* str, bool silent /* = false */){
 
 	if(!globDataPtr->debuggingEnabled()){
 		return;
@@ -46,7 +46,13 @@ void debugOutputToHistory(const char* str){
 	char buf[ARRAY_SIZE];
 
 	sprintf(buf,debugOutputFormat,str);
-	XOPNotice(buf);
+
+	if(silent){
+		XOPNotice2(buf,0);
+	}
+	else{
+		XOPNotice(buf);
+	}
 }
 
 void outputToHistory(const char *str){

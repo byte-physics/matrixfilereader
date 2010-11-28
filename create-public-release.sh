@@ -2,7 +2,7 @@
 
 set -e
 
-if [ ! -z "$(git status -s .)" ]; then
+if [ ! -z "$(git status -s --untracked-files=no .)" ]; then
 	echo "Aborting, please commit the changes first"
 #	exit 0
 fi

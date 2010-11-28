@@ -15,6 +15,7 @@ Various Hints:
 Compilation:
 - Close all Igor instances
 - Open MatrixFileReader.sln
+- Adjust the library paths in header.h if necessary
 - Adjust the path where the XOP should be copied after the build (Project->Properties, Build-Events, Post-Build Event)
 - Build it (Build->Rebuild Solution)
 - After the build the XOP is automatically copied to the location given earlier

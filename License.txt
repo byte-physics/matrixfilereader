@@ -6,10 +6,10 @@
 
     Additional permission under GNU GPL version 3 section 7
 
-    The "MatrixFileReader XOP" may be (dynamically or statically) linked against the following possibly non-free libraries:
-	- XOPSupport.lib, XOPSupport64.lib, Igor.lib, Igor64.lib and possible other libraries required,
-	  to get it running with "Igor Pro" from WaveMetrics Incorporated, Portland, USA.
-	- Libraries included with Vernissage from Omicron NanoTechnology GmbH, Taunusstein, Germany.
+    - The "MatrixFileReader Project" may be statically linked against libraries from the XOP Toolkit (WaveMetrics Incorporated, Portland, USA) to produce an External Operation for Igor Pro.
+    - Dynamic/Static linking to libraries from the Vernissage Toolkit from Omicron NanoTechnology GmbH, Taunusstein, Germany is also allowed.
+    - You may copy and distribute such a system following the terms of the GNU Lesser GPL v3 or later for the "MatrixFileReader XOP" and the licenses of the other code/libraries concerned.
+
 
 					__FULLTEXT OF THE LGPLv3 License__
 

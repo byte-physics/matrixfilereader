@@ -4,7 +4,7 @@ set -e
 
 if [ ! -z "$(git status -s --untracked-files=no .)" ]; then
 	echo "Aborting, please commit the changes first"
-#	exit 0
+	exit 0
 fi
 
 folder=public-releases/new-release

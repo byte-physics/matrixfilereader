@@ -9,27 +9,24 @@
 
 #include "XOP_Toolkit_6/IgorXOPs6/XOPSupport/XOPResources.h"
 
-1100 STR#					// Custom error messages
+1100 STR#
 BEGIN
 	"MatrixFileReader requires Igor 6.20 or later.\0",			
 	"Out of memory. Bad luck...\0",
-	// You can add error messages here.
 	
-	0,								// NOTE: 0 required to terminate the resource.
+	0,
 END
 
-/* no menu item */
-
-1100 XOPI							// XOPI - Describes general XOP properties to IGOR. 
+1100 XOPI
 BEGIN
-	XOP_VERSION,					// Version number of host XOP system.
-	DEV_SYS_CODE,					// Code for development system used to make XOP.
-	0,								// Obsolete - set to zero.
-	0,								// Obsolete - set to zero.
-	XOP_TOOLKIT_VERSION				// XOP Toolkit version.
+	XOP_VERSION,				
+	DEV_SYS_CODE,
+	0,
+	0,
+	XOP_TOOLKIT_VERSION
 END
 
-1100 XOPC							// Describes functions added by XOP to IGOR.
+1100 XOPC
 BEGIN
 	"MFR_OpenResultFile\0",
 	XOPOp | utilOp | compilableOp,
@@ -59,5 +56,5 @@ BEGIN
 	XOPOp | utilOp | compilableOp,
 	"MFR_GetXOPErrorMessage\0",
 	XOPOp | utilOp | compilableOp,
-	"\0"							// NOTE: 0 required to terminate the resource.
+	"\0"
 END

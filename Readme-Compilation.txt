@@ -3,9 +3,9 @@ This is a step-by-step manual to compile the MatrixFileReader XOP.
 Requirements:
 - Visual Studio 2005 (it is not advised to try a different version. If you have to switch you need a different Vernissage SDK)
 - Windows XP SP2 or later
-- Vernissage 2.0 SDK (at least the T10 preview version, included)
-- XOP Toolkit 6 (included)
-- Igor 6.20 or later
+- Vernissage 2.0 and the corresponding SDK (at least the T10 preview version)
+- XOP Toolkit 6
+- Igor 6.2.1 or later
 
 Various Hints:
 - Always compile the "Release" version. The "Debug" version can not be used with the Vernissage DLLs.
@@ -15,7 +15,6 @@ Various Hints:
 Compilation:
 - Close all Igor instances
 - Open MatrixFileReader.sln
-- Adjust the library paths in header.h if necessary
 - Adjust the path where the XOP should be copied after the build (Project->Properties, Build-Events, Post-Build Event)
 - Build it (Build->Rebuild Solution)
 - After the build the XOP is automatically copied to the location given earlier

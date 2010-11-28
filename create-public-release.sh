@@ -14,9 +14,9 @@ pxpFolder=$folder/pxp
 
 lastVersion=0.10
 
-mkdir $folder
-mkdir $srcFolder
-mkdir $docFolder
+mkdir -p $folder
+mkdir -p $srcFolder
+mkdir -p $docFolder
 
 cp License.txt $folder
 cp INSTALL.txt faq.txt Readme-Compilation.txt $folder

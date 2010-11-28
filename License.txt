@@ -1,4 +1,6 @@
     Copyright (C) 2009-2010, Thomas Braun, thomas <dot> braun <aeht> virtuell <minus> zuhause <dot> de
+     
+    This work was almost completely done during the work at EMPA Thun, section 127 (nanotech@surfaces, http://www.empa.ch/plugin/template/empa/848/*/---/l=1), Switzerland.
 
     The "MatrixFileReader XOP" is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 

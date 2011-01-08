@@ -712,7 +712,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
 	char fullPath[MAX_PATH_LEN+1]="", fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1], fileNameOrPath[MAX_PATH_LEN+1];
-	int ret = 0,i, offset=0,count=0, maxCount=100;
+	int ret = 0, i, totalNumBricklets ;
 	void* pContext  = NULL, *pBricklet = NULL;
 	bool loadSuccess;
 	
@@ -726,25 +726,32 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		return 0;
 	}
 
-	if(p->fileNameOrPathEncountered && p->fileNameOrPathParamsSet[0] \
-		&& p->fileNameOrPath != NULL && GetHandleSize(p->fileNameOrPath) != 0L){
+	if(p->fileNameOrPathEncountered && GetHandleSize(p->fileNameOrPath) != 0L){
 
 			ret = GetCStringFromHandle(p->fileNameOrPath,fileNameOrPath,MAX_PATH_LEN);
 			if( ret != 0 ){
 				globDataPtr->setInternalError(ret);
 				return 0;
 			}
-			ret = GetFullPathFromSymbolicPathAndFilePath(p->pathName,fileNameOrPath,fullPath);
-			if( ret != 0){
-				globDataPtr->setInternalError(ret);
-				return 0;
+			// check if we have a symbolic path
+			if( p->PFlagEncountered && GetHandleSize(p->pathName) != 0L ){
+				ret = GetFullPathFromSymbolicPathAndFilePath(p->pathName,fileNameOrPath,fullPath);
+				if( ret != 0){
+					globDataPtr->setInternalError(ret);
+					return 0;
+				}
+			}
+			// if not, fileNameOrPath is an absolute path
+			else{
+				strncpy(fullPath,fileNameOrPath,MAX_PATH_LEN+1);
+				fullPath[MAX_PATH_LEN]='\0';
 			}
 	}
+	// an empty or missing fileNameOrPath parameter results in an openfile dialog being displayed
 	else{
 		sprintf(globDataPtr->outputBuffer,"dir=%s,index=%d",globDataPtr->openDlgInitialDir,globDataPtr->openDlgFileIndex);
 		debugOutputToHistory(globDataPtr->outputBuffer);
 
-		// an empty or missing fileNameOrPath parameter result in an openfile dialog being displayed
 		ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(globDataPtr->openDlgFileIndex), globDataPtr->openDlgInitialDir, fullPath);
 		if(ret == -1){ //the user cancelled the dialog
 			globDataPtr->setError(WRONG_PARAMETER,"fileNameOrPath");
@@ -773,7 +780,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 
 	if( !FullPathPointsToFolder(dirPath) ){
 		globDataPtr->setError(FILE_NOT_READABLE,dirPath);
-		return 0;	
+		return 0;
 	}
 
 	if( !FullPathPointsToFile(fullPath)){
@@ -792,6 +799,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	sprintf(globDataPtr->outputBuffer,"dirPath %s",dirPath);
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
+	// crashes sometimes after this point on windows 7
 	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
@@ -807,7 +815,11 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	//starting from here the result file is valid
 	globDataPtr->setResultFile(CharPtrToWString(dirPath),CharPtrToWString(fileName));
 
-	for(i=1; i <= pSession->getBrickletCount(); i++ ){
+	totalNumBricklets = pSession->getBrickletCount();
+	sprintf(globDataPtr->outputBuffer,"totalNumBricklets=%d",totalNumBricklets);
+
+	// brickletIDs are 1-based
+	for( i=1; i <= totalNumBricklets; i++){
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
 		try{

@@ -116,7 +116,6 @@ void DLLHandler::setLibraryPath(){
 	}
 }
 
-// FIXME
 // check the registry for the path to the Vernissage DLLs and return (as pointer in the argument) a pointer to the loaded Foundation.dll
 // Remarks:
 // - Only one vernissage version can be installed at a time, so we take the one which is referenced in the regsitry

@@ -6,7 +6,7 @@
 
 #include "header.h"
 
-#include "BrickletClass.h"
+#include "brickletclass.h"
 
 #include "globaldata.h"
 #include "utils.h"
@@ -81,8 +81,8 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		sprintf(globDataPtr->outputBuffer,"pBuffer=%d,count=%d",*pBuffer,count);
 		debugOutputToHistory(globDataPtr->outputBuffer);
 
-		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise the getRaw* routines will be called by
-		// loadbrickletContents implicitly which is quite expensive
+		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called by
+		// implicitly which is quite expensive
 		m_minRawValue = m_VernissageSession->getRawMin(m_brickletPtr);
 		m_maxRawValue = m_VernissageSession->getRawMax(m_brickletPtr);
 
@@ -125,6 +125,7 @@ void BrickletClass::getBrickletMetaData(std::vector<std::string> &keys, std::vec
 			e->Delete();
 			keys.clear();
 			values.clear();
+			return;
 		}
 		loadBrickletMetaDataFromResultFile();
 		// shrink both vectors to their actual size

@@ -61,6 +61,7 @@ void GlobalData::closeResultFile(){
 	IntBrickletClassPtrMap::const_iterator it;
 	for(it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++){
 		delete it->second;
+		it->second = NULL;
 	}
 	// empty bricklet map
 	m_brickletIDBrickletClassMap.clear();
@@ -193,7 +194,7 @@ void GlobalData::finalize(bool clearCache /* = false */, int errorCode /* = SUCC
 void GlobalData::initialize(int calledFromMacro,int calledFromFunction){
 
 	this->readSettings();
-	m_errorToHistory = false;	// otherwise the setError in the next line causes the error message to be printout
+	m_errorToHistory = false;	// otherwise the setError in the next line causes the error message to be printed
 	this->setError(UNKNOWN_ERROR);
 	m_errorToHistory = ( calledFromMacro == 0 && calledFromFunction == 0 );
 }

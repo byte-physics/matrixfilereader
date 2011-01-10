@@ -734,7 +734,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 				return 0;
 			}
 			// check if we have a symbolic path
-			if( p->PFlagEncountered && GetHandleSize(p->pathName) != 0L ){
+			if( p->PFlagEncountered && strlen(p->pathName) > 0L ){
 				ret = GetFullPathFromSymbolicPathAndFilePath(p->pathName,fileNameOrPath,fullPath);
 				if( ret != 0){
 					globDataPtr->setInternalError(ret);

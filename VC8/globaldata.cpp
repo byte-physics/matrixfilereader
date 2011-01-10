@@ -58,7 +58,7 @@ Vernissage::Session* GlobalData::getVernissageSession(){
 void GlobalData::closeResultFile(){
 
 	//delete BrickletClass objects
-	IntBrickletClassPtrMap::const_iterator it;
+	IntBrickletClassPtrMap::iterator it;
 	for(it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++){
 		delete it->second;
 		it->second = NULL;

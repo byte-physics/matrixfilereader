@@ -14,7 +14,7 @@
 
 #include "XOP_Toolkit_6/IgorXOPs6/XOPSupport/xopstandardheaders.h"
 
-#include "VernissageSDK_T2.0_8/src/Incl/vernissage.h"
+#include "VernissageSDK_V2.0/src/Incl/vernissage.h"
 
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/IGOR.lib")
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.lib")

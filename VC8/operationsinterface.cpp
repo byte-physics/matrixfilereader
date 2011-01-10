@@ -799,7 +799,6 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	sprintf(globDataPtr->outputBuffer,"dirPath %s",dirPath);
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	// crashes sometimes after this point on windows 7
 	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 

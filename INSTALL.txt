@@ -1,7 +1,7 @@
 Requirements:
 - Igor Pro version 6.2.1 or later
 - Omicron Vernissage version 2.0 (this exact version)
-- Windows XP SP2 or Windows 7 (Windows Vista is not tested _and_ unsupported)
+- Windows XP SP2/Vista/7
 
 Installation:
 1.) Install Igor 6.2.1 or later

@@ -191,12 +191,17 @@ void GlobalData::finalize(bool clearCache /* = false */, int errorCode /* = SUCC
 	}
 }
 
-void GlobalData::initialize(int calledFromMacro,int calledFromFunction){
+void GlobalData::initializeWithoutReadSettings(int calledFromMacro,int calledFromFunction){
 
-	this->readSettings();
 	m_errorToHistory = false;	// otherwise the setError in the next line causes the error message to be printed
 	this->setError(UNKNOWN_ERROR);
 	m_errorToHistory = ( calledFromMacro == 0 && calledFromFunction == 0 );
+}
+
+void GlobalData::initialize(int calledFromMacro,int calledFromFunction){
+
+	this->readSettings();
+	this->initializeWithoutReadSettings(calledFromMacro,calledFromFunction);
 }
 
 void GlobalData::setError(int errorCode, std::string argument){
@@ -278,90 +283,89 @@ std::string GlobalData::getErrorMessage(int errorCode){
 	return msg;
 }
 
-void GlobalData::readSettings(){
+// Reads settings, see *_option_name in the data folder dataFolderHndl. In case dataFolderHndl is
+// null the current data folder is used.
+void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */){
 
-	double realPart, complexPart;
-	int ret;
-	bool setting,debugEnabled=false;
+	int ret, objType;
+	bool setting;
 
-	// we need to check that here to get consistent output, changing debugging with these settings otherwise interferes with the output
-	if(debuggingEnabled()){
-		debugEnabled = true;
-		outputToHistory("DEBUG: Various Settings");
-	}
-
-	// overwrite setting
-	ret = FetchNumVar(overwrite_option_name,&realPart,&complexPart);
-	if(ret == -1){// variable does not exist
-		enableOverwrite(overwrite_default);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: overwrite=%d (default)",overwrite_default);
-	}
-	else{
-		setting = doubleToBool(realPart);
-		enableOverwrite(setting);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: overwrite=%d",setting);
-	}
-	if(debugEnabled){
-		outputToHistory(globDataPtr->outputBuffer);
-	}
+	char dataFolderPath[MAXCMDLEN+1], buf[ARRAY_SIZE];
+	DataObjectValue objValue;
 
 	// debug setting
-	ret = FetchNumVar(debug_option_name,&realPart,&complexPart);
-	if(ret == -1){// variable does not exist
+	ret = GetDataFolderObject(dataFolderHndl,debug_option_name,&objType,&objValue);
+	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDebugging(debug_default);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: debug=%d (default)",debug_default);
+		sprintf(globDataPtr->outputBuffer,"debug=%d (default)",debug_default);
 	}
 	else{
-		setting = doubleToBool(realPart);
+		setting = doubleToBool(objValue.nv.realValue);
 		enableDebugging(setting);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: debug=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"debug=%d",setting);
 	}
-	if(debugEnabled){
-		outputToHistory(globDataPtr->outputBuffer);
+	if(debuggingEnabled()){
+		// flags=3 returns the full path to the datafolder and including quotes if needed
+		ret = GetDataFolderNameOrPath(dataFolderHndl, 3,dataFolderPath);
+		if(ret == 0){
+			// the additional buf array is needed here because globDataPtr->outputBuffer is still occupied
+			sprintf(buf,"V_MatrixFileReader* variables in the folder %s:",dataFolderPath);
+			debugOutputToHistory(buf);
+		}
+		debugOutputToHistory(globDataPtr->outputBuffer);
 	}
+
+	//overwrite setting
+	ret = GetDataFolderObject(dataFolderHndl,overwrite_option_name,&objType,&objValue);
+	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
+		enableOverwrite(overwrite_default);
+		sprintf(globDataPtr->outputBuffer,"overwrite=%d (default)",overwrite_default);
+	}
+	else{
+		setting = doubleToBool(objValue.nv.realValue);
+		enableOverwrite(setting);
+		sprintf(globDataPtr->outputBuffer,"overwrite=%d",setting);
+	}
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	// double setting
-	ret = FetchNumVar(double_option_name,&realPart,&complexPart);
-	if(ret == -1){// variable does not exist
+	ret = GetDataFolderObject(dataFolderHndl,double_option_name,&objType,&objValue);
+	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDoubleWave(double_default);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: double=%d (default)",double_default);
+		sprintf(globDataPtr->outputBuffer,"double=%d (default)",double_default);
 	}
 	else{
-		setting = doubleToBool(realPart);
+		setting = doubleToBool(objValue.nv.realValue);
 		enableDoubleWave(setting);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: double=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"double=%d",setting);
 	}
-	if(debugEnabled){
-		outputToHistory(globDataPtr->outputBuffer);
-	}
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	// folder setting
-	ret = FetchNumVar(datafolder_option_name,&realPart,&complexPart);
-	if(ret == -1){// variable does not exist
+	ret = GetDataFolderObject(dataFolderHndl,datafolder_option_name,&objType,&objValue);
+	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDatafolder(datafolder_default);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: datafolder=%d (default)",datafolder_default);
+		sprintf(globDataPtr->outputBuffer,"datafolder=%d (default)",datafolder_default);
 	}
 	else{
-		setting = doubleToBool(realPart);
+		setting = doubleToBool(objValue.nv.realValue);
 		enableDatafolder(setting);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: datafolder=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"datafolder=%d",setting);
 	}
-	if(debugEnabled){
-		outputToHistory(globDataPtr->outputBuffer);
-	}
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	// cache setting
-	ret = FetchNumVar(cache_option_name,&realPart,&complexPart);
-	if(ret == -1){// variable does not exist
+	// chache setting
+	ret = GetDataFolderObject(dataFolderHndl,cache_option_name,&objType,&objValue);
+	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDataCaching(cache_default);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: cache=%d (default)",cache_default);
+		sprintf(globDataPtr->outputBuffer,"cache=%d (default)",cache_default);
 	}
 	else{
-		setting = doubleToBool(realPart);
+		setting = doubleToBool(objValue.nv.realValue);
 		enableDataCaching(setting);
-		sprintf(globDataPtr->outputBuffer,"DEBUG: cache=%d",setting);
+		sprintf(globDataPtr->outputBuffer,"cache=%d",setting);
 	}
-	if(debugEnabled){
-		outputToHistory(globDataPtr->outputBuffer);
-	}
+	debugOutputToHistory(globDataPtr->outputBuffer);
+
+	return;
 }

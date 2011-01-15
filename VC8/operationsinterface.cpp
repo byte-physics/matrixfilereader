@@ -118,7 +118,8 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
 
 extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
+
 	SetOperationStrVar(S_waveNames,"");
 
 	std::string waveName, fullPathOfCreatedWaves;
@@ -130,6 +131,25 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	BrickletClass *bricklet = NULL;
 	tm ctime;
 	Vernissage::Session::BrickletMetaData brickletMetaData;
+
+	// check of DEST flag which tells us that we should place all output in the supplied datafolder
+	// and also read the variable settings from this folder
+	if (p->DESTFlagEncountered){
+		if(p->dfref == NULL){
+			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			return 0;
+		}
+		destDataFolderHndl = p->dfref;
+		// Here we check again for the config variables, this time in the destDataFolderHndl
+	}
+	else{// no DEST flag given, so we take the current data folder as destination folder
+		ret = GetCurrentDataFolder(&destDataFolderHndl);
+		if(ret != 0){
+			globDataPtr->setInternalError(ret);
+			return 0;
+		}
+	}
+	globDataPtr->readSettings(destDataFolderHndl);
 
 	if(!globDataPtr->resultFileOpen()){
 		globDataPtr->setError(NO_FILE_OPEN);
@@ -153,23 +173,6 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	}
 	else{
 		waveName = resultMetaDefault;
-	}
-
-	// check of DEST flag which tells us that we should place all output in the supplied datafolder 
-	if (p->DESTFlagEncountered){
-		if(p->dfref == NULL){
-			globDataPtr->setError(WRONG_PARAMETER,"dfref");
-			return 0;
-		}
-		destDataFolderHndl = p->dfref;
-	}
-	else{
-		// no DEST flag given, so we take the current data folder as destination folder
-		ret = GetCurrentDataFolder(&destDataFolderHndl);
-		if(ret != 0){
-			globDataPtr->setInternalError(ret);
-			return 0;
-		}
 	}
 
 	keys.push_back("resultFilePath");
@@ -252,7 +255,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 
 extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
 	int ret=-1;
@@ -264,8 +267,26 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
 	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
-
 	std::vector<std::string> keys, textWaveContents;
+
+	// check of DEST flag which tells us that we should place all output in the supplied datafolder
+	// and also read the variable settings from this folder
+	if (p->DESTFlagEncountered){
+		if(p->dfref == NULL){
+			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			return 0;
+		}
+		destDataFolderHndl = p->dfref;
+		// Here we check again for the config variables, this time in the destDataFolderHndl
+	}
+	else{// no DEST flag given, so we take the current data folder as destination folder
+		ret = GetCurrentDataFolder(&destDataFolderHndl);
+		if(ret != 0){
+			globDataPtr->setInternalError(ret);
+			return 0;
+		}
+	}
+	globDataPtr->readSettings(destDataFolderHndl);
 
 	if(!globDataPtr->resultFileOpen()){
 		globDataPtr->setError(NO_FILE_OPEN);
@@ -293,23 +314,6 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	}
 	else{
 		keyList = keyList_default;
-	}
-
-	// check of DEST flag which tells us that we should place all output in the supplied datafolder 
-	if (p->DESTFlagEncountered){
-		if(p->dfref == NULL){
-			globDataPtr->setError(WRONG_PARAMETER,"dfref");
-			return 0;
-		}
-		destDataFolderHndl = p->dfref;
-	}
-	else{
-		// no DEST flag given, so we take the current data folder as destination folder
-		ret = GetCurrentDataFolder(&destDataFolderHndl);
-		if(ret != 0){
-			globDataPtr->setInternalError(ret);
-			return 0;
-		}
 	}
 
 	// check waveName parameter
@@ -520,7 +524,7 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 
 int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	BEGIN_OUTER_CATCH
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
 	const char *sepChar = ";";
@@ -533,6 +537,25 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	int startBrickletID=-1, endBrickletID=-1;
 	int pixelSize;
 	bool resampleData;
+
+	// check of DEST flag which tells us that we should place all output in the supplied datafolder
+	// and also read the variable settings from this folder
+	if (p->DESTFlagEncountered){
+		if(p->dfref == NULL){
+			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			return 0;
+		}
+		destDataFolderHndl = p->dfref;
+		// Here we check again for the config variables, this time in the destDataFolderHndl
+	}
+	else{// no DEST flag given, so we take the current data folder as destination folder
+		ret = GetCurrentDataFolder(&destDataFolderHndl);
+		if(ret != 0){
+			globDataPtr->setInternalError(ret);
+			return 0;
+		}
+	}
+	globDataPtr->readSettings(destDataFolderHndl);
 
 	if(!globDataPtr->resultFileOpen()){
 		globDataPtr->setError(NO_FILE_OPEN);
@@ -617,23 +640,6 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	}
 	sprintf(globDataPtr->outputBuffer,"pixelSize=%d",pixelSize);
 	debugOutputToHistory(globDataPtr->outputBuffer);
-
-	// check of DEST flag which tells us that we should place all output in the supplied datafolder 
-	if (p->DESTFlagEncountered){
-		if(p->dfref == NULL){
-			globDataPtr->setError(WRONG_PARAMETER,"dfref");
-			return 0;
-		}
-		destDataFolderHndl = p->dfref;
-	}
-	else{
-		// no DEST flag given, so we take the current data folder as destination folder
-		ret = GetCurrentDataFolder(&destDataFolderHndl);
-		if(ret != 0){
-			globDataPtr->setInternalError(ret);
-			return 0;
-		}
-	}
 
 	for(brickletID=startBrickletID; brickletID <= endBrickletID; brickletID++){
 

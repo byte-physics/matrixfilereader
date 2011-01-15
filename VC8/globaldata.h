@@ -43,10 +43,12 @@ public:
 	std::string getLastErrorMessage();
 	std::string getErrorMessage(int errorCode);
 
+	void initializeWithoutReadSettings(int calledFromMacro,int calledFromFunction);
 	void initialize(int calledFromMacro,int calledFromFunction);
+
 	void finalize(bool clearCache = false, int errorCode = SUCCESS);
 
-	void readSettings();
+	void readSettings(DataFolderHandle dataFolderHndl = NULL);
 	// debug
 	bool debuggingEnabled(){ return m_debug; };
 	
@@ -87,7 +89,6 @@ private:
 	void enableDebugging(bool var){ m_debug=var; };
 	void enableOverwrite(bool var){ m_overwrite = var; };
 	void enableDataCaching(bool var){m_datacache = var; };
-
 };
 
 // declare global object globDataPtr

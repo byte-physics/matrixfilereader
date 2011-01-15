@@ -15,7 +15,7 @@ int RegisterGetResultFileMetaData(void){
 	const char* runtimeStrVarList;
 
 	// NOTE: If you change this template, you must change the GetResultFileMetaDataRuntimeParams structure as well.
-	cmdTemplate = "MFR_GetResultFileMetaData /N=string:waveName";
+	cmdTemplate = "MFR_GetResultFileMetaData /N=string:waveName /DEST=dataFolderRef:dfref";
 	runtimeNumVarList = V_flag;
 	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetResultFileMetaDataRuntimeParams), (void*)ExecuteGetResultFileMetaData, 0);
@@ -110,12 +110,13 @@ int RegisterGetBrickletData(void){
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
 
-	// NOTE: If you change this template, you must change the GetBrickletDataRuntimeParams structure as well.
-	cmdTemplate = "MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:pixelSize /N=string:baseName";
+	// NOTE: If you change this template, you must change the MFR_GetBrickletDataRuntimeParams structure as well.
+	cmdTemplate = "MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:pixelSize /N=string:baseName /DEST=dataFolderRef:dfref";
 	runtimeNumVarList = V_flag;
 	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletDataRuntimeParams), (void*)ExecuteGetBrickletData, 0);
 }
+
 
 int RegisterGetBrickletMetaData(void){
 	const char* cmdTemplate;
@@ -123,7 +124,7 @@ int RegisterGetBrickletMetaData(void){
 	const char* runtimeStrVarList;
 
 	// NOTE: If you change this template, you must change the GetBrickletMetaDataRuntimeParams structure as well.
-	cmdTemplate = "MFR_GetBrickletMetaData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
+	cmdTemplate = "MFR_GetBrickletMetaData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName /DEST=dataFolderRef:dfref";
 	runtimeNumVarList = V_flag;
 	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletMetaDataRuntimeParams), (void*)ExecuteGetBrickletMetaData, 0);
@@ -135,7 +136,7 @@ int RegisterGetBrickletRawData(void){
 	const char* runtimeStrVarList;
 
 	// NOTE: If you change this template, you must change the GetBrickletRawDataRuntimeParams structure as well.
-	cmdTemplate = "MFR_GetBrickletRawData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName";
+	cmdTemplate = "MFR_GetBrickletRawData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName /DEST=dataFolderRef:dfref";
 	runtimeNumVarList = V_flag;
 	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletRawDataRuntimeParams), (void*)ExecuteGetBrickletRawData, 0);
@@ -159,7 +160,7 @@ int RegisterCreateOverviewTable(void){
 	const char* runtimeStrVarList;
 
 	// NOTE: If you change this template, you must change the CreateOverviewTableRuntimeParams structure as well.
-	cmdTemplate = "MFR_CreateOverviewTable /N=string:waveName /KEYS=string:keyList";
+	cmdTemplate = "MFR_CreateOverviewTable /N=string:waveName /KEYS=string:keyList /DEST=dataFolderRef:dfref";
 	runtimeNumVarList = V_flag;
 	runtimeStrVarList = S_waveNames;
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(CreateOverviewTableRuntimeParams), (void*)ExecuteCreateOverviewTable, 0);

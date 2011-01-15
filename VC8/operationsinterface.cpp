@@ -122,6 +122,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	SetOperationStrVar(S_waveNames,"");
 
 	std::string waveName, fullPathOfCreatedWaves;
+	DataFolderHandle destDataFolderHndl = NULL;
 	std::vector<std::string> keys,values;
 	char buf[ARRAY_SIZE];
 	int ret;
@@ -144,6 +145,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	if (p->NFlagEncountered){
 		if( GetHandleSize(p->waveName) == 0L ){
 			globDataPtr->setError(WRONG_PARAMETER,"waveName");
+			return 0;
 		}
 		else{
 			convertHandleToString(p->waveName,waveName);
@@ -151,6 +153,23 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	}
 	else{
 		waveName = resultMetaDefault;
+	}
+
+	// check of DEST flag which tells us that we should place all output in the supplied datafolder 
+	if (p->DESTFlagEncountered){
+		if(p->dfref == NULL){
+			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			return 0;
+		}
+		destDataFolderHndl = p->dfref;
+	}
+	else{
+		// no DEST flag given, so we take the current data folder as destination folder
+		ret = GetCurrentDataFolder(&destDataFolderHndl);
+		if(ret != 0){
+			globDataPtr->setInternalError(ret);
+			return 0;
+		}
 	}
 
 	keys.push_back("resultFilePath");
@@ -213,7 +232,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	}
 
 	// brickletID=0 because we are handling resultfile metadata
-	ret = createAndFillTextWave(keys,values,NULL,waveName.c_str(),0,fullPathOfCreatedWaves);
+	ret = createAndFillTextWave(keys,values,destDataFolderHndl,waveName.c_str(),0,fullPathOfCreatedWaves);
 
 	if(ret == WAVE_EXIST){
 		globDataPtr->setError(ret,waveName);
@@ -239,7 +258,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	int ret=-1;
 	std::string keyList, key, value, waveName;
 	waveHndl waveHandle;
-	DataFolderHandle parentDataFolderHPtr = NULL;
+	DataFolderHandle destDataFolderHndl = NULL;
 	BrickletClass *bricklet=NULL;
 	int i, j;
 
@@ -276,10 +295,28 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 		keyList = keyList_default;
 	}
 
+	// check of DEST flag which tells us that we should place all output in the supplied datafolder 
+	if (p->DESTFlagEncountered){
+		if(p->dfref == NULL){
+			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			return 0;
+		}
+		destDataFolderHndl = p->dfref;
+	}
+	else{
+		// no DEST flag given, so we take the current data folder as destination folder
+		ret = GetCurrentDataFolder(&destDataFolderHndl);
+		if(ret != 0){
+			globDataPtr->setInternalError(ret);
+			return 0;
+		}
+	}
+
 	// check waveName parameter
 	if (p->NFlagEncountered){
 		if( GetHandleSize(p->waveName) == 0L ){
 			globDataPtr->setError(WRONG_PARAMETER,"waveName");
+			return 0;
 		}
 		else{
 			convertHandleToString(p->waveName,waveName);
@@ -300,9 +337,9 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	dimensionSizes[ROWS] = numberOfBricklets;
 	dimensionSizes[COLUMNS] = keys.size();
 
-	ret = MDMakeWave(&waveHandle,waveName.c_str(),NULL,dimensionSizes,TEXT_WAVE_TYPE,globDataPtr->overwriteEnabledAsInt());
+	ret = MDMakeWave(&waveHandle,waveName.c_str(),destDataFolderHndl,dimensionSizes,TEXT_WAVE_TYPE,globDataPtr->overwriteEnabledAsInt());
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveName);
+		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveName.c_str());
 		debugOutputToHistory(globDataPtr->outputBuffer);
 		globDataPtr->setError(WAVE_EXIST,waveName);
 		return 0;
@@ -341,13 +378,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	// brickletID equals 0 because the wave note is for a resultfile kind wave
 	setOtherWaveNote(0,waveHandle);
 
-	ret = GetCurrentDataFolder(&parentDataFolderHPtr);
-	if(ret != 0){
-		globDataPtr->setInternalError(ret);
-		return 0;
-	}
-
-	SetOperationStrVar(S_waveNames,getFullWavePath(parentDataFolderHPtr,waveHandle).c_str());
+	SetOperationStrVar(S_waveNames,getFullWavePath(destDataFolderHndl,waveHandle).c_str());
 	bool clearCache=true;
 	globDataPtr->finalize(clearCache);
 	END_OUTER_CATCH
@@ -422,7 +453,11 @@ extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
 
 	params.SFlagEncountered		= p->SFlagEncountered;
 	params.SFlagParamsSet[0]	= p->SFlagParamsSet[0];
-	params.pixelSize					= p->pixelSize;
+	params.pixelSize			= p->pixelSize;
+
+	params.DESTFlagEncountered  = p->DESTFlagEncountered;
+	params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
+	params.dfref				= p->dfref;
 
 	return GenericGetBricklet(&params,CONVERTED_DATA);
 }
@@ -448,6 +483,10 @@ int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p){
 	params.SFlagParamsSet[0]	= 0;
 	params.pixelSize			= 0.0;
 
+	params.DESTFlagEncountered  = p->DESTFlagEncountered;
+	params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
+	params.dfref				= p->dfref;
+
 	return GenericGetBricklet(&params,META_DATA);
 }
 
@@ -472,6 +511,10 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 	params.SFlagParamsSet[0]	= 0;
 	params.pixelSize			= 0.0;
 
+	params.DESTFlagEncountered  = p->DESTFlagEncountered;
+	params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
+	params.dfref				= p->dfref;
+
 	return GenericGetBricklet(&params,RAW_DATA);
 }
 
@@ -485,7 +528,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	std::vector<std::string> keys, values;
 	BrickletClass *bricklet = NULL;
 	char waveName[ARRAY_SIZE], dataFolderName[MAX_OBJ_NAME+1];
-	DataFolderHandle parentDataFolderHPtr = NULL, newDataFolderHPtr = NULL;
+	DataFolderHandle destDataFolderHndl = NULL, brickletDataFolderHndl = NULL;
 	int brickletID=-1, ret=-1;
 	int startBrickletID=-1, endBrickletID=-1;
 	int pixelSize;
@@ -533,7 +576,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	// from here on we have a none empty result set open and a valid bricklet range
 	if( p->NFlagEncountered ){
 		if( GetHandleSize(p->baseName) == 0L ){
-			globDataPtr->setError(WRONG_PARAMETER,"\\N=");
+			globDataPtr->setError(WRONG_PARAMETER,"baseName");
 			return 0;
 		}
 		else{
@@ -559,8 +602,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		}
 	}
 
+	// check for possible resample flag (only in case we are dealing with converted data)
 	pixelSize=1;
-	// check for possible resample flag in case we are dealing with converted data
 	if( p->SFlagEncountered ){
 		resampleData = true;
 		pixelSize = int( floor(p->pixelSize) );
@@ -575,12 +618,29 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	sprintf(globDataPtr->outputBuffer,"pixelSize=%d",pixelSize);
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
+	// check of DEST flag which tells us that we should place all output in the supplied datafolder 
+	if (p->DESTFlagEncountered){
+		if(p->dfref == NULL){
+			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			return 0;
+		}
+		destDataFolderHndl = p->dfref;
+	}
+	else{
+		// no DEST flag given, so we take the current data folder as destination folder
+		ret = GetCurrentDataFolder(&destDataFolderHndl);
+		if(ret != 0){
+			globDataPtr->setInternalError(ret);
+			return 0;
+		}
+	}
+
 	for(brickletID=startBrickletID; brickletID <= endBrickletID; brickletID++){
 
 		bricklet = globDataPtr->getBrickletClassObject(brickletID);
 		ASSERT_RETURN_ZERO(bricklet);
 
-		// check the length of the wave baseName
+		// check only the length of the wave "baseName"
 		// if we don't do it here we can not know an upper limit for char waveName[]
 		// if it is too long we abort
 		ret = CheckName(NULL,WAVE_OBJECT,baseName.c_str());
@@ -594,14 +654,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		// datafolder handling
 		if( globDataPtr->datafolderEnabled() ){
 
-			ret = GetCurrentDataFolder(&parentDataFolderHPtr);
-			if(ret != 0){
-				globDataPtr->setInternalError(ret);
-				return 0;
-			}
-
 			sprintf(dataFolderName,dataFolderFormat,brickletID);
-			ret = NewDataFolder(parentDataFolderHPtr, dataFolderName, &newDataFolderHPtr);
+			ret = NewDataFolder(destDataFolderHndl, dataFolderName, &brickletDataFolderHndl);
 
 			// continue if the datafolder alrady exists, abort on all other errors
 			if( ret != 0 && ret != FOLDER_NAME_EXISTS ){
@@ -609,17 +663,22 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				return 0;
 			}
 		}
+		else{
+			// we don't use extra datafolders for the bricklets, so they should be created 
+			// in destDataFolderHndl, see DEST flag handling above
+			brickletDataFolderHndl = destDataFolderHndl;
+		}
 		
 		switch(typeOfData){
 			case RAW_DATA:
-				ret = createRawDataWave(newDataFolderHPtr,waveName,brickletID,fullPathOfCreatedWaves);
+				ret = createRawDataWave(brickletDataFolderHndl,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			case CONVERTED_DATA:
-				ret = createWaves(newDataFolderHPtr,waveName,brickletID,resampleData,pixelSize,fullPathOfCreatedWaves);		
+				ret = createWaves(brickletDataFolderHndl,waveName,brickletID,resampleData,pixelSize,fullPathOfCreatedWaves);		
 				break;
 			case META_DATA:
 				bricklet->getBrickletMetaData(keys,values);
-				ret = createAndFillTextWave(keys,values,newDataFolderHPtr,waveName,brickletID,fullPathOfCreatedWaves);
+				ret = createAndFillTextWave(keys,values,brickletDataFolderHndl,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			default:
 				outputToHistory("Error in GenericGetBricklet");

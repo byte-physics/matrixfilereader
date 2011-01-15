@@ -40,6 +40,11 @@ struct GetResultFileMetaDataRuntimeParams {
 	Handle waveName;
 	int NFlagParamsSet[1];
 
+	// Parameters for /DEST flag group.
+	int DESTFlagEncountered;
+	DataFolderHandle dfref;
+	int DESTFlagParamsSet[1];
+
 	// Main parameters.
 
 	// These are postamble fields that Igor sets.
@@ -67,6 +72,11 @@ struct CreateOverviewTableRuntimeParams {
 	int KEYSFlagEncountered;
 	Handle keyList;
 	int KEYSFlagParamsSet[1];
+
+	// Parameters for /DEST flag group.
+	int DESTFlagEncountered;
+	DataFolderHandle dfref;
+	int DESTFlagParamsSet[1];
 
 	// Main parameters.
 
@@ -195,7 +205,7 @@ typedef struct GetVernissageVersionRuntimeParams GetVernissageVersionRuntimePara
 typedef struct GetVernissageVersionRuntimeParams* GetVernissageVersionRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
 
-// Operation template: MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:pixelSize /N=string:baseName
+// Operation template: MFR_GetBrickletData /R=(number:startBrickletID[,number:endBrickletID]) /S=number:pixelSize /N=string:baseName /DEST=dataFolderRef:dfref
 
 // Runtime param structure for MFR_GetBrickletData operation.
 #pragma pack(2)	// All structures passed to Igor are two-byte aligned.
@@ -217,6 +227,11 @@ struct GetBrickletDataRuntimeParams {
 	int NFlagEncountered;
 	Handle baseName;
 	int NFlagParamsSet[1];
+
+	// Parameters for /DEST flag group.
+	int DESTFlagEncountered;
+	DataFolderHandle dfref;
+	int DESTFlagParamsSet[1];
 
 	// Main parameters.
 
@@ -245,6 +260,11 @@ struct GetBrickletMetaDataRuntimeParams {
 	int NFlagEncountered;
 	Handle baseName;
 	int NFlagParamsSet[1];
+
+	// Parameters for /DEST flag group.
+	int DESTFlagEncountered;
+	DataFolderHandle dfref;
+	int DESTFlagParamsSet[1];
 
 	// Main parameters.
 
@@ -277,6 +297,11 @@ struct GenericGetBrickletParams {
 	Handle baseName;
 	int NFlagParamsSet[1];
 
+	// Parameters for /DEST flag group.
+	int DESTFlagEncountered;
+	DataFolderHandle dfref;
+	int DESTFlagParamsSet[1];
+
 	// Main parameters.
 
 	// These are postamble fields that Igor sets.
@@ -305,6 +330,11 @@ struct GetBrickletRawDataRuntimeParams {
 	Handle baseName;
 	int NFlagParamsSet[1];
 
+	// Parameters for /DEST flag group.
+	int DESTFlagEncountered;
+	DataFolderHandle dfref;
+	int DESTFlagParamsSet[1];
+
 	// Main parameters.
 
 	// These are postamble fields that Igor sets.
@@ -314,6 +344,8 @@ struct GetBrickletRawDataRuntimeParams {
 typedef struct GetBrickletRawDataRuntimeParams GetBrickletRawDataRuntimeParams;
 typedef struct GetBrickletRawDataRuntimeParams* GetBrickletRawDataRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
+
+int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData);
 
 // Operation template: MFR_GetReportTemplate
 
@@ -331,8 +363,6 @@ struct GetReportTemplateRuntimeParams {
 typedef struct GetReportTemplateRuntimeParams GetReportTemplateRuntimeParams;
 typedef struct GetReportTemplateRuntimeParams* GetReportTemplateRuntimeParamsPtr;
 #pragma pack()	// All structures passed to Igor are two-byte aligned.
-
-int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData);
 
 // Operation template: MFR_CheckForNewBricklets
 

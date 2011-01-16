@@ -6,7 +6,7 @@
 
 #pragma once
 
-// If this enum is changed, check GlobalData::setError(...)
+// If this enum is changed, check GlobalData::setError(...) to see if it needs adaption
 enum errorCode{
 	SUCCESS =0,
 	UNKNOWN_ERROR=10001,

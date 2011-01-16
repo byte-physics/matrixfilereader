@@ -806,10 +806,14 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 					return 0;
 				}
 			}
-			// if not, fileNameOrPath is an absolute path
-			else{
-				strncpy(fullPath,fileNameOrPath,MAX_PATH_LEN+1);
-				fullPath[MAX_PATH_LEN]='\0';
+			else{// if not, fileNameOrPath is an absolute path
+				// GetNativePath ensure that the path has only either backslashes or colons but not mixed, as
+				// GetDirectoryAndFileNameFromFullPath() does not like that
+				ret = GetNativePath(fileNameOrPath,fullPath);
+				if( ret != 0){
+					globDataPtr->setInternalError(ret);
+					return 0;
+				}
 			}
 	}
 	// an empty or missing fileNameOrPath parameter results in an openfile dialog being displayed
@@ -881,6 +885,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 
 	totalNumBricklets = pSession->getBrickletCount();
 	sprintf(globDataPtr->outputBuffer,"totalNumBricklets=%d",totalNumBricklets);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	// brickletIDs are 1-based
 	for( i=1; i <= totalNumBricklets; i++){

@@ -25,7 +25,8 @@ mkdir -p $docFolder
 mkdir -p $pxpFolder
 
 cp License.txt $folder
-cp INSTALL.txt Readme-Compilation.txt $folder
+cp Readme-Compilation.txt $folder
+cp INSTALL-public.txt $folder/INSTALL.txt
 cp "matrixfilereader Help.ihf" $docFolder
 cp matrixfilereader-basic-gui.pxp $pxpFolder
 

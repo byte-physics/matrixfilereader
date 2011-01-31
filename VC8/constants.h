@@ -18,11 +18,11 @@ const int ARRAY_SIZE = 1024;
 
 // format string for wavenames in igor
 
-const char brickletDataDefault[]	 = "brickletData";
-const char brickletMetaDefault[]	 = "brickletMetaData";
+const char brickletDataDefault[]	 = "data";
+const char brickletMetaDefault[]	 = "metaData";
 const char resultMetaDefault[]		 = "resultFileMetaData";
 const char overViewTableDefault[]	 = "overViewTable";
-const char brickletRawDefault[]		 = "brickletRawData";
+const char brickletRawDefault[]		 = "rawData";
 const char brickletMetaDataFormat[]	 = "%s_%05d";
 const char brickletDataFormat[]		 = "%s_%05d";
 const char dataFolderFormat[]		 = "X_%05d";
@@ -47,10 +47,10 @@ const char VTC_1DPROFILE_STRING[]	= "vtc_1DProfile";
 const char VTC_INTERFEROMETER[]		= "vtc_Interferometer";
 
 // wave name suffixes
-const char TRACE_UP_STRING[]		= "_TraceUp";
-const char TRACE_DOWN_STRING[]		= "_TraceDown";
-const char RE_TRACE_UP_STRING[]		= "_ReTraceUp";
-const char RE_TRACE_DOWN_STRING[]	= "_ReTraceDown";
+const char TRACE_UP_STRING[]		= "_Up";
+const char TRACE_DOWN_STRING[]		= "_Down";
+const char RE_TRACE_UP_STRING[]		= "_ReUp";
+const char RE_TRACE_DOWN_STRING[]	= "_ReDown";
 
 // as all parameters to XOP functions are of type double one has to define an epsilon value when one compares them to a given int value
 const double doubleEpsilon = 1e-5;

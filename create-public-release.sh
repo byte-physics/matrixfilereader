@@ -37,5 +37,5 @@ cp Operation-Template-Generator.pxp $srcFolder
 cp VC8/Release/matrixfilereader.xop $folder
 cp VC8/VC2005_Redist_package_x86/vcredist_x86.exe $folder
 
-git rev-parse HEAD > $folder/versionString.txt
+git rev-parse HEAD > $folder/internalVersionString.txt
 git log --pretty="%B" $(cat releases/$lastVersion/fullVersion.txt)..HEAD > changelog

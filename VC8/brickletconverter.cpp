@@ -691,7 +691,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 			}
 
 			// Y Axis
-			int numPointsYAxis = xAxis.clocks;
+			int numPointsYAxis = yAxis.clocks;
 			
 			if(yAxis.mirrored){
 				numPointsYAxis /= 2;

@@ -350,6 +350,10 @@
 				RelativePath=".\utils.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\xop_const_wrappers.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -401,6 +405,10 @@
 			</File>
 			<File
 				RelativePath=".\version.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xop_const_wrappers.h"
 				>
 			</File>
 		</Filter>

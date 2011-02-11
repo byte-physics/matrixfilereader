@@ -358,7 +358,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	for(j=0; j < keys.size(); j++){
 
 		key = keys.at(j);
-		MDSetDimensionLabel(waveHandle,COLUMNS,j,const_cast<char *> (key.c_str()));
+		MDSetDimensionLabel(waveHandle,COLUMNS,j,key.c_str());
 		sprintf(globDataPtr->outputBuffer,"key=%s",key.c_str());
 		debugOutputToHistory(globDataPtr->outputBuffer);
 

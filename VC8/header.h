@@ -22,3 +22,5 @@
 #include "constants.h"
 #include "errorcodes.h"
 #include "version.h"
+
+#include "xop_const_wrappers.h"

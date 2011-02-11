@@ -104,7 +104,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 	std::vector<std::string> waveNameVector;
 	std::string waveNote;
 
-	int *rawBrickletDataPtr = NULL;
+	const int *rawBrickletDataPtr = NULL;
 	int rawBrickletSize=0, waveSize=0, firstBlockOffset=0, triggerAxisBlockSize=0;
 
 	int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex, traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
@@ -190,7 +190,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 	sprintf(globDataPtr->outputBuffer,"pBuffer=%p,count=%d",&pBuffer,rawBrickletSize);
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	rawBrickletDataPtr = const_cast<int *> (pBuffer);
+	rawBrickletDataPtr = pBuffer;
 	ASSERT_RETURN_ONE(rawBrickletDataPtr);
 
 	// create data for raw->scaled transformation
@@ -270,8 +270,8 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 
 			MDSetWaveScaling(waveHandle,ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
-			MDSetWaveUnits(waveHandle,ROWS,const_cast<char *>(WStringToString(triggerAxis.physicalUnit).c_str()));
-			MDSetWaveUnits(waveHandle,-1,const_cast<char *>(bricklet->getMetaDataValueAsString("channelUnit").c_str()));
+			MDSetWaveUnits(waveHandle,ROWS,WStringToString(triggerAxis.physicalUnit).c_str());
+			MDSetWaveUnits(waveHandle,-1,bricklet->getMetaDataValueAsString("channelUnit").c_str());
 			fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandle));
 			fullPathOfCreatedWave.append(";");
 
@@ -630,9 +630,9 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 					MDSetWaveScaling(waveHandleVector[i],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
 				}
 
-				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(triggerAxis.physicalUnit).c_str())));
-				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(rootAxis.physicalUnit).c_str()));
-				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(bricklet->getMetaDataValueAsString("channelUnit").c_str()));
+				MDSetWaveUnits(waveHandleVector[i],ROWS,WStringToString(triggerAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[i],COLUMNS,WStringToString(rootAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[i],-1,bricklet->getMetaDataValueAsString("channelUnit").c_str());
 				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[i]));
 				fullPathOfCreatedWave.append(";");
 			}
@@ -1101,10 +1101,10 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				// here we don't use setScaleOffset=0
 				MDSetWaveScaling(waveHandleVector[i],LAYERS,&specAxis.physicalIncrement,&specAxis.physicalStart);
 
-				MDSetWaveUnits(waveHandleVector[i],ROWS,const_cast<char *>((WStringToString(xAxis.physicalUnit).c_str())));
-				MDSetWaveUnits(waveHandleVector[i],COLUMNS,const_cast<char *>(WStringToString(yAxis.physicalUnit).c_str()));
-				MDSetWaveUnits(waveHandleVector[i],LAYERS,const_cast<char *>(WStringToString(specAxis.physicalUnit).c_str()));
-				MDSetWaveUnits(waveHandleVector[i],-1,const_cast<char *>(bricklet->getMetaDataValueAsString("channelUnit").c_str()));
+				MDSetWaveUnits(waveHandleVector[i],ROWS,WStringToString(xAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[i],COLUMNS,WStringToString(yAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[i],LAYERS,WStringToString(specAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[i],-1,bricklet->getMetaDataValueAsString("channelUnit").c_str());
 
 				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[i]));
 				fullPathOfCreatedWave.append(";");

@@ -240,10 +240,10 @@ std::string GlobalData::getErrorMessage(int errorCode){
 	switch(errorCode){
 
 	case SUCCESS:
-		msg = "No error, everything went nice and smoothly.";
+		msg = "No error, everything went nice and smooth.";
 		break;
 	case UNKNOWN_ERROR:
-		msg = "A strange and unknown error happened. It might be appropriate to file a bug report.";
+		msg = "A strange and unknown error happened. It might be appropriate to file a bug report at " + std::string(PROJECTURL) + ".";
 		break;
 	case ALREADY_FILE_OPEN:
 		msg = "A file is already file open and it can only be one file open at a time.";
@@ -252,7 +252,7 @@ std::string GlobalData::getErrorMessage(int errorCode){
 		msg = "The result file is empty, so there is little one can do here...";
 		break;
 	case FILE_NOT_READABLE:
-		msg = "The file " + this->getLastErrorArgument() + " can not be opened.";
+		msg = "The file/folder " + this->getLastErrorArgument() + " is not readable.";
 		break;
 	case NO_NEW_BRICKLETS:
 		msg = "There are no new bricklets in the result file.";

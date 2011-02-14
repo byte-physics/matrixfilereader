@@ -52,6 +52,7 @@ const char TRACE_DOWN_STRING[]		= "_Down";
 const char RE_TRACE_UP_STRING[]		= "_ReUp";
 const char RE_TRACE_DOWN_STRING[]	= "_ReDown";
 
+const char PROJECTURL[]				= "http://www.igorexchange.com/project/matrixFileReader";
 // as all parameters to XOP functions are of type double one has to define an epsilon value when one compares them to a given int value
 const double doubleEpsilon = 1e-5;
 

@@ -3,12 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6AE16886-D517-483C-9FFF-41B95746EB2A}"
 	ProjectSection(SolutionItems) = preProject
 		copyfiles.bat = copyfiles.bat
-		..\faq.txt = ..\faq.txt
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MatrixFileReader", "MatrixFileReader.vcproj", "{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XOP Toolkit", "XOP Toolkit", "{8EDE0F68-3C79-451D-BB4E-63811002353C}"
+	ProjectSection(SolutionItems) = preProject
 		XOP_Toolkit_6\IgorXOPs6\XOPSupport\IgorErrors.h = XOP_Toolkit_6\IgorXOPs6\XOPSupport\IgorErrors.h
 		XOP_Toolkit_6\IgorXOPs6\XOPSupport\IgorXOP.h = XOP_Toolkit_6\IgorXOPs6\XOPSupport\IgorXOP.h
-		..\INSTALL.TXT = ..\INSTALL.TXT
 		XOP_Toolkit_6\IgorXOPs6\XOPSupport\NamedFIFO.h = XOP_Toolkit_6\IgorXOPs6\XOPSupport\NamedFIFO.h
-		..\todo.txt = ..\todo.txt
 		XOP_Toolkit_6\IgorXOPs6\XOPSupport\WMTypes.h = XOP_Toolkit_6\IgorXOPs6\XOPSupport\WMTypes.h
 		XOP_Toolkit_6\IgorXOPs6\XOPSupport\XOP.h = XOP_Toolkit_6\IgorXOPs6\XOPSupport\XOP.h
 		XOP_Toolkit_6\IgorXOPs6\XOPSupport\XOPDataFolderAccess.c = XOP_Toolkit_6\IgorXOPs6\XOPSupport\XOPDataFolderAccess.c
@@ -33,8 +36,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		XOP_Toolkit_6\IgorXOPs6\XOPSupport\XOPWinMacSupport.h = XOP_Toolkit_6\IgorXOPs6\XOPSupport\XOPWinMacSupport.h
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MatrixFileReader", "MatrixFileReader.vcproj", "{93F8C561-7B77-4DEA-8DFC-0686D676DFB4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Win32 = Release|Win32
@@ -45,5 +46,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8EDE0F68-3C79-451D-BB4E-63811002353C} = {6AE16886-D517-483C-9FFF-41B95746EB2A}
 	EndGlobalSection
 EndGlobal

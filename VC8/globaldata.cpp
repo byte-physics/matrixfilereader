@@ -269,9 +269,6 @@ std::string GlobalData::getErrorMessage(int errorCode){
 	case INVALID_RANGE:
 		msg = "The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and startBrickletID may not be bigger than endBrickletID.";
 		break;
-	case NON_EXISTENT_BRICKLET:
-		msg = "The bricklet number " + this->getLastErrorArgument() + " does not exist.";
-		break;
 	case WAVE_EXIST:
 		msg = "The wave " + this->getLastErrorArgument() + " already exists. Please move/delete it first.";
 		break;

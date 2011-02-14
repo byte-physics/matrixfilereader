@@ -7,6 +7,7 @@
 #pragma once
 
 // If this enum is changed, check GlobalData::setError(...) to see if it needs adaption
+// the values start at 10000 because these are reserved for custom XOP error codes according to the XOP Toolkit manual
 enum errorCode{
 	SUCCESS =0,
 	UNKNOWN_ERROR=10001,
@@ -18,6 +19,5 @@ enum errorCode{
 	INTERNAL_ERROR_CONVERTING_DATA=10064,
 	NO_FILE_OPEN=10128,
 	INVALID_RANGE=10256,  
-	NON_EXISTENT_BRICKLET=10512,
-	WAVE_EXIST=11024
+	WAVE_EXIST=10512
 };

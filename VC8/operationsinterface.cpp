@@ -433,7 +433,6 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	SetOperationStrVar(S_value,str.c_str());
 
 	outputToHistory(str.c_str());
-	globDataPtr->finalize();
 	END_OUTER_CATCH
 	return 0;
 }

@@ -265,7 +265,7 @@ std::string getStandardWaveNote(int brickletID){
 	std::string waveNote;
 
 	waveNote.append("resultFileName=" + globDataPtr->getFileName() + "\r");
-	waveNote.append("resultFilePath=" + globDataPtr->getDirPath() + "\r");
+	waveNote.append("resultDirPath=" + globDataPtr->getDirPath() + "\r");
 
 	// we pass brickletID=0 for waveNotes concerning the resultFileMetaData wave
 	if(brickletID > 0){

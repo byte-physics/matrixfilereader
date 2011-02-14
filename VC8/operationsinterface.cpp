@@ -175,7 +175,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 		waveName = resultMetaDefault;
 	}
 
-	keys.push_back("resultFilePath");
+	keys.push_back("resultDirPath");
 	values.push_back(globDataPtr->getDirPath());
 
 	keys.push_back("resultFileName");

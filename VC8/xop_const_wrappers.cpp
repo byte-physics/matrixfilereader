@@ -1,3 +1,9 @@
+/*
+	The file xop_const_wrappers.cpp is part of the "MatrixFileReader XOP".
+	It is licensed under the LGPLv3 with additional permissions,
+	see License.txt	in the source folder for details.
+*/
+
 #include "xop_const_wrappers.h"
 
 int MDSetDimensionLabel(waveHndl waveH, int dimension, IndexInt element, const char constLabel[MAX_DIM_LABEL_CHARS+1]){

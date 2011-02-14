@@ -99,6 +99,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 	std::vector<std::string> allAxes;
 	Vernissage::Session::AxisDescriptor triggerAxis, rootAxis;
 	int numPointsTriggerAxis=-1, numPointsRootAxis=-1, ret=-1, i, j,k;
+	unsigned int ii;
 	std::vector<waveHndl> waveHandleVector;
 	waveHndl waveHandle;
 	std::vector<std::string> waveNameVector;
@@ -572,9 +573,9 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				}
 			}
 
-			for(i=0; i < waveHandleVector.size(); i++){
+			for(ii=0; ii < waveHandleVector.size(); ii++){
 				if( resampleData ){
-					sprintf(globDataPtr->outputBuffer,"Resampling wave %s with pixelSize=%d",waveNameVector[i].c_str(),pixelSize);
+					sprintf(globDataPtr->outputBuffer,"Resampling wave %s with pixelSize=%d",waveNameVector[ii].c_str(),pixelSize);
 					debugOutputToHistory(globDataPtr->outputBuffer);
 
 					// flag=3 results in the full path being returned including a trailing colon
@@ -586,7 +587,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 					sprintf(cmd,"ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s",\
 						pixelSize,pixelSize,dataFolderPath,dataFolderPath);
 					// quote waveName properly, it might be a liberal name
-					CatPossiblyQuotedName(cmd,waveNameVector[i].c_str());
+					CatPossiblyQuotedName(cmd,waveNameVector[ii].c_str());
 					if(globDataPtr->debuggingEnabled()){
 						debugOutputToHistory(cmd);
 					}
@@ -597,43 +598,43 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 						continue;
 					}
 
-					// kill the un-interpolated wave and invalidate waveHandeVector[i]
-					ret = KillWave(waveHandleVector[i]);
-					waveHandleVector[i] = NULL;
+					// kill the un-interpolated wave and invalidate waveHandeVector[ii]
+					ret = KillWave(waveHandleVector[ii]);
+					waveHandleVector[ii] = NULL;
 					if(ret != 0){
 						return ret;
 					}
-					// rename wave from M_PixelatedImage to waveNameVector[i] both sitting in dfHandle
-					ret = RenameDataFolderObject(dfHandle,WAVE_OBJECT,"M_PixelatedImage",waveNameVector[i].c_str());
+					// rename wave from M_PixelatedImage to waveNameVector[ii] both sitting in dfHandle
+					ret = RenameDataFolderObject(dfHandle,WAVE_OBJECT,"M_PixelatedImage",waveNameVector[ii].c_str());
 					if(ret != 0){
 						return ret;
 					}
-					waveHandleVector[i] = FetchWaveFromDataFolder(dfHandle,waveNameVector[i].c_str());
-					ASSERT_RETURN_ONE(waveHandleVector[i]);
+					waveHandleVector[ii] = FetchWaveFromDataFolder(dfHandle,waveNameVector[ii].c_str());
+					ASSERT_RETURN_ONE(waveHandleVector[ii]);
 					// get wave dimensions; needed for setScale below
-					MDGetWaveDimensions(waveHandleVector[i],&numDimensions,interpolatedDimSizes);
+					MDGetWaveDimensions(waveHandleVector[ii],&numDimensions,interpolatedDimSizes);
 				}
 		
 				// set wave note
-				setDataWaveNote(brickletID,extremaData[i],waveHandleVector[i],pixelSize);
+				setDataWaveNote(brickletID,extremaData[ii],waveHandleVector[ii],pixelSize);
 
 				// add info about resampling to the wave note, also the wave scaling changes
 				if( resampleData ){
 					physIncrement = triggerAxis.physicalIncrement*double(dimensionSizes[ROWS])/double(interpolatedDimSizes[ROWS]);
-					MDSetWaveScaling(waveHandleVector[i],ROWS,&physIncrement,&setScaleOffset);
+					MDSetWaveScaling(waveHandleVector[ii],ROWS,&physIncrement,&setScaleOffset);
 
 					physIncrement = rootAxis.physicalIncrement*double(dimensionSizes[COLUMNS])/double(interpolatedDimSizes[COLUMNS]);
-					MDSetWaveScaling(waveHandleVector[i],COLUMNS,&physIncrement,&setScaleOffset);
+					MDSetWaveScaling(waveHandleVector[ii],COLUMNS,&physIncrement,&setScaleOffset);
 				}
 				else{// original image
-					MDSetWaveScaling(waveHandleVector[i],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
-					MDSetWaveScaling(waveHandleVector[i],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
+					MDSetWaveScaling(waveHandleVector[ii],ROWS,&triggerAxis.physicalIncrement,&setScaleOffset);
+					MDSetWaveScaling(waveHandleVector[ii],COLUMNS,&rootAxis.physicalIncrement,&setScaleOffset);
 				}
 
-				MDSetWaveUnits(waveHandleVector[i],ROWS,WStringToString(triggerAxis.physicalUnit).c_str());
-				MDSetWaveUnits(waveHandleVector[i],COLUMNS,WStringToString(rootAxis.physicalUnit).c_str());
-				MDSetWaveUnits(waveHandleVector[i],-1,bricklet->getMetaDataValueAsString("channelUnit").c_str());
-				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[i]));
+				MDSetWaveUnits(waveHandleVector[ii],ROWS,WStringToString(triggerAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[ii],COLUMNS,WStringToString(rootAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[ii],-1,bricklet->getMetaDataValueAsString("channelUnit").c_str());
+				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[ii]));
 				fullPathOfCreatedWave.append(";");
 			}
 			break;
@@ -1093,20 +1094,20 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 		} // for COLUMNS
 
 			// set wave note and dimension units
-			for(i=0; i < waveHandleVector.size(); i++){
-				setDataWaveNote(brickletID,extremaData[i],waveHandleVector[i]);
+			for(ii=0; ii < waveHandleVector.size(); ii++){
+				setDataWaveNote(brickletID,extremaData[ii],waveHandleVector[ii]);
 
-				MDSetWaveScaling(waveHandleVector[i],ROWS,&xAxisIncrement,&setScaleOffset);
-				MDSetWaveScaling(waveHandleVector[i],COLUMNS,&yAxisIncrement,&setScaleOffset);
+				MDSetWaveScaling(waveHandleVector[ii],ROWS,&xAxisIncrement,&setScaleOffset);
+				MDSetWaveScaling(waveHandleVector[ii],COLUMNS,&yAxisIncrement,&setScaleOffset);
 				// here we don't use setScaleOffset=0
-				MDSetWaveScaling(waveHandleVector[i],LAYERS,&specAxis.physicalIncrement,&specAxis.physicalStart);
+				MDSetWaveScaling(waveHandleVector[ii],LAYERS,&specAxis.physicalIncrement,&specAxis.physicalStart);
 
-				MDSetWaveUnits(waveHandleVector[i],ROWS,WStringToString(xAxis.physicalUnit).c_str());
-				MDSetWaveUnits(waveHandleVector[i],COLUMNS,WStringToString(yAxis.physicalUnit).c_str());
-				MDSetWaveUnits(waveHandleVector[i],LAYERS,WStringToString(specAxis.physicalUnit).c_str());
-				MDSetWaveUnits(waveHandleVector[i],-1,bricklet->getMetaDataValueAsString("channelUnit").c_str());
+				MDSetWaveUnits(waveHandleVector[ii],ROWS,WStringToString(xAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[ii],COLUMNS,WStringToString(yAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[ii],LAYERS,WStringToString(specAxis.physicalUnit).c_str());
+				MDSetWaveUnits(waveHandleVector[ii],-1,bricklet->getMetaDataValueAsString("channelUnit").c_str());
 
-				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[i]));
+				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,waveHandleVector[ii]));
 				fullPathOfCreatedWave.append(";");
 			}
 

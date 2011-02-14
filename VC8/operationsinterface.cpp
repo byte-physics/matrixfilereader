@@ -263,7 +263,8 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	waveHndl waveHandle;
 	DataFolderHandle destDataFolderHndl = NULL;
 	BrickletClass *bricklet=NULL;
-	int i, j;
+	int i;
+	unsigned int j;
 
 	CountInt dimensionSizes[MAX_DIMENSIONS+1];
 	MemClear(dimensionSizes, sizeof(dimensionSizes));

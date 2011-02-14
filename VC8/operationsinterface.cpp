@@ -175,10 +175,10 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 		waveName = resultMetaDefault;
 	}
 
-	keys.push_back("resultDirPath");
+	keys.push_back(RESULT_DIR_PATH_KEY);
 	values.push_back(globDataPtr->getDirPath());
 
-	keys.push_back("resultFileName");
+	keys.push_back(RESULT_FILE_NAME_KEY);
 	values.push_back(globDataPtr->getFileName());
 
 	keys.push_back("totalNumberOfBricklets");

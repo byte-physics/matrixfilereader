@@ -174,15 +174,15 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 	m_metaDataKeys.push_back("viewTypeCodes");
 	m_metaDataValues.push_back(viewTypeCodesAsOneString);
 
-	m_metaDataKeys.push_back("brickletID");
+	m_metaDataKeys.push_back(BRICKLET_ID_KEY);
 	m_metaDataValues.push_back(anyTypeToString<int>(m_brickletID));
 
 	// resultfile name
-	m_metaDataKeys.push_back("resultFileName");
+	m_metaDataKeys.push_back(RESULT_FILE_NAME_KEY);
 	m_metaDataValues.push_back(globDataPtr->getFileName());
 
 	// resultfile path
-	m_metaDataKeys.push_back("resultDirPath");
+	m_metaDataKeys.push_back(RESULT_DIR_PATH_KEY);
 	m_metaDataValues.push_back(globDataPtr->getDirPath());
 
 	// introduced with Vernissage 2.0

@@ -20,6 +20,7 @@
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.lib")
 
 #include "constants.h"
+#include "keynames.h"
 #include "errorcodes.h"
 #include "version.h"
 

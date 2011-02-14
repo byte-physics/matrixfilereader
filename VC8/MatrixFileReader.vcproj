@@ -388,6 +388,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\keynames.h"
+				>
+			</File>
+			<File
 				RelativePath=".\operationsinterface.h"
 				>
 			</File>

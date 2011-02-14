@@ -264,15 +264,15 @@ std::string getStandardWaveNote(int brickletID){
 
 	std::string waveNote;
 
-	waveNote.append("resultFileName=" + globDataPtr->getFileName() + "\r");
-	waveNote.append("resultDirPath=" + globDataPtr->getDirPath() + "\r");
+	waveNote.append(RESULT_FILE_NAME_KEY + "=" + globDataPtr->getFileName() + "\r");
+	waveNote.append(RESULT_DIR_PATH_KEY +"=" + globDataPtr->getDirPath() + "\r");
 
 	// we pass brickletID=0 for waveNotes concerning the resultFileMetaData wave
 	if(brickletID > 0){
-		waveNote.append("brickletID=" + anyTypeToString<int>(brickletID) + "\r");
+		waveNote.append(BRICKLET_ID_KEY + "=" + anyTypeToString<int>(brickletID) + "\r");
 	}
 	else{
-		waveNote.append("brickletID=\r");
+		waveNote.append(BRICKLET_ID_KEY + "=\r");
 	}
 
 	waveNote.append("xopVersion=" + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");

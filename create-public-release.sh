@@ -12,7 +12,7 @@ srcFolder=$folder/src
 docFolder=$folder/doc
 pxpFolder=$folder/pxp
 
-lastVersion=0.11
+lastVersion=0.12
 
 if [ -e "$folder" ]; then
 	echo "Aborting, the folder $folder exists already"

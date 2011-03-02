@@ -194,7 +194,12 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 	m_metaDataValues.push_back(WStringToString(m_VernissageSession->getDataSetName(m_brickletPtr)));
 
 	// dito
+	// datacomment is a vector, each entry is from one call to writeDataComment
 	std::vector<std::wstring> dataComments = m_VernissageSession->getDataComments(m_brickletPtr);
+
+	// we also write out the number of data comments for convenient access
+	m_metaDataKeys.push_back("dataComment.count");
+	m_metaDataValues.push_back(anyTypeToString(dataComments.size()));
 
 	for(unsigned int i = 0; i < dataComments.size(); i++){
 		m_metaDataKeys.push_back("dataCommentNo" + anyTypeToString(i+1));

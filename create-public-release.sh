@@ -14,11 +14,7 @@ pxpFolder=$folder/pxp
 
 lastVersion=0.12
 
-if [ -e "$folder" ]; then
-	echo "Aborting, the folder $folder exists already"
-	exit 0
-fi
-
+rm -rf $folder
 mkdir -p $folder
 mkdir -p $srcFolder
 mkdir -p $docFolder

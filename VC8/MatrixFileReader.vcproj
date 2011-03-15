@@ -331,6 +331,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\extremadata.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\globaldata.cpp"
 				>
 			</File>
@@ -377,6 +381,10 @@
 			</File>
 			<File
 				RelativePath=".\errorcodes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\extremadata.h"
 				>
 			</File>
 			<File

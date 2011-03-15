@@ -6,14 +6,6 @@
 
 #pragma once
 
-// hold information about extrema values of waves
-struct extremaData{
-	int		rawMin;
-	int		rawMax;
-	double	physValRawMin;
-	double	physValRawMax;
-};
-
 const int ARRAY_SIZE = 1024;
 
 // format string for wavenames in igor
@@ -51,6 +43,11 @@ const char TRACE_UP_STRING[]		= "_Up";
 const char TRACE_DOWN_STRING[]		= "_Down";
 const char RE_TRACE_UP_STRING[]		= "_ReUp";
 const char RE_TRACE_DOWN_STRING[]	= "_ReDown";
+
+const int TRACE_UP 					= 0;
+const int RE_TRACE_UP 				= 1;
+const int TRACE_DOWN				= 2;
+const int RE_TRACE_DOWN				= 3;
 
 const char PROJECTURL[]				= "http://www.igorexchange.com/project/matrixFileReader";
 // as all parameters to XOP functions are of type double one has to define an epsilon value when one compares them to a given int value

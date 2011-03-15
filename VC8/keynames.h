@@ -9,3 +9,4 @@
 const std::string RESULT_FILE_NAME_KEY = "resultFileName";
 const std::string RESULT_DIR_PATH_KEY = "resultDirPath";
 const std::string BRICKLET_ID_KEY = "brickletID";
+const std::string TRACEDIR_ID_KEY = "traceDirection";

@@ -200,7 +200,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		outputToHistory(globDataPtr->outputBuffer);
 		return ret;
 	}
-	setOtherWaveNote(brickletID,waveHandle);
+	setOtherWaveNote(waveHandle,brickletID);
 	fullPathOfCreatedWaves.append(getFullWavePath(dataFolderHandle,waveHandle));
 	fullPathOfCreatedWaves.append(";");
 
@@ -208,7 +208,6 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 }
 
 std::string viewTypeCodeToString(int idx){
-
 	
 	std::vector<std::string> names;
 
@@ -232,15 +231,15 @@ std::string viewTypeCodeToString(int idx){
 	}
 }
 
-void setDataWaveNote(int brickletID, int rawMin, int rawMax, double physicalValueOfRawMin, double physicalValueOfRawMax, waveHndl waveHandle, int pixelSize /* = 1 */){
+void setDataWaveNote(int brickletID, int traceDir, const ExtremaData &extrema,waveHndl waveHandle, int pixelSize /*= 1*/){
 
-	std::string	waveNote = getStandardWaveNote(brickletID);
+	std::string	waveNote = getStandardWaveNote(brickletID,traceDir);
 
-	waveNote.append("rawMin="    + anyTypeToString<int>(rawMin)    + "\r");
-	waveNote.append("rawMax="	 + anyTypeToString<int>(rawMax)	 + "\r");
+	waveNote.append("rawMin="    + anyTypeToString<int>(extrema.getRawMin())    + "\r");
+	waveNote.append("rawMax="	 + anyTypeToString<int>(extrema.getRawMax())	 + "\r");
 	
-	waveNote.append("physicalValueOfRawMin=" + anyTypeToString<double>(physicalValueOfRawMin) + "\r");
-	waveNote.append("physicalValueOfRawMax=" + anyTypeToString<double>(physicalValueOfRawMax) + "\r");
+	waveNote.append("physicalValueOfRawMin=" + anyTypeToString<double>(extrema.getPhysValRawMin()) + "\r");
+	waveNote.append("physicalValueOfRawMax=" + anyTypeToString<double>(extrema.getPhysValRawMax()) + "\r");
 	waveNote.append("pixelSize=" + anyTypeToString<int>(pixelSize) + "\r");
 
 	//clear the wave note
@@ -248,31 +247,33 @@ void setDataWaveNote(int brickletID, int rawMin, int rawMax, double physicalValu
 	appendToWaveNote(waveNote,waveHandle);
 }
 
-void setDataWaveNote(int brickletID, extremaData &extremaData, waveHndl waveHandle, int pixelSize /* = 1 */){
-	setDataWaveNote(brickletID,extremaData.rawMin,extremaData.rawMax,extremaData.physValRawMin,extremaData.physValRawMax,waveHandle,pixelSize);
-}
-void setOtherWaveNote(int brickletID, waveHndl waveHandle){
-
-	std::string waveNote = getStandardWaveNote(brickletID);
+void setOtherWaveNote(waveHndl waveHandle,int brickletID /*= -1*/,int traceDir  /*= -1*/){
 
 	//clear the wave note
 	SetWaveNote(waveHandle,NULL);
-	appendToWaveNote(waveNote,waveHandle);
+	appendToWaveNote(getStandardWaveNote(brickletID, traceDir),waveHandle);
 }
 
-std::string getStandardWaveNote(int brickletID){
+std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 */){
 
 	std::string waveNote;
 
 	waveNote.append(RESULT_FILE_NAME_KEY + "=" + globDataPtr->getFileName() + "\r");
 	waveNote.append(RESULT_DIR_PATH_KEY +"=" + globDataPtr->getDirPath() + "\r");
 
-	// we pass brickletID=0 for waveNotes concerning the resultFileMetaData wave
 	if(brickletID > 0){
 		waveNote.append(BRICKLET_ID_KEY + "=" + anyTypeToString<int>(brickletID) + "\r");
 	}
 	else{
 		waveNote.append(BRICKLET_ID_KEY + "=\r");
+	}
+
+	// see definitons of TRACE_UP and friends in constants.h
+	if(traceDir >= 0){
+		waveNote.append(TRACEDIR_ID_KEY + "=" + anyTypeToString<int>(traceDir) + "\r");
+	}
+	else{
+		waveNote.append(TRACEDIR_ID_KEY + "=\r");
 	}
 
 	waveNote.append("xopVersion=" + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
@@ -474,7 +475,8 @@ int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, 
 
 	memcpy(dataPtr,pBuffer,count*sizeof(int));
 	
-	setDataWaveNote(brickletID,bricklet->getRawMin(),bricklet->getRawMax(),bricklet->getPhysValRawMin(),bricklet->getPhysValRawMax(),waveHandle);
+	// traceDir is -1 because 1D waves don't have that
+	setDataWaveNote(brickletID,-1,bricklet->getExtrema(),waveHandle);
 	
 	fullPathOfCreatedWaves.append(getFullWavePath(dfHandle, waveHandle));
 	fullPathOfCreatedWaves.append(";");

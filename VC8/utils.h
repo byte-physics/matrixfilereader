@@ -69,13 +69,12 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
 
-void setDataWaveNote(int brickletID, int rawMin, int rawMax, double scaledMin, double scaledMax, waveHndl waveHandle, int pixelSize = 1);
-void setDataWaveNote(int brickletID, extremaData &extremaData,waveHndl waveHandle, int pixelSize = 1);
+void setDataWaveNote(int brickletID, int traceDir, const ExtremaData &extrema,waveHndl waveHandle, int pixelSize = 1);
 
-void setOtherWaveNote(int brickletID,waveHndl waveHandle);
+void setOtherWaveNote(waveHndl waveHandle,int brickletID  = -1,int traceDir  = -1);
 void appendToWaveNote(std::string waveNote, waveHndl waveHandle);
 
-std::string getStandardWaveNote(int brickletID);
+std::string getStandardWaveNote(int brickletID = -1, int traceDir = -1 );
 
 void waveClearNaN64(double *wavePtr, long length);
 void waveClearNaN32(float  *wavePtr, long length);

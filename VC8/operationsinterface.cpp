@@ -380,8 +380,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 		return 0;
 	}
 
-	// brickletID equals 0 because the wave note is for a resultfile kind wave
-	setOtherWaveNote(0,waveHandle);
+	setOtherWaveNote(waveHandle);
 
 	SetOperationStrVar(S_waveNames,getFullWavePath(destDataFolderHndl,waveHandle).c_str());
 	bool clearCache=true;

@@ -31,10 +31,7 @@ public:
 	std::string getMetaDataValueAsString(std::string key);
 	int			getMetaDataValueAsInt(std::string key);
 	double		getMetaDataValueAsDouble(std::string key);
-	int getRawMax(){ return m_maxRawValue; };
-	int getRawMin(){ return m_minRawValue; };
-	double getPhysValRawMax(){ return m_maxScaledValue; };
-	double getPhysValRawMin(){ return m_minScaledValue; };
+	const ExtremaData& getExtrema()const{ return m_extrema; };
 
 private:
 	void BrickletClass::loadBrickletMetaDataFromResultFile();
@@ -48,11 +45,7 @@ private:
 	int *m_rawBufferContents;
 	int m_rawBufferContentsSize;
 
-	// min and max raw values
-	int m_minRawValue, m_maxRawValue;
-
-	// min and max scaled values
-	double m_minScaledValue, m_maxScaledValue;
+	ExtremaData m_extrema;
 
 	// meta data
 	std::vector<std::string> m_metaDataKeys;

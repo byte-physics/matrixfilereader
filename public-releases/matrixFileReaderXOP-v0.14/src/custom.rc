@@ -1,0 +1,60 @@
+/*
+	The file custom.rc is part of the "MatrixFileReader XOP".
+	It is licensed under the LGPLv3 with additional permissions, see License.txt
+	in the source folder for details.
+
+	This file is compiled by the resource compiler and creates XOP-specific
+	resources that IGOR looks for in an XOP module.
+*/
+
+#include "XOP_Toolkit_6/IgorXOPs6/XOPSupport/XOPResources.h"
+
+1100 STR#
+BEGIN
+	"MatrixFileReader requires Igor 6.20 or later.\0",			
+	"Out of memory. Bad luck...\0",
+	
+	0,
+END
+
+1100 XOPI
+BEGIN
+	XOP_VERSION,				
+	DEV_SYS_CODE,
+	0,
+	0,
+	XOP_TOOLKIT_VERSION
+END
+
+1100 XOPC
+BEGIN
+	"MFR_OpenResultFile\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_CloseResultFile\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetBrickletCount\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetResultFileName\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetVersion\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetVernissageVersion\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetBrickletData\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetBrickletRawData\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetBrickletMetaData\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetReportTemplate\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_CreateOverviewTable\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetResultFileMetaData\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_CheckForNewBricklets\0",
+	XOPOp | utilOp | compilableOp,
+	"MFR_GetXOPErrorMessage\0",
+	XOPOp | utilOp | compilableOp,
+	"\0"
+END

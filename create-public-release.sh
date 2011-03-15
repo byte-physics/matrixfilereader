@@ -12,7 +12,7 @@ srcFolder=$folder/src
 docFolder=$folder/doc
 pxpFolder=$folder/pxp
 
-lastVersion=0.13
+lastVersion=0.14
 
 rm -rf $folder
 mkdir -p $folder

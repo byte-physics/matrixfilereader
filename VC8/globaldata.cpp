@@ -33,7 +33,7 @@ GlobalData::~GlobalData(){
 	m_DLLHandler = NULL;
 }
 
-void GlobalData::setResultFile(std::wstring dirPath, std::wstring fileName){
+void GlobalData::setResultFile(const std::wstring &dirPath, const std::wstring &fileName){
 	
 	if(this->resultFileOpen()){
 		outputToHistory("BUG: there is already a result file open, please close that first");

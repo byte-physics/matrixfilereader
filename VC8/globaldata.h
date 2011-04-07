@@ -29,7 +29,7 @@ public:
 	std::wstring getDirPathWString();
 	std::string getFileName();
 	std::string getDirPath();
-	void setResultFile( std::wstring dirPath, std::wstring fileName);
+	void setResultFile(const std::wstring &dirPath, const std::wstring &fileName);
 	bool resultFileOpen();
 	Vernissage::Session* getVernissageSession();
 	std::string getVernissageVersion();

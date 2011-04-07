@@ -196,8 +196,17 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 	yOne = bricklet->getExtrema().getPhysValRawMin();
 	yTwo = bricklet->getExtrema().getPhysValRawMax();
 
-	slope = (yOne - yTwo) / (xOne*1.0 - xTwo*1.0);
-	yIntercept = yOne - slope*xOne;
+	// usually xOne is not euqal to xTwo
+	if(xOne != xTwo){
+		slope = (yOne - yTwo) / (xOne*1.0 - xTwo*1.0);
+		yIntercept = yOne - slope*xOne;
+	}
+	else{
+		// but if it is we have to do something different
+		// xOne == xTwo means that the minimum is equal to the maximum, so the data is everywhere yOne == yTwo aka constant
+		slope = 0;
+		yIntercept = yOne;
+	}
 
 	sprintf(globDataPtr->outputBuffer,"raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%g,yTwo=%g",xOne,xTwo,yOne,yTwo);
 	debugOutputToHistory(globDataPtr->outputBuffer);

@@ -33,5 +33,10 @@ cp Operation-Template-Generator.pxp $srcFolder
 cp VC8/Release/matrixfilereader.xop $folder
 cp VC8/VC2005_Redist_package_x86/vcredist_x86.exe $folder
 
+filesToWatch="VC8 *.txt matrixfilereader-basic-gui.pxp Operation-Template-Generator.pxp *.ihf"
 git rev-parse HEAD > $folder/internalVersionString.txt
-git log --pretty="%B" $(cat public-releases/matrixFileReaderXOP-v$lastVersion/internalVersionString.txt)..HEAD . > changelog
+rm changelog
+git log --pretty="%B" $(cat public-releases/matrixFileReaderXOP-v$lastVersion/internalVersionString.txt)..HEAD $filesToWatch >> changelog
+echo "################################################" >> changelog
+echo "################################################" >> changelog
+git log --stat $(cat public-releases/matrixFileReaderXOP-v$lastVersion/internalVersionString.txt)..HEAD $filesToWatch >> changelog

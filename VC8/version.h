@@ -6,5 +6,5 @@
 
 #pragma once
 
-#define MatrixFileReader_XOP_VERSION 0,1,4,0
-#define MatrixFileReader_XOP_VERSION_STR "0.14\0"
+#define MatrixFileReader_XOP_VERSION 0,1,5,0
+#define MatrixFileReader_XOP_VERSION_STR "0.15\0"

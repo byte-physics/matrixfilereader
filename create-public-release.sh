@@ -26,7 +26,7 @@ cp INSTALL-public.txt $folder/INSTALL.txt
 cp "matrixfilereader Help.ihf" $docFolder
 cp matrixfilereader-basic-gui.pxp $pxpFolder
 
-cp VC8/*.bat VC8/*.cpp VC8/*.h VC8/*.rc VC8/MatrixFileReader.sln VC8/MatrixFileReader.suo VC8/MatrixFileReader.vcproj $srcFolder
+cp VC8/*.bat VC8/*.cpp VC8/*.h VC8/*.rc VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcproj $srcFolder
 
 cp Operation-Template-Generator.pxp $srcFolder
 

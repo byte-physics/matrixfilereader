@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "wavedata.h"
 #include "globaldata.h"
 #include "utils.h"
 
@@ -231,6 +232,11 @@ std::string viewTypeCodeToString(int idx){
 	}
 }
 
+void setDataWaveNote(int brickletID, MyWave &waveData){
+
+	setDataWaveNote(brickletID,waveData.getTraceDir(),waveData.extrema,waveData.getWaveHandle(),waveData.pixelSize);
+}
+
 void setDataWaveNote(int brickletID, int traceDir, const ExtremaData &extrema,waveHndl waveHandle, int pixelSize /*= 1*/){
 
 	std::string	waveNote = getStandardWaveNote(brickletID,traceDir);
@@ -311,7 +317,7 @@ void appendToWaveNote(std::string waveNote, waveHndl waveHandle){
 	SetWaveNote(waveHandle, newNoteHandle);
 }
 
-void waveClearNaN64(double *data, long size){
+void waveClearNaN64(double* data, const CountInt &size){
 
 	long i;
 
@@ -322,7 +328,7 @@ void waveClearNaN64(double *data, long size){
 	}
 }
 
-void waveClearNaN32(float *data, long size){
+void waveClearNaN32(float *data, const CountInt &size){
 
 	long i;
 

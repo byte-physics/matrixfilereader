@@ -10,6 +10,7 @@
 
 #include <sstream>
 #include <limits>
+#include "wavedata.h"
 
 // formatStrings
 const char outputFormat[]			= "%s\r";	//  outputToHistory
@@ -69,6 +70,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
 
+void setDataWaveNote(int brickletID, MyWave &waveData);
 void setDataWaveNote(int brickletID, int traceDir, const ExtremaData &extrema,waveHndl waveHandle, int pixelSize = 1);
 
 void setOtherWaveNote(waveHndl waveHandle,int brickletID  = -1,int traceDir  = -1);
@@ -76,8 +78,8 @@ void appendToWaveNote(std::string waveNote, waveHndl waveHandle);
 
 std::string getStandardWaveNote(int brickletID = -1, int traceDir = -1 );
 
-void waveClearNaN64(double *wavePtr, long length);
-void waveClearNaN32(float  *wavePtr, long length);
+void waveClearNaN64(double *wavePtr, const CountInt &length);
+void waveClearNaN32(float  *wavePtr, const CountInt &length);
 
 void  splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
 void  splitString(std::string &str, char *sepChar, std::vector<std::string> &list);

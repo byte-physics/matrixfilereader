@@ -18,7 +18,7 @@ public:
 	~BrickletClass(void);
 
 public:
-	void* getBrickletPointer(){ return m_brickletPtr;};
+	void* getBrickletPointer()const{ return m_brickletPtr;};
 	// resetting *pBricklet is only needed after the same result file is loaded again to check for new bricklets
 	void setBrickletPointer(void* pBricklet){ m_brickletPtr = pBricklet;};
 
@@ -26,8 +26,8 @@ public:
 	void  getBrickletContentsBuffer(const int** pBuffer, int &count);
 	void  getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values);
 	std::vector<std::wstring> generateAllAxesVector();
-	void getAxes(std::vector<std::string> &allAxes){ allAxes = m_allAxes; };
-	void getViewTypeCodes(std::vector<Vernissage::Session::ViewTypeCode> &viewTypeCodes){ viewTypeCodes = m_viewTypeCodes; };
+	void getAxes(std::vector<std::string> &allAxes)const{ allAxes = m_allAxes; };
+	void getViewTypeCodes(std::vector<Vernissage::Session::ViewTypeCode> &viewTypeCodes)const{ viewTypeCodes = m_viewTypeCodes; };
 	std::string getMetaDataValueAsString(std::string key);
 	int			getMetaDataValueAsInt(std::string key);
 	double		getMetaDataValueAsDouble(std::string key);

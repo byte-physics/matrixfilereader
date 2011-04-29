@@ -355,6 +355,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\wavedata.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\xop_const_wrappers.cpp"
 				>
 			</File>
@@ -417,6 +421,10 @@
 			</File>
 			<File
 				RelativePath=".\version.h"
+				>
+			</File>
+			<File
+				RelativePath=".\wavedata.h"
 				>
 			</File>
 			<File

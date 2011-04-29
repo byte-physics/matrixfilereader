@@ -44,17 +44,25 @@ const char TRACE_DOWN_STRING[]		= "_Down";
 const char RE_TRACE_UP_STRING[]		= "_ReUp";
 const char RE_TRACE_DOWN_STRING[]	= "_ReDown";
 
+const int NO_TRACE					=-1;
 const int TRACE_UP 					= 0;
 const int RE_TRACE_UP 				= 1;
 const int TRACE_DOWN				= 2;
 const int RE_TRACE_DOWN				= 3;
 
+// number of different trace types
+const int MAX_NUM_TRACES			= 4;
+
 const char PROJECTURL[]				= "http://www.igorexchange.com/project/matrixFileReader";
+
 // as all parameters to XOP functions are of type double one has to define an epsilon value when one compares them to a given int value
 const double doubleEpsilon = 1e-5;
 
 // number of keys to reserve space for in the metadata std::vector
 const int  METADATA_RESERVE_SIZE	= 1024;
+
+// useful for MDSetWaveUnits, defined in accordance to ROWS, COLUMNS, etc.
+const int DATA = -1;
 
 // default values for the options
 const bool debug_default		= false;

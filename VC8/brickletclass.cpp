@@ -9,7 +9,7 @@
 #include "brickletclass.h"
 
 #include "globaldata.h"
-#include "utils.h"
+#include "utils_bricklet.h"
 
 BrickletClass::BrickletClass(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 
@@ -149,13 +149,11 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 	Vernissage::Session::AxisDescriptor axisDescriptor;
 	Vernissage::Session::AxisTableSets axisTableSetsMap;
 	std::wstring axisNameWString;
-	std::vector<std::wstring> allAxesAsWString;
 	std::string axisNameString, baseName, viewTypeCodesAsOneString;
 	int index;
 	char buf[ARRAY_SIZE];
 
 	elementInstanceNames.clear();
-	m_allAxes.clear();
 	allAxesAsOneString.clear();
 	m_metaDataKeys.clear();
 	m_metaDataValues.clear();
@@ -372,19 +370,18 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 	m_metaDataValues.push_back(WStringToString(experimentInfo.projectFileSpec));
 	// END Vernissage::Session::ExperimentInfo
 
-	// store a list of all axes
-	allAxesAsWString = generateAllAxesVector();
+	// create m_allAxes* internally
+	getAxes();
 	m_metaDataKeys.push_back("allAxes");
 
 	std::vector<std::wstring>::const_iterator itAllAxes;
-	for(itAllAxes = allAxesAsWString.begin(); itAllAxes != allAxesAsWString.end(); itAllAxes++){
+	for(itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++){
 		allAxesAsOneString.append(WStringToString(*itAllAxes) + ";");
-		m_allAxes.push_back(WStringToString(*itAllAxes));
 	}
 	m_metaDataValues.push_back(allAxesAsOneString);
 
 	// BEGIN Vernissage::Session::axisDescriptor
-	for(itAllAxes = allAxesAsWString.begin(); itAllAxes != allAxesAsWString.end(); itAllAxes++){
+	for(itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++){
 		axisNameWString = *itAllAxes;
 		axisNameString  = WStringToString(*itAllAxes);
 
@@ -485,10 +482,11 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 // In more than 99% of the cases this routine will return one to three axes
 // The value of maxRuns is strictly speaking wrong becase the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
 // The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName" 
-std::vector<std::wstring> BrickletClass::generateAllAxesVector(){
+void BrickletClass::generateAllAxesVector(){
 
 	std::wstring axisName, rootAxis, triggerAxis;
-	std::vector<std::wstring> allAxes;
+	std::vector<std::wstring> allAxesWString;
+	std::vector<std::string> allAxesString;
 
 	int numRuns=0,maxRuns=100;
 
@@ -496,11 +494,13 @@ std::vector<std::wstring> BrickletClass::generateAllAxesVector(){
 	triggerAxis = m_VernissageSession->getTriggerAxisName(m_brickletPtr);
 
 	axisName = triggerAxis;
-	allAxes.push_back(triggerAxis);
+	allAxesWString.push_back(triggerAxis);
+	allAxesString.push_back(WStringToString(triggerAxis));
 
 	while(axisName != rootAxis){
-		axisName= m_VernissageSession->getAxisDescriptor(m_brickletPtr,axisName).triggerAxisName;
-		allAxes.push_back(axisName);
+		axisName = m_VernissageSession->getAxisDescriptor(m_brickletPtr,axisName).triggerAxisName;
+		allAxesWString.push_back(axisName);
+		allAxesString.push_back(WStringToString(axisName));
 
 		numRuns++;
 		if(numRuns > maxRuns){
@@ -508,20 +508,36 @@ std::vector<std::wstring> BrickletClass::generateAllAxesVector(){
 			break;
 		}
 	}
-
-	return allAxes;
+	m_allAxesWString = allAxesWString;
+	m_allAxesString  = allAxesString;
 }
 
-int	BrickletClass::getMetaDataValueAsInt(std::string key){
+const std::vector<std::wstring>& BrickletClass::getAxes(){
+
+	if(m_allAxesString.empty() || m_allAxesWString.empty()){
+		generateAllAxesVector();
+	}
+	return m_allAxesWString;
+}
+
+const std::vector<std::string>& BrickletClass::getAxesString(){
+
+	if(m_allAxesString.empty() || m_allAxesWString.empty()){
+		generateAllAxesVector();
+	}
+	return m_allAxesString;
+}
+
+int	BrickletClass::getMetaDataValueAsInt(const std::string &key){
 	return stringToAnyType<int>(this->getMetaDataValueAsString(key));
 };
 
-double BrickletClass::getMetaDataValueAsDouble(std::string key){
+double BrickletClass::getMetaDataValueAsDouble(const std::string &key){
 	return stringToAnyType<double>(this->getMetaDataValueAsString(key));
 };
 
 
-std::string BrickletClass::getMetaDataValueAsString(std::string key){
+std::string BrickletClass::getMetaDataValueAsString(const std::string &key){
 
 	std::string value;
 

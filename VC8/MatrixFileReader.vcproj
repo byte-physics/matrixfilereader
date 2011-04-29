@@ -46,6 +46,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="2"
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				GeneratePreprocessedFile="0"
@@ -351,11 +352,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils.cpp"
+				RelativePath=".\utils_bricklet.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\wavedata.cpp"
+				RelativePath=".\utils_generic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils_xop.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\waveclass.cpp"
 				>
 			</File>
 			<File
@@ -416,7 +425,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils.h"
+				RelativePath=".\utils_bricklet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils_generic.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils_xop.h"
 				>
 			</File>
 			<File
@@ -424,7 +441,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\wavedata.h"
+				RelativePath=".\waveclass.h"
 				>
 			</File>
 			<File

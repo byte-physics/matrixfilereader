@@ -13,7 +13,7 @@
 #include <string>
 #include <math.h>
 
-#include "utils.h"
+#include "utils_bricklet.h"
 #include "brickletconverter.h"
 #include "globaldata.h"
 #include "preferences.h"

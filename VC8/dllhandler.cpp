@@ -11,7 +11,6 @@
 #include <vector>
 #include <string>
 
-#include "utils.h"
 #include "globaldata.h"
 
 DLLHandler::DLLHandler():
@@ -31,7 +30,7 @@ void DLLHandler::closeSession(){
 	
 	FreeLibrary(this->m_foundationModule);
 	m_foundationModule = NULL;
-	m_vernissageVersion = "0.0";
+	m_vernissageVersion = "0.00";
 	m_pReleaseSessionFunc = NULL;
 	m_pGetSessionFunc = NULL;
 }

@@ -7,14 +7,15 @@ public:
 	~ExtremaData(void);
 
 public:
-	int getRawMin ()const{return m_rawMin ;};
 	void setRawMin(int rawMin){ m_rawMin = rawMin; };
-	int getRawMax ()const{ return m_rawMax; };
 	void setRawMax(int rawMax){ m_rawMax = rawMax; };
-	double getPhysValRawMin ()const{ return m_physValRawMin; };
 	void setPhysValRawMin(double physValRawMin){ m_physValRawMin = physValRawMin; };
-	double getPhysValRawMax ()const{ return m_physValRawMax; };
 	void setPhysValRawMax(double physValRawMax){ m_physValRawMax = physValRawMax; };
+
+	int getRawMin ()const{return m_rawMin ;};
+	int getRawMax ()const{ return m_rawMax; };
+	double getPhysValRawMin ()const{ return m_physValRawMin; };
+	double getPhysValRawMax ()const{ return m_physValRawMax; };
 
 private:
 	int		m_rawMin;

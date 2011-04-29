@@ -9,7 +9,6 @@
 #include "preferences.h"
 
 #include "globaldata.h"
-#include "utils.h"
 
 void loadXOPPreferences(){
 

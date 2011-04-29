@@ -1,8 +1,14 @@
-#include "wavedata.h"
-#include "utils.h"
+/*
+	The file wavedata.cpp is part of the "MatrixFileReader XOP".
+	It is licensed under the LGPLv3 with additional permissions,
+	see License.txt in the source folder for details.
+*/
+#include "header.h"
+
+#include "waveclass.h"
 #include "globaldata.h"
 
-MyWave::MyWave(){
+WaveClass::WaveClass(){
 	// set save defaults
 	m_traceDir = -1;
 	moreData=false;
@@ -12,10 +18,10 @@ MyWave::MyWave(){
 	m_waveHandle=NULL;
 }
 
-MyWave::~MyWave(){
+WaveClass::~WaveClass(){
 }
 
-void MyWave::setWaveDataPtr(const waveHndl &waveHandle){
+void WaveClass::setWaveDataPtr(const waveHndl &waveHandle){
 
 	if(WaveType(waveHandle) & NT_FP64){
 		m_doublePtr = getWaveDataPtr<double>(waveHandle);
@@ -41,12 +47,18 @@ void MyWave::setWaveDataPtr(const waveHndl &waveHandle){
 			m_waveHandle = waveHandle;
 		}
 	}
+	else if(WaveType(waveHandle) & NT_I32){
+		m_doublePtr = NULL;
+		m_floatPtr = NULL;
+
+		m_waveHandle = waveHandle;
+	}
 	else{
 		outputToHistory("wrong datatype in setWaveDataPtr");
 	}
 }
 
-void MyWave::setNameAndTraceDir(const std::string &basename, const int &traceDir){
+void WaveClass::setNameAndTraceDir(const std::string &basename, const int &traceDir){
 
 	m_traceDir = traceDir;
 
@@ -72,39 +84,13 @@ void MyWave::setNameAndTraceDir(const std::string &basename, const int &traceDir
 	}
 }
 
-void MyWave::printDebugInfo(){
+void WaveClass::printDebugInfo(){
 	sprintf(globDataPtr->outputBuffer,"%s: waveHandle=%p, float=%p, double=%p, moreData=%s",\
 		m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr, moreData ? "true" : "false");
 	debugOutputToHistory(globDataPtr->outputBuffer);
 }
 
-// FIXME check if this is fast enough
-void MyWave::fillWave(const int &index, const int &rawValue,const double &scaledValue){
-
-	if(m_doublePtr){
-		m_doublePtr[index] = scaledValue;
-	}
-	else if(m_floatPtr){
-		m_floatPtr[index]	= static_cast<float>(scaledValue);
-	}
-	else{
-		outputToHistory("Both waveData pointers are NULL, this should not happen...");
-	}
-
-	//check if it is a new minimium
-	if(rawValue < extrema.getRawMin()){
-		extrema.setRawMin(rawValue);
-		extrema.setPhysValRawMin(scaledValue);
-	}
-
-	//check if it is a new maximum
-	if(rawValue > extrema.getRawMax()){
-		extrema.setRawMax(rawValue);
-		extrema.setPhysValRawMax(scaledValue);
-	}
-}
-
-void MyWave::clearWave(){
+void WaveClass::clearWave(){
 
 	if(m_doublePtr){
 		waveClearNaN64(m_doublePtr,WavePoints(m_waveHandle));

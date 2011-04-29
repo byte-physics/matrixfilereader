@@ -8,10 +8,10 @@
 
 #include "header.h"
 
-typedef Vernissage::Session * (*GetSessionFunc) ();
-typedef void (*ReleaseSessionFunc) ();
-
 class DLLHandler{
+
+	typedef Vernissage::Session * (*GetSessionFunc) ();
+	typedef void (*ReleaseSessionFunc) ();
 
 	public:
 		// de/-constructors
@@ -20,9 +20,14 @@ class DLLHandler{
 
 		// functions
 		Vernissage::Session* createSessionObject();
-		void setLibraryPath();
 		void closeSession();
-		std::string getVernissageVersion(){ return m_vernissageVersion;};
+
+	// const functions
+	public:
+		const std::string& getVernissageVersion()const{ return m_vernissageVersion;};
+
+	private:
+		void setLibraryPath();
 
 	private:
 		// variables

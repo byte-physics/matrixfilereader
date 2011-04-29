@@ -19,7 +19,9 @@
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/IGOR.lib")
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.lib")
 
-#include "extremadata.h"
+#include "utils_generic.h"
+#include "utils_xop.h"
+
 #include "constants.h"
 #include "keynames.h"
 #include "errorcodes.h"

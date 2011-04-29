@@ -16,7 +16,8 @@
 #include "utils.h"
 #include "globaldata.h"
 
-int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int brickletID, bool resampleData, int pixelSize, std::string &fullPathOfCreatedWave){
+int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int brickletID, bool resampleData,\
+				int pixelSize, std::string &fullPathOfCreatedWave){
 
 	int dimension;
 	std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes;
@@ -29,7 +30,8 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 	const int *rawBrickletDataPtr;
 	int rawBrickletSize=0, waveSize=0, firstBlockOffset=0, triggerAxisBlockSize=0;
 
-	int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex, traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
+	int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex;
+	int traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
 
 	const double zeroSetScaleOffset=0.0;
 
@@ -149,7 +151,8 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 
 			myWaveData1D.setNameAndTraceDir(waveBaseName,NO_TRACE);
 
-			ret = MDMakeWave(&waveHandle, myWaveData1D.getWaveName(),dfHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
+			ret = MDMakeWave(&waveHandle, myWaveData1D.getWaveName(),dfHandle,dimensionSizes,\
+				globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 			if(ret == NAME_WAV_CONFLICT){
 				sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",myWaveData1D.getWaveName());
 				debugOutputToHistory(globDataPtr->outputBuffer);
@@ -270,7 +273,8 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				if(myWaveData[i].isEmpty()){
 					continue;
 				}
-				ret = MDMakeWave(&waveHandle, myWaveData[i].getWaveName(),dfHandle,dimensionSizes,globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
+				ret = MDMakeWave(&waveHandle, myWaveData[i].getWaveName(),dfHandle,dimensionSizes,\
+					globDataPtr->getIgorWaveType(),globDataPtr->overwriteEnabledAsInt());
 
 				if(ret == NAME_WAV_CONFLICT){
 					sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",myWaveData[i].getWaveName());
@@ -536,18 +540,30 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 			Vernissage::Session::TableSet xSet = sets[specAxis.triggerAxisName];
 			Vernissage::Session::TableSet ySet = sets[xAxis.triggerAxisName];
 
-			double xAxisIncrement = xAxis.physicalIncrement;
-			double yAxisIncrement = yAxis.physicalIncrement;
+			double xAxisDelta, yAxisDelta;
+			double xAxisOffset, yAxisOffset;
 			
 			// normally we have table sets with some step width >1, so the physicalIncrement has to be multiplied by this factor
-			// Note: this approach assumes that all axis table sets have the same physical step width, this is at least the case for Matrix 2.2-1
+			// Note: this approach assumes that the axis table sets of once axis all have the same physical step width,
+			// this is at least the case for Matrix 2.2-1 and Matrix 3.0
+			// typically *set.begin().start is one so that yAxisOffest is 0.0
 			if( ySet.size() > 0){
-				yAxisIncrement *= ySet.begin()->step;
+				yAxisDelta	= yAxis.physicalIncrement * ySet.begin()->step;
+				yAxisOffset	= yAxis.physicalIncrement *( ySet.begin()->start - 1 );
 			}
+			else{
+				yAxisDelta	= yAxis.physicalIncrement;
+				yAxisOffset	= 0.0;
+			}
+
 			if( xSet.size() > 0 ){
-				xAxisIncrement *= xSet.begin()->step;
+				xAxisDelta	= xAxis.physicalIncrement * xSet.begin()->step;
+				xAxisOffset	= xAxis.physicalIncrement *( xSet.begin()->start - 1 );
 			}
-			//FIXME we have also a dimoffset which depends on the traceDirection
+			else{
+				xAxisDelta	= xAxis.physicalIncrement;
+				xAxisOffset	= 0.0;
+			}
 
 			if(globDataPtr->debuggingEnabled()){
 				Vernissage::Session::TableSet::const_iterator it;
@@ -557,17 +573,19 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 
 				debugOutputToHistory("Tablesets: xAxis");
 				for( it= xSet.begin(); it != xSet.end(); it++){
-					sprintf(globDataPtr->outputBuffer,"start=%d,step=%d,stop=%d",it->start,it->step,it->stop);
+					sprintf(globDataPtr->outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
 					debugOutputToHistory(globDataPtr->outputBuffer);
 				}
 
 				debugOutputToHistory("Tablesets: yAxis");
 				for( it= ySet.begin(); it != ySet.end(); it++){
-					sprintf(globDataPtr->outputBuffer,"start=%d,step=%d,stop=%d",it->start,it->step,it->stop);
+					sprintf(globDataPtr->outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
 					debugOutputToHistory(globDataPtr->outputBuffer);
 				}
 
-				sprintf(globDataPtr->outputBuffer,"xAxisIncrement=%g,yAxisIncrement=%g",xAxisIncrement,yAxisIncrement);
+				sprintf(globDataPtr->outputBuffer,"xAxisDelta=%g, yAxisDelta=%g",xAxisDelta,yAxisDelta);
+				debugOutputToHistory(globDataPtr->outputBuffer);
+				sprintf(globDataPtr->outputBuffer,"xAxisOffset=%g, yAxisOffset=%g",xAxisOffset,yAxisOffset);
 				debugOutputToHistory(globDataPtr->outputBuffer);
 			}
 
@@ -758,7 +776,8 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 			// numPointsXAxisWithTableBWD or numPointsXAxisWithTableFWD being zero makes it correct
 			xAxisBlockSize	   = ( numPointsXAxisWithTableBWD + numPointsXAxisWithTableFWD ) * numPointsVAxis;
 
-			// data index to the start of the TraceDown data (this is the same for all combinations as xAxisBlockSize is set apropriately), in case traceDown does not exist this is no problem
+			// data index to the start of the TraceDown data (this is the same for all combinations as xAxisBlockSize is set apropriately)
+			// in case the traceDown scan does not exist this is also no problem
 			firstBlockOffset = numPointsYAxisWithTableUp*xAxisBlockSize;
 
 			sprintf(globDataPtr->outputBuffer,"xAxisBlockSize=%d,firstBlockOffset=%d",xAxisBlockSize,firstBlockOffset);
@@ -927,17 +946,14 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				if(myWaveData[i].isEmpty()){
 					continue;
 				}
-
 				setDataWaveNote(brickletID,myWaveData[i]);
 
-				MDSetWaveScaling(myWaveData[i].getWaveHandle(),ROWS,&xAxisIncrement,&zeroSetScaleOffset);
-				MDSetWaveScaling(myWaveData[i].getWaveHandle(),COLUMNS,&yAxisIncrement,&zeroSetScaleOffset);
-
-				// we don't use zeroSetScaleOffset=0 here
+				MDSetWaveScaling(myWaveData[i].getWaveHandle(),ROWS,&xAxisDelta,&xAxisOffset);
+				MDSetWaveScaling(myWaveData[i].getWaveHandle(),COLUMNS,&yAxisDelta,&yAxisOffset);
 				MDSetWaveScaling(myWaveData[i].getWaveHandle(),LAYERS,&specAxis.physicalIncrement,&specAxis.physicalStart);
+	
 				MDSetWaveUnits(myWaveData[i].getWaveHandle(),ROWS,WStringToString(xAxis.physicalUnit).c_str());
 				MDSetWaveUnits(myWaveData[i].getWaveHandle(),COLUMNS,WStringToString(yAxis.physicalUnit).c_str());
-
 				MDSetWaveUnits(myWaveData[i].getWaveHandle(),LAYERS,WStringToString(specAxis.physicalUnit).c_str());
 				MDSetWaveUnits(myWaveData[i].getWaveHandle(),DATA,bricklet->getMetaDataValueAsString("channelUnit").c_str());
 

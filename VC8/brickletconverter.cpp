@@ -168,7 +168,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 		debugOutputToHistory(globDataPtr->outputBuffer);
 	}
 
-	ExtremaData extremaData[3];
+	ExtremaData extremaData[4];
 
 	ExtremaData *traceUpExtrema=NULL,*traceDownExtrema=NULL,*reTraceUpExtrema=NULL,*reTraceDownExtrema=NULL;
 

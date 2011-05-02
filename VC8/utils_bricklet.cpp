@@ -10,7 +10,6 @@
 
 #include <string>
 
-#include "utils_xop.h"
 #include "waveclass.h"
 #include "globaldata.h"
 
@@ -74,8 +73,7 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 		return ret;
 	}
 	setOtherWaveNote(waveHandle,brickletID);
-	fullPathOfCreatedWaves.append(getFullWavePath(dataFolderHandle,waveHandle));
-	fullPathOfCreatedWaves.append(";");
+	appendToWaveList(dataFolderHandle,waveHandle,fullPathOfCreatedWaves);
 
 	return 0;
 }
@@ -162,11 +160,3 @@ bool isValidBrickletRange(double startID, double endID,int numberOfBricklets){
 		&& startID <= numberOfBricklets
 		&& endID   <= numberOfBricklets );
 }
-
-void  splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
-void  splitString(std::string &str, char *sepChar, std::vector<std::string> &list);
-
-void joinString(std::vector<std::string> &list,const char *sepChar, std::string &joinedList);
-
-bool doubleToBool(double value);
-

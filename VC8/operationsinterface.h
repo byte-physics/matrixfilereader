@@ -11,12 +11,20 @@
 #include "operationstructs.h"
 
 /* custom error codes */
-
 #define REQUIRES_IGOR_620	FIRST_XOP_ERR + 1
 #define OUT_OF_MEMORY		FIRST_XOP_ERR + 2
 
 /* Prototypes */
 HOST_IMPORT int XOPMain(IORecHandle ioRecHandle);
+
+#define BEGIN_OUTER_CATCH	try{
+#define END_OUTER_CATCH		}\
+							catch(...){\
+								sprintf(globDataPtr->outputBuffer,"Unexpected exception caught in line %d, function %s,  file %s\r", __LINE__, __FUNCTION__, __FILE__);\
+								XOPNotice(globDataPtr->outputBuffer);\
+								globDataPtr->setError(UNKNOWN_ERROR);\
+								return 0;\
+							}
 
 extern "C" {
 	int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p);

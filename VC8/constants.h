@@ -50,13 +50,10 @@ const int RE_TRACE_UP 				= 1;
 const int TRACE_DOWN				= 2;
 const int RE_TRACE_DOWN				= 3;
 
-// number of different trace types
+// number of different trace types, TRACE_UP to RE_TRACE_DOWN
 const int MAX_NUM_TRACES			= 4;
 
 const char PROJECTURL[]				= "http://www.igorexchange.com/project/matrixFileReader";
-
-// as all parameters to XOP functions are of type double one has to define an epsilon value when one compares them to a given int value
-const double doubleEpsilon = 1e-5;
 
 // number of keys to reserve space for in the metadata std::vector
 const int  METADATA_RESERVE_SIZE	= 1024;

@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "utils_bricklet.h"
-#include "utils_xop.h"
 
 #include "globaldata.h"
 #include "waveclass.h"
@@ -51,20 +50,21 @@ int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, 
 	else if(ret != 0 ){
 		return ret;
 	}
+
 	ASSERT_RETURN_ONE(waveHandle);
 	wave.setWaveDataPtr(waveHandle);
+	waveHandle = NULL;
 
 	dataPtr = getWaveDataPtr<int>(waveHandle);
+
 	ASSERT_RETURN_ONE(dataPtr);
 	ASSERT_RETURN_ONE(pBuffer);
-
 	memcpy(dataPtr,pBuffer,count*sizeof(int));
 	
 	wave.extrema = bricklet->getExtrema();
 	setDataWaveNote(brickletID,	wave);
 	
-	fullPathOfCreatedWaves.append(getFullWavePath(dfHandle, wave.getWaveHandle()));
-	fullPathOfCreatedWaves.append(";");
+	appendToWaveList(dfHandle,wave,fullPathOfCreatedWaves);
 	return ret;
 }
 
@@ -97,7 +97,8 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 	char cmd[ARRAY_SIZE];
 	char dataFolderPath[MAXCMDLEN+1];
 	int numDimensions;
-	double physIncrement;
+	double xAxisDelta, yAxisDelta;
+	double xAxisOffset, yAxisOffset;
 
 	std::string waveBaseName(waveBaseNameChar);
 
@@ -237,13 +238,12 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 			}
 			setDataWaveNote(brickletID,wave1D);
 
-			MDSetWaveScaling(wave1D.getWaveHandle(),ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
+			wave1D.setWaveScaling(ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
-			MDSetWaveUnits(wave1D.getWaveHandle(),ROWS,WStringToString(triggerAxis.physicalUnit).c_str());
-			MDSetWaveUnits(wave1D.getWaveHandle(),DATA,bricklet->getMetaDataValueAsString("channelUnit").c_str());
+			wave1D.setWaveUnits(ROWS,triggerAxis.physicalUnit);
+			wave1D.setWaveUnits(DATA,bricklet->getMetaDataValueAsString("channelUnit"));
 
-			fullPathOfCreatedWave.append(getFullWavePath(dfHandle,wave1D.getWaveHandle()));
-			fullPathOfCreatedWave.append(";");
+			appendToWaveList(dfHandle,wave1D,fullPathOfCreatedWave);
 
 			break;
 
@@ -546,23 +546,21 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 
 				//  also the wave scaling changes if we have resampled the data
 				if( resampleData ){
-					physIncrement = triggerAxis.physicalIncrement*double(dimensionSizes[ROWS])/double(interpolatedDimSizes[ROWS]);
-					MDSetWaveScaling(wave[i].getWaveHandle(),ROWS,&physIncrement,&zeroSetScaleOffset);
-
-					physIncrement = rootAxis.physicalIncrement*double(dimensionSizes[COLUMNS])/double(interpolatedDimSizes[COLUMNS]);
-					MDSetWaveScaling(wave[i].getWaveHandle(),COLUMNS,&physIncrement,&zeroSetScaleOffset);
+					xAxisDelta = triggerAxis.physicalIncrement*double(dimensionSizes[ROWS])/double(interpolatedDimSizes[ROWS]);
+					yAxisDelta = rootAxis.physicalIncrement*double(dimensionSizes[COLUMNS])/double(interpolatedDimSizes[COLUMNS]);
 				}
 				else{// original image
-					MDSetWaveScaling(wave[i].getWaveHandle(),ROWS,&triggerAxis.physicalIncrement,&zeroSetScaleOffset);
-					MDSetWaveScaling(wave[i].getWaveHandle(),COLUMNS,&rootAxis.physicalIncrement,&zeroSetScaleOffset);
+					xAxisDelta = triggerAxis.physicalIncrement;
+					yAxisDelta = rootAxis.physicalIncrement;
 				}
+				wave[i].setWaveScaling(ROWS,&xAxisDelta,&zeroSetScaleOffset);
+				wave[i].setWaveScaling(COLUMNS,&yAxisDelta,&zeroSetScaleOffset);
 
-				MDSetWaveUnits(wave[i].getWaveHandle(),ROWS,WStringToString(triggerAxis.physicalUnit).c_str());
-				MDSetWaveUnits(wave[i].getWaveHandle(),COLUMNS,WStringToString(rootAxis.physicalUnit).c_str());
-				MDSetWaveUnits(wave[i].getWaveHandle(),DATA,bricklet->getMetaDataValueAsString("channelUnit").c_str());
+				wave[i].setWaveUnits(ROWS,triggerAxis.physicalUnit);
+				wave[i].setWaveUnits(COLUMNS,rootAxis.physicalUnit);
+				wave[i].setWaveUnits(DATA,bricklet->getMetaDataValueAsString("channelUnit"));
 
-				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,wave[i].getWaveHandle()));
-				fullPathOfCreatedWave.append(";");
+				appendToWaveList(dfHandle,wave[i],fullPathOfCreatedWave);
 			}
 			break;
 
@@ -592,9 +590,6 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 			Vernissage::Session::TableSet xSet = sets[specAxis.triggerAxisName];
 			Vernissage::Session::TableSet ySet = sets[xAxis.triggerAxisName];
 
-			double xAxisDelta, yAxisDelta;
-			double xAxisOffset, yAxisOffset;
-			
 			// normally we have table sets with some step width >1, so the physicalIncrement has to be multiplied by this factor
 			// Note: this approach assumes that the axis table sets of once axis all have the same physical step width,
 			// this is at least the case for Matrix 2.2-1 and Matrix 3.0
@@ -998,19 +993,19 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				if(wave[i].isEmpty()){
 					continue;
 				}
+
 				setDataWaveNote(brickletID,wave[i]);
 
-				MDSetWaveScaling(wave[i].getWaveHandle(),ROWS,&xAxisDelta,&xAxisOffset);
-				MDSetWaveScaling(wave[i].getWaveHandle(),COLUMNS,&yAxisDelta,&yAxisOffset);
-				MDSetWaveScaling(wave[i].getWaveHandle(),LAYERS,&specAxis.physicalIncrement,&specAxis.physicalStart);
+				wave[i].setWaveScaling(ROWS,&xAxisDelta,&xAxisOffset);
+				wave[i].setWaveScaling(COLUMNS,&yAxisDelta,&yAxisOffset);
+				wave[i].setWaveScaling(LAYERS,&specAxis.physicalIncrement,&specAxis.physicalStart);
 	
-				MDSetWaveUnits(wave[i].getWaveHandle(),ROWS,WStringToString(xAxis.physicalUnit).c_str());
-				MDSetWaveUnits(wave[i].getWaveHandle(),COLUMNS,WStringToString(yAxis.physicalUnit).c_str());
-				MDSetWaveUnits(wave[i].getWaveHandle(),LAYERS,WStringToString(specAxis.physicalUnit).c_str());
-				MDSetWaveUnits(wave[i].getWaveHandle(),DATA,bricklet->getMetaDataValueAsString("channelUnit").c_str());
+				wave[i].setWaveUnits(ROWS,xAxis.physicalUnit);
+				wave[i].setWaveUnits(COLUMNS,yAxis.physicalUnit);
+				wave[i].setWaveUnits(LAYERS,specAxis.physicalUnit);
+				wave[i].setWaveUnits(DATA,bricklet->getMetaDataValueAsString("channelUnit"));
 
-				fullPathOfCreatedWave.append(getFullWavePath(dfHandle,wave[i].getWaveHandle()));
-				fullPathOfCreatedWave.append(";");
+				appendToWaveList(dfHandle,wave[i],fullPathOfCreatedWave);
 			}
 
 			break;

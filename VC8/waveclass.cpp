@@ -99,3 +99,23 @@ void WaveClass::clearWave(){
 		waveClearNaN32(m_floatPtr,WavePoints(m_waveHandle));
 	}
 }
+
+void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr){
+	ASSERT_RETURN_VOID(m_waveHandle);
+
+	int ret = MDSetWaveScaling(m_waveHandle,dimension,sfAPtr,sfBPtr);
+	if(ret != 0){
+		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"WaveClass::setWaveScaling returned error %d",ret);
+	}
+}
+
+void WaveClass::setWaveUnits(int dimension, const std::string& units){
+	ASSERT_RETURN_VOID(m_waveHandle);
+
+	int ret = MDSetWaveUnits(m_waveHandle,dimension,units.c_str());
+	if(ret != 0){
+		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"WaveClass::setWaveUnits returned error %d",ret);
+	}
+}

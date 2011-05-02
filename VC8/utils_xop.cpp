@@ -163,7 +163,16 @@ void waveClearNaN32(float *data, const CountInt &size){
 	}
 }
 
-std::string getFullWavePath(DataFolderHandle df, waveHndl wv){
+void appendToWaveList(const DataFolderHandle& df, const waveHndl& wv, std::string &waveList){
+	waveList.append(getFullWavePath(df,wv));
+	waveList.append(";");
+}
+
+void appendToWaveList(const DataFolderHandle& df, const WaveClass& wave, std::string &waveList){
+	appendToWaveList(df,wave.getWaveHandle(), waveList);
+}
+
+std::string getFullWavePath(const DataFolderHandle& df, const waveHndl& wv){
 
 	char waveName[MAX_OBJ_NAME+1];
 	char dataFolderPath[MAXCMDLEN+1];

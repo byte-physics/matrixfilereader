@@ -7,6 +7,9 @@
 #pragma once
 
 #include "header.h"
+
+#include "waveclass.h"
+
 #include <string>
 
 const char outputFormat[]			= "%s\r";	//  outputToHistory
@@ -39,6 +42,10 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 
 void waveClearNaN64(double *wavePtr, const CountInt &length);
 void waveClearNaN32(float  *wavePtr, const CountInt &length);
-std::string getFullWavePath(DataFolderHandle df, waveHndl wv);
+
+std::string getFullWavePath(const DataFolderHandle& df, const waveHndl& wv);
+void appendToWaveList(const DataFolderHandle& df, const WaveClass& wave, std::string& waveList);
+void appendToWaveList(const DataFolderHandle& df, const waveHndl& wv, std::string& waveList);
+
 void convertHandleToString(Handle strHandle,std::string &str);
 

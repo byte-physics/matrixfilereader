@@ -344,6 +344,54 @@
 				>
 			</File>
 			<File
+				RelativePath=".\operationsinterface_checkfornewbricklets.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_closeresultfile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_createoverviewtable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_genericgetbricklet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_getbrickletcount.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_getreporttemplate.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_getresultfilemetadata.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_getresultfilename.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_getvernissageversion.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_getversion.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_getxoperrormessage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\operationsinterface_openresultfile.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\operationsregister.cpp"
 				>
 			</File>

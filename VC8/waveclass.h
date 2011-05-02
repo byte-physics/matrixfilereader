@@ -1,7 +1,7 @@
 /*
-The file waveclass.h is part of the "MatrixFileReader XOP".
-It is licensed under the LGPLv3 with additional permissions,
-see License.txt in the source folder for details.
+	The file waveclass.h is part of the "MatrixFileReader XOP".
+	It is licensed under the LGPLv3 with additional permissions,
+	see License.txt in the source folder for details.
 */
 
 #pragma once
@@ -19,15 +19,19 @@ public:
 	void clearWave();
 	void setWaveDataPtr(const waveHndl &waveHandle);
 	void setNameAndTraceDir(const std::string &basename, const int &traceDir);
-	void fillWave(const int &index, const int &rawValue, const double &scaledValue);
 	void printDebugInfo();
+	void setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr);
+	void setWaveUnits(int dimension, const std::wstring& units){ setWaveUnits(dimension,WStringToString(units)); }
+	void setWaveUnits(int dimension, const std::string& units);
 
-	bool isEmpty(){ return m_wavename.empty(); }
+	// const getters
+	const char* getWaveName()const{ return m_wavename.c_str(); }
+	waveHndl getWaveHandle()const{ return m_waveHandle; }
+	int getTraceDir()const{ return m_traceDir; }
+	bool isEmpty()const{ return m_wavename.empty(); }
 
-	// getters
-	const char* getWaveName(){ return m_wavename.c_str(); }
-	waveHndl getWaveHandle(){ return m_waveHandle; }
-	int getTraceDir(){ return m_traceDir; }
+	// inlined, has to be very fast
+	void fillWave(const int &index, const int &rawValue, const double &scaledValue);
 
 
 public:

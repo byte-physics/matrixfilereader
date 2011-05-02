@@ -94,7 +94,7 @@ bool doubleToBool(double value){
 	
 	bool result;
 
-	if( value < doubleEpsilon){
+	if( value < DBL_EPSILON){
 		result = false;
 	}
 	else{

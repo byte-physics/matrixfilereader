@@ -13,7 +13,7 @@
 #include <limits>
 #include "waveclass.h"
 
-std::string viewTypeCodeToString(int idx);
+std::string viewTypeCodeToString(unsigned int idx);
 
 void setDataWaveNote(int brickletID, WaveClass &waveData);
 void setOtherWaveNote(waveHndl waveHandle,int brickletID  = -1,int traceDir  = -1);

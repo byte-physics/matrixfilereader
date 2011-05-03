@@ -85,7 +85,7 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 /*
 	Convert a vernissage viewtype code to a string
 */
-std::string viewTypeCodeToString(int idx){
+std::string viewTypeCodeToString(unsigned int idx){
 	
 	std::vector<std::string> names;
 
@@ -99,7 +99,7 @@ std::string viewTypeCodeToString(int idx){
 	names.push_back(VTC_1DPROFILE_STRING);
 	names.push_back(VTC_INTERFEROMETER);
 
-	if(idx < 0 || idx >= int(names.size())){
+	if(idx < 0 || idx >= names.size()){
 		sprintf(globDataPtr->outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
 		debugOutputToHistory(globDataPtr->outputBuffer);
 		return std::string();

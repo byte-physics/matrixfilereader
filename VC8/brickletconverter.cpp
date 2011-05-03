@@ -20,7 +20,7 @@
 /*
 	create the raw data wave which just holds the raw data as 1D array
 */
-int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
+int createRawDataWave(DataFolderHandle dfHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
 	const int *pBuffer;
 	int* dataPtr = NULL;
@@ -46,7 +46,7 @@ int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, 
 
 	ret = MDMakeWave(&waveHandle,wave.getWaveName(),dfHandle,dimensionSizes,NT_I32,globDataPtr->overwriteEnabledAsInt());
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveName);
+		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",wave.getWaveName());
 		debugOutputToHistory(globDataPtr->outputBuffer);
 		return WAVE_EXIST;	
 	}

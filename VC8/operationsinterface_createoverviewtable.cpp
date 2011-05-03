@@ -91,8 +91,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 		waveName = overViewTableDefault;
 	}
 
-	char sepChar[] = ";";
-	splitString(keyList,sepChar,keys);
+	splitString(keyList,listSepChar,keys);
 
 	if( keys.size() == 0 ){
 		globDataPtr->setError(WRONG_PARAMETER,"keyList");

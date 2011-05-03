@@ -192,7 +192,7 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 	m_viewTypeCodes = m_VernissageSession->getViewTypes(m_brickletPtr);
 	std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCode;
 	for(itViewTypeCode = m_viewTypeCodes.begin(); itViewTypeCode != m_viewTypeCodes.end(); itViewTypeCode++){
-		viewTypeCodesAsOneString.append( viewTypeCodeToString(*itViewTypeCode) + ";");
+		viewTypeCodesAsOneString.append( viewTypeCodeToString(*itViewTypeCode) + listSepChar);
 	}
 	metaDataKeys.push_back("viewTypeCodes");
 	metaDataValues.push_back(viewTypeCodesAsOneString);
@@ -397,15 +397,13 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 
 	// create m_allAxes* internally
 	getAxes();
-	metaDataKeys.push_back("allAxes");
+	joinString(m_allAxesString,listSepChar,allAxesAsOneString);
 
-	std::vector<std::wstring>::const_iterator itAllAxes;
-	for(itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++){
-		allAxesAsOneString.append(WStringToString(*itAllAxes) + ";");
-	}
+	metaDataKeys.push_back("allAxes");
 	metaDataValues.push_back(allAxesAsOneString);
 
 	// BEGIN Vernissage::Session::axisDescriptor
+	std::vector<std::wstring>::const_iterator itAllAxes;
 	for(itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++){
 		axisNameWString = *itAllAxes;
 		axisNameString  = WStringToString(*itAllAxes);

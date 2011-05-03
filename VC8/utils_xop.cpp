@@ -187,7 +187,7 @@ void waveClearNaN32(float *data, const CountInt &size){
 */
 void appendToWaveList(const DataFolderHandle& df, const waveHndl& wv, std::string &waveList){
 	waveList.append(getFullWavePath(df,wv));
-	waveList.append(";");
+	waveList.append(listSepChar);
 }
 
 /*

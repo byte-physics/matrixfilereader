@@ -109,3 +109,5 @@ const char dlgPrompt[] = "Looking for a MATRIX result file";
 
 //maximum allowed pixelSize, although this is already ridiculously high
 const int maximum_pixelSize = 10;
+
+const char listSepChar[] = ";";

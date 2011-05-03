@@ -21,8 +21,8 @@ public:
 	~WaveClass();
 
 	void clearWave();
-	void setWaveDataPtr(const waveHndl &waveHandle);
-	void setNameAndTraceDir(const std::string &basename, const int &traceDir);
+	void setWaveHandle(const waveHndl &waveHandle);
+	void setNameAndTraceDir(const std::string &basename, int traceDir);
 	void printDebugInfo();
 	void setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr);
 	void setWaveUnits(int dimension, const std::wstring& units){ setWaveUnits(dimension,WStringToString(units)); }

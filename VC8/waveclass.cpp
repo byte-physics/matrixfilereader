@@ -43,14 +43,14 @@ void WaveClass::setExtrema(const ExtremaData& extremaData){
 /*
 	Make a connection between the waveHandle and this class
 */
-void WaveClass::setWaveDataPtr(const waveHndl &waveHandle){
+void WaveClass::setWaveHandle(const waveHndl &waveHandle){
 
 	if(WaveType(waveHandle) & NT_FP64){
 		m_doublePtr = getWaveDataPtr<double>(waveHandle);
 		m_floatPtr = NULL;
 
 		if(m_doublePtr == NULL){
-			outputToHistory("BUG: setWaveDataPtr(...) m_doublePtr is NULL, this should not happen...");
+			outputToHistory("BUG: setWaveHandle(...) m_doublePtr is NULL, this should not happen...");
 		}
 		else{
 			moreData = true;
@@ -62,7 +62,7 @@ void WaveClass::setWaveDataPtr(const waveHndl &waveHandle){
 		m_floatPtr = getWaveDataPtr<float>(waveHandle);
 
 		if(m_floatPtr == NULL){
-			outputToHistory("BUG: setWaveDataPtr(...) m_floatPtr is NULL, this should not happen...");
+			outputToHistory("BUG: setWaveHandle(...) m_floatPtr is NULL, this should not happen...");
 		}
 		else{
 			moreData = true;
@@ -76,7 +76,7 @@ void WaveClass::setWaveDataPtr(const waveHndl &waveHandle){
 		m_waveHandle = waveHandle;
 	}
 	else{
-		outputToHistory("wrong datatype in setWaveDataPtr");
+		outputToHistory("wrong datatype in setWaveHandle");
 	}
 }
 

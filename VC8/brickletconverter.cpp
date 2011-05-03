@@ -55,7 +55,7 @@ int createRawDataWave(DataFolderHandle dfHandle,const char *waveName, int brickl
 	}
 
 	ASSERT_RETURN_ONE(waveHandle);
-	wave.setWaveDataPtr(waveHandle);
+	wave.setWaveHandle(waveHandle);
 	waveHandle = NULL;
 
 	dataPtr = getWaveDataPtr<int>(wave.getWaveHandle());
@@ -225,7 +225,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 
 			ASSERT_RETURN_ONE(waveHandle);
 
-			wave1D.setWaveDataPtr(waveHandle);
+			wave1D.setWaveHandle(waveHandle);
 			wave1D.clearWave();
 			waveHandle = NULL;
 
@@ -346,7 +346,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				}
 
 				ASSERT_RETURN_ONE(waveHandle);
-				wave[i].setWaveDataPtr(waveHandle);
+				wave[i].setWaveHandle(waveHandle);
 				wave[i].clearWave();
 				waveHandle=NULL;
 			}
@@ -541,7 +541,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 					if(ret != 0){
 						return ret;
 					}
-					wave[i].setWaveDataPtr(FetchWaveFromDataFolder(dfHandle,wave[i].getWaveName()));
+					wave[i].setWaveHandle(FetchWaveFromDataFolder(dfHandle,wave[i].getWaveName()));
 					ASSERT_RETURN_ONE(wave[i].getWaveHandle());
 					// get wave dimensions; needed for setScale below
 					MDGetWaveDimensions(wave[i].getWaveHandle(),&numDimensions,interpolatedDimSizes);
@@ -855,7 +855,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 					return UNKNOWN_ERROR;
 				}
 				ASSERT_RETURN_ONE(waveHandle);
-				wave[i].setWaveDataPtr(waveHandle);
+				wave[i].setWaveHandle(waveHandle);
 				wave[i].clearWave();
 				waveHandle = NULL;
 			}

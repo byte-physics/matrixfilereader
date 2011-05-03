@@ -113,14 +113,5 @@ void joinString(const std::vector<std::string> &list, const char* sepChar, std::
 */
 bool doubleToBool(double value){
 	
-	bool result;
-
-	if( value < DBL_EPSILON){
-		result = false;
-	}
-	else{
-		result = true;
-	}
-
-	return result;
+	return (value < DBL_EPSILON ? false : true);
 }

@@ -103,8 +103,6 @@ void joinString(const std::vector<std::string> &list, const char* sepChar, std::
 		joinedList.append(*it);
 		joinedList.append(sepChar);	
 	}
-
-	return;
 }
 
 /*

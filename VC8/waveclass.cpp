@@ -83,11 +83,11 @@ void WaveClass::setWaveHandle(const waveHndl &waveHandle){
 /*
 	Set the name and trace direction of the wave, adds then the appropriate suffix to the wave name
 */
-void WaveClass::setNameAndTraceDir(const std::string &basename, const int &traceDir){
+void WaveClass::setNameAndTraceDir(const std::string &basename, int traceDir){
 
 	m_traceDir = traceDir;
 
-	switch(traceDir){
+	switch(m_traceDir){
 		case NO_TRACE:
 			m_wavename = basename;
 			break;
@@ -103,9 +103,9 @@ void WaveClass::setNameAndTraceDir(const std::string &basename, const int &trace
 		case RE_TRACE_DOWN:
 			m_wavename = basename + RE_TRACE_DOWN_STRING;
 			break;
-	default:	
-		outputToHistory("tracedir is out of range");
-		break;
+		default:
+			outputToHistory("tracedir is out of range");
+			break;
 	}
 }
 

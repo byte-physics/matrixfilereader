@@ -16,7 +16,7 @@
 #include "globaldata.h"
 
 namespace{
-	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4};
+	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4 };
 }
 
 extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p){
@@ -105,12 +105,11 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 
 int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	BEGIN_OUTER_CATCH
+	// due to our special handling of the /DEST flag we read the settigs later
 	globDataPtr->initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
-	const char *sepChar = ";";
 	std::string fullPathOfCreatedWaves, baseName;
-	std::vector<std::string> keys, values;
 	BrickletClass *bricklet = NULL;
 	char waveName[ARRAY_SIZE], dataFolderName[MAX_OBJ_NAME+1];
 	DataFolderHandle destDataFolderHndl = NULL, brickletDataFolderHndl = NULL;
@@ -264,8 +263,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				ret = createWaves(brickletDataFolderHndl,waveName,brickletID,resampleData,pixelSize,fullPathOfCreatedWaves);		
 				break;
 			case META_DATA:
-				bricklet->getBrickletMetaData(keys,values);
-				ret = createAndFillTextWave(keys,values,brickletDataFolderHndl,waveName,brickletID,fullPathOfCreatedWaves);
+				ret = createAndFillTextWave(bricklet->getBrickletMetaDataKeys(),bricklet->getBrickletMetaDataValues()\
+											,brickletDataFolderHndl,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			default:
 				outputToHistory("Error in GenericGetBricklet");

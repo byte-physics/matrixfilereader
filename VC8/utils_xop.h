@@ -45,7 +45,7 @@ template <class T> T* getWaveDataPtr(waveHndl waveH){
 
 void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle);
 
-int stringVectorToTextWave(std::vector<std::string> &metaData,waveHndl &waveHandle);
+int stringVectorToTextWave(const std::vector<std::string>& metaData,waveHndl waveHandle);
 
 void waveClearNaN64(double *wavePtr, const CountInt &length);
 void waveClearNaN32(float  *wavePtr, const CountInt &length);

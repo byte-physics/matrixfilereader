@@ -247,7 +247,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 			wave1D.setWaveScaling(ROWS,&triggerAxis.physicalIncrement,&triggerAxis.physicalStart);
 			
 			wave1D.setWaveUnits(ROWS,triggerAxis.physicalUnit);
-			wave1D.setWaveUnits(DATA,bricklet->getMetaDataValueAsString("channelUnit"));
+			wave1D.setWaveUnits(DATA,bricklet->getMetaDataValueAsString(CHANNEL_UNIT_KEY));
 
 			appendToWaveList(dfHandle,wave1D,fullPathOfCreatedWave);
 
@@ -564,7 +564,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 
 				wave[i].setWaveUnits(ROWS,triggerAxis.physicalUnit);
 				wave[i].setWaveUnits(COLUMNS,rootAxis.physicalUnit);
-				wave[i].setWaveUnits(DATA,bricklet->getMetaDataValueAsString("channelUnit"));
+				wave[i].setWaveUnits(DATA,bricklet->getMetaDataValueAsString(CHANNEL_UNIT_KEY));
 
 				appendToWaveList(dfHandle,wave[i],fullPathOfCreatedWave);
 			}
@@ -1009,7 +1009,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				wave[i].setWaveUnits(ROWS,xAxis.physicalUnit);
 				wave[i].setWaveUnits(COLUMNS,yAxis.physicalUnit);
 				wave[i].setWaveUnits(LAYERS,specAxis.physicalUnit);
-				wave[i].setWaveUnits(DATA,bricklet->getMetaDataValueAsString("channelUnit"));
+				wave[i].setWaveUnits(DATA,bricklet->getMetaDataValueAsString(CHANNEL_UNIT_KEY));
 
 				appendToWaveList(dfHandle,wave[i],fullPathOfCreatedWave);
 			}

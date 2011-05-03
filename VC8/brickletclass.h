@@ -29,10 +29,13 @@ public:
 
 	void clearCache(void);
 	void getBrickletContentsBuffer(const int** pBuffer, int &count);
-	void getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values);
+
+	const std::vector<std::string>& getBrickletMetaDataValues();
+	const std::vector<std::string>& getBrickletMetaDataKeys();
 	std::string getMetaDataValueAsString(const std::string &key);
 	int			getMetaDataValueAsInt(const std::string &key);
 	double		getMetaDataValueAsDouble(const std::string &key);
+
 	const std::vector<std::wstring>& getAxes();
 	const std::vector<std::string>& getAxesString();
 

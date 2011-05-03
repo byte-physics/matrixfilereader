@@ -16,7 +16,8 @@
 /*
 	Create a two column text wave from two string vectors
 */
-int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
+int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std::vector<std::string>&secondColumn,\
+						  DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
 	std::vector<std::string> allColumns;
 	waveHndl waveHandle;

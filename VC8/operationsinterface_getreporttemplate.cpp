@@ -13,7 +13,7 @@
 
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-		SetOperationStrVar(S_value,"");
+	SetOperationStrVar(S_value,"");
 
 	std::string str;
 

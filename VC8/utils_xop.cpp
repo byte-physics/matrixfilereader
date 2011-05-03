@@ -48,7 +48,7 @@ void outputToHistory(const char *str){
 /*
 	Write stringVector to the textwave waveHandle, using memcpy this is quite fast
 */
-int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &waveHandle){
+int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHndl waveHandle){
 
 	ASSERT_RETURN_ONE(stringVector.size());
 

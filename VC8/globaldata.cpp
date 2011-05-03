@@ -10,7 +10,7 @@
 
 #include "dllhandler.h"
 
-GlobalData *globDataPtr;
+GlobalData *globDataPtr = NULL;
 
 GlobalData::GlobalData(): m_VernissageSession(NULL),
 	m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),
@@ -18,14 +18,13 @@ GlobalData::GlobalData(): m_VernissageSession(NULL),
 	m_overwrite(overwrite_default),m_datafolder(datafolder_default),
 	m_datacache(cache_default),m_errorToHistory(false){
 
-	try{
-		m_DLLHandler = new DLLHandler;
+	if(globDataPtr != NULL){
+		throw(std::runtime_error("BUG: Global object exists more than once!"));
 	}
-	catch( CMemoryException* e ){
-		XOPNotice("Out of memory in GlobalData constructor");
-		e->Delete();
-		return;
-	}
+
+	globDataPtr = this;
+
+	m_DLLHandler = new DLLHandler;
 }
 
 GlobalData::~GlobalData(){

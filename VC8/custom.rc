@@ -15,7 +15,7 @@
 1100 STR#
 BEGIN
 	"MatrixFileReader requires Igor 6.20 or later.\0",			
-	"Out of memory. Bad luck...\0",
+	"MatrixFileReader could not initialize itself, aborting\0",
 	0,
 END
 

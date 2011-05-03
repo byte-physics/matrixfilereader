@@ -228,10 +228,10 @@ HOST_IMPORT int XOPMain(IORecHandle ioRecHandle){
 	}
 
 	try{
-		globDataPtr = new GlobalData();
+		new GlobalData();
 	}
 	catch(...){
-		SetXOPResult(OUT_OF_MEMORY);
+		SetXOPResult(BROKEN_XOP);
 		return EXIT_FAILURE;
 	}
 

@@ -27,22 +27,24 @@ public:
 	void setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr);
 	void setWaveUnits(int dimension, const std::wstring& units){ setWaveUnits(dimension,WStringToString(units)); }
 	void setWaveUnits(int dimension, const std::string& units);
+	void setExtrema(const ExtremaData& extremaData);
 
 	// const getters
 	const char* getWaveName()const{ return m_wavename.c_str(); }
 	waveHndl getWaveHandle()const{ return m_waveHandle; }
 	int getTraceDir()const{ return m_traceDir; }
 	bool isEmpty()const{ return m_wavename.empty(); }
+	const ExtremaData& getExtrema()const{ return *m_extrema; };
 
 	// inlined, has to be very fast
 	void fillWave(const int &index, const int &rawValue, const double &scaledValue);
 
 public:
 	bool moreData;
-	ExtremaData extrema;
 	int pixelSize;
 
 private:
+	ExtremaData *m_extrema;
 	std::string m_wavename;
 	int m_traceDir;
 	waveHndl m_waveHandle;
@@ -69,14 +71,14 @@ __forceinline void WaveClass::fillWave(const int &index, const int &rawValue, co
 		}
 
 		//check if it is a new minimium
-		if(rawValue < extrema.getRawMin()){
-			extrema.setRawMin(rawValue);
-			extrema.setPhysValRawMin(scaledValue);
+		if(rawValue < m_extrema->getRawMin()){
+			m_extrema->setRawMin(rawValue);
+			m_extrema->setPhysValRawMin(scaledValue);
 		}
 
 		//check if it is a new maximum
-		if(rawValue > extrema.getRawMax()){
-			extrema.setRawMax(rawValue);
-			extrema.setPhysValRawMax(scaledValue);
+		if(rawValue > m_extrema->getRawMax()){
+			m_extrema->setRawMax(rawValue);
+			m_extrema->setPhysValRawMax(scaledValue);
 		}
 	}

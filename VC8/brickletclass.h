@@ -43,7 +43,7 @@ public:
 public:
 	const std::vector<Vernissage::Session::ViewTypeCode>& getViewTypeCodes()const{ return m_viewTypeCodes; };
 	void* getBrickletPointer()const{ return m_brickletPtr; };
-	const ExtremaData& getExtrema()const{ return m_extrema; };
+	const ExtremaData& getExtrema()const{ return *m_extrema; };
 
 private:
 	void BrickletClass::loadBrickletMetaDataFromResultFile();
@@ -58,8 +58,7 @@ private:
 	int *m_rawBufferContents;
 	int m_rawBufferContentsSize;
 
-	//FIXME use new
-	ExtremaData m_extrema;
+	ExtremaData *m_extrema;
 
 	// meta data
 	std::vector<std::string> m_metaDataKeys;

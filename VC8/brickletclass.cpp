@@ -14,11 +14,16 @@
 BrickletClass::BrickletClass(void* const pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 
 	m_VernissageSession = globDataPtr->getVernissageSession();
+	m_extrema = new ExtremaData();
+
 	ASSERT_RETURN_VOID(m_VernissageSession);
 }
 
 BrickletClass::~BrickletClass(void){
 	this->clearCache();
+
+	delete m_extrema;
+	m_extrema = NULL;
 }
 
 /*	
@@ -89,13 +94,13 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
 		// implicitly which is quite expensive
-		m_extrema.setRawMin(m_VernissageSession->getRawMin(m_brickletPtr));
-		m_extrema.setRawMax(m_VernissageSession->getRawMax(m_brickletPtr));
+		m_extrema->setRawMin(m_VernissageSession->getRawMin(m_brickletPtr));
+		m_extrema->setRawMax(m_VernissageSession->getRawMax(m_brickletPtr));
 
-		m_extrema.setPhysValRawMin(m_VernissageSession->toPhysical(m_extrema.getRawMin(), m_brickletPtr));
-		m_extrema.setPhysValRawMax(m_VernissageSession->toPhysical(m_extrema.getRawMax(), m_brickletPtr));
+		m_extrema->setPhysValRawMin(m_VernissageSession->toPhysical(m_extrema->getRawMin(), m_brickletPtr));
+		m_extrema->setPhysValRawMax(m_VernissageSession->toPhysical(m_extrema->getRawMax(), m_brickletPtr));
 
-		sprintf(globDataPtr->outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_extrema.getRawMin(),m_extrema.getRawMax(),m_extrema.getPhysValRawMin(),m_extrema.getPhysValRawMax());
+		sprintf(globDataPtr->outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_extrema->getRawMin(),m_extrema->getRawMax(),m_extrema->getPhysValRawMin(),m_extrema->getPhysValRawMax());
 		debugOutputToHistory(globDataPtr->outputBuffer);
 
 		// copy the raw data to our own cache

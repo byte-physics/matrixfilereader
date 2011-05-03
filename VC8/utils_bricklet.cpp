@@ -116,11 +116,11 @@ void setDataWaveNote(int brickletID, WaveClass &waveData){
 
 	std::string	waveNote = getStandardWaveNote(brickletID,waveData.getTraceDir());
 
-	waveNote.append("rawMin="    + anyTypeToString<int>(waveData.extrema.getRawMin())    + "\r");
-	waveNote.append("rawMax="	 + anyTypeToString<int>(waveData.extrema.getRawMax())	 + "\r");
+	waveNote.append("rawMin="    + anyTypeToString<int>(waveData.getExtrema().getRawMin())    + "\r");
+	waveNote.append("rawMax="	 + anyTypeToString<int>(waveData.getExtrema().getRawMax())	 + "\r");
 	
-	waveNote.append("physicalValueOfRawMin=" + anyTypeToString<double>(waveData.extrema.getPhysValRawMin()) + "\r");
-	waveNote.append("physicalValueOfRawMax=" + anyTypeToString<double>(waveData.extrema.getPhysValRawMax()) + "\r");
+	waveNote.append("physicalValueOfRawMin=" + anyTypeToString<double>(waveData.getExtrema().getPhysValRawMin()) + "\r");
+	waveNote.append("physicalValueOfRawMax=" + anyTypeToString<double>(waveData.getExtrema().getPhysValRawMax()) + "\r");
 	waveNote.append("pixelSize=" + anyTypeToString<int>(waveData.pixelSize) + "\r");
 
 	setWaveNoteAsString(waveNote, waveData.getWaveHandle());

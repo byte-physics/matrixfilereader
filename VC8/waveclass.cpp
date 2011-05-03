@@ -3,6 +3,7 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt in the source folder for details.
 */
+
 #include "header.h"
 
 #include "waveclass.h"
@@ -16,10 +17,28 @@ WaveClass::WaveClass(){
 	m_floatPtr=NULL;
 	pixelSize=1;
 	m_waveHandle=NULL;
+
+	m_extrema = new ExtremaData();
 }
 
 WaveClass::~WaveClass(){
+
+	delete m_extrema;
+	m_extrema = NULL;
 }
+
+/*
+	Set the extrema data, useful if WaveClass represents a complete bricklet
+*/
+void WaveClass::setExtrema(const ExtremaData& extremaData){
+
+	m_extrema->setRawMin(extremaData.getRawMin());
+	m_extrema->setRawMax(extremaData.getRawMax());
+
+	m_extrema->setPhysValRawMax(extremaData.getPhysValRawMax());
+	m_extrema->setPhysValRawMin(extremaData.getPhysValRawMin());
+}
+
 
 /*
 	Make a connection between the waveHandle and this class

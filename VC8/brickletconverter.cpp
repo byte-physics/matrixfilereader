@@ -64,7 +64,7 @@ int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, 
 	ASSERT_RETURN_ONE(pBuffer);
 	memcpy(dataPtr,pBuffer,count*sizeof(int));
 	
-	wave.extrema = bricklet->getExtrema();
+	wave.setExtrema(bricklet->getExtrema());
 	setDataWaveNote(brickletID,	wave);
 	
 	appendToWaveList(dfHandle,wave,fullPathOfCreatedWaves);

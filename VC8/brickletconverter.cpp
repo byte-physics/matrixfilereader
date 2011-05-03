@@ -58,7 +58,7 @@ int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, 
 	wave.setWaveDataPtr(waveHandle);
 	waveHandle = NULL;
 
-	dataPtr = getWaveDataPtr<int>(waveHandle);
+	dataPtr = getWaveDataPtr<int>(wave.getWaveHandle());
 
 	ASSERT_RETURN_ONE(dataPtr);
 	ASSERT_RETURN_ONE(pBuffer);

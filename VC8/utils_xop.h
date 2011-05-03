@@ -29,6 +29,10 @@ template <class T> T* getWaveDataPtr(waveHndl waveH){
 	BCInt dataOffset;
 	T *dataPtr;
 
+	if(waveH == NULL){
+		return NULL;
+	}
+
 	ret = MDAccessNumericWaveData(waveH, accessMode, &dataOffset);
 	if(ret != 0 ){
 		// throw here someting if you want to have it more C++-ish

@@ -9,11 +9,13 @@
 
 #include "XOP_Toolkit_6/IgorXOPs6/XOPSupport/XOPResources.h"
 
+/*
+	Error messages for the codes defined in operationsinterface.h
+*/
 1100 STR#
 BEGIN
 	"MatrixFileReader requires Igor 6.20 or later.\0",			
 	"Out of memory. Bad luck...\0",
-	
 	0,
 END
 
@@ -26,6 +28,9 @@ BEGIN
 	XOP_TOOLKIT_VERSION
 END
 
+/*
+	Names of the implemented operations
+*/
 1100 XOPC
 BEGIN
 	"MFR_OpenResultFile\0",

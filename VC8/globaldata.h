@@ -4,17 +4,20 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Global and unique object which keeps track of the internal state
+*/
 #pragma once
 
 #include <map>
 
 #include "dllhandler.h"
 #include "constants.h"
-#include "brickletClass.h"
-
-typedef	std::map<int, BrickletClass*, std::less<int>>		IntBrickletClassPtrMap;
+#include "brickletclass.h"
 
 class GlobalData{
+
+	typedef	std::map<int, BrickletClass*, std::less<int>>		IntBrickletClassPtrMap;
 
 public:
 	// constructors/deconstructors
@@ -25,51 +28,58 @@ public:
 	// functions
 
 	// return the filename and the dirPath of the currently loaded result set
-	std::wstring getFileNameWString();
-	std::wstring getDirPathWString();
-	std::string getFileName();
-	std::string getDirPath();
-	void setResultFile(const std::wstring &dirPath, const std::wstring &fileName);
-	bool resultFileOpen();
-	Vernissage::Session* getVernissageSession();
-	std::string getVernissageVersion();
+	void setResultFile(const std::wstring& dirPath, const std::wstring& fileName);
 	void closeSession();
 	void closeResultFile();
-	BrickletClass* getBrickletClassObject(int brickletID);
-	void createBrickletClassObject(int brickletID, void *pBricklet);
+	void createBrickletClassObject(int brickletID, void* const pBricklet);
 	void setError(int errorCode, std::string msgArgument = std::string());
 	void setInternalError(int errorCode);
-	int getLastError(){ return m_lastError; }
-	std::string getLastErrorMessage();
-	std::string getErrorMessage(int errorCode);
+
+	Vernissage::Session* getVernissageSession();
+	std::string getVernissageVersion();
 
 	void initializeWithoutReadSettings(int calledFromMacro,int calledFromFunction);
 	void initialize(int calledFromMacro,int calledFromFunction);
 
-	void finalize(bool clearCache = false, int errorCode = SUCCESS);
+	void finalize(bool filledCache = false, int errorCode = SUCCESS);
 
 	void readSettings(DataFolderHandle dataFolderHndl = NULL);
-	// debug
-	bool debuggingEnabled(){ return m_debug; };
-	
-	// double
-	bool doubleWaveEnabled(){ return m_doubleWave; };
-	int getIgorWaveType();
-
-	// datafolder
-	bool datafolderEnabled(){ return m_datafolder; };
-
-	// overwrite
-	bool overwriteEnabled(){ return m_overwrite; };
-	int overwriteEnabledAsInt(){ return int(m_overwrite); };
-
-	// cache
-	bool dataCacheEnabled(){ return m_datacache; };
 
 	// variables
 	char outputBuffer[ARRAY_SIZE];
 	int  openDlgFileIndex;
 	char openDlgInitialDir[MAX_PATH_LEN+1];
+
+	// const functions
+	std::wstring getFileNameWString() const;
+	std::wstring getDirPathWString() const;
+	std::string getFileName() const;
+	std::string getDirPath() const;
+
+	bool resultFileOpen() const;
+
+
+	std::string getLastErrorMessage() const;
+	std::string getErrorMessage (int errorCode) const;
+	int getLastError() const{ return m_lastError; }
+
+	BrickletClass* getBrickletClassObject(int brickletID) const;
+
+	// debug
+	bool debuggingEnabled() const{ return m_debug; };
+	// double
+	bool doubleWaveEnabled() const{ return m_doubleWave; };
+	int getIgorWaveType() const;
+
+	// datafolder
+	bool datafolderEnabled() const{ return m_datafolder; };
+
+	// overwrite
+	bool overwriteEnabled() const{ return m_overwrite; };
+	int overwriteEnabledAsInt() const{ return int(m_overwrite); };
+
+	// cache
+	bool dataCacheEnabled() const{ return m_datacache; };
 
 private:
 	bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
@@ -82,7 +92,6 @@ private:
 	IntBrickletClassPtrMap m_brickletIDBrickletClassMap;
 
 	void setLastError(int errorCode, std::string argument = std::string());
-	std::string getLastErrorArgument(){ return m_lastErrorArgument;}
 
 	void enableDatafolder(bool var){ m_datafolder = var; };
 	void enableDoubleWave(bool var){ m_doubleWave = var; };

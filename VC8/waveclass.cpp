@@ -9,8 +9,8 @@
 #include "globaldata.h"
 
 WaveClass::WaveClass(){
-	// set save defaults
-	m_traceDir = -1;
+
+	m_traceDir = NO_TRACE;
 	moreData=false;
 	m_doublePtr=NULL;
 	m_floatPtr=NULL;
@@ -21,6 +21,9 @@ WaveClass::WaveClass(){
 WaveClass::~WaveClass(){
 }
 
+/*
+	Make a connection between the waveHandle and this class
+*/
 void WaveClass::setWaveDataPtr(const waveHndl &waveHandle){
 
 	if(WaveType(waveHandle) & NT_FP64){
@@ -58,6 +61,9 @@ void WaveClass::setWaveDataPtr(const waveHndl &waveHandle){
 	}
 }
 
+/*
+	Set the name and trace direction of the wave, adds then the appropriate suffix to the wave name
+*/
 void WaveClass::setNameAndTraceDir(const std::string &basename, const int &traceDir){
 
 	m_traceDir = traceDir;
@@ -84,12 +90,18 @@ void WaveClass::setNameAndTraceDir(const std::string &basename, const int &trace
 	}
 }
 
+/*
+	Output debug info
+*/
 void WaveClass::printDebugInfo(){
 	sprintf(globDataPtr->outputBuffer,"%s: waveHandle=%p, float=%p, double=%p, moreData=%s",\
 		m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr, moreData ? "true" : "false");
 	debugOutputToHistory(globDataPtr->outputBuffer);
 }
 
+/*
+	Sets the complete wave to NaN
+*/
 void WaveClass::clearWave(){
 
 	if(m_doublePtr){
@@ -100,6 +112,9 @@ void WaveClass::clearWave(){
 	}
 }
 
+/*
+	convenience wrapper
+*/
 void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr){
 	ASSERT_RETURN_VOID(m_waveHandle);
 
@@ -110,6 +125,9 @@ void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double
 	}
 }
 
+/*
+	convenience wrapper
+*/
 void WaveClass::setWaveUnits(int dimension, const std::string& units){
 	ASSERT_RETURN_VOID(m_waveHandle);
 

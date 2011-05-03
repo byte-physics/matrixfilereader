@@ -4,12 +4,15 @@
 	see License.txt in the source folder for details.
 */
 
+/*
+	Utility functions involving bricklets
+*/
+
 #pragma once
 
 #include <limits>
 #include "waveclass.h"
 
-std::vector<std::wstring> getAllAxesNames(void *pBricklet);
 std::string viewTypeCodeToString(int idx);
 
 void setDataWaveNote(int brickletID, WaveClass &waveData);
@@ -18,4 +21,5 @@ std::string getStandardWaveNote(int brickletID = -1, int traceDir = -1 );
 
 bool isValidBrickletRange(double startID, double endID, int numberOfBricklets);
 
+int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves);
 

@@ -56,5 +56,5 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 
 	outputToHistory(str.c_str());
 	END_OUTER_CATCH
-		return 0;
+	return 0;
 }

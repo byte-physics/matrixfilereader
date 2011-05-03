@@ -4,6 +4,10 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Takes care of xop initialization, igor message handling and registering all operations
+*/
+
 #pragma once
 
 #include "header.h"
@@ -16,7 +20,10 @@
 
 /* Prototypes */
 HOST_IMPORT int XOPMain(IORecHandle ioRecHandle);
+extern "C" void XOPEntry(void);
 
+// Igor aborts if it encounters an unhandled exception, therefore every operation
+// needs enclosing BEGIN_OUTER_CATCH and END_OUTER_CATCH macros
 #define BEGIN_OUTER_CATCH	try{
 #define END_OUTER_CATCH		}\
 							catch(...){\
@@ -26,35 +33,19 @@ HOST_IMPORT int XOPMain(IORecHandle ioRecHandle);
 								return 0;\
 							}
 
-extern "C" {
-	int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p);
-	int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p);
-	int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p);
-	int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p);
-	int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p);
-	int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p);
-	int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p);
-	int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p);
-	int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p);
-	int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p);
-	int ExecuteGetVersion(GetVersionRuntimeParamsPtr p);
-	int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p);
-	int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p);
-	int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p);
-	void XOPEntry();
-}
-
-int RegisterGetResultFileMetaData();
-int RegisterGetMtrxFileReaderVersion();
-int RegisterGetVernissageVersion();
-int RegisterGetXOPErrorMessage();
-int RegisterOpenResultFile();
-int RegisterCloseResultFile();
-int RegisterGetBrickletCount();
-int RegisterGetResultFileName();
-int RegisterGetBrickletData();
-int RegisterGetBrickletMetaData();
-int RegisterGetBrickletRawData();
-int RegisterGetReportTemplate();
-int RegisterCreateOverviewTable();
-int RegisterCheckForNewBricklets();
+// each execute function holds the implementation of one igor operation
+// are each in a separate file named operationsinterface_*
+extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p);
+extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p);
+extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p);
+extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p);
+extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p);
+extern "C" int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p);
+extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p);
+extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p);
+extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p);
+extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p);
+extern "C" int ExecuteGetVersion(GetVersionRuntimeParamsPtr p);
+extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p);
+extern "C" int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p);
+extern "C" int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p);

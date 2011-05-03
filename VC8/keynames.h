@@ -4,6 +4,10 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Common names for the data and meta data waves
+*/
+
 #pragma once
 
 const std::string RESULT_FILE_NAME_KEY = "resultFileName";

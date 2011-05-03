@@ -10,6 +10,10 @@
 
 #include "globaldata.h"
 
+/*
+	Load the preferences from the internal igor storage currently (Igor 6.22) located in
+	"C:\Dokumente und Einstellungen\thomas\Anwendungsdaten\WaveMetrics\Igor Pro 6\Igor Preferences.ipr.igr"
+*/
 void loadXOPPreferences(){
 
 	XOPprefStructHandle prefHandle;
@@ -31,7 +35,8 @@ void loadXOPPreferences(){
 		sprintf(globDataPtr->outputBuffer,"openDlgInitialDir=%s",(*prefHandle)->openDlgInitialDir);
 		debugOutputToHistory(globDataPtr->outputBuffer);
 
-	}else{
+	}
+	else{
 		debugOutputToHistory("No preferences saved or the internal structure has changed, loading defaults",true);
 		globDataPtr->openDlgFileIndex=1;
 		strcpy(globDataPtr->openDlgInitialDir,"");
@@ -42,6 +47,7 @@ void loadXOPPreferences(){
 	}
 };
 
+// Save the preferences to the internal igor storage
 void saveXOPPreferences(){
 
 	XOPprefStructHandle prefHandle;

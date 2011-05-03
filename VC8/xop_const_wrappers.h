@@ -4,6 +4,9 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Wrapper functions for the XOP Toolkit to allow passing a const char instead of a char
+*/
 
 #pragma once
 

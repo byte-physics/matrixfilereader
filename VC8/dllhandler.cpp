@@ -20,7 +20,7 @@ DLLHandler::DLLHandler():
 	m_vernissageVersion("0.00"){
 }
 
-DLLHandler::~DLLHandler(){};
+DLLHandler::~DLLHandler(){}
 
 void DLLHandler::closeSession(){
 
@@ -28,13 +28,20 @@ void DLLHandler::closeSession(){
 		(*m_pReleaseSessionFunc) ();
 	}
 	
-	FreeLibrary(this->m_foundationModule);
+	FreeLibrary(m_foundationModule);
 	m_foundationModule = NULL;
 	m_vernissageVersion = "0.00";
 	m_pReleaseSessionFunc = NULL;
 	m_pGetSessionFunc = NULL;
 }
 
+/*
+Reads the registry, which tells us where the vernissage libraries are located
+This path will then be added to the DLL search path
+Only one vernissage version can be installed at a time, so we take the one which is referenced in the regsitry
+The length of the arrays is taken from "Registry Element Size Limits"@MSDN
+The registry key looks like "HKEY_LOCAL_MACHINE\SOFTWARE\Omicron NanoTechnology\Vernissage\V1.0\Main"
+*/
 void DLLHandler::setLibraryPath(){
 
 	BOOL result;
@@ -115,11 +122,10 @@ void DLLHandler::setLibraryPath(){
 	}
 }
 
-// check the registry for the path to the Vernissage DLLs and return (as pointer in the argument) a pointer to the loaded Foundation.dll
-// Remarks:
-// - Only one vernissage version can be installed at a time, so we take the one which is referenced in the regsitry
-// - The length of the arrays is taken from "Registry Element Size Limits"@MSDN
-// - The registry key looks like "HKEY_LOCAL_MACHINE\SOFTWARE\Omicron NanoTechnology\Vernissage\V1.0\Main"
+/*
+Load the vernissage library, setLibraryPath() will be called before
+In case something goes wrong, NULL is returned
+*/
 Vernissage::Session* DLLHandler::createSessionObject(){
 
 	Vernissage::Session *pSession=NULL;

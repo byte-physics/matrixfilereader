@@ -4,6 +4,10 @@
 	see License.txt	in the source folder for details.
 */
 
+/* Everything related to loading the Vernissage DLLs.
+Calling closeSession() before exiting the application is mandatory.
+*/
+
 #pragma once
 
 #include "header.h"
@@ -22,9 +26,8 @@ class DLLHandler{
 		Vernissage::Session* createSessionObject();
 		void closeSession();
 
-	// const functions
-	public:
-		const std::string& getVernissageVersion()const{ return m_vernissageVersion;};
+		// const functions
+		const std::string& getVernissageVersion()const{ return m_vernissageVersion; };
 
 	private:
 		void setLibraryPath();

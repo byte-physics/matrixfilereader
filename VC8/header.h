@@ -4,6 +4,11 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Main header file which is included by all source files
+	globaldata.h is missing here on purpose
+*/
+
 #pragma once
 
 // allow the system to be equal or newer than Windows Server 2003 with SP1 or Windows XP with SP2

@@ -4,6 +4,10 @@
 	see License.txt in the source folder for details.
 */
 
+/*
+	Place for generic functions which are neither XOP nor vernissage specific
+*/
+
 #pragma once
 
 #include <sstream>

@@ -4,6 +4,10 @@
 	see License.txt in the source folder for details.
 */
 
+/*
+	Internal representation of a igor wave
+*/
+
 #pragma once
 
 #include "header.h"
@@ -33,7 +37,6 @@ public:
 	// inlined, has to be very fast
 	void fillWave(const int &index, const int &rawValue, const double &scaledValue);
 
-
 public:
 	bool moreData;
 	ExtremaData extrema;
@@ -48,7 +51,13 @@ private:
 
 };
 
+/*
+	Writes the data into the wave
+	It will _not_ be checked if index is out-of-range
+	Here we also determine the extrema values
+*/
 __forceinline void WaveClass::fillWave(const int &index, const int &rawValue, const double &scaledValue){
+		
 		if(m_doublePtr){
 			m_doublePtr[index] = scaledValue;
 		}

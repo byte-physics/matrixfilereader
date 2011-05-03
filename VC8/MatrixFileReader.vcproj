@@ -54,6 +54,7 @@
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=""
+				AssemblerOutput="0"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -389,10 +390,6 @@
 			</File>
 			<File
 				RelativePath=".\operationsinterface_openresultfile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\operationsregister.cpp"
 				>
 			</File>
 			<File

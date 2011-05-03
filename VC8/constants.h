@@ -4,6 +4,12 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Global constants
+	Most strings are part of the Igor interface
+	The total number of bricklets is limited to 10^5, see brickletDataFormat and friends
+*/
+
 #pragma once
 
 const int ARRAY_SIZE = 1024;
@@ -20,6 +26,7 @@ const char brickletDataFormat[]		 = "%s_%05d";
 const char dataFolderFormat[]		 = "X_%05d";
 
 // value types from element instance parameters
+// from the vernissage header file
 const char VT_SPECIAL_STRING[] = "vt_Special";
 const char VT_INTEGER_STRING[] = "vt_Integer";
 const char VT_DOUBLE_STRING[]  = "vt_Double";
@@ -28,6 +35,7 @@ const char VT_ENUM_STRING[]	   = "vt_Enum";
 const char VT_STRING_STRING[]  = "vt_String";
 
 // viewtype codes as strings
+// from the vernissage header file
 const char VTC_OTHER_STRING[]		= "vtc_Other";
 const char VTC_SIMPLE2D_STRING[]	= "vtc_Simple2D";
 const char VTC_SIMPLE1D_STRING[]	= "vtc_Simple1D";
@@ -44,6 +52,7 @@ const char TRACE_DOWN_STRING[]		= "_Down";
 const char RE_TRACE_UP_STRING[]		= "_ReUp";
 const char RE_TRACE_DOWN_STRING[]	= "_ReDown";
 
+// used for WaveClass
 const int NO_TRACE					=-1;
 const int TRACE_UP 					= 0;
 const int RE_TRACE_UP 				= 1;
@@ -74,12 +83,13 @@ const char overwrite_option_name[]	= "V_MatrixFileReaderOverwrite";
 const char double_option_name[]		= "V_MatrixFileReaderDouble";
 const char cache_option_name[]		= "V_MatrixFileReaderCache";
 
-// only one vernissage can be supported at a time
+// Due to historic problems with different vernissage version, we currently only support exactly one version
 const char properVernissageVersion[] ="2.0";
 
+// default keys for MFR_CreateOverViewTable
 const char keyList_default[] = "brickletID;scanCycleCount;runCycleCount;sequenceID;dimension;channelName";
 
-// runTime variables
+// runtime variables, returned by the operations
 const char V_flag[]				= "V_flag";
 const char V_startBrickletID[]	= "V_startBrickletID";
 const char V_endBrickletID[]	= "V_endBrickletID";
@@ -93,6 +103,7 @@ const char S_value[]			= "S_value";
 const char S_waveNames[]		= "S_waveNames";
 const char S_errorMessage[]		= "S_errorMessage";
 
+// Openresultfile dialog
 const char filterStr[] = "Matrix result files (*.mtrx)\0*.mtrx\0All Files (*.*)\0*.*\0\0";
 const char dlgPrompt[] = "Looking for a MATRIX result file";
 

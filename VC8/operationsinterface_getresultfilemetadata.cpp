@@ -9,6 +9,8 @@
 #include "operationstructs.h"
 #include "operationsinterface.h"
 
+#include "utils_bricklet.h"
+
 #include "globaldata.h"
 
 extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){

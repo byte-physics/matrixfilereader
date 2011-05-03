@@ -12,19 +12,27 @@
 
 #include "globaldata.h"
 
+/*
+	Convert a string to a wstring
+*/
 std::wstring StringToWString(const std::string& s){
 	std::wstring temp(s.length(),L' ');
 	std::copy(s.begin(), s.end(), temp.begin());
 	return temp;
 }
 
-
+/*
+	Convert a wstring to a string
+*/
 std::string WStringToString(const std::wstring& s){
 	std::string temp(s.length(), ' ');
 	std::copy(s.begin(), s.end(), temp.begin());
 	return temp;
 }
 
+/*
+	Convert a char ptr to a string
+*/
 std::wstring CharPtrToWString(char* cStr){
 
 	if(cStr == NULL){
@@ -35,6 +43,9 @@ std::wstring CharPtrToWString(char* cStr){
 	return StringToWString(str);
 }
 
+/*
+	Convenience wrapper
+*/
 void splitString(char *strChar, char *sepChar, std::vector<std::string> &list){
 	
 	list.clear();
@@ -47,6 +58,9 @@ void splitString(char *strChar, char *sepChar, std::vector<std::string> &list){
 	splitString(str, sepChar, list);
 }
 
+/*
+	Splits string separated by sepChar into a vector of strings
+*/
 void splitString(std::string &string, char *sepChar, std::vector<std::string> &list){
 
 	list.clear();
@@ -78,6 +92,9 @@ void splitString(std::string &string, char *sepChar, std::vector<std::string> &l
 	}
 }
 
+/*
+	Undos a former split string, therefore concatenating each element plus sepchar of list into one string
+*/
 void joinString(std::vector<std::string> &list,const char *sepChar, std::string &joinedList){
 
 	std::vector<std::string>::const_iterator it;
@@ -90,6 +107,10 @@ void joinString(std::vector<std::string> &list,const char *sepChar, std::string 
 	return;
 }
 
+/*
+	Some XOP parameters are of type double, but internally we want them to be bool
+	Therefore we want to convert it into a planned way and not by casting
+*/
 bool doubleToBool(double value){
 	
 	bool result;

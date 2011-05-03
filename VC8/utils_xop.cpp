@@ -10,6 +10,10 @@
 
 #include "globaldata.h"
 
+
+/*
+	Outputs str if debugging is enabled, silent = true will not mark the experiment as modified
+*/
 void debugOutputToHistory(const char* str, bool silent /* = false */){
 
 	if(!globDataPtr->debuggingEnabled()){
@@ -29,6 +33,9 @@ void debugOutputToHistory(const char* str, bool silent /* = false */){
 	}
 }
 
+/*
+	Outputs str, a CR is added automatically
+*/
 void outputToHistory(const char *str){
 
 	ASSERT_RETURN_VOID(str);
@@ -38,6 +45,9 @@ void outputToHistory(const char *str){
 	XOPNotice(buf);
 }
 
+/*
+	Write stringVector to the textwave waveHandle, using memcpy this is quite fast
+*/
 int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &waveHandle){
 
 	ASSERT_RETURN_ONE(stringVector.size());
@@ -115,6 +125,9 @@ int stringVectorToTextWave(std::vector<std::string> &stringVector, waveHndl &wav
 	return ret;
 }
 
+/*
+	Write the string waveNote as wave note into waveHandle
+*/
 void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle){
 
 	int ret;
@@ -141,6 +154,9 @@ void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle){
 	SetWaveNote(waveHandle, noteHandle);
 }
 
+/*
+	Sets the complete wave data to which data points to NaN (double precision version)
+*/
 void waveClearNaN64(double* data, const CountInt &size){
 
 	long i;
@@ -152,6 +168,9 @@ void waveClearNaN64(double* data, const CountInt &size){
 	}
 }
 
+/*
+	Sets the complete wave data to which data points to NaN (single precision version)
+*/
 void waveClearNaN32(float *data, const CountInt &size){
 
 	long i;
@@ -163,15 +182,24 @@ void waveClearNaN32(float *data, const CountInt &size){
 	}
 }
 
+/*
+	Append the full path of wv to waveList
+*/
 void appendToWaveList(const DataFolderHandle& df, const waveHndl& wv, std::string &waveList){
 	waveList.append(getFullWavePath(df,wv));
 	waveList.append(";");
 }
 
+/*
+	Append the full path of wave.getWaveHandle() to waveList
+*/
 void appendToWaveList(const DataFolderHandle& df, const WaveClass& wave, std::string &waveList){
 	appendToWaveList(df,wave.getWaveHandle(), waveList);
 }
 
+/*
+	return the full path of the wave
+*/
 std::string getFullWavePath(const DataFolderHandle& df, const waveHndl& wv){
 
 	char waveName[MAX_OBJ_NAME+1];
@@ -192,6 +220,9 @@ std::string getFullWavePath(const DataFolderHandle& df, const waveHndl& wv){
 	return fullPath;
 }
 
+/*
+	Convert a XOP string handle to a std::string
+*/
 void convertHandleToString(Handle strHandle,std::string &str){
 
 	str.clear();

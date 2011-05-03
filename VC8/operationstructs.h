@@ -4,6 +4,11 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Operation structs are defined here (they are automatically generated using the
+	ParseOperationTemplate Igor function, see Operation-Template-Generator.pxp)
+*/
+
 #pragma once
 
 #include "header.h"

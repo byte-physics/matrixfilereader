@@ -4,6 +4,11 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Holds the minima and maxima values for a given dataset. This dataset can either be a BrickletClass
+	(which may hold data of multiple trace directions) or a WaveClass (data from exactly one trace direction)
+*/
+
 #pragma once
 
 class ExtremaData{
@@ -18,7 +23,8 @@ public:
 	void setPhysValRawMin(double physValRawMin){ m_physValRawMin = physValRawMin; };
 	void setPhysValRawMax(double physValRawMax){ m_physValRawMax = physValRawMax; };
 
-	int getRawMin ()const{return m_rawMin ;};
+	// const getters
+	int getRawMin ()const{ return m_rawMin ; };
 	int getRawMax ()const{ return m_rawMax; };
 	double getPhysValRawMin ()const{ return m_physValRawMin; };
 	double getPhysValRawMax ()const{ return m_physValRawMax; };

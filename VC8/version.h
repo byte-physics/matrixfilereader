@@ -4,6 +4,11 @@
 	see License.txt	in the source folder for details.
 */
 
+/* 
+	version string of the XOP
+	returned by the GetMtrxFileReaderVersion operation and also used for the resource file
+*/
+
 #pragma once
 
 #define MatrixFileReader_XOP_VERSION 0,1,5,0

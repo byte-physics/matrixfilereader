@@ -4,6 +4,10 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Saving and Loading of XOP Preferences is done here
+*/
+
 #pragma once
 
 #include "header.h"

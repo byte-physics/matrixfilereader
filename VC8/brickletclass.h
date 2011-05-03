@@ -4,23 +4,28 @@
 	see License.txt	in the source folder for details.
 */
 
+/*
+	Internal representation of a bricklet
+*/
+
 #pragma once
+
+#include "header.h"
+
+#include "extremadata.h"
 
 #include <vector>
 #include <string>
 
-#include "header.h"
-#include "extremadata.h"
-
 class BrickletClass
 {
 public:
-	BrickletClass(void* pBricklet,int brickletID);
+	BrickletClass(void* const pBricklet,int brickletID);
 	~BrickletClass(void);
 
 public:
 	// resetting *pBricklet is only needed after the same result file is loaded again to check for new bricklets
-	void setBrickletPointer(void *pBricklet){ m_brickletPtr = pBricklet; };
+	void setBrickletPointer(void* const pBricklet){ m_brickletPtr = pBricklet; };
 
 	void clearCache(void);
 	void getBrickletContentsBuffer(const int** pBuffer, int &count);
@@ -50,6 +55,7 @@ private:
 	int *m_rawBufferContents;
 	int m_rawBufferContentsSize;
 
+	//FIXME use new
 	ExtremaData m_extrema;
 
 	// meta data

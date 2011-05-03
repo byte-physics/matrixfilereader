@@ -17,6 +17,9 @@
 #include "globaldata.h"
 #include "waveclass.h"
 
+/*
+	create the raw data wave which just holds the raw data as 1D array
+*/
 int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
 	const int *pBuffer;
@@ -68,6 +71,9 @@ int createRawDataWave(DataFolderHandle dfHandle,char *waveName, int brickletID, 
 	return ret;
 }
 
+/*
+	Creates the real data waves, supports 1D-3D data
+*/
 int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int brickletID, bool resampleData,\
 				int pixelSize, std::string &fullPathOfCreatedWave){
 

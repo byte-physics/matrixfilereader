@@ -11,7 +11,7 @@
 #include "globaldata.h"
 #include "utils_bricklet.h"
 
-BrickletClass::BrickletClass(void* pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
+BrickletClass::BrickletClass(void* const pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 
 	m_VernissageSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_VOID(m_VernissageSession);
@@ -21,6 +21,10 @@ BrickletClass::~BrickletClass(void){
 	this->clearCache();
 }
 
+/*	
+	delete our internally cached data, ís called at destruction time and if we want keep memory
+	consumption low
+*/
 void BrickletClass::clearCache(void){
 
 	if(m_rawBufferContents != NULL){
@@ -31,11 +35,15 @@ void BrickletClass::clearCache(void){
 		m_rawBufferContentsSize=0;
 	}
 
+	// FIXME
 	// resize to zero elements, clear() would only delete them, but not reduce the memory consumption
 	m_metaDataKeys.resize(0);
 	m_metaDataValues.resize(0);
 }
 
+/*
+	Load the raw data of the bricklet into our own cache
+*/
 void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 	ASSERT_RETURN_VOID(pBuffer);
@@ -58,7 +66,6 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 	else{ // we are called the first time
 
 		try{
-			// load raw data from vernissage DLL
 			m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
 		}
 		catch(...){
@@ -68,7 +75,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 			count = 0;
 			return;	
 		}
-
+		// loadBrickletContents either throws an exception or returns pBuffer == 0 || count == 0
 		if(*pBuffer == NULL || count == 0){
 			sprintf(globDataPtr->outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
 			outputToHistory(globDataPtr->outputBuffer);
@@ -113,6 +120,10 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 	}
 }
 
+// FIXME inefficient
+/*
+	Wrapper function which returns a vector of meta data keys and values
+*/
 void BrickletClass::getBrickletMetaData(std::vector<std::string> &keys, std::vector<std::string> &values){
 
 	if(m_metaDataKeys.size() == 0 ||  m_metaDataValues.size() == 0){
@@ -128,7 +139,7 @@ void BrickletClass::getBrickletMetaData(std::vector<std::string> &keys, std::vec
 			return;
 		}
 		loadBrickletMetaDataFromResultFile();
-		// shrink both vectors to their actual size
+		// shrink both vectors to their actual size FIXME
 		m_metaDataKeys.resize(m_metaDataKeys.size());
 		m_metaDataValues.resize(m_metaDataValues.size());
 	}
@@ -137,6 +148,9 @@ void BrickletClass::getBrickletMetaData(std::vector<std::string> &keys, std::vec
 	values = m_metaDataValues;
 }
 
+/*
+	Reads all meta data into our own structures
+*/
 void BrickletClass::loadBrickletMetaDataFromResultFile(){
 
 	std::vector<std::wstring> elementInstanceNames;
@@ -153,6 +167,7 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 	int index;
 	char buf[ARRAY_SIZE];
 
+	//FIXME remove calls
 	elementInstanceNames.clear();
 	allAxesAsOneString.clear();
 	m_metaDataKeys.clear();
@@ -512,6 +527,9 @@ void BrickletClass::generateAllAxesVector(){
 	m_allAxesString  = allAxesString;
 }
 
+/*
+	returns a vector with the axis hierachy (std::wstring)
+*/
 const std::vector<std::wstring>& BrickletClass::getAxes(){
 
 	if(m_allAxesString.empty() || m_allAxesWString.empty()){
@@ -520,6 +538,9 @@ const std::vector<std::wstring>& BrickletClass::getAxes(){
 	return m_allAxesWString;
 }
 
+/*
+	returns a vector with the axis hierachy (std::string)
+*/
 const std::vector<std::string>& BrickletClass::getAxesString(){
 
 	if(m_allAxesString.empty() || m_allAxesWString.empty()){
@@ -528,15 +549,24 @@ const std::vector<std::string>& BrickletClass::getAxesString(){
 	return m_allAxesString;
 }
 
+/*
+	Wrapper function which returns a metadata value of type int for a given key
+*/
 int	BrickletClass::getMetaDataValueAsInt(const std::string &key){
 	return stringToAnyType<int>(this->getMetaDataValueAsString(key));
 };
 
+/*
+	Wrapper function which returns a metadata value of type double for a given key
+*/
 double BrickletClass::getMetaDataValueAsDouble(const std::string &key){
 	return stringToAnyType<double>(this->getMetaDataValueAsString(key));
 };
 
-
+/*
+	Return a given metadata value as string
+*/
+// FIXME add CString wrapper which returns a char*
 std::string BrickletClass::getMetaDataValueAsString(const std::string &key){
 
 	std::string value;
@@ -551,7 +581,7 @@ std::string BrickletClass::getMetaDataValueAsString(const std::string &key){
 	}
 
 	for(unsigned int i=0; i < m_metaDataKeys.size(); i++){
-		if( m_metaDataKeys[i] == key){
+		if( m_metaDataKeys[i] == key ){
 			value = m_metaDataValues[i];
 			break;
 		}

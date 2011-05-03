@@ -34,6 +34,7 @@ GlobalData::~GlobalData(){
 	m_DLLHandler = NULL;
 }
 
+// store name and path of the open result file
 void GlobalData::setResultFile(const std::wstring &dirPath, const std::wstring &fileName){
 	
 	if(this->resultFileOpen()){
@@ -45,6 +46,10 @@ void GlobalData::setResultFile(const std::wstring &dirPath, const std::wstring &
 	m_resultFileName = fileName;
 }
 
+/*
+	get a pointer to the vernissage session object
+	automatically loads the vernissage DLL if there is no such object
+*/
 Vernissage::Session* GlobalData::getVernissageSession(){
 
 	if(m_VernissageSession != NULL){
@@ -56,6 +61,9 @@ Vernissage::Session* GlobalData::getVernissageSession(){
 	}
 }
 
+/*
+	closes a result file, deletes all internal objects associated with that result file
+*/
 void GlobalData::closeResultFile(){
 
 	//delete BrickletClass objects
@@ -77,6 +85,10 @@ void GlobalData::closeResultFile(){
 	m_resultDirPath.erase();
 }
 
+/*
+	closes the session and unloads the DLL
+	will only be called when we receivce the CLEANUP signal
+*/
 void GlobalData::closeSession(){
 	
 	this->closeResultFile();
@@ -84,6 +96,7 @@ void GlobalData::closeSession(){
 	m_VernissageSession = NULL;
 }
 
+// return a version string identifying the vernissage DLL version
 std::string GlobalData::getVernissageVersion(){
 
 	if(m_VernissageSession == NULL){
@@ -97,31 +110,34 @@ std::string GlobalData::getVernissageVersion(){
 		return std::string();
 }
 
-bool GlobalData::resultFileOpen(){
+bool GlobalData::resultFileOpen() const{
 
 	return !m_resultFileName.empty();
 }
 
-std::string GlobalData::getDirPath(){
+std::string GlobalData::getDirPath() const{
 
 	return WStringToString(m_resultDirPath);
 }
-std::string GlobalData::getFileName(){
+std::string GlobalData::getFileName() const{
 
 	return WStringToString(m_resultFileName);
 }
 
-std::wstring GlobalData::getDirPathWString(){
+std::wstring GlobalData::getDirPathWString() const{
 
 	return m_resultDirPath;
 }
-std::wstring GlobalData::getFileNameWString(){
+std::wstring GlobalData::getFileNameWString() const{
 
 	return m_resultFileName;
 }
 
-
-int GlobalData::getIgorWaveType(){
+/*
+	returns an integer which tells if we should create single or double precision waves
+	the integer can be readily used with MDMakeWave
+*/
+int GlobalData::getIgorWaveType() const{
 
 	int waveType;
 
@@ -134,10 +150,13 @@ int GlobalData::getIgorWaveType(){
 	return waveType;
 }
 
+/*	
+	m_brickletIDBrickletClassMap maps a brickletID to a brickletClass pointer
+	returns NULL if the bricklet with brickletID can not be found
+*/
+BrickletClass* GlobalData::getBrickletClassObject(int brickletID) const{
 
-BrickletClass* GlobalData::getBrickletClassObject(int brickletID){
-
-	IntBrickletClassPtrMap::iterator it = m_brickletIDBrickletClassMap.find(brickletID);
+	IntBrickletClassPtrMap::const_iterator it = m_brickletIDBrickletClassMap.find(brickletID);
 
 	if(it != m_brickletIDBrickletClassMap.end()){ // we found the element
 		return it->second;
@@ -147,7 +166,11 @@ BrickletClass* GlobalData::getBrickletClassObject(int brickletID){
 	}
 }
 
-void GlobalData::createBrickletClassObject(int brickletID, void *pBricklet){
+/*
+	for each bricklet we have to call this function and make the connection between the pBricklet pointer
+	from the vernissage DLL and our brickletClass objects
+*/
+void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet){
 	
 	BrickletClass *bricklet = NULL;
 	try{
@@ -164,8 +187,12 @@ void GlobalData::createBrickletClassObject(int brickletID, void *pBricklet){
 	debugOutputToHistory(globDataPtr->outputBuffer);
 }
 
+/*
+	errors which are not recoverable should be told the user by calling setInternalError
+*/
 void GlobalData::setInternalError(int errorValue){
 
+	// 256 is taken from the GetIgorErrorMessage declaration
 	char errorMessage[256];
 	int ret;
 
@@ -177,13 +204,16 @@ void GlobalData::setInternalError(int errorValue){
 		outputToHistory(errorMessage);		
 	}
 }
-
-void GlobalData::finalize(bool clearCache /* = false */, int errorCode /* = SUCCESS */ ){
+/*
+	Must be called by every operation which sets V_flag before returning
+	In case some internal cache got filled by the operation, filledCache=true has to be passed
+*/
+void GlobalData::finalize(bool filledCache /* = false */, int errorCode /* = SUCCESS */){
 	this->setError(errorCode);
 
-	if(!dataCacheEnabled() && clearCache){
+	if(!dataCacheEnabled() && filledCache){
 		BrickletClass *bricklet = NULL;
-		const int totalBrickletCount = m_VernissageSession->getBrickletCount();
+		int totalBrickletCount = m_VernissageSession->getBrickletCount();
 		for(int i=1; i <= totalBrickletCount; i++){
 			bricklet = globDataPtr->getBrickletClassObject(i);
 			ASSERT_RETURN_VOID(bricklet);
@@ -192,19 +222,33 @@ void GlobalData::finalize(bool clearCache /* = false */, int errorCode /* = SUCC
 	}
 }
 
-void GlobalData::initializeWithoutReadSettings(int calledFromMacro,int calledFromFunction){
+/*
+	Must be called by every operation which sets V_flag and does _not_ depend on the V_MatrixFileReader* 
+	variables defined in constans.h
+*/
+void GlobalData::initializeWithoutReadSettings(int calledFromMacro, int calledFromFunction){
 
-	m_errorToHistory = false;	// otherwise the setError in the next line causes the error message to be printed
+	// otherwise the setError in the next line causes the error message to be printed
+	m_errorToHistory = false;
+
 	this->setError(UNKNOWN_ERROR);
 	m_errorToHistory = ( calledFromMacro == 0 && calledFromFunction == 0 );
 }
 
-void GlobalData::initialize(int calledFromMacro,int calledFromFunction){
+/*
+	Must be called by every operation which sets V_flag and does depend on the V_MatrixFileReader* 
+	variables defined in constans.h
+*/
+void GlobalData::initialize(int calledFromMacro, const int calledFromFunction){
 
 	this->readSettings();
 	this->initializeWithoutReadSettings(calledFromMacro,calledFromFunction);
 }
 
+/*
+	Takes care of setting V_flag to the current error value
+	Should be called immediately before calling return in a operation
+*/
 void GlobalData::setError(int errorCode, std::string argument){
 
 	if(errorCode < SUCCESS || errorCode > WAVE_EXIST){
@@ -230,11 +274,17 @@ void GlobalData::setError(int errorCode, std::string argument){
 	}
 }
 
-std::string GlobalData::getLastErrorMessage(){
+/*
+	Get a string with the last error message
+*/
+std::string GlobalData::getLastErrorMessage() const{
 	return getErrorMessage(getLastError());
 }
 
-std::string GlobalData::getErrorMessage(int errorCode){
+/*
+	Translate a error code to a human readable error message
+*/
+std::string GlobalData::getErrorMessage(int errorCode) const{
 
 	std::string msg;
 
@@ -247,19 +297,19 @@ std::string GlobalData::getErrorMessage(int errorCode){
 		msg = "A strange and unknown error happened. It might be appropriate to file a bug report at " + std::string(PROJECTURL) + ".";
 		break;
 	case ALREADY_FILE_OPEN:
-		msg = "A file is already file open and it can only be one file open at a time.";
+		msg = "A file is already open and it can only be one file open at a time.";
 		break;
 	case EMPTY_RESULTFILE:
 		msg = "The result file is empty, so there is little one can do here...";
 		break;
 	case FILE_NOT_READABLE:
-		msg = "The file/folder " + this->getLastErrorArgument() + " is not readable.";
+		msg = "The file/folder " + m_lastErrorArgument + " is not readable.";
 		break;
 	case NO_NEW_BRICKLETS:
 		msg = "There are no new bricklets in the result file.";
 		break;
 	case WRONG_PARAMETER:
-		msg = "The paramter " + this->getLastErrorArgument() + " is missing or wrong. Please consult the documentation.";
+		msg = "The paramter " + m_lastErrorArgument + " is missing or wrong. Please consult the documentation.";
 		break;
 	case INTERNAL_ERROR_CONVERTING_DATA:
 		msg = "The rawdata could not be interpreted. You can try using getRawBrickleData() instead and consulting the vernissage documentation. Please file also a bug report and attach your data.";
@@ -271,7 +321,7 @@ std::string GlobalData::getErrorMessage(int errorCode){
 		msg = "The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and startBrickletID may not be bigger than endBrickletID.";
 		break;
 	case WAVE_EXIST:
-		msg = "The wave " + this->getLastErrorArgument() + " already exists. Please move/delete it first.";
+		msg = "The wave " + m_lastErrorArgument + " already exists. Please move/delete it first.";
 		break;
 	default:
 		msg = "BUG: unknown error code";
@@ -281,8 +331,10 @@ std::string GlobalData::getErrorMessage(int errorCode){
 	return msg;
 }
 
-// Reads settings, see *_option_name in the data folder dataFolderHndl. In case dataFolderHndl is
-// null the current data folder is used.
+/*
+	Reads variables in the data folder dataFolderHndl. In case dataFolderHndl is
+	null the current data folder is used.
+*/
 void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */){
 
 	int ret, objType;

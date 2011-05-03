@@ -13,6 +13,9 @@
 #include "waveclass.h"
 #include "globaldata.h"
 
+/*
+	Create a two column text wave from two string vectors
+*/
 int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std::string> &secondColumn, DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves){
 
 	std::vector<std::string> allColumns;
@@ -78,6 +81,9 @@ int createAndFillTextWave(std::vector<std::string> &firstColumn, std::vector<std
 	return 0;
 }
 
+/*
+	Convert a vernissage viewtype code to a string
+*/
 std::string viewTypeCodeToString(int idx){
 	
 	std::vector<std::string> names;
@@ -102,6 +108,9 @@ std::string viewTypeCodeToString(int idx){
 	}
 }
 
+/*
+	Set the appropriate wave note for data waves
+*/
 void setDataWaveNote(int brickletID, WaveClass &waveData){
 
 	std::string	waveNote = getStandardWaveNote(brickletID,waveData.getTraceDir());
@@ -116,12 +125,18 @@ void setDataWaveNote(int brickletID, WaveClass &waveData){
 	setWaveNoteAsString(waveNote, waveData.getWaveHandle());
 }
 
+/*
+	Set the appropriate wave note for the other waves (bricklet metadata, resultfile meta data, overviewtable)
+*/
 
 void setOtherWaveNote(waveHndl waveHandle,int brickletID /*= -1*/,int traceDir  /*= -1*/){
 
 	setWaveNoteAsString(getStandardWaveNote(brickletID, traceDir),waveHandle);
 }
 
+/*
+	Return a string containing the standard wave note part
+*/
 std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 */){
 
 	std::string waveNote;
@@ -150,8 +165,10 @@ std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 
 	return waveNote;
 }
 
-
-bool isValidBrickletRange(double startID, double endID,int numberOfBricklets){
+/*
+	Check if the bricklet range startID-endID is valid
+*/
+bool isValidBrickletRange(double startID, double endID, int numberOfBricklets){
 
 	// brickletIDs are 1-based
 	return ( startID <=  endID

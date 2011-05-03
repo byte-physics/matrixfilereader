@@ -46,7 +46,7 @@ std::wstring CharPtrToWString(char* cStr){
 /*
 	Convenience wrapper
 */
-void splitString(char *strChar, char *sepChar, std::vector<std::string> &list){
+void splitString(const char* strChar, const char* sepChar, std::vector<std::string> &list){
 	
 	list.clear();
 
@@ -61,30 +61,30 @@ void splitString(char *strChar, char *sepChar, std::vector<std::string> &list){
 /*
 	Splits string separated by sepChar into a vector of strings
 */
-void splitString(std::string &string, char *sepChar, std::vector<std::string> &list){
-
-	list.clear();
+void splitString(const std::string &string, const char* sepChar, std::vector<std::string> &list){
 
 	if(sepChar == NULL){
 		return;
 	}
 
+	list.clear();
+	std::string stringCopy = string;
 	int pos=-1;
 	int offset=0;
 
-	string.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
+	stringCopy.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
 
-	sprintf(globDataPtr->outputBuffer,"keyList=%s",string.c_str());
+	sprintf(globDataPtr->outputBuffer,"keyList=%s",stringCopy.c_str());
 	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	while( ( pos = string.find(sepChar,offset) ) != std::string::npos ){
+	while( ( pos = stringCopy.find(sepChar,offset) ) != std::string::npos ){
 
 		if(pos == offset){// skip empty element
 			offset++;
 			continue;
 		}
 
-		list.push_back(string.substr(offset,pos-offset));
+		list.push_back(stringCopy.substr(offset,pos-offset));
 		sprintf(globDataPtr->outputBuffer,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
 		debugOutputToHistory(globDataPtr->outputBuffer);
 
@@ -95,14 +95,14 @@ void splitString(std::string &string, char *sepChar, std::vector<std::string> &l
 /*
 	Undos a former split string, therefore concatenating each element plus sepchar of list into one string
 */
-void joinString(std::vector<std::string> &list,const char *sepChar, std::string &joinedList){
+void joinString(const std::vector<std::string> &list, const char* sepChar, std::string &joinedList){
 
+	joinedList.clear();
 	std::vector<std::string>::const_iterator it;
 	for(it = list.begin(); it != list.end(); it++){
 		joinedList.append(*it);
 		joinedList.append(sepChar);	
 	}
-	debugOutputToHistory(joinedList.c_str());
 
 	return;
 }

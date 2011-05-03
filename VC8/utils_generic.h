@@ -41,10 +41,10 @@ std::string anyTypeToString(const T& t){
 	return ss.str();
 }
 
-void  splitString(char* stringChar, char *sepChar, std::vector<std::string> &list);
-void  splitString(std::string &str, char *sepChar, std::vector<std::string> &list);
+void  splitString(const char* stringChar, const char* sepChar, std::vector<std::string> &list);
+void  splitString(const std::string &str, const char* sepChar, std::vector<std::string> &list);
 
-void joinString(std::vector<std::string> &list,const char *sepChar, std::string &joinedList);
+void joinString(const std::vector<std::string> &list,const char* sepChar, std::string &joinedList);
 
 bool doubleToBool(double value);
 

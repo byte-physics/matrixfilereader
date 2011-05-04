@@ -19,5 +19,5 @@ Compilation:
 - Build it (Build->Rebuild Solution)
 - After the build the XOP and the help file is automatically copied to the location given earlier
 
-Each header file contains a small abstract about is purpose.
+Each header file contains a small abstract about its purpose.
 

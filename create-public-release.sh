@@ -11,20 +11,24 @@ folder=public-releases/new-release
 srcFolder=$folder/src
 docFolder=$folder/doc
 pxpFolder=$folder/pxp
+regressFolder=$folder/regression_tests
 
-lastVersion=0.14
+lastVersion=0.15
 
 rm -rf $folder
 mkdir -p $folder
 mkdir -p $srcFolder
 mkdir -p $docFolder
 mkdir -p $pxpFolder
+mkdir -p $regressFolder
 
 cp License.txt $folder
 cp Readme-Compilation.txt $folder
 cp INSTALL-public.txt $folder/INSTALL.txt
 cp "matrixfilereader Help.ihf" $docFolder
 cp matrixfilereader-basic-gui.pxp $pxpFolder
+
+cp regression_tests/readme.txt regression_tests/*.pxp $regressFolder
 
 cp VC8/*.bat VC8/*.cpp VC8/*.h VC8/*.rc VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcproj $srcFolder
 

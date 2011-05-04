@@ -35,7 +35,7 @@ cp VC8/VC2005_Redist_package_x86/vcredist_x86.exe $folder
 
 filesToWatch="VC8 *.txt matrixfilereader-basic-gui.pxp Operation-Template-Generator.pxp *.ihf"
 git rev-parse HEAD > $folder/internalVersionString.txt
-rm changelog
+rm -f changelog
 git log --pretty="%B" $(cat public-releases/matrixFileReaderXOP-v$lastVersion/internalVersionString.txt)..HEAD $filesToWatch >> changelog
 echo "################################################" >> changelog
 echo "################################################" >> changelog

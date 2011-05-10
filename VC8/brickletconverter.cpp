@@ -599,52 +599,6 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 			Vernissage::Session::TableSet xSet = sets[specAxis.triggerAxisName];
 			Vernissage::Session::TableSet ySet = sets[xAxis.triggerAxisName];
 
-			// normally we have table sets with some step width >1, so the physicalIncrement has to be multiplied by this factor
-			// Note: this approach assumes that the axis table sets of once axis all have the same physical step width,
-			// this is at least the case for Matrix 2.2-1 and Matrix 3.0
-			// typically *set.begin().start is one so that yAxisOffest is 0.0
-			if( ySet.size() > 0){
-				yAxisDelta	= yAxis.physicalIncrement * ySet.begin()->step;
-				yAxisOffset	= yAxis.physicalIncrement *( ySet.begin()->start - 1 );
-			}
-			else{
-				yAxisDelta	= yAxis.physicalIncrement;
-				yAxisOffset	= 0.0;
-			}
-
-			if( xSet.size() > 0 ){
-				xAxisDelta	= xAxis.physicalIncrement * xSet.begin()->step;
-				xAxisOffset	= xAxis.physicalIncrement *( xSet.begin()->start - 1 );
-			}
-			else{
-				xAxisDelta	= xAxis.physicalIncrement;
-				xAxisOffset	= 0.0;
-			}
-
-			if(globDataPtr->debuggingEnabled()){
-				Vernissage::Session::TableSet::const_iterator it;
-
-				sprintf(globDataPtr->outputBuffer,"Number of axes we have table sets for: %d",sets.size());
-				debugOutputToHistory(globDataPtr->outputBuffer);
-
-				debugOutputToHistory("Tablesets: xAxis");
-				for( it= xSet.begin(); it != xSet.end(); it++){
-					sprintf(globDataPtr->outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
-					debugOutputToHistory(globDataPtr->outputBuffer);
-				}
-
-				debugOutputToHistory("Tablesets: yAxis");
-				for( it= ySet.begin(); it != ySet.end(); it++){
-					sprintf(globDataPtr->outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
-					debugOutputToHistory(globDataPtr->outputBuffer);
-				}
-
-				sprintf(globDataPtr->outputBuffer,"xAxisDelta=%g, yAxisDelta=%g",xAxisDelta,yAxisDelta);
-				debugOutputToHistory(globDataPtr->outputBuffer);
-				sprintf(globDataPtr->outputBuffer,"xAxisOffset=%g, yAxisOffset=%g",xAxisOffset,yAxisOffset);
-				debugOutputToHistory(globDataPtr->outputBuffer);
-			}
-
 			int xAxisBlockSize=0,yAxisBlockSize=0;
 
 			// V Axis
@@ -775,6 +729,60 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 				outputToHistory(globDataPtr->outputBuffer);
 			}
 
+			// normally we have table sets with some step width >1, so the physicalIncrement has to be multiplied by this factor
+			// Note: this approach assumes that the axis table sets of one axis all have the same physical step width,
+			// this is at least the case for Matrix 2.2-1 and Matrix 3.0
+			if( ySet.size() > 0){
+				yAxisDelta	= yAxis.physicalIncrement * ySet.begin()->step;
+				yAxisOffset	= yAxis.physicalIncrement *( ySet.begin()->start - 1 );
+			}
+			else{
+				yAxisDelta	= yAxis.physicalIncrement;
+				yAxisOffset	= 0.0;
+			}
+
+			if( xSet.size() > 0 ){
+				xAxisDelta	= xAxis.physicalIncrement * xSet.begin()->step;
+				if( numPointsXAxisWithTableFWD != 0 ){
+					// we also scanned in TraceUP direction, therefore we can use the same algorithm like for y-Axis
+					xAxisOffset	= xAxis.physicalIncrement *( xSet.begin()->start - 1 );
+				}
+				else{
+					// we didn't scan in TraceUp direction, therefore we assume that this table sets stop value is somewhere
+					// near the start of the scan
+					// Typically xSet.begin()->stop is equal to xAxis.clocks and therefore xAxisOffset being zero
+					xAxisOffset	= xAxis.physicalIncrement *( xSet.begin()->stop - xAxis.clocks );
+				}
+			}
+			else{
+				xAxisDelta	= xAxis.physicalIncrement;
+				xAxisOffset	= 0.0;
+			}
+
+			if(globDataPtr->debuggingEnabled()){
+				Vernissage::Session::TableSet::const_iterator it;
+
+				sprintf(globDataPtr->outputBuffer,"Number of axes we have table sets for: %d",sets.size());
+				debugOutputToHistory(globDataPtr->outputBuffer);
+
+				debugOutputToHistory("Tablesets: xAxis");
+				for( it= xSet.begin(); it != xSet.end(); it++){
+					sprintf(globDataPtr->outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
+					debugOutputToHistory(globDataPtr->outputBuffer);
+				}
+
+				debugOutputToHistory("Tablesets: yAxis");
+				for( it= ySet.begin(); it != ySet.end(); it++){
+					sprintf(globDataPtr->outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
+					debugOutputToHistory(globDataPtr->outputBuffer);
+				}
+
+				sprintf(globDataPtr->outputBuffer,"xAxisDelta=%g, yAxisDelta=%g",xAxisDelta,yAxisDelta);
+				debugOutputToHistory(globDataPtr->outputBuffer);
+				sprintf(globDataPtr->outputBuffer,"xAxisOffset=%g, yAxisOffset=%g",xAxisOffset,yAxisOffset);
+				debugOutputToHistory(globDataPtr->outputBuffer);
+			}
+
 			// dimensions of the cube
 			if(numPointsXAxisWithTableFWD != 0)
 				dimensionSizes[ROWS]	= numPointsXAxisWithTableFWD;
@@ -902,7 +910,6 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 							}
 					}// if traceUpDataPtr
 
-					// traceDown
 					if(traceDownData->moreData){
 
 							traceDownRawBrickletIndex = firstBlockOffset + i*xAxisBlockSize + j*dimensionSizes[LAYERS] + k;
@@ -931,7 +938,6 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 						}
 					}// if traceDownDataPtr
 
-					// reTraceUp
 					if(reTraceUpData->moreData){
 
 						reTraceUpRawBrickletIndex = i*xAxisBlockSize + (dimensionSizes[ROWS] - (j+1))*dimensionSizes[LAYERS] + k;
@@ -960,7 +966,6 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 						}
 					}// if reTraceUpDataPtr
 
-					// reTraceDown
 					if(reTraceDownData->moreData){
 
 						reTraceDownRawBrickletIndex	= firstBlockOffset + i*xAxisBlockSize + (dimensionSizes[ROWS] - (j+1))*dimensionSizes[LAYERS] + k;

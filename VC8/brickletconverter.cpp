@@ -544,7 +544,10 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseNameChar, int bri
 					wave[i].setWaveHandle(FetchWaveFromDataFolder(dfHandle,wave[i].getWaveName()));
 					ASSERT_RETURN_ONE(wave[i].getWaveHandle());
 					// get wave dimensions; needed for setScale below
-					MDGetWaveDimensions(wave[i].getWaveHandle(),&numDimensions,interpolatedDimSizes);
+					ret = MDGetWaveDimensions(wave[i].getWaveHandle(),&numDimensions,interpolatedDimSizes);
+					if(ret != 0){
+						return ret;
+					}
 				}
 		
 				// set wave note and add info about resampling to the wave note

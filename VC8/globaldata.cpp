@@ -222,8 +222,10 @@ void GlobalData::finalize(bool filledCache /* = false */, int errorCode /* = SUC
 }
 
 /*
-	Must be called by every operation which sets V_flag and does _not_ depend on the V_MatrixFileReader* 
-	variables defined in constans.h
+	Must be called by every operation which sets V_flag and does not want to read the V_MatrixFileReader* 
+	variables defined in constans.h. This is the case if these variables are not relevant or if the 
+	operation has the /DEST parameter, in that case the readsettings call must be delayed to use the
+	correct datafolder for the variables.
 */
 void GlobalData::initializeWithoutReadSettings(int calledFromMacro, int calledFromFunction){
 

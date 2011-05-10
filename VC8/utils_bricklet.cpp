@@ -145,15 +145,14 @@ std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 
 	waveNote.append(RESULT_FILE_NAME_KEY + "=" + globDataPtr->getFileName() + "\r");
 	waveNote.append(RESULT_DIR_PATH_KEY +"=" + globDataPtr->getDirPath() + "\r");
 
-	if(brickletID > 0){
+	if(isValidBrickletID(brickletID)){
 		waveNote.append(BRICKLET_ID_KEY + "=" + anyTypeToString<int>(brickletID) + "\r");
 	}
 	else{
 		waveNote.append(BRICKLET_ID_KEY + "=\r");
 	}
 
-	// see definitions of TRACE_UP and friends in constants.h
-	if(traceDir >= 0){
+	if(isValidTraceDir(traceDir)){
 		waveNote.append(TRACEDIR_ID_KEY + "=" + anyTypeToString<int>(traceDir) + "\r");
 	}
 	else{
@@ -177,4 +176,19 @@ bool isValidBrickletRange(double startID, double endID, int numberOfBricklets){
 		&& endID   >=  1
 		&& startID <= numberOfBricklets
 		&& endID   <= numberOfBricklets );
+}
+
+/*
+	A valid brickletID is a positive and non-zero number 
+*/
+bool isValidBrickletID(int brickletID){
+	return (brickletID > 0);
+}
+
+/*
+	The trace direction knows four different states defined in constants.h.
+	In accordance with vernissage the range is from TRACE_UP(=0) to RE_TRACE_DOWN(3)
+*/
+bool isValidTraceDir(int traceDir){
+	return (traceDir >= TRACE_UP && traceDir <= RE_TRACE_DOWN);
 }

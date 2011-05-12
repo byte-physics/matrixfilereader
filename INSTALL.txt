@@ -1,6 +1,6 @@
 Requirements:
 - Igor Pro version 6.2.1 or later
-- Omicron Vernissage version 2.0 (this exact version)
+- Omicron Vernissage version 2.0/2.0-1 (only these two versions are possible)
 - Windows XP SP2/Vista/7
 
 Installation:
@@ -11,7 +11,7 @@ Installation:
 5.) a.) Copy "matrixfilereader.xop" to "My Documents\WaveMetrics\Igor Pro 6 User Files\Igor extensions"
     b.) Copy "matrixfilereader Help.ihf" to "My Documents\WaveMetrics\Igor Pro 6 User Files\Igor Help files"
     c.) Copy everything in procedures to "My Documents\WaveMetrics\Igor Pro 6 User Files\User Procedures"
-    d.) Check for old procedure files and XOPs with the same name, they must be removed. Be sure also to check "C:\Program Files\WaveMetrics\Igor Proc".
+    d.) Check for old procedure files and XOPs with the same name, they must be removed. Be sure also to check "C:\Program Files\WaveMetrics\Igor Procedures".
 6.) Start Igor
 7.) Load the experiment template matrixfilereader.pxt which adds a new menu item called MatrixFileReader.
 

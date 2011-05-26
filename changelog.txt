@@ -1,0 +1,38 @@
+Features:
+*add a menu entry in "MatrixFileReader" which outputs all datafolder and waves from the top dataview. This is intended as starting point for custom data manipulation.
+*clone Graph copies now all waves from the new graph to a toplevel folder called clonedData. This servers as yet another starting point for data maniupluation by the user.
+*add new preview panel popup menu selection mode named OnlyZ
+*add new experiment template with both mfr gui and gpib control panel
+
+-- Fixes --
+Generic:
+*proper alert message if the result file can not be reopened
+*fix ordering of brickletlist in createDataWindowWithDFR
+*rework cloned graph legend handling, fix it for arbitrary cuts and images
+*Duplicate axis labels also for cloned graphs
+
+Preview:
+*show the spectroscopy source position in the previewpanel again
+*fix not-so-nice display of non-rectangular data in the preview
+
+Dataview1D:
+*better wording for the no-originator-bricklet-found error message
+
+Dataview2D:
+*make cloned profile legend work again
+*make the fft wave names shorter
+*restore original graph magnification on undo
+*copying image width and height settings didn't work for graphs in the fftpalen
+*fix FFT Transformation, the normalization key from the wavenote was not up to date, therfore the transformation was wrong
+
+Dataview 3D:
+*be more permissive for finding grid spectroscopy originator bricklets
+*fix labels for Z(V) Daten
+*prevent processing multiple double clicks in the preview panel through a home-built blockreentry mechanism
+*rename cloned data entries for the cuts again; now they are named the same as in the export popup menu
+*Z(V) data; as in this case we also want to prescale the axes
+*name the top and bottom cuts in a generic way for the clone menu 
+*rework what we write into the wavenotes for 3D dataviews and especially for arbirtrary cuts
+*interchange axis labels in spec const graph
+*reverse trigger axis (Z or V) if the step width is negative
+

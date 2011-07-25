@@ -13,7 +13,7 @@ docFolder=$folder/doc
 pxpFolder=$folder/pxp
 regressFolder=$folder/regression_tests
 
-lastVersion=0.16
+lastVersion=0.17
 
 rm -rf $folder
 mkdir -p $folder

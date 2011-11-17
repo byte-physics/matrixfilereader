@@ -6,9 +6,7 @@
 
 /*
 	Main header file which is included by all source files
-	globaldata.h is missing here on purpose
 */
-
 #pragma once
 
 // allow the system to be equal or newer than Windows Server 2003 with SP1 or Windows XP with SP2
@@ -17,9 +15,14 @@
 #endif					
 #include <afx.h>
 
-#include "XOP_Toolkit_6/IgorXOPs6/XOPSupport/xopstandardheaders.h"
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <limits>
 
-#include "VernissageSDK_V2.0-1/src/Incl/vernissage.h"
+#include "XOPStandardHeaders.h"
+#include "vernissage.h"
 
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/IGOR.lib")
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.lib")

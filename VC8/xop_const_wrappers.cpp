@@ -4,6 +4,8 @@
 	see License.txt	in the source folder for details.
 */
 
+#include "stdafx.h"
+
 #include "xop_const_wrappers.h"
 
 int MDSetDimensionLabel(waveHndl waveH, int dimension, IndexInt element, const char constLabel[MAX_DIM_LABEL_CHARS+1]){

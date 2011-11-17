@@ -4,11 +4,10 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
-
 #include "utils_bricklet.h"
 #include "globaldata.h"
 #include "preferences.h"
@@ -193,8 +192,6 @@ extern "C" void XOPEntry(void){
 		switch (GetXOPMessage()) {
 			case CLEANUP:
 				saveXOPPreferences();
-				// in case the user has forgotten to close the result file
-				GlobalData::Instance().closeResultFile();
 
 				// close the session and unload the DLL
 				GlobalData::Instance().closeSession();

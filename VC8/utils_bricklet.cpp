@@ -4,12 +4,9 @@
 	see License.txt in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "utils_bricklet.h"
-
-#include <string>
-
 #include "waveclass.h"
 #include "globaldata.h"
 

@@ -4,16 +4,14 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
-
 #include "utils_bricklet.h"
-
 #include "brickletconverter.h"
-
 #include "globaldata.h"
+#include "brickletclass.h"
 
 namespace{
 	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4 };

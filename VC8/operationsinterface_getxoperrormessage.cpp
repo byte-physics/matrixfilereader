@@ -4,11 +4,10 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
-
 #include "globaldata.h"
 
 extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){

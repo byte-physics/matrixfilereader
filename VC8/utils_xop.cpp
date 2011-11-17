@@ -4,12 +4,11 @@
 	see License.txt in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "utils_xop.h"
-
 #include "globaldata.h"
-
+#include "waveclass.h"
 
 /*
 	Outputs str if debugging is enabled, silent = true will not mark the experiment as modified

@@ -3,16 +3,13 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
+#pragma once
+
+#include "operationstructs.h"
 
 /*
 	Takes care of xop initialization, igor message handling and registering all operations
 */
-
-#pragma once
-
-#include "header.h"
-
-#include "operationstructs.h"
 
 /* custom error codes */
 #define REQUIRES_IGOR_620	FIRST_XOP_ERR + 1

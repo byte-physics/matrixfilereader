@@ -3,18 +3,15 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt in the source folder for details.
 */
+#pragma once
+
+#include <string>
+
+#include "ForwardDecl.h"
 
 /*
 	Utility functions which are xop specific
 */
-
-#pragma once
-
-#include "header.h"
-
-#include "waveclass.h"
-
-#include <string>
 
 const char outputFormat[]			= "%s\r";	//  outputToHistory
 const char debugOutputFormat[]		= "DEBUG: %s\r"; // debugOutputToHistory

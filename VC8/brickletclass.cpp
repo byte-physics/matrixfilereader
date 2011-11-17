@@ -4,12 +4,12 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "brickletclass.h"
-
 #include "globaldata.h"
 #include "utils_bricklet.h"
+#include "extremadata.h"
 
 BrickletClass::BrickletClass(void* const pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 

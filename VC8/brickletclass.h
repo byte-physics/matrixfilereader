@@ -3,20 +3,15 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
+#pragma once
+
+#include <vector>
+#include <string>
+#include "ForwardDecl.h"
 
 /*
 	Internal representation of a bricklet
 */
-
-#pragma once
-
-#include "header.h"
-
-#include "extremadata.h"
-
-#include <vector>
-#include <string>
-
 class BrickletClass
 {
 public:

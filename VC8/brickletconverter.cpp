@@ -4,18 +4,14 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "brickletconverter.h"
-
-#include <string>
-#include <sstream>
-#include <vector>
-
 #include "utils_bricklet.h"
-
 #include "globaldata.h"
 #include "waveclass.h"
+#include "brickletclass.h"
+#include "extremadata.h"
 
 /*
 	create the raw data wave which just holds the raw data as 1D array

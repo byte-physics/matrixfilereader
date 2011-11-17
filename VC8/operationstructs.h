@@ -3,15 +3,12 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
+#pragma once
 
 /*
 	Operation structs are defined here (they are automatically generated using the
 	ParseOperationTemplate Igor function, see Operation-Template-Generator.pxp)
 */
-
-#pragma once
-
-#include "header.h"
 
 // Operation template: MFR_GetXOPErrorMessage [number:errorCode]
 

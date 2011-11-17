@@ -3,16 +3,17 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt in the source folder for details.
 */
+#pragma once
+
+#include "stdafx.h"
+
+#include <string>
+#include "ForwardDecl.h"
+#include "extremadata.h"
 
 /*
 	Internal representation of a igor wave
 */
-
-#pragma once
-
-#include "header.h"
-#include "extremadata.h"
-#include <string>
 
 class WaveClass{
 

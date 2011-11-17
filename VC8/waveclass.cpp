@@ -4,7 +4,7 @@
 	see License.txt in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "waveclass.h"
 #include "globaldata.h"

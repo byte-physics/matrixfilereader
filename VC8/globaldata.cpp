@@ -4,11 +4,11 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "globaldata.h"
-
 #include "dllhandler.h"
+#include "brickletclass.h"
 
 GlobalData::GlobalData(): m_VernissageSession(NULL),
 	m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),

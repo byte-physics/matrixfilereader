@@ -3,10 +3,8 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
-
+#include "stdafx.h"
 #include "extremadata.h"
-
-#include <limits>
 
 ExtremaData::ExtremaData(void){
 

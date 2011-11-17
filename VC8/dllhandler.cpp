@@ -4,13 +4,9 @@
 	for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "dllhandler.h"
-
-#include <vector>
-#include <string>
-
 #include "globaldata.h"
 
 DLLHandler::DLLHandler():

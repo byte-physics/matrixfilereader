@@ -9,11 +9,7 @@
 */
 #pragma once
 
-#include <map>
-
-#include "dllhandler.h"
-#include "constants.h"
-#include "brickletclass.h"
+#include "ForwardDecl.h"
 
 class GlobalData{
 
@@ -80,7 +76,6 @@ public:
 		static GlobalData globData;
 		return globData;
 	}
-
 
 private:
 	GlobalData(); // hide ctor

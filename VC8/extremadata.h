@@ -4,12 +4,12 @@
 	see License.txt	in the source folder for details.
 */
 
+#pragma once
+
 /*
 	Holds the minima and maxima values for a given dataset. This dataset can either be a BrickletClass
 	(which may hold data of multiple trace directions) or a WaveClass (data from exactly one trace direction)
 */
-
-#pragma once
 
 class ExtremaData{
 

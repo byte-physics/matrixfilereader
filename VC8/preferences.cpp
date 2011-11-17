@@ -4,10 +4,9 @@
 	see License.txt	in the source folder for details.
 */
 
-#include <string.h>
+#include "stdafx.h"
 
 #include "preferences.h"
-
 #include "globaldata.h"
 
 /*

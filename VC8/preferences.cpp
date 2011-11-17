@@ -24,22 +24,22 @@ void loadXOPPreferences(){
 
 		debugOutputToHistory("Loading preferences from file",true);
 
-		size_t len = sizeof(globDataPtr->openDlgInitialDir);
-		strncpy(globDataPtr->openDlgInitialDir,(*prefHandle)->openDlgInitialDir,len);
-		globDataPtr->openDlgInitialDir[len-1]='\0';
+		size_t len = sizeof(GlobalData::Instance().openDlgInitialDir);
+		strncpy(GlobalData::Instance().openDlgInitialDir,(*prefHandle)->openDlgInitialDir,len);
+		GlobalData::Instance().openDlgInitialDir[len-1]='\0';
 
-		globDataPtr->openDlgFileIndex = (*prefHandle)->openDlgFileIndex;
+		GlobalData::Instance().openDlgFileIndex = (*prefHandle)->openDlgFileIndex;
 
-		sprintf(globDataPtr->outputBuffer,"openDlgFileIndex=%d",(*prefHandle)->openDlgFileIndex);
-		debugOutputToHistory(globDataPtr->outputBuffer);
-		sprintf(globDataPtr->outputBuffer,"openDlgInitialDir=%s",(*prefHandle)->openDlgInitialDir);
-		debugOutputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"openDlgFileIndex=%d",(*prefHandle)->openDlgFileIndex);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"openDlgInitialDir=%s",(*prefHandle)->openDlgInitialDir);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
 	}
 	else{
 		debugOutputToHistory("No preferences saved or the internal structure has changed, loading defaults",true);
-		globDataPtr->openDlgFileIndex=1;
-		strcpy(globDataPtr->openDlgInitialDir,"");
+		GlobalData::Instance().openDlgFileIndex=1;
+		strcpy(GlobalData::Instance().openDlgInitialDir,"");
 	}
 
 	if(prefHandle != NULL){
@@ -63,11 +63,11 @@ void saveXOPPreferences(){
 		
 		// write the starting directory of MFR_OpenResultFile
 		size_t len = sizeof((*prefHandle)->openDlgInitialDir);
-		strncpy((*prefHandle)->openDlgInitialDir,globDataPtr->openDlgInitialDir,len);
+		strncpy((*prefHandle)->openDlgInitialDir,GlobalData::Instance().openDlgInitialDir,len);
 		(*prefHandle)->openDlgInitialDir[len-1]='\0';
 
 		// remember the selected file type in the open dialog from MFR_OpenResultFile
-		(*prefHandle)->openDlgFileIndex = globDataPtr->openDlgFileIndex;
+		(*prefHandle)->openDlgFileIndex = GlobalData::Instance().openDlgFileIndex;
 
 		// save struct on disc
 		SaveXOPPrefsHandle((Handle)prefHandle);

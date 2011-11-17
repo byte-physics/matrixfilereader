@@ -13,18 +13,18 @@
 
 extern "C" int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
+	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
 
-	if(!globDataPtr->resultFileOpen()){
-		globDataPtr->setError(NO_FILE_OPEN);
+	if(!GlobalData::Instance().resultFileOpen()){
+		GlobalData::Instance().setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
+	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	SetOperationNumVar(V_count,pSession->getBrickletCount());
-	globDataPtr->finalize();
+	GlobalData::Instance().finalize();
 	END_OUTER_CATCH
 	return 0;
 }

@@ -16,7 +16,7 @@
 */
 void debugOutputToHistory(const char* str, bool silent /* = false */){
 
-	if(!globDataPtr->debuggingEnabled()){
+	if(!GlobalData::Instance().debuggingEnabled()){
 		return;
 	}
 
@@ -80,8 +80,8 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 		return NOMEM;
 	}
 
-	//sprintf(globDataPtr->outputBuffer,"totalSize of strings %d",GetHandleSize(textHandle));
-	//debugOutputToHistory(globDataPtr->outputBuffer);
+	//sprintf(GlobalData::Instance().outputBuffer,"totalSize of strings %d",GetHandleSize(textHandle));
+	//debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
 	for(i=0; i < numEntriesPlusOne; i++){
 
@@ -91,16 +91,16 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 		else{ // and of all the others
 			offset+=stringSizes[i-1];
 		}
-		//sprintf(globDataPtr->outputBuffer,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
-		//debugOutputToHistory(globDataPtr->outputBuffer);
+		//sprintf(GlobalData::Instance().outputBuffer,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
+		//debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
 		// write offsets
 		memcpy(*textHandle+i*sizeof(long),&offset,sizeof(long));
 
 		if(i < stringVector.size()){
 
-			//sprintf(globDataPtr->outputBuffer,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
-			//debugOutputToHistory(globDataPtr->outputBuffer);
+			//sprintf(GlobalData::Instance().outputBuffer,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
+			//debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
 			// write strings
 			memcpy(*textHandle+offset,stringVector[i].c_str(),stringSizes[i]);
@@ -118,8 +118,8 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 
 	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
-	//sprintf(globDataPtr->outputBuffer,"SetTextWaveData returned %d",ret);
-	//debugOutputToHistory(globDataPtr->outputBuffer);
+	//sprintf(GlobalData::Instance().outputBuffer,"SetTextWaveData returned %d",ret);
+	//debugOutputToHistory(GlobalData::Instance().outputBuffer);
 	DisposeHandle(textHandle);
 
 	return ret;
@@ -145,8 +145,8 @@ void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle){
 
 	ret = PutCStringInHandle(waveNote.c_str(),noteHandle);
 	if(ret != 0){
-		sprintf(globDataPtr->outputBuffer,"internal error %d, aborting",ret);
-		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"internal error %d, aborting",ret);
+		outputToHistory(GlobalData::Instance().outputBuffer);
 		return;
 	}
 

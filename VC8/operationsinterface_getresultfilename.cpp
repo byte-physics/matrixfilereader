@@ -13,18 +13,18 @@
 
 extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
 
-	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
+	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_fileName,"");
 	SetOperationStrVar(S_dirPath,"");
 
-	if(!globDataPtr->resultFileOpen()){
-		globDataPtr->setError(NO_FILE_OPEN);
+	if(!GlobalData::Instance().resultFileOpen()){
+		GlobalData::Instance().setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	SetOperationStrVar(S_fileName,globDataPtr->getFileName().c_str());
-	SetOperationStrVar(S_dirPath,globDataPtr->getDirPath().c_str());
+	SetOperationStrVar(S_fileName,GlobalData::Instance().getFileName().c_str());
+	SetOperationStrVar(S_dirPath,GlobalData::Instance().getDirPath().c_str());
 
-	globDataPtr->finalize();
+	GlobalData::Instance().finalize();
 	return 0;
 }

@@ -194,13 +194,10 @@ extern "C" void XOPEntry(void){
 			case CLEANUP:
 				saveXOPPreferences();
 				// in case the user has forgotten to close the result file
-				if(globDataPtr->resultFileOpen()){
-					globDataPtr->closeResultFile();
-				}
+				GlobalData::Instance().closeResultFile();
+
 				// close the session and unload the DLL
-				globDataPtr->closeSession();
-				delete globDataPtr;
-				globDataPtr = NULL;
+				GlobalData::Instance().closeSession();
 			break;
 		}
 	}
@@ -224,14 +221,6 @@ HOST_IMPORT int XOPMain(IORecHandle ioRecHandle){
 
 	if (igorVersion < 620){
 		SetXOPResult(REQUIRES_IGOR_620);
-		return EXIT_FAILURE;
-	}
-
-	try{
-		new GlobalData();
-	}
-	catch(...){
-		SetXOPResult(BROKEN_XOP);
 		return EXIT_FAILURE;
 	}
 

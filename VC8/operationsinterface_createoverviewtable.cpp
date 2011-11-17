@@ -15,7 +15,7 @@
 
 extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	globDataPtr->initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
+	GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
 	int ret=-1;
@@ -34,7 +34,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	// and also read the variable settings from this folder
 	if (p->DESTFlagEncountered){
 		if(p->dfref == NULL){
-			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			GlobalData::Instance().setError(WRONG_PARAMETER,"dfref");
 			return 0;
 		}
 		destDataFolderHndl = p->dfref;
@@ -43,30 +43,30 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	else{// no DEST flag given, so we take the current data folder as destination folder
 		ret = GetCurrentDataFolder(&destDataFolderHndl);
 		if(ret != 0){
-			globDataPtr->setInternalError(ret);
+			GlobalData::Instance().setInternalError(ret);
 			return 0;
 		}
 	}
-	globDataPtr->readSettings(destDataFolderHndl);
+	GlobalData::Instance().readSettings(destDataFolderHndl);
 
-	if(!globDataPtr->resultFileOpen()){
-		globDataPtr->setError(NO_FILE_OPEN);
+	if(!GlobalData::Instance().resultFileOpen()){
+		GlobalData::Instance().setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
+	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	const int numberOfBricklets = pSession->getBrickletCount();
 	if(numberOfBricklets == 0){
-		globDataPtr->setError(EMPTY_RESULTFILE);
+		GlobalData::Instance().setError(EMPTY_RESULTFILE);
 		return 0;
 	}
 
 	// check keyList parameter
 	if (p->KEYSFlagEncountered) {
 		if( GetHandleSize(p->keyList) == 0L ){
-			globDataPtr->setError(WRONG_PARAMETER,"keyList");
+			GlobalData::Instance().setError(WRONG_PARAMETER,"keyList");
 			return 0;
 		}
 		else{
@@ -80,7 +80,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	// check waveName parameter
 	if (p->NFlagEncountered){
 		if( GetHandleSize(p->waveName) == 0L ){
-			globDataPtr->setError(WRONG_PARAMETER,"waveName");
+			GlobalData::Instance().setError(WRONG_PARAMETER,"waveName");
 			return 0;
 		}
 		else{
@@ -94,22 +94,22 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 	splitString(keyList,listSepChar,keys);
 
 	if( keys.size() == 0 ){
-		globDataPtr->setError(WRONG_PARAMETER,"keyList");
+		GlobalData::Instance().setError(WRONG_PARAMETER,"keyList");
 		return 0;
 	}
 
 	dimensionSizes[ROWS] = numberOfBricklets;
 	dimensionSizes[COLUMNS] = keys.size();
 
-	ret = MDMakeWave(&waveHandle,waveName.c_str(),destDataFolderHndl,dimensionSizes,TEXT_WAVE_TYPE,globDataPtr->overwriteEnabledAsInt());
+	ret = MDMakeWave(&waveHandle,waveName.c_str(),destDataFolderHndl,dimensionSizes,TEXT_WAVE_TYPE,GlobalData::Instance().overwriteEnabledAsInt());
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveName.c_str());
-		debugOutputToHistory(globDataPtr->outputBuffer);
-		globDataPtr->setError(WAVE_EXIST,waveName);
+		sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",waveName.c_str());
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		GlobalData::Instance().setError(WAVE_EXIST,waveName);
 		return 0;
 	}
 	else if(ret != 0 ){
-		globDataPtr->setInternalError(ret);
+		GlobalData::Instance().setInternalError(ret);
 		return 0;
 	}
 
@@ -119,23 +119,23 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
 		key = keys.at(j);
 		MDSetDimensionLabel(waveHandle,COLUMNS,j,key.c_str());
-		sprintf(globDataPtr->outputBuffer,"key=%s",key.c_str());
-		debugOutputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"key=%s",key.c_str());
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
 		for(i=1; i <= numberOfBricklets; i++){
-			bricklet = globDataPtr->getBrickletClassObject(i);
+			bricklet = GlobalData::Instance().getBrickletClassObject(i);
 			ASSERT_RETURN_ZERO(bricklet);
 			value = bricklet->getMetaDataValueAsString(key);
 			textWaveContents.push_back(value);
 
-			sprintf(globDataPtr->outputBuffer,"   value=%s",value.c_str());
-			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(GlobalData::Instance().outputBuffer,"   value=%s",value.c_str());
+			debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		}
 	}
 
 	ret = stringVectorToTextWave(textWaveContents,waveHandle);
 	if(ret != 0){
-		globDataPtr->setInternalError(ret);
+		GlobalData::Instance().setInternalError(ret);
 		return 0;
 	}
 
@@ -143,7 +143,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
 	SetOperationStrVar(S_waveNames,getFullWavePath(destDataFolderHndl,waveHandle).c_str());
 	bool clearCache=true;
-	globDataPtr->finalize(clearCache);
+	GlobalData::Instance().finalize(clearCache);
 	END_OUTER_CATCH
 	return 0;
 }

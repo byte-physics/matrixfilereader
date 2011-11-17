@@ -44,7 +44,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 #endif
 
 	str.append("Igor Pro Version: " + anyTypeToString<int>(igorVersion) + "\r");
-	str.append("Vernissage version: " + globDataPtr->getVernissageVersion() + "\r");
+	str.append("Vernissage version: " + GlobalData::Instance().getVernissageVersion() + "\r");
 	str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
 	str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
 	str.append("\r");

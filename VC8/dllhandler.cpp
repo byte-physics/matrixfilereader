@@ -65,8 +65,8 @@ void DLLHandler::setLibraryPath(){
 	result = RegEnumKeyEx(hregBaseKey,subKeyIndex, subKeyName, &subKeyLength,NULL,NULL,NULL,NULL);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(globDataPtr->outputBuffer,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
-		debugOutputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		return;
 	}
 
@@ -75,14 +75,14 @@ void DLLHandler::setLibraryPath(){
 	regKey += subKeyName;
 	regKey += "\\Main";
 
-	sprintf(globDataPtr->outputBuffer,"Checking registry key %s",regKey.c_str());
-	debugOutputToHistory(globDataPtr->outputBuffer);
+	sprintf(GlobalData::Instance().outputBuffer,"Checking registry key %s",regKey.c_str());
+	debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regKey.c_str(),0,KEY_READ,&hKey);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(globDataPtr->outputBuffer,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		return;
 	}
 
@@ -92,8 +92,8 @@ void DLLHandler::setLibraryPath(){
 	RegCloseKey(hregBaseKey);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(globDataPtr->outputBuffer,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		return;
 	}
 
@@ -101,19 +101,19 @@ void DLLHandler::setLibraryPath(){
 	m_vernissageVersion = version.substr(1,version.length()-1);
 
 	if(m_vernissageVersion.compare(properVernissageVersion) != 0 ){
-		sprintf(globDataPtr->outputBuffer,"Vernissage version %s can not be used to due a bug in this version. Please install version %s and try again.",m_vernissageVersion.c_str(),properVernissageVersion);
-		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"Vernissage version %s can not be used to due a bug in this version. Please install version %s and try again.",m_vernissageVersion.c_str(),properVernissageVersion);
+		outputToHistory(GlobalData::Instance().outputBuffer);
 		return;
 	}
 	else{
-		sprintf(globDataPtr->outputBuffer,"Vernissage version %s",m_vernissageVersion.c_str());
-		debugOutputToHistory(globDataPtr->outputBuffer);	
+		sprintf(GlobalData::Instance().outputBuffer,"Vernissage version %s",m_vernissageVersion.c_str());
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);	
 	}
 
 	std::string dllDirectory (data);
 	dllDirectory.append("\\Bin");
-	sprintf(globDataPtr->outputBuffer, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
-	debugOutputToHistory(globDataPtr->outputBuffer);
+	sprintf(GlobalData::Instance().outputBuffer, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
+	debugOutputToHistory(GlobalData::Instance().outputBuffer);
 	result = SetDllDirectory((LPCSTR) dllDirectory.c_str());
 
 	if(!result){
@@ -142,12 +142,12 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 		module = LoadLibrary( (LPCSTR) dllName.c_str());
 
 		if(module != NULL){
-			sprintf(globDataPtr->outputBuffer,"Successfully loaded DLL %s",dllName.c_str());
-			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(GlobalData::Instance().outputBuffer,"Successfully loaded DLL %s",dllName.c_str());
+			debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		}
 		else{
-			sprintf(globDataPtr->outputBuffer,"Something went wrong loading the DLL %s",dllName.c_str());
-			debugOutputToHistory(globDataPtr->outputBuffer);
+			sprintf(GlobalData::Instance().outputBuffer,"Something went wrong loading the DLL %s",dllName.c_str());
+			debugOutputToHistory(GlobalData::Instance().outputBuffer);
 			return pSession;
 		}
 	}

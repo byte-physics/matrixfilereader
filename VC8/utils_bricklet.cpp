@@ -27,31 +27,31 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 
 	// create 2D textwave with firstColumn.size() rows and 2 columns
 	if(firstColumn.size() == 0 || secondColumn.size() == 0 ){
-		sprintf(globDataPtr->outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(GlobalData::Instance().outputBuffer);
 		return UNKNOWN_ERROR;
 	}
 	else if(firstColumn.size() == secondColumn.size() ){
 		dimensionSizes[ROWS] = firstColumn.size();
 	}
 	else{
-		sprintf(globDataPtr->outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
+		outputToHistory(GlobalData::Instance().outputBuffer);
 		return UNKNOWN_ERROR;
 	}
 
 	dimensionSizes[COLUMNS]=2;
 	
-	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,globDataPtr->overwriteEnabledAsInt());
+	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,GlobalData::Instance().overwriteEnabledAsInt());
 
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(globDataPtr->outputBuffer,"Wave %s already exists.",waveName);
-		debugOutputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",waveName);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		return WAVE_EXIST;
 	}
 	else if(ret != 0 ){
-		sprintf(globDataPtr->outputBuffer,"Error %d in creating wave %s.",ret, waveName);
-		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"Error %d in creating wave %s.",ret, waveName);
+		outputToHistory(GlobalData::Instance().outputBuffer);
 		return UNKNOWN_ERROR;
 	}
 	ASSERT_RETURN_ONE(waveHandle);
@@ -72,8 +72,8 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 	ret = stringVectorToTextWave(allColumns,waveHandle);
 
 	if(ret != 0){
-		sprintf(globDataPtr->outputBuffer,"stringVectorToTextWave returned %d",ret);
-		outputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"stringVectorToTextWave returned %d",ret);
+		outputToHistory(GlobalData::Instance().outputBuffer);
 		return ret;
 	}
 	setOtherWaveNote(waveHandle,brickletID);
@@ -100,8 +100,8 @@ std::string viewTypeCodeToString(unsigned int idx){
 	names.push_back(VTC_INTERFEROMETER);
 
 	if(idx < 0 || idx >= names.size()){
-		sprintf(globDataPtr->outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
-		debugOutputToHistory(globDataPtr->outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		return std::string();
 	}
 	else{
@@ -142,8 +142,8 @@ std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 
 
 	std::string waveNote;
 
-	waveNote.append(RESULT_FILE_NAME_KEY + "=" + globDataPtr->getFileName() + "\r");
-	waveNote.append(RESULT_DIR_PATH_KEY +"=" + globDataPtr->getDirPath() + "\r");
+	waveNote.append(RESULT_FILE_NAME_KEY + "=" + GlobalData::Instance().getFileName() + "\r");
+	waveNote.append(RESULT_DIR_PATH_KEY +"=" + GlobalData::Instance().getDirPath() + "\r");
 
 	if(isValidBrickletID(brickletID)){
 		waveNote.append(BRICKLET_ID_KEY + "=" + anyTypeToString<int>(brickletID) + "\r");
@@ -160,7 +160,7 @@ std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 
 	}
 
 	waveNote.append("xopVersion=" + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
-	waveNote.append("vernissageVersion=" + globDataPtr->getVernissageVersion() + "\r");
+	waveNote.append("vernissageVersion=" + GlobalData::Instance().getVernissageVersion() + "\r");
 
 	return waveNote;
 }

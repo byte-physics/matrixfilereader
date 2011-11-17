@@ -13,12 +13,17 @@
 #ifndef _WIN32_WINNT		
 	#define _WIN32_WINNT 0x0502
 #endif					
-#include <afx.h>
 
 #include <string>
 #include <sstream>
 #include <vector>
 #include <map>
+
+#include <afx.h>
+
+#undef max
+#undef min
+
 #include <limits>
 
 #include "XOPStandardHeaders.h"

@@ -12,6 +12,7 @@
 #include "brickletconverter.h"
 #include "globaldata.h"
 #include "brickletclass.h"
+#include "utils_generic.h"
 
 namespace{
 	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4 };

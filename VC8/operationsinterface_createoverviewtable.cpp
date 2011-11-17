@@ -11,6 +11,7 @@
 #include "globaldata.h"
 #include "utils_bricklet.h"
 #include "brickletclass.h"
+#include "utils_generic.h"
 
 extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH

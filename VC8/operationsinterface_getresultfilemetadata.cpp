@@ -11,6 +11,7 @@
 #include "utils_bricklet.h"
 #include "globaldata.h"
 #include "brickletclass.h"
+#include "utils_generic.h"
 
 extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH

@@ -26,7 +26,7 @@ public:
 	void setNameAndTraceDir(const std::string &basename, int traceDir);
 	void printDebugInfo();
 	void setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr);
-	void setWaveUnits(int dimension, const std::wstring& units){ setWaveUnits(dimension,WStringToString(units)); }
+	void setWaveUnits(int dimension, const std::wstring& units);
 	void setWaveUnits(int dimension, const std::string& units);
 	void setExtrema(const ExtremaData& extremaData);
 

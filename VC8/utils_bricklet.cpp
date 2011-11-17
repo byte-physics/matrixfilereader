@@ -9,6 +9,7 @@
 #include "utils_bricklet.h"
 #include "waveclass.h"
 #include "globaldata.h"
+#include "utils_generic.h"
 
 /*
 	Create a two column text wave from two string vectors

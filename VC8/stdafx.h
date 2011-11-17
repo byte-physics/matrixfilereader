@@ -14,10 +14,16 @@
 	#define _WIN32_WINNT 0x0502
 #endif					
 
+#pragma  warning(push)
+#pragma  warning(disable: 4244) // conversion from 'const wchar_t' to 'char', possible loss of data
 #include <string>
+#pragma  warning(pop)
+
+#include <algorithm>
 #include <sstream>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include <afx.h>
 
@@ -32,7 +38,6 @@
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/IGOR.lib")
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.lib")
 
-#include "utils_generic.h"
 #include "utils_xop.h"
 
 #include "constants.h"

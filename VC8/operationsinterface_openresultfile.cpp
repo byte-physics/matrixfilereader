@@ -10,6 +10,7 @@
 #include "operationsinterface.h"
 #include "globaldata.h"
 
+#include "utils_generic.h"
 extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);

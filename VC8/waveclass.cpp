@@ -8,6 +8,7 @@
 
 #include "waveclass.h"
 #include "globaldata.h"
+#include "utils_generic.h"
 
 WaveClass::WaveClass(){
 
@@ -155,4 +156,9 @@ void WaveClass::setWaveUnits(int dimension, const std::string& units){
 		outputToHistory(GlobalData::Instance().outputBuffer);
 		sprintf(GlobalData::Instance().outputBuffer,"WaveClass::setWaveUnits returned error %d",ret);
 	}
+}
+
+void WaveClass::setWaveUnits( int dimension, const std::wstring& units )
+{
+	setWaveUnits(dimension,WStringToString(units));
 }

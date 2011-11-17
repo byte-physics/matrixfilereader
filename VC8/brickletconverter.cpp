@@ -12,6 +12,7 @@
 #include "waveclass.h"
 #include "brickletclass.h"
 #include "extremadata.h"
+#include "utils_generic.h"
 
 /*
 	create the raw data wave which just holds the raw data as 1D array

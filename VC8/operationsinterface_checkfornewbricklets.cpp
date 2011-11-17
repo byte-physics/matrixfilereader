@@ -10,6 +10,7 @@
 #include "operationsinterface.h"
 #include "globaldata.h"
 #include "brickletclass.h"
+#include "utils_generic.h"
 
 extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH

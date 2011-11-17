@@ -9,6 +9,7 @@
 #include "utils_xop.h"
 #include "globaldata.h"
 #include "waveclass.h"
+#include "utils_generic.h"
 
 /*
 	Outputs str if debugging is enabled, silent = true will not mark the experiment as modified

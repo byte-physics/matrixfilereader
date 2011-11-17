@@ -9,6 +9,7 @@
 #include "operationstructs.h"
 #include "operationsinterface.h"
 #include "globaldata.h"
+#include "utils_generic.h"
 
 extern "C" int ExecuteGetVersion(GetVersionRuntimeParamsPtr p){
 

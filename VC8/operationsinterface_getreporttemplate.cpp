@@ -10,6 +10,7 @@
 #include "operationsinterface.h"
 #include "globaldata.h"
 
+#include "utils_generic.h"
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	SetOperationStrVar(S_value,"");

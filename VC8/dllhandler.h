@@ -6,12 +6,11 @@
 #pragma once
 
 #include "ForwardDecl.h"
+
 /*
 	Everything related to loading the Vernissage DLLs.
 	Calling closeSession() before exiting the application is mandatory.
 */
-
-
 class DLLHandler{
 
 	typedef Vernissage::Session * (*GetSessionFunc) ();

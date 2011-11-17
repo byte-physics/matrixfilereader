@@ -437,10 +437,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\extremadata.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\globaldata.cpp"
 				>
 			</File>

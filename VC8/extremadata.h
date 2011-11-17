@@ -14,8 +14,15 @@
 class ExtremaData{
 
 public:
-	ExtremaData(void);
-	~ExtremaData(void);
+	ExtremaData()
+		:
+		m_rawMin(_I32_MAX),
+		m_rawMax(_I32_MIN),
+		m_physValRawMin(DBL_MAX),
+		m_physValRawMax(-DBL_MAX)
+		{}
+
+	~ExtremaData(){}
 
 public:
 	void setRawMin(int rawMin){ m_rawMin = rawMin; };

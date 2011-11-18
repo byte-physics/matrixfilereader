@@ -20,7 +20,8 @@ public:
 		m_rawMin(std::numeric_limits<int>::max()),
 		m_rawMax(std::numeric_limits<int>::min()),
 		m_physValRawMin(std::numeric_limits<double>::max()),
-		m_physValRawMax(std::numeric_limits<double>::min())
+		// we don't want the smallest positive number but the most negative one
+		m_physValRawMax(-std::numeric_limits<double>::max())
 		{}
 
 public:

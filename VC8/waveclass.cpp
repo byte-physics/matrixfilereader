@@ -14,30 +14,24 @@ WaveClass::WaveClass(){
 
 	m_traceDir = NO_TRACE;
 	moreData=false;
+
 	m_doublePtr=NULL;
 	m_floatPtr=NULL;
-	pixelSize=1;
+
 	m_waveHandle=NULL;
+	pixelSize=1;
 
-	m_extrema = new ExtremaData();
+	m_extrema = ExtremaData();
 }
 
-WaveClass::~WaveClass(){
-
-	delete m_extrema;
-	m_extrema = NULL;
-}
+WaveClass::~WaveClass(){}
 
 /*
 	Set the extrema data, useful if WaveClass represents a complete bricklet
 */
 void WaveClass::setExtrema(const ExtremaData& extremaData){
 
-	m_extrema->setRawMin(extremaData.getRawMin());
-	m_extrema->setRawMax(extremaData.getRawMax());
-
-	m_extrema->setPhysValRawMax(extremaData.getPhysValRawMax());
-	m_extrema->setPhysValRawMin(extremaData.getPhysValRawMin());
+	m_extrema = extremaData;
 }
 
 

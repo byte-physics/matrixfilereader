@@ -10,6 +10,7 @@
 #pragma once
 
 #include "ForwardDecl.h"
+#include "dllhandler.h"
 
 class GlobalData{
 
@@ -86,7 +87,7 @@ private:
 	bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
 	std::wstring m_resultFileName, m_resultDirPath;
 	Vernissage::Session *m_VernissageSession;
-	DLLHandler *m_DLLHandler;
+	DLLHandler m_DLLHandler;
 	bool m_errorToHistory;
 	int m_lastError;
 	std::string m_lastErrorArgument;

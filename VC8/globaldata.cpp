@@ -12,19 +12,13 @@
 #include "utils_generic.h"
 
 GlobalData::GlobalData(): m_VernissageSession(NULL),
-	m_DLLHandler(NULL), m_lastError(UNKNOWN_ERROR),
+	m_DLLHandler(DLLHandler()), m_lastError(UNKNOWN_ERROR),
 	m_debug(debug_default),m_doubleWave(double_default),
 	m_overwrite(overwrite_default),m_datafolder(datafolder_default),
 	m_datacache(cache_default),m_errorToHistory(false){
-
-	m_DLLHandler = new DLLHandler;
 }
 
-GlobalData::~GlobalData(){
-
-	delete m_DLLHandler;
-	m_DLLHandler = NULL;
-}
+GlobalData::~GlobalData(){}
 
 // store name and path of the open result file
 void GlobalData::setResultFile(const std::wstring &dirPath, const std::wstring &fileName){
@@ -48,7 +42,7 @@ Vernissage::Session* GlobalData::getVernissageSession(){
 		return m_VernissageSession;
 	}
 	else{
-		m_VernissageSession = m_DLLHandler->createSessionObject();
+		m_VernissageSession = m_DLLHandler.createSessionObject();
 		return m_VernissageSession;
 	}
 }
@@ -84,7 +78,7 @@ void GlobalData::closeResultFile(){
 void GlobalData::closeSession(){
 	
 	this->closeResultFile();
-	m_DLLHandler->closeSession();
+	m_DLLHandler.closeSession();
 	m_VernissageSession = NULL;
 }
 
@@ -95,11 +89,7 @@ std::string GlobalData::getVernissageVersion(){
 		this->getVernissageSession();
 	}
 
-	if(m_DLLHandler != NULL){
-		return m_DLLHandler->getVernissageVersion();
-	}
-	else
-		return std::string();
+	return m_DLLHandler.getVernissageVersion();
 }
 
 bool GlobalData::resultFileOpen() const{

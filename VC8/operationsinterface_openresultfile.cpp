@@ -110,21 +110,31 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		return 0;	
 	}
 
+	DEBUGCODE;
+
 	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
-	
+
+	DEBUGCODE;
+
 	// now we convert to wide strings
 	std::wstring  dirPathWString = CharPtrToWString(dirPath);
 	std::wstring  fileNameWString = CharPtrToWString(fileName);
+
+	DEBUGCODE;
 
 	// true -> result set will be added to the database
 	// false -> replaces the current results sets in the internal databse 
 	loadSuccess = pSession->loadResultSet(dirPathWString,fileNameWString,false);
 
+	DEBUGCODE;
+
 	if(!loadSuccess){
 		outputToHistory("Could not load the result file");
 		return 0;
 	}
+
+	DEBUGCODE;
 
 	//starting from here the result file is valid
 	GlobalData::Instance().setResultFile(dirPathWString,fileNameWString);
@@ -132,6 +142,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	totalNumBricklets = pSession->getBrickletCount();
 	sprintf(GlobalData::Instance().outputBuffer,"totalNumBricklets=%d",totalNumBricklets);
 	debugOutputToHistory(GlobalData::Instance().outputBuffer);
+
+	DEBUGCODE;
 
 	// brickletIDs are 1-based
 	for( i=1; i <= totalNumBricklets; i++){
@@ -147,6 +159,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 			break;
 		}
 	}
+
+	DEBUGCODE;
 
 	GlobalData::Instance().finalize();
 	END_OUTER_CATCH

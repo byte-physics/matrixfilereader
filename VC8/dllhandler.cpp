@@ -8,6 +8,7 @@
 
 #include "dllhandler.h"
 #include "globaldata.h"
+#include "utils_generic.h"
 
 DLLHandler::DLLHandler():
 	m_foundationModule(NULL),
@@ -133,6 +134,8 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 
 	setLibraryPath();
 
+	DEBUGCODE;
+
 	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
 		dllName = *it;
 		module = LoadLibrary( (LPCSTR) dllName.c_str());
@@ -148,14 +151,31 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 		}
 	}
 
+	DEBUGCODE;
+
 	// module is now pointing to Foundation.dll
 	m_foundationModule		= module;
+
+	DEBUGCODE;
+
 	m_pGetSessionFunc		= (GetSessionFunc)		GetProcAddress(m_foundationModule, "getSession");
+
+	DEBUGCODE;
+
 	m_pReleaseSessionFunc	= (ReleaseSessionFunc)  GetProcAddress(m_foundationModule, "releaseSession");
+
+	DEBUGCODE;
+
+	ASSERT_RETURN_ZERO(m_foundationModule);
+	ASSERT_RETURN_ZERO(m_pGetSessionFunc);
+	ASSERT_RETURN_ZERO(m_pReleaseSessionFunc);
 
 	if(m_pGetSessionFunc != NULL){
 		pSession = (*m_pGetSessionFunc) ();
 	}
+	DEBUGCODE;
+
+	ASSERT_RETURN_ZERO(pSession);
 
 	return pSession;
 }

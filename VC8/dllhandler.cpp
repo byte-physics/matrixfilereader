@@ -150,6 +150,7 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 			return pSession;
 		}
 	}
+	ASSERT_RETURN_ZERO(module);
 
 	DEBUGCODE;
 

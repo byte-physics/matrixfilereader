@@ -15,7 +15,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
 
-	char fullPath[MAX_PATH_LEN+1], fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1], fileNameOrPath[MAX_PATH_LEN+1];
+	char fullPath[MAX_PATH_LEN+1], fileName[MAX_FILENAME_LEN+1], dirPath[MAX_PATH_LEN+1], fileNameOrPath[MAX_PATH_LEN+1];
 	int ret = 0, i, totalNumBricklets ;
 	void* pContext = NULL, *pBricklet = NULL;
 	bool loadSuccess;

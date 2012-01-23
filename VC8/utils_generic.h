@@ -20,9 +20,9 @@
 #define ASSERT_RETURN_ONE(A) { MYASSERT(A,1)}
 #define ASSERT_RETURN_VOID(A) { MYASSERT(A,)}
 
-#define DEBUGCODE \
-	sprintf(GlobalData::Instance().outputBuffer,"line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);\
-	outputToHistory(GlobalData::Instance().outputBuffer);
+//#define DEBUGCODE \
+//	sprintf(GlobalData::Instance().outputBuffer,"line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);\
+//	outputToHistory(GlobalData::Instance().outputBuffer);
 
 template <class T>
 T stringToAnyType(std::string str){

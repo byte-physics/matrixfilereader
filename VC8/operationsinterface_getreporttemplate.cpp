@@ -4,13 +4,13 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "globaldata.h"
 
-#include "utils_generic.h"
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	SetOperationStrVar(S_value,"");
@@ -44,7 +44,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 #endif
 
 	str.append("Igor Pro Version: " + anyTypeToString<int>(igorVersion) + "\r");
-	str.append("Vernissage version: " + GlobalData::Instance().getVernissageVersion() + "\r");
+	str.append("Vernissage version: " + globDataPtr->getVernissageVersion() + "\r");
 	str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
 	str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
 	str.append("\r");
@@ -55,9 +55,6 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 	SetOperationStrVar(S_value,str.c_str());
 
 	outputToHistory(str.c_str());
-
-	// set errorCode to SUCCESS
-	GlobalData::Instance().finalize();
 	END_OUTER_CATCH
 	return 0;
 }

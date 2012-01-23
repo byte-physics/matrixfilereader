@@ -4,27 +4,27 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "globaldata.h"
-#include "utils_generic.h"
 
 extern "C" int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
-	if(!GlobalData::Instance().resultFileOpen()){
-		GlobalData::Instance().setError(NO_FILE_OPEN);
+	if(!globDataPtr->resultFileOpen()){
+		globDataPtr->setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
+	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	SetOperationNumVar(V_count,pSession->getBrickletCount());
-	GlobalData::Instance().finalize();
+	globDataPtr->finalize();
 	END_OUTER_CATCH
 	return 0;
 }

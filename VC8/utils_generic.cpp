@@ -3,9 +3,13 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt in the source folder for details.
 */
-#include "stdafx.h"
+#include "header.h"
 
 #include "utils_generic.h"
+
+#include <string>
+#include <vector>
+
 #include "globaldata.h"
 
 /*
@@ -70,8 +74,8 @@ void splitString(const std::string &string, const char* sepChar, std::vector<std
 
 	stringCopy.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
 
-	sprintf(GlobalData::Instance().outputBuffer,"keyList=%s",stringCopy.c_str());
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"keyList=%s",stringCopy.c_str());
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	while( ( pos = stringCopy.find(sepChar,offset) ) != std::string::npos ){
 
@@ -81,8 +85,8 @@ void splitString(const std::string &string, const char* sepChar, std::vector<std
 		}
 
 		list.push_back(stringCopy.substr(offset,pos-offset));
-		sprintf(GlobalData::Instance().outputBuffer,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 
 		offset = pos+1;
 	}

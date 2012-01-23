@@ -9,13 +9,21 @@
 */
 #pragma once
 
-#include "ForwardDecl.h"
+#include <map>
+
 #include "dllhandler.h"
+#include "constants.h"
+#include "brickletclass.h"
 
 class GlobalData{
 
 	typedef	std::map<int, BrickletClass*, std::less<int>>		IntBrickletClassPtrMap;
 
+public:
+	// constructors/deconstructors
+	GlobalData();
+	~GlobalData();
+	
 public:
 	// functions
 
@@ -50,6 +58,7 @@ public:
 
 	bool resultFileOpen() const;
 
+
 	std::string getLastErrorMessage() const;
 	std::string getErrorMessage (int errorCode) const;
 	int getLastError() const{ return m_lastError; }
@@ -72,22 +81,11 @@ public:
 	// cache
 	bool dataCacheEnabled() const{ return m_datacache; };
 
-	// Access to singleton-type global object
-	static GlobalData& GlobalData::Instance(){
-		static GlobalData globData;
-		return globData;
-	}
-
 private:
-	GlobalData(); // hide ctor
-	~GlobalData(); // hide dtor
-	GlobalData(const GlobalData&); // hide copy ctor
-	GlobalData& operator=(const GlobalData&); // hide assignment operator
-
 	bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
 	std::wstring m_resultFileName, m_resultDirPath;
 	Vernissage::Session *m_VernissageSession;
-	DLLHandler m_DLLHandler;
+	DLLHandler *m_DLLHandler;
 	bool m_errorToHistory;
 	int m_lastError;
 	std::string m_lastErrorArgument;
@@ -101,3 +99,6 @@ private:
 	void enableOverwrite(bool var){ m_overwrite = var; };
 	void enableDataCaching(bool var){m_datacache = var; };
 };
+
+// declare global object globDataPtr
+extern GlobalData *globDataPtr;

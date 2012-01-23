@@ -3,14 +3,15 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
+
+/* Everything related to loading the Vernissage DLLs.
+Calling closeSession() before exiting the application is mandatory.
+*/
+
 #pragma once
 
-#include "ForwardDecl.h"
+#include "header.h"
 
-/*
-	Everything related to loading the Vernissage DLLs.
-	Calling closeSession() before exiting the application is mandatory.
-*/
 class DLLHandler{
 
 	typedef Vernissage::Session * (*GetSessionFunc) ();

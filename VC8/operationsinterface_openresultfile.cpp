@@ -4,29 +4,29 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "globaldata.h"
 
-#include "utils_generic.h"
 extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
-	char fullPath[MAX_PATH_LEN+1], fileName[MAX_FILENAME_LEN+1], dirPath[MAX_PATH_LEN+1], fileNameOrPath[MAX_PATH_LEN+1];
+	char fullPath[MAX_PATH_LEN+1], fileName[MAX_PATH_LEN+1], dirPath[MAX_PATH_LEN+1], fileNameOrPath[MAX_PATH_LEN+1];
 	int ret = 0, i, totalNumBricklets ;
 	void* pContext = NULL, *pBricklet = NULL;
 	bool loadSuccess;
 	
 	// /K will close an possibly open result file before opening a new one
 	if (p->KFlagEncountered) {
-		GlobalData::Instance().closeResultFile();
+		globDataPtr->closeResultFile();
 	}
 
-	if(GlobalData::Instance().resultFileOpen()){
-		GlobalData::Instance().setError(ALREADY_FILE_OPEN,GlobalData::Instance().getFileName());
+	if(globDataPtr->resultFileOpen()){
+		globDataPtr->setError(ALREADY_FILE_OPEN,globDataPtr->getFileName());
 		return 0;
 	}
 
@@ -34,14 +34,14 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 
 			ret = GetCStringFromHandle(p->fileNameOrPath,fileNameOrPath,MAX_PATH_LEN);
 			if( ret != 0 ){
-				GlobalData::Instance().setInternalError(ret);
+				globDataPtr->setInternalError(ret);
 				return 0;
 			}
 			// check if we have a symbolic path
 			if( p->PFlagEncountered && strlen(p->pathName) > 0L ){
 				ret = GetFullPathFromSymbolicPathAndFilePath(p->pathName,fileNameOrPath,fullPath);
 				if( ret != 0){
-					GlobalData::Instance().setInternalError(ret);
+					globDataPtr->setInternalError(ret);
 					return 0;
 				}
 			}
@@ -50,36 +50,36 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 				// GetDirectoryAndFileNameFromFullPath() does not like that
 				ret = GetNativePath(fileNameOrPath,fullPath);
 				if( ret != 0){
-					GlobalData::Instance().setInternalError(ret);
+					globDataPtr->setInternalError(ret);
 					return 0;
 				}
 			}
 	}
 	// an empty or missing fileNameOrPath parameter results in an openfile dialog being displayed
 	else{
-		sprintf(GlobalData::Instance().outputBuffer,"dir=%s,index=%d",GlobalData::Instance().openDlgInitialDir,GlobalData::Instance().openDlgFileIndex);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"dir=%s,index=%d",globDataPtr->openDlgInitialDir,globDataPtr->openDlgFileIndex);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 
-		ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(GlobalData::Instance().openDlgFileIndex), GlobalData::Instance().openDlgInitialDir, fullPath);
+		ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(globDataPtr->openDlgFileIndex), globDataPtr->openDlgInitialDir, fullPath);
 		if(ret == -1){ //the user cancelled the dialog
-			GlobalData::Instance().setError(WRONG_PARAMETER,"fileNameOrPath");
+			globDataPtr->setError(WRONG_PARAMETER,"fileNameOrPath");
 			return 0;
 		}
 		else if(ret != 0){
-			GlobalData::Instance().setInternalError(ret);
+			globDataPtr->setInternalError(ret);
 			return 0;
 		}
 	}
 
 	ret = GetDirectoryAndFileNameFromFullPath(fullPath,dirPath,fileName);
 	if( ret != 0){
-		GlobalData::Instance().setInternalError(ret);
+		globDataPtr->setInternalError(ret);
 		return 0;
 	}
 
-	// store the last used directory in GlobalData::Instance().openDlgInitialDir
-	strncpy(GlobalData::Instance().openDlgInitialDir,dirPath,MAX_PATH_LEN+1);
-	GlobalData::Instance().openDlgInitialDir[MAX_PATH_LEN]='\0';
+	// store the last used directory in globDataPtr->openDlgInitialDir
+	strncpy(globDataPtr->openDlgInitialDir,dirPath,MAX_PATH_LEN+1);
+	globDataPtr->openDlgInitialDir[MAX_PATH_LEN]='\0';
 
 	// remove suffix \\ in the dirPath because loadResultset does not like that
 	if(dirPath[strlen(dirPath)-1] == '\\'){
@@ -91,28 +91,28 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	// dirPath c:\data
 	// fullPath c:\data\myName.test
 
-	sprintf(GlobalData::Instance().outputBuffer,"fullPath %s",fullPath);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"fullPath %s",fullPath);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	sprintf(GlobalData::Instance().outputBuffer,"filename %s",fileName);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"filename %s",fileName);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
-	sprintf(GlobalData::Instance().outputBuffer,"dirPath %s",dirPath);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"dirPath %s",dirPath);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	if( !FullPathPointsToFolder(dirPath) ){
-		GlobalData::Instance().setError(FILE_NOT_READABLE,dirPath);
+		globDataPtr->setError(FILE_NOT_READABLE,dirPath);
 		return 0;
 	}
 
 	if( !FullPathPointsToFile(fullPath)){
-		GlobalData::Instance().setError(FILE_NOT_READABLE,fullPath);
+		globDataPtr->setError(FILE_NOT_READABLE,fullPath);
 		return 0;	
 	}
 
-	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
+	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
-
+	
 	// now we convert to wide strings
 	std::wstring  dirPathWString = CharPtrToWString(dirPath);
 	std::wstring  fileNameWString = CharPtrToWString(fileName);
@@ -127,28 +127,28 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	}
 
 	//starting from here the result file is valid
-	GlobalData::Instance().setResultFile(dirPathWString,fileNameWString);
+	globDataPtr->setResultFile(dirPathWString,fileNameWString);
 
 	totalNumBricklets = pSession->getBrickletCount();
-	sprintf(GlobalData::Instance().outputBuffer,"totalNumBricklets=%d",totalNumBricklets);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"totalNumBricklets=%d",totalNumBricklets);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	// brickletIDs are 1-based
 	for( i=1; i <= totalNumBricklets; i++){
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
 		try{
-			GlobalData::Instance().createBrickletClassObject(i,pBricklet);
+			globDataPtr->createBrickletClassObject(i,pBricklet);
 		}
 		catch(CMemoryException *e){
 			e->Delete();
-			sprintf(GlobalData::Instance().outputBuffer,"Could not reserve memory for brickletID %d, giving up",i);
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"Could not reserve memory for brickletID %d, giving up",i);
+			outputToHistory(globDataPtr->outputBuffer);
 			break;
 		}
 	}
 
-	GlobalData::Instance().finalize();
+	globDataPtr->finalize();
 	END_OUTER_CATCH
 	return 0;
 }

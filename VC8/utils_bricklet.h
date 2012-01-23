@@ -3,11 +3,15 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt in the source folder for details.
 */
-#pragma once
 
 /*
 	Utility functions involving bricklets
 */
+
+#pragma once
+
+#include <limits>
+#include "waveclass.h"
 
 std::string viewTypeCodeToString(unsigned int idx);
 
@@ -19,6 +23,6 @@ bool isValidBrickletRange(double startID, double endID, int numberOfBricklets);
 bool isValidBrickletID(int brickletID);
 bool isValidTraceDir(int traceDir);
 
-int createAndFillTextWave(const std::vector<std::string> &firstColumn, const std::vector<std::string> &secondColumn,
+int createAndFillTextWave(const std::vector<std::string> &firstColumn, const std::vector<std::string> &secondColumn,\
 						  DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves);
 

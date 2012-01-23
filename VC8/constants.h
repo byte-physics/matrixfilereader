@@ -36,21 +36,15 @@ const char VT_STRING_STRING[]  = "vt_String";
 
 // viewtype codes as strings
 // from the vernissage header file
-const char VTC_OTHER_STRING[]			= "vtc_Other";
-const char VTC_SIMPLE2D_STRING[]		= "vtc_Simple2D";
-const char VTC_SIMPLE1D_STRING[]		= "vtc_Simple1D";
-const char VTC_FWDBWD2D_STRING[]		= "vtc_ForwardBackward2D";
-const char VTC_2DOF3D_STRING[]			= "vtc_2Dof3D";
-const char VTC_SPECTROSCOPY_STRING[]	= "vtc_Spectroscopy";
-const char VTC_FORCECURVE_STRING[]		= "vtc_ForceCurve";
-const char VTC_1DPROFILE_STRING[]		= "vtc_1DProfile";
-const char VTC_INTERFEROMETER[]			= "vtc_Interferometer";
-const char vtc_ContinuousCurve[]		= "vtc_ContinuousCurve";
-const char vtc_PhaseAmplitudeCurve[]	= "vtc_PhaseAmplitudeCurve";
-const char vtc_CurveSet[]				= "vtc_CurveSet";
-const char vtc_ParameterisedCurveSet[]	= "vtc_ParameterisedCurveSet"; 
-const char vtc_DiscreteEnergyMap[]		= "vtc_DiscreteEnergyMap";
-const char vtc_ESpImageMap[]			= "vtc_ESpImageMap";
+const char VTC_OTHER_STRING[]		= "vtc_Other";
+const char VTC_SIMPLE2D_STRING[]	= "vtc_Simple2D";
+const char VTC_SIMPLE1D_STRING[]	= "vtc_Simple1D";
+const char VTC_FWDBWD2D_STRING[]	= "vtc_ForwardBackward2D";
+const char VTC_2DOF3D_STRING[]		= "vtc_2Dof3D";
+const char VTC_SPECTROSCOPY_STRING[]= "vtc_Spectroscopy";
+const char VTC_FORCECURVE_STRING[]	= "vtc_ForceCurve";
+const char VTC_1DPROFILE_STRING[]	= "vtc_1DProfile";
+const char VTC_INTERFEROMETER[]		= "vtc_Interferometer";
 
 // wave name suffixes
 const char TRACE_UP_STRING[]		= "_Up";
@@ -90,7 +84,7 @@ const char double_option_name[]		= "V_MatrixFileReaderDouble";
 const char cache_option_name[]		= "V_MatrixFileReaderCache";
 
 // Due to historic problems with different vernissage version, we currently only support exactly one version
-const char properVernissageVersion[] ="2.1";
+const char properVernissageVersion[] ="2.0";
 
 // default keys for MFR_CreateOverViewTable
 const char keyList_default[] = "brickletID;scanCycleCount;runCycleCount;sequenceID;dimension;channelName";

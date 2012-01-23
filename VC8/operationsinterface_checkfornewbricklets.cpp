@@ -4,17 +4,16 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "globaldata.h"
-#include "brickletclass.h"
-#include "utils_generic.h"
 
 extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 
 	void* pContext  = NULL, *pBricklet = NULL;
 	BrickletClass *bricklet = NULL;
@@ -26,18 +25,18 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
 	SetOperationNumVar(V_startBrickletID,-1.0);
 	SetOperationNumVar(V_endBrickletID,-1.0);
 
-	if(!GlobalData::Instance().resultFileOpen()){
-		GlobalData::Instance().setError(NO_FILE_OPEN);
+	if(!globDataPtr->resultFileOpen()){
+		globDataPtr->setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
+	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	const int oldNumberOfBricklets = pSession->getBrickletCount();
 
-	fileName = GlobalData::Instance().getFileNameWString();
-	dirPath = GlobalData::Instance().getDirPathWString();
+	fileName = globDataPtr->getFileNameWString();
+	dirPath = globDataPtr->getDirPathWString();
 
 	// true -> result set will be added to the database
 	// false -> replaces the current results sets in the internal databse 
@@ -58,10 +57,10 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
 		pBricklet = pSession->getNextBricklet(&pContext);
 		ASSERT_RETURN_ZERO(pBricklet);
 
-		bricklet = GlobalData::Instance().getBrickletClassObject(i);
+		bricklet = globDataPtr->getBrickletClassObject(i);
 
 		if(bricklet == NULL){// this is a new bricklet
-			GlobalData::Instance().createBrickletClassObject(i,pBricklet);
+			globDataPtr->createBrickletClassObject(i,pBricklet);
 		}
 		else{	// the bricklet is old and we only have to update *pBricklet
 			bricklet->setBrickletPointer(pBricklet);
@@ -76,23 +75,23 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
 
 	// from here on we know that numberOfBricklets >= oldNumberOfBricklets 
 	if(oldNumberOfBricklets == numberOfBricklets){
-		GlobalData::Instance().setError(NO_NEW_BRICKLETS);
+		globDataPtr->setError(NO_NEW_BRICKLETS);
 		return 0;
 	}
 
 	ret = SetOperationNumVar(V_startBrickletID,oldNumberOfBricklets+1);
 	if(ret != 0){
-		GlobalData::Instance().setInternalError(ret);
+		globDataPtr->setInternalError(ret);
 		return 0;
 	}
 
 	ret = SetOperationNumVar(V_endBrickletID,numberOfBricklets);
 	if(ret != 0){
-		GlobalData::Instance().setInternalError(ret);
+		globDataPtr->setInternalError(ret);
 		return 0;
 	}
 
-	GlobalData::Instance().finalize();
+	globDataPtr->finalize();
 	END_OUTER_CATCH
 	return 0;
 }

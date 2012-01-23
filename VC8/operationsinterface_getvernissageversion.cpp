@@ -4,21 +4,21 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "globaldata.h"
-#include "utils_generic.h"
 
 extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	SetOperationNumVar(V_DLLversion,0);
 
-	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
+	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
-	SetOperationNumVar(V_DLLversion,stringToAnyType<double>(GlobalData::Instance().getVernissageVersion()));
+	SetOperationNumVar(V_DLLversion,stringToAnyType<double>(globDataPtr->getVernissageVersion()));
 	END_OUTER_CATCH
 	return 0;
 }

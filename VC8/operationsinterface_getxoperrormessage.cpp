@@ -4,10 +4,11 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "globaldata.h"
 
 extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
@@ -15,10 +16,10 @@ extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
 
 	// return requested error message
 	if (p->errorCodeEncountered && p->errorCodeParamsSet[0]) {
-		errorMessage = GlobalData::Instance().getErrorMessage(int(p->errorCode));
+		errorMessage = globDataPtr->getErrorMessage(int(p->errorCode));
 	}
 	else{// get last error message
-		errorMessage = GlobalData::Instance().getLastErrorMessage();
+		errorMessage = globDataPtr->getLastErrorMessage();
 	}
 	outputToHistory(errorMessage.c_str());
 	return 0;

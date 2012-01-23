@@ -4,26 +4,27 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "globaldata.h"
 
 extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p){
 
-	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initialize(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_fileName,"");
 	SetOperationStrVar(S_dirPath,"");
 
-	if(!GlobalData::Instance().resultFileOpen()){
-		GlobalData::Instance().setError(NO_FILE_OPEN);
+	if(!globDataPtr->resultFileOpen()){
+		globDataPtr->setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	SetOperationStrVar(S_fileName,GlobalData::Instance().getFileName().c_str());
-	SetOperationStrVar(S_dirPath,GlobalData::Instance().getDirPath().c_str());
+	SetOperationStrVar(S_fileName,globDataPtr->getFileName().c_str());
+	SetOperationStrVar(S_dirPath,globDataPtr->getDirPath().c_str());
 
-	GlobalData::Instance().finalize();
+	globDataPtr->finalize();
 	return 0;
 }

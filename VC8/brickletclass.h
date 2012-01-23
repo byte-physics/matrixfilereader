@@ -3,16 +3,20 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
-#pragma once
-
-#include <vector>
-#include <string>
-#include "ForwardDecl.h"
-#include "extremadata.h"
 
 /*
 	Internal representation of a bricklet
 */
+
+#pragma once
+
+#include "header.h"
+
+#include "extremadata.h"
+
+#include <vector>
+#include <string>
+
 class BrickletClass
 {
 public:
@@ -39,7 +43,7 @@ public:
 public:
 	const std::vector<Vernissage::Session::ViewTypeCode>& getViewTypeCodes()const{ return m_viewTypeCodes; };
 	void* getBrickletPointer()const{ return m_brickletPtr; };
-	const ExtremaData& getExtrema()const{ return m_extrema; };
+	const ExtremaData& getExtrema()const{ return *m_extrema; };
 
 private:
 	void BrickletClass::loadBrickletMetaDataFromResultFile();
@@ -54,7 +58,7 @@ private:
 	int *m_rawBufferContents;
 	int m_rawBufferContentsSize;
 
-	ExtremaData m_extrema;
+	ExtremaData *m_extrema;
 
 	// meta data
 	std::vector<std::string> m_metaDataKeys;

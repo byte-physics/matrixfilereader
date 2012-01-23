@@ -47,14 +47,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;VernissageSDK_V2.1-T5/src/Incl"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				GeneratePreprocessedFile="0"
 				StringPooling="false"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile="Release/stdafx.pch"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=""
 				AssemblerOutput="0"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
@@ -437,6 +436,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\extremadata.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\globaldata.cpp"
 				>
 			</File>
@@ -497,18 +500,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\utils_bricklet.cpp"
 				>
 			</File>
@@ -558,11 +549,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ForwardDecl.h"
+				RelativePath=".\globaldata.h"
 				>
 			</File>
 			<File
-				RelativePath=".\globaldata.h"
+				RelativePath=".\header.h"
 				>
 			</File>
 			<File
@@ -579,10 +570,6 @@
 			</File>
 			<File
 				RelativePath=".\preferences.h"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
@@ -639,10 +626,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\todo.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

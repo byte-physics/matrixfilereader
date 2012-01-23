@@ -4,10 +4,11 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "utils_bricklet.h"
 #include "globaldata.h"
 #include "preferences.h"
@@ -192,9 +193,14 @@ extern "C" void XOPEntry(void){
 		switch (GetXOPMessage()) {
 			case CLEANUP:
 				saveXOPPreferences();
-
+				// in case the user has forgotten to close the result file
+				if(globDataPtr->resultFileOpen()){
+					globDataPtr->closeResultFile();
+				}
 				// close the session and unload the DLL
-				GlobalData::Instance().closeSession();
+				globDataPtr->closeSession();
+				delete globDataPtr;
+				globDataPtr = NULL;
 			break;
 		}
 	}
@@ -218,6 +224,14 @@ HOST_IMPORT int XOPMain(IORecHandle ioRecHandle){
 
 	if (igorVersion < 620){
 		SetXOPResult(REQUIRES_IGOR_620);
+		return EXIT_FAILURE;
+	}
+
+	try{
+		new GlobalData();
+	}
+	catch(...){
+		SetXOPResult(BROKEN_XOP);
 		return EXIT_FAILURE;
 	}
 

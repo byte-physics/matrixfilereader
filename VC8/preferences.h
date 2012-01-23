@@ -3,11 +3,14 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
-#pragma once
 
 /*
 	Saving and Loading of XOP Preferences is done here
 */
+
+#pragma once
+
+#include "header.h"
 
 #pragma pack(2)
 

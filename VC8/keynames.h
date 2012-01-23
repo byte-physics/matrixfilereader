@@ -3,13 +3,12 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
-#pragma once
-
-#include <string>
 
 /*
 	Common names for the data and meta data waves
 */
+
+#pragma once
 
 const std::string RESULT_FILE_NAME_KEY = "resultFileName";
 const std::string RESULT_DIR_PATH_KEY = "resultDirPath";

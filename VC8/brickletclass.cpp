@@ -4,24 +4,26 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "brickletclass.h"
+
 #include "globaldata.h"
 #include "utils_bricklet.h"
-#include "extremadata.h"
-#include "utils_generic.h"
 
 BrickletClass::BrickletClass(void* const pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
 
-	m_VernissageSession = GlobalData::Instance().getVernissageSession();
-	m_extrema = ExtremaData();
+	m_VernissageSession = globDataPtr->getVernissageSession();
+	m_extrema = new ExtremaData();
 
 	ASSERT_RETURN_VOID(m_VernissageSession);
 }
 
 BrickletClass::~BrickletClass(void){
 	this->clearCache();
+
+	delete m_extrema;
+	m_extrema = NULL;
 }
 
 /*	
@@ -31,8 +33,8 @@ BrickletClass::~BrickletClass(void){
 void BrickletClass::clearCache(void){
 
 	if(m_rawBufferContents != NULL){
-		sprintf(GlobalData::Instance().outputBuffer,"Deleting raw data from bricklet %d",m_brickletID);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"Deleting raw data from bricklet %d",m_brickletID);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 		delete[] m_rawBufferContents;
 		m_rawBufferContents=NULL;
 		m_rawBufferContentsSize=0;
@@ -56,14 +58,14 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 	if(m_rawBufferContents != NULL){
 		debugOutputToHistory("GlobalData::getBrickletContentsBuffer Using cached values");
 
-		sprintf(GlobalData::Instance().outputBuffer,"before: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"before: pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 
 		*pBuffer = m_rawBufferContents;
 		count    = m_rawBufferContentsSize;
 
-		sprintf(GlobalData::Instance().outputBuffer,"after: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"after: pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 	}
 	else{ // we are called the first time
 
@@ -71,36 +73,35 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 			m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
 		}
 		catch(...){
-			sprintf(GlobalData::Instance().outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
+			outputToHistory(globDataPtr->outputBuffer);
 			*pBuffer = NULL;
 			count = 0;
 			return;	
 		}
 		// loadBrickletContents either throws an exception or returns pBuffer == 0 || count == 0
 		if(*pBuffer == NULL || count == 0){
-			sprintf(GlobalData::Instance().outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			sprintf(globDataPtr->outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
+			outputToHistory(globDataPtr->outputBuffer);
 			m_VernissageSession->unloadBrickletContents(m_brickletPtr);
 			*pBuffer = NULL;
 			count=0;
 			return;
 		}
 
-		sprintf(GlobalData::Instance().outputBuffer,"pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"pBuffer=%d,count=%d",*pBuffer,count);
+		debugOutputToHistory(globDataPtr->outputBuffer);
 
 		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
 		// implicitly which is quite expensive
-		m_extrema.setRawMin(m_VernissageSession->getRawMin(m_brickletPtr));
-		m_extrema.setRawMax(m_VernissageSession->getRawMax(m_brickletPtr));
+		m_extrema->setRawMin(m_VernissageSession->getRawMin(m_brickletPtr));
+		m_extrema->setRawMax(m_VernissageSession->getRawMax(m_brickletPtr));
 
-		m_extrema.setPhysValRawMin(m_VernissageSession->toPhysical(m_extrema.getRawMin(), m_brickletPtr));
-		m_extrema.setPhysValRawMax(m_VernissageSession->toPhysical(m_extrema.getRawMax(), m_brickletPtr));
+		m_extrema->setPhysValRawMin(m_VernissageSession->toPhysical(m_extrema->getRawMin(), m_brickletPtr));
+		m_extrema->setPhysValRawMax(m_VernissageSession->toPhysical(m_extrema->getRawMax(), m_brickletPtr));
 
-		sprintf(GlobalData::Instance().outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
-			m_extrema.getRawMin(),m_extrema.getRawMax(),m_extrema.getPhysValRawMin(),m_extrema.getPhysValRawMax());
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(globDataPtr->outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",m_extrema->getRawMin(),m_extrema->getRawMax(),m_extrema->getPhysValRawMin(),m_extrema->getPhysValRawMax());
+		debugOutputToHistory(globDataPtr->outputBuffer);
 
 		// copy the raw data to our own cache
 		m_rawBufferContentsSize = count;
@@ -201,11 +202,11 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 
 	// resultfile name
 	metaDataKeys.push_back(RESULT_FILE_NAME_KEY);
-	metaDataValues.push_back(GlobalData::Instance().getFileName());
+	metaDataValues.push_back(globDataPtr->getFileName());
 
 	// resultfile path
 	metaDataKeys.push_back(RESULT_DIR_PATH_KEY);
-	metaDataValues.push_back(GlobalData::Instance().getDirPath());
+	metaDataValues.push_back(globDataPtr->getDirPath());
 
 	// introduced with Vernissage 2.0
 	metaDataKeys.push_back("sampleName");
@@ -487,8 +488,8 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 		// END Vernissage::Session:AxisTableSet
 	}
 
-	sprintf(GlobalData::Instance().outputBuffer,"Loaded %d keys and %d values as brickletMetaData for bricklet %d",metaDataKeys.size(), metaDataValues.size(),m_brickletID);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
+	sprintf(globDataPtr->outputBuffer,"Loaded %d keys and %d values as brickletMetaData for bricklet %d",metaDataKeys.size(), metaDataValues.size(),m_brickletID);
+	debugOutputToHistory(globDataPtr->outputBuffer);
 
 	if(metaDataKeys.size() != metaDataValues.size()){
 		outputToHistory("BUG: key value lists don't have the same size, aborting");

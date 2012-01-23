@@ -4,18 +4,18 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "stdafx.h"
+#include "header.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
+
 #include "utils_bricklet.h"
+
 #include "globaldata.h"
-#include "brickletclass.h"
-#include "utils_generic.h"
 
 extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
-	GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
+	globDataPtr->initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
 
 	SetOperationStrVar(S_waveNames,"");
 
@@ -33,7 +33,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	// and also read the variable settings from this folder
 	if (p->DESTFlagEncountered){
 		if(p->dfref == NULL){
-			GlobalData::Instance().setError(WRONG_PARAMETER,"dfref");
+			globDataPtr->setError(WRONG_PARAMETER,"dfref");
 			return 0;
 		}
 		destDataFolderHndl = p->dfref;
@@ -42,18 +42,18 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	else{// no DEST flag given, so we take the current data folder as destination folder
 		ret = GetCurrentDataFolder(&destDataFolderHndl);
 		if(ret != 0){
-			GlobalData::Instance().setInternalError(ret);
+			globDataPtr->setInternalError(ret);
 			return 0;
 		}
 	}
-	GlobalData::Instance().readSettings(destDataFolderHndl);
+	globDataPtr->readSettings(destDataFolderHndl);
 
-	if(!GlobalData::Instance().resultFileOpen()){
-		GlobalData::Instance().setError(NO_FILE_OPEN);
+	if(!globDataPtr->resultFileOpen()){
+		globDataPtr->setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
+	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	const int numberOfBricklets = pSession->getBrickletCount();
@@ -61,7 +61,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	// check waveName parameter
 	if (p->NFlagEncountered){
 		if( GetHandleSize(p->waveName) == 0L ){
-			GlobalData::Instance().setError(WRONG_PARAMETER,"waveName");
+			globDataPtr->setError(WRONG_PARAMETER,"waveName");
 			return 0;
 		}
 		else{
@@ -73,16 +73,16 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	}
 
 	keys.push_back(RESULT_DIR_PATH_KEY);
-	values.push_back(GlobalData::Instance().getDirPath());
+	values.push_back(globDataPtr->getDirPath());
 
 	keys.push_back(RESULT_FILE_NAME_KEY);
-	values.push_back(GlobalData::Instance().getFileName());
+	values.push_back(globDataPtr->getFileName());
 
 	keys.push_back("totalNumberOfBricklets");
 	values.push_back(anyTypeToString<int>(numberOfBricklets));
 
 	if(numberOfBricklets > 0){
-		bricklet = GlobalData::Instance().getBrickletClassObject(numberOfBricklets);
+		bricklet = globDataPtr->getBrickletClassObject(numberOfBricklets);
 		ASSERT_RETURN_ZERO(bricklet);	
 		pBricklet  = bricklet->getBrickletPointer();
 		ASSERT_RETURN_ZERO(pBricklet);
@@ -135,17 +135,17 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 	ret = createAndFillTextWave(keys,values,destDataFolderHndl,waveName.c_str(),0,fullPathOfCreatedWaves);
 
 	if(ret == WAVE_EXIST){
-		GlobalData::Instance().setError(ret,waveName);
+		globDataPtr->setError(ret,waveName);
 		return 0;
 	}
 	else if(ret != 0){
-		GlobalData::Instance().setInternalError(ret);
+		globDataPtr->setInternalError(ret);
 		return 0;
 	}
 
 	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
 	bool clearCache=true;
-	GlobalData::Instance().finalize(clearCache);
+	globDataPtr->finalize(clearCache);
 	END_OUTER_CATCH
 	return 0;
 }

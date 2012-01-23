@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;VernissageSDK_V2.0-1/src/Incl"
+				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;VernissageSDK_V2.1-T5/src/Incl"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				GeneratePreprocessedFile="0"
 				StringPooling="false"

@@ -33,7 +33,7 @@
 #include <limits>
 
 #include "XOPStandardHeaders.h"
-#include "vernissage.h"
+#include "Vernissage.h"
 
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/IGOR.lib")
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.lib")

@@ -329,7 +329,6 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */){
 	int ret, objType;
 	bool setting;
 
-	char dataFolderPath[MAXCMDLEN+1], buf[ARRAY_SIZE];
 	DataObjectValue objValue;
 
 	// debug setting
@@ -344,6 +343,7 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */){
 		sprintf(GlobalData::Instance().outputBuffer,"debug=%d",setting);
 	}
 	if(debuggingEnabled()){
+		char dataFolderPath[MAXCMDLEN+1], buf[ARRAY_SIZE];
 		// flags=3 returns the full path to the datafolder and including quotes if needed
 		ret = GetDataFolderNameOrPath(dataFolderHndl, 3,dataFolderPath);
 		if(ret == 0){

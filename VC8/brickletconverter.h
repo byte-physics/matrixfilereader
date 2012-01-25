@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "header.h"
-
 int createRawDataWave(DataFolderHandle dataFolderHandle, const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves);
 
 int createWaves(DataFolderHandle dataFolderHandle, const char *baseName, int brickletID, bool resampleData, int pixelSize, std::string &fullPathOfCreatedWaves);

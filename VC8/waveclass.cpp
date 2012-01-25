@@ -4,39 +4,34 @@
 	see License.txt in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "waveclass.h"
 #include "globaldata.h"
+#include "utils_generic.h"
 
 WaveClass::WaveClass(){
 
 	m_traceDir = NO_TRACE;
 	moreData=false;
+
 	m_doublePtr=NULL;
 	m_floatPtr=NULL;
-	pixelSize=1;
+
 	m_waveHandle=NULL;
+	pixelSize=1;
 
-	m_extrema = new ExtremaData();
+	m_extrema = ExtremaData();
 }
 
-WaveClass::~WaveClass(){
-
-	delete m_extrema;
-	m_extrema = NULL;
-}
+WaveClass::~WaveClass(){}
 
 /*
 	Set the extrema data, useful if WaveClass represents a complete bricklet
 */
 void WaveClass::setExtrema(const ExtremaData& extremaData){
 
-	m_extrema->setRawMin(extremaData.getRawMin());
-	m_extrema->setRawMax(extremaData.getRawMax());
-
-	m_extrema->setPhysValRawMax(extremaData.getPhysValRawMax());
-	m_extrema->setPhysValRawMin(extremaData.getPhysValRawMin());
+	m_extrema = extremaData;
 }
 
 
@@ -113,9 +108,9 @@ void WaveClass::setNameAndTraceDir(const std::string &basename, int traceDir){
 	Output debug info
 */
 void WaveClass::printDebugInfo(){
-	sprintf(globDataPtr->outputBuffer,"%s: waveHandle=%p, float=%p, double=%p, moreData=%s",\
+	sprintf(GlobalData::Instance().outputBuffer,"%s: waveHandle=%p, float=%p, double=%p, moreData=%s",\
 		m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr, moreData ? "true" : "false");
-	debugOutputToHistory(globDataPtr->outputBuffer);
+	debugOutputToHistory(GlobalData::Instance().outputBuffer);
 }
 
 /*
@@ -139,8 +134,8 @@ void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double
 
 	int ret = MDSetWaveScaling(m_waveHandle,dimension,sfAPtr,sfBPtr);
 	if(ret != 0){
-		outputToHistory(globDataPtr->outputBuffer);
-		sprintf(globDataPtr->outputBuffer,"WaveClass::setWaveScaling returned error %d",ret);
+		outputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"WaveClass::setWaveScaling returned error %d",ret);
 	}
 }
 
@@ -152,7 +147,12 @@ void WaveClass::setWaveUnits(int dimension, const std::string& units){
 
 	int ret = MDSetWaveUnits(m_waveHandle,dimension,units.c_str());
 	if(ret != 0){
-		outputToHistory(globDataPtr->outputBuffer);
-		sprintf(globDataPtr->outputBuffer,"WaveClass::setWaveUnits returned error %d",ret);
+		outputToHistory(GlobalData::Instance().outputBuffer);
+		sprintf(GlobalData::Instance().outputBuffer,"WaveClass::setWaveUnits returned error %d",ret);
 	}
+}
+
+void WaveClass::setWaveUnits( int dimension, const std::wstring& units )
+{
+	setWaveUnits(dimension,WStringToString(units));
 }

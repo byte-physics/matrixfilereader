@@ -4,18 +4,25 @@
 	see License.txt	in the source folder for details.
 */
 
+#pragma once
+#include <limits>
+
 /*
 	Holds the minima and maxima values for a given dataset. This dataset can either be a BrickletClass
 	(which may hold data of multiple trace directions) or a WaveClass (data from exactly one trace direction)
 */
 
-#pragma once
-
 class ExtremaData{
 
 public:
-	ExtremaData(void);
-	~ExtremaData(void);
+	ExtremaData()
+		:
+		m_rawMin(std::numeric_limits<int>::max()),
+		m_rawMax(std::numeric_limits<int>::min()),
+		m_physValRawMin(std::numeric_limits<double>::max()),
+		// we don't want the smallest positive number but the most negative one
+		m_physValRawMax(-std::numeric_limits<double>::max())
+		{}
 
 public:
 	void setRawMin(int rawMin){ m_rawMin = rawMin; };
@@ -35,4 +42,3 @@ private:
 	double	m_physValRawMin; //converted value of rawMin
 	double	m_physValRawMax; //converted value of rawMax
 };
-

@@ -4,16 +4,15 @@
 	see License.txt	in the source folder for details.
 */
 
-#include "header.h"
+#include "stdafx.h"
 
 #include "operationstructs.h"
 #include "operationsinterface.h"
-
 #include "utils_bricklet.h"
-
 #include "brickletconverter.h"
-
 #include "globaldata.h"
+#include "brickletclass.h"
+#include "utils_generic.h"
 
 namespace{
 	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4 };
@@ -106,7 +105,7 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	BEGIN_OUTER_CATCH
 	// due to our special handling of the /DEST flag we read the settigs later
-	globDataPtr->initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
+	GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
 
 	std::string fullPathOfCreatedWaves, baseName;
@@ -122,7 +121,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	// and also read the variable settings from this folder
 	if (p->DESTFlagEncountered){
 		if(p->dfref == NULL){
-			globDataPtr->setError(WRONG_PARAMETER,"dfref");
+			GlobalData::Instance().setError(WRONG_PARAMETER,"dfref");
 			return 0;
 		}
 		destDataFolderHndl = p->dfref;
@@ -131,23 +130,23 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	else{// no DEST flag given, so we take the current data folder as destination folder
 		ret = GetCurrentDataFolder(&destDataFolderHndl);
 		if(ret != 0){
-			globDataPtr->setInternalError(ret);
+			GlobalData::Instance().setInternalError(ret);
 			return 0;
 		}
 	}
-	globDataPtr->readSettings(destDataFolderHndl);
+	GlobalData::Instance().readSettings(destDataFolderHndl);
 
-	if(!globDataPtr->resultFileOpen()){
-		globDataPtr->setError(NO_FILE_OPEN);
+	if(!GlobalData::Instance().resultFileOpen()){
+		GlobalData::Instance().setError(NO_FILE_OPEN);
 		return 0;
 	}
 
-	Vernissage::Session *pSession = globDataPtr->getVernissageSession();
+	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);
 
 	const int numberOfBricklets = pSession->getBrickletCount();
 	if(numberOfBricklets == 0){
-		globDataPtr->setError(EMPTY_RESULTFILE);
+		GlobalData::Instance().setError(EMPTY_RESULTFILE);
 		return 0;
 	}
 
@@ -168,18 +167,18 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		}
 	}
 
-	sprintf(globDataPtr->outputBuffer,"startBrickletID=%d, endBrickletID=%d",startBrickletID,endBrickletID);
-	debugOutputToHistory(globDataPtr->outputBuffer);
+	sprintf(GlobalData::Instance().outputBuffer,"startBrickletID=%d, endBrickletID=%d",startBrickletID,endBrickletID);
+	debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
 	if(!isValidBrickletRange(startBrickletID,endBrickletID,numberOfBricklets)){
-		globDataPtr->setError(INVALID_RANGE);
+		GlobalData::Instance().setError(INVALID_RANGE);
 		return 0;
 	}
 
 	// from here on we have a none empty result set open and a valid bricklet range
 	if( p->NFlagEncountered ){
 		if( GetHandleSize(p->baseName) == 0L ){
-			globDataPtr->setError(WRONG_PARAMETER,"baseName");
+			GlobalData::Instance().setError(WRONG_PARAMETER,"baseName");
 			return 0;
 		}
 		else{
@@ -211,19 +210,19 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		resampleData = true;
 		pixelSize = int( floor(p->pixelSize) );
 		if(pixelSize < 2 || pixelSize > maximum_pixelSize){
-			globDataPtr->setError(WRONG_PARAMETER,"pixelSize");
+			GlobalData::Instance().setError(WRONG_PARAMETER,"pixelSize");
 			return 0;
 		}
 	}
 	else{
 		resampleData = false;
 	}
-	sprintf(globDataPtr->outputBuffer,"pixelSize=%d",pixelSize);
-	debugOutputToHistory(globDataPtr->outputBuffer);
+	sprintf(GlobalData::Instance().outputBuffer,"pixelSize=%d",pixelSize);
+	debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
 	for(brickletID=startBrickletID; brickletID <= endBrickletID; brickletID++){
 
-		bricklet = globDataPtr->getBrickletClassObject(brickletID);
+		bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
 		ASSERT_RETURN_ZERO(bricklet);
 
 		// check only the length of the wave "baseName"
@@ -231,21 +230,21 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		// if it is too long we abort
 		ret = CheckName(NULL,WAVE_OBJECT,baseName.c_str());
 		if(ret == NAME_TOO_LONG){
-			globDataPtr->setInternalError(ret);
+			GlobalData::Instance().setInternalError(ret);
 			return ret;
 		}
 
 		sprintf(waveName,brickletDataFormat,baseName.c_str(),brickletID);
 
 		// datafolder handling
-		if( globDataPtr->datafolderEnabled() ){
+		if( GlobalData::Instance().datafolderEnabled() ){
 
 			sprintf(dataFolderName,dataFolderFormat,brickletID);
 			ret = NewDataFolder(destDataFolderHndl, dataFolderName, &brickletDataFolderHndl);
 
 			// continue if the datafolder alrady exists, abort on all other errors
 			if( ret != 0 && ret != FOLDER_NAME_EXISTS ){
-				globDataPtr->setInternalError(ret);
+				GlobalData::Instance().setInternalError(ret);
 				return 0;
 			}
 		}
@@ -271,20 +270,20 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				return 0;
 				break;
 		}
-		if(!globDataPtr->dataCacheEnabled()){
+		if(!GlobalData::Instance().dataCacheEnabled()){
 			bricklet->clearCache();
 		}
 
 		if(ret == WAVE_EXIST){
-			globDataPtr->setError(ret,waveName);
+			GlobalData::Instance().setError(ret,waveName);
 			return 0;
 		}
 		else if(ret == INTERNAL_ERROR_CONVERTING_DATA || ret == UNKNOWN_ERROR){
-			globDataPtr->setError(ret);
+			GlobalData::Instance().setError(ret);
 			return 0;
 		}
 		else if(ret != SUCCESS){
-			globDataPtr->setInternalError(ret);
+			GlobalData::Instance().setInternalError(ret);
 			return 0;
 		}
 
@@ -297,7 +296,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
 
 	bool clearCache=true;
-	globDataPtr->finalize(clearCache,ret);
+	GlobalData::Instance().finalize(clearCache,ret);
 	END_OUTER_CATCH
 	return 0;
 }

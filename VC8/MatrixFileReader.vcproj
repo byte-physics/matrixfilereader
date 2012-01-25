@@ -47,15 +47,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;VernissageSDK_V2.0-1/src/Incl"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				GeneratePreprocessedFile="0"
 				StringPooling="false"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
-				AssemblerOutput="0"
-				AssemblerListingLocation=".\Release/"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="stdafx.h"
+				PrecompiledHeaderFile="Release/stdafx.pch"
+				AssemblerListingLocation=""
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
@@ -67,18 +67,16 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\brt127\My Documents\gitRepo\Archiv-so-erhalten\Wavemetrics XOP Toolkit\XOPToolkit6Alpha100506\XOP Toolkit 6\IgorXOPs6\XOPSupport&quot;"
+				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport/"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/MACHINE:I386"
 				AdditionalDependencies="version.lib"
-				OutputFile="Release\matrixfilereader.xop"
+				OutputFile="$(ConfigurationName)/matrixfilereader.xop"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="libcmt.lib"
@@ -436,10 +434,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\extremadata.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\globaldata.cpp"
 				>
 			</File>
@@ -500,6 +494,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\stdafx.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\utils_bricklet.cpp"
 				>
 			</File>
@@ -549,11 +555,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\globaldata.h"
+				RelativePath=".\ForwardDecl.h"
 				>
 			</File>
 			<File
-				RelativePath=".\header.h"
+				RelativePath=".\globaldata.h"
 				>
 			</File>
 			<File
@@ -570,6 +576,10 @@
 			</File>
 			<File
 				RelativePath=".\preferences.h"
+				>
+			</File>
+			<File
+				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
@@ -626,6 +636,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\todo.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

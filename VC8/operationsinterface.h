@@ -3,16 +3,13 @@
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
+#pragma once
+
+#include "operationstructs.h"
 
 /*
 	Takes care of xop initialization, igor message handling and registering all operations
 */
-
-#pragma once
-
-#include "header.h"
-
-#include "operationstructs.h"
 
 /* custom error codes */
 #define REQUIRES_IGOR_620	FIRST_XOP_ERR + 1
@@ -27,9 +24,9 @@ extern "C" void XOPEntry(void);
 #define BEGIN_OUTER_CATCH	try{
 #define END_OUTER_CATCH		}\
 							catch(...){\
-								sprintf(globDataPtr->outputBuffer,"Unexpected exception caught in line %d, function %s,  file %s\r", __LINE__, __FUNCTION__, __FILE__);\
-								XOPNotice(globDataPtr->outputBuffer);\
-								globDataPtr->setError(UNKNOWN_ERROR);\
+								sprintf(GlobalData::Instance().outputBuffer,"Unexpected exception caught in line %d, function %s,  file %s\r", __LINE__, __FUNCTION__, __FILE__);\
+								XOPNotice(GlobalData::Instance().outputBuffer);\
+								GlobalData::Instance().setError(UNKNOWN_ERROR);\
 								return 0;\
 							}
 

@@ -23,7 +23,6 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include <algorithm>
 
 #include <afx.h>
 
@@ -33,7 +32,6 @@
 #include <limits>
 
 #include "XOPStandardHeaders.h"
-#include "Vernissage.h"
 
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/IGOR.lib")
 #pragma comment(lib,"XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8/XOPSupport.lib")
@@ -46,3 +44,5 @@
 #include "version.h"
 
 #include "xop_const_wrappers.h"
+
+#include "Vernissage.h"

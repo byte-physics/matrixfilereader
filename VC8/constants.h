@@ -84,7 +84,7 @@ const char double_option_name[]		= "V_MatrixFileReaderDouble";
 const char cache_option_name[]		= "V_MatrixFileReaderCache";
 
 // Due to historic problems with different vernissage version, we currently only support exactly one version
-const char properVernissageVersion[] ="2.0";
+const char properVernissageVersion[] ="2.1";
 
 // default keys for MFR_CreateOverViewTable
 const char keyList_default[] = "brickletID;scanCycleCount;runCycleCount;sequenceID;dimension;channelName";

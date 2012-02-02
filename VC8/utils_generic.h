@@ -51,3 +51,4 @@ void joinString(const std::vector<std::string> &list,const char* sepChar, std::s
 
 bool doubleToBool(double value);
 
+void RemoveAllBackslashesAtTheEnd( char* str );

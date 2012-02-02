@@ -11,6 +11,7 @@
 #include "globaldata.h"
 
 #include "utils_generic.h"
+
 extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH
 	GlobalData::Instance().initialize(p->calledFromMacro,p->calledFromFunction);
@@ -79,15 +80,6 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		return 0;
 	}
 
-	// store the last used directory in GlobalData::Instance().openDlgInitialDir
-	strncpy(GlobalData::Instance().openDlgInitialDir,dirPath,MAX_PATH_LEN+1);
-	GlobalData::Instance().openDlgInitialDir[MAX_PATH_LEN]='\0';
-
-	// remove suffix \\ in the dirPath because loadResultset does not like that
-	if(dirPath[strlen(dirPath)-1] == '\\'){
-		dirPath[strlen(dirPath)-1] = '\0';
-	}
-
 	// from here on we have
 	// filename : myName.test
 	// dirPath c:\data
@@ -111,6 +103,12 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		GlobalData::Instance().setError(FILE_NOT_READABLE,fullPath);
 		return 0;	
 	}
+
+	RemoveAllBackslashesAtTheEnd(dirPath);
+
+	// store the last used directory in GlobalData::Instance().openDlgInitialDir
+	strncpy(GlobalData::Instance().openDlgInitialDir,dirPath,MAX_PATH_LEN+1);
+	GlobalData::Instance().openDlgInitialDir[MAX_PATH_LEN]='\0';
 
 	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
 	ASSERT_RETURN_ZERO(pSession);

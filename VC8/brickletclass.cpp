@@ -71,7 +71,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 			m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
 		}
 		catch(...){
-			sprintf(GlobalData::Instance().outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
+			sprintf(GlobalData::Instance().outputBuffer,"Could not load the bricklet contents, probably out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
 			outputToHistory(GlobalData::Instance().outputBuffer);
 			*pBuffer = NULL;
 			count = 0;
@@ -132,9 +132,9 @@ const std::vector<std::string>& BrickletClass::getBrickletMetaDataValues(){
 		try{
 			loadBrickletMetaDataFromResultFile();
 		}
-		catch(CMemoryException *e){
-			XOPNotice("Out of memory in getBrickletMetaData()");
+		catch(CMemoryException* e){
 			e->Delete();
+			XOPNotice("Out of memory in getBrickletMetaDataValues()");
 			return m_metaDataValues;
 		}
 	}
@@ -150,9 +150,9 @@ const std::vector<std::string>& BrickletClass::getBrickletMetaDataKeys(){
 		try{
 			loadBrickletMetaDataFromResultFile();
 		}
-		catch(CMemoryException *e){
-			XOPNotice("Out of memory in getBrickletMetaData()");
+		catch(CMemoryException* e){
 			e->Delete();
+			XOPNotice("Out of memory in getBrickletMetaData()");
 			return m_metaDataKeys;
 		}
 	}

@@ -237,8 +237,8 @@ void convertHandleToString(Handle strHandle,std::string &str){
 	try{
 		str = std::string(*strHandle,handleSize);
 	}
-	catch(...){
-		XOPNotice("Out of memory in convertHandleToString");
-		str.clear();
+	catch(CMemoryException* e){
+		e->Delete();
+		XOPNotice("Out of memory in convertHandleToString()");
 	}
 }

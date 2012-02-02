@@ -52,4 +52,3 @@ void appendToWaveList(const DataFolderHandle& df, const WaveClass& wave, std::st
 void appendToWaveList(const DataFolderHandle& df, const waveHndl& wv, std::string& waveList);
 
 void convertHandleToString(Handle strHandle,std::string &str);
-

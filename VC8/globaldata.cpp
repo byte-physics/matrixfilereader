@@ -158,7 +158,8 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet
 	try{
 		bricklet = new BrickletClass(pBricklet,brickletID);
 	}
-	catch(CMemoryException *e){
+	catch(CMemoryException* e){
+		e->Delete();
 		XOPNotice("Out of memory in createBrickletClassObject\r");
 		throw e;
 	}

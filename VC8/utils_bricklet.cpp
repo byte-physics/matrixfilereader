@@ -60,7 +60,8 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 	try{
 		allColumns.reserve(firstColumn.size() + secondColumn.size());
 	}
-	catch(...){
+	catch(CMemoryException* e){
+		e->Delete();
 		XOPNotice("Out of memory in createAndFillTextWave()\r");
 		return UNKNOWN_ERROR;
 	}

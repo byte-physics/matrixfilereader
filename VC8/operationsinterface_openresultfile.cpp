@@ -140,7 +140,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		try{
 			GlobalData::Instance().createBrickletClassObject(i,pBricklet);
 		}
-		catch(CMemoryException *e){
+		catch(CMemoryException* e){
 			e->Delete();
 			sprintf(GlobalData::Instance().outputBuffer,"Could not reserve memory for brickletID %d, giving up",i);
 			outputToHistory(GlobalData::Instance().outputBuffer);

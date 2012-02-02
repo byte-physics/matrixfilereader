@@ -93,7 +93,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
 	splitString(keyList,listSepChar,keys);
 
-	if( keys.size() == 0 ){
+	if( keys.empty() ){
 		GlobalData::Instance().setError(WRONG_PARAMETER,"keyList");
 		return 0;
 	}

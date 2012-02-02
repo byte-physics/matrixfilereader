@@ -24,7 +24,7 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 	MemClear(dimensionSizes, sizeof(dimensionSizes));
 
 	// create 2D textwave with firstColumn.size() rows and 2 columns
-	if(firstColumn.size() == 0 || secondColumn.size() == 0 ){
+	if(firstColumn.empty() || secondColumn.empty() ){
 		sprintf(GlobalData::Instance().outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
 		outputToHistory(GlobalData::Instance().outputBuffer);
 		return UNKNOWN_ERROR;

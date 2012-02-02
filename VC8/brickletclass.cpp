@@ -128,7 +128,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 */
 const std::vector<std::string>& BrickletClass::getBrickletMetaDataValues(){
 
-	if(m_metaDataKeys.size() == 0 ||  m_metaDataValues.size() == 0){
+	if(m_metaDataKeys.empty() ||  m_metaDataValues.empty()){
 		try{
 			loadBrickletMetaDataFromResultFile();
 		}
@@ -146,7 +146,7 @@ const std::vector<std::string>& BrickletClass::getBrickletMetaDataValues(){
 */
 const std::vector<std::string>& BrickletClass::getBrickletMetaDataKeys(){
 
-	if(m_metaDataKeys.size() == 0 ||  m_metaDataValues.size() == 0){
+	if(m_metaDataKeys.empty() ||  m_metaDataValues.empty()){
 		try{
 			loadBrickletMetaDataFromResultFile();
 		}
@@ -438,7 +438,7 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 		axisTableSetsMap = m_VernissageSession->getAxisTableSets(m_brickletPtr,*itAllAxes);
 
 		// if it is empty, we got the standard table set which is [start=1,step=1,stop=clocks]
-		if(axisTableSetsMap.size() == 0){
+		if(axisTableSetsMap.empty()){
 
 			metaDataKeys.push_back( axisNameString + ".AxisTableSet.count");
 			metaDataValues.push_back(anyTypeToString<int>(1));
@@ -581,12 +581,12 @@ std::string BrickletClass::getMetaDataValueAsString(const std::string &key){
 
 	std::string value;
 
-	if(key.size() == 0){
+	if(key.empty()){
 		outputToHistory("BUG: getMetaDataValueAsString called with empty parameter");
 		return value;
 	}
 
-	if(m_metaDataKeys.size() == 0 || m_metaDataValues.size() == 0){
+	if(m_metaDataKeys.empty() || m_metaDataValues.empty()){
 		loadBrickletMetaDataFromResultFile();
 	}
 

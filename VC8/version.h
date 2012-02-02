@@ -10,5 +10,5 @@
 	returned by the GetMtrxFileReaderVersion operation and also used for the resource file
 */
 
-#define MatrixFileReader_XOP_VERSION 0,1,8,0
-#define MatrixFileReader_XOP_VERSION_STR "0.18\0"
+#define MatrixFileReader_XOP_VERSION 0,1,8,1
+#define MatrixFileReader_XOP_VERSION_STR "0.181\0"

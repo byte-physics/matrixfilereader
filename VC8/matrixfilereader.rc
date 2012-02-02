@@ -58,7 +58,7 @@ BEGIN
             VALUE "FileDescription", "MatrixFileReader XOP is an Igor Pro extension.\0"
             VALUE "FileVersion", MatrixFileReader_XOP_VERSION_STR
             VALUE "InternalName", "matrixFileReader\0"
-            VALUE "LegalCopyright", "Copyright © 2009-2011\0"
+            VALUE "LegalCopyright", "2009-2012\0"
             VALUE "OriginalFilename", "matrixFileReader.xop\0"
             VALUE "ProductName", "MatrixFileReader XOP\0"
             VALUE "ProductVersion", MatrixFileReader_XOP_VERSION_STR

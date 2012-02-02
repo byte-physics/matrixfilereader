@@ -39,7 +39,7 @@ Only one vernissage version can be installed at a time, so we take the one which
 The length of the arrays is taken from "Registry Element Size Limits"@MSDN
 The registry key looks like "HKEY_LOCAL_MACHINE\SOFTWARE\Omicron NanoTechnology\Vernissage\V1.0\Main"
 */
-void DLLHandler::setLibraryPath(){
+std::string DLLHandler::getVernissagePath(){
 
 	BOOL result;
 	char data[16383];
@@ -56,7 +56,7 @@ void DLLHandler::setLibraryPath(){
 
 	if(result != ERROR_SUCCESS){
 		outputToHistory("Opening a registry key failed. Is Vernissage installed?");
-		return;
+		return std::string();
 	}
 
 	result = RegEnumKeyEx(hregBaseKey,subKeyIndex, subKeyName, &subKeyLength,NULL,NULL,NULL,NULL);
@@ -64,7 +64,7 @@ void DLLHandler::setLibraryPath(){
 	if(result != ERROR_SUCCESS){
 		sprintf(GlobalData::Instance().outputBuffer,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
 		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return;
+		return std::string();
 	}
 
 	regKey  = regBaseKeyName;
@@ -80,7 +80,7 @@ void DLLHandler::setLibraryPath(){
 	if(result != ERROR_SUCCESS){
 		sprintf(GlobalData::Instance().outputBuffer,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
 		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return;
+		return std::string();
 	}
 
 	result = RegQueryValueEx(hKey,"InstallDirectory",NULL,NULL,(LPBYTE) data,&dataLength);
@@ -91,7 +91,7 @@ void DLLHandler::setLibraryPath(){
 	if(result != ERROR_SUCCESS){
 		sprintf(GlobalData::Instance().outputBuffer,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
 		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return;
+		return std::string();
 	}
 
 	std::string version = subKeyName;
@@ -100,23 +100,19 @@ void DLLHandler::setLibraryPath(){
 	if(m_vernissageVersion.compare(properVernissageVersion) != 0 ){
 		sprintf(GlobalData::Instance().outputBuffer,"Vernissage version %s can not be used. Please install version %s and try again.",m_vernissageVersion.c_str(),properVernissageVersion);
 		outputToHistory(GlobalData::Instance().outputBuffer);
-		return;
+		return std::string();
 	}
 	else{
 		sprintf(GlobalData::Instance().outputBuffer,"Vernissage version %s",m_vernissageVersion.c_str());
 		debugOutputToHistory(GlobalData::Instance().outputBuffer);	
 	}
 
-	std::string dllDirectory (data);
-	dllDirectory.append("\\Bin");
+	std::string dllDirectory(data);
+	dllDirectory += "Bin";
 	sprintf(GlobalData::Instance().outputBuffer, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
 	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-	result = SetDllDirectory((LPCSTR) dllDirectory.c_str());
 
-	if(!result){
-		debugOutputToHistory("Error setting DLL load path");
-		return;
-	}
+	return dllDirectory;
 }
 
 /*
@@ -126,16 +122,22 @@ In case something goes wrong, NULL is returned
 Vernissage::Session* DLLHandler::createSessionObject(){
 
 	Vernissage::Session *pSession=NULL;
-	HMODULE module;
-	std::string dllName;
-
 	std::vector<std::string> dllNames;
+
+	dllNames.push_back("Ace.dll");
+	dllNames.push_back("Platform.dll");
+	dllNames.push_back("Base.dll");
+	dllNames.push_back("Xerces.dll");
+	dllNames.push_back("Store_XML.dll");
+	dllNames.push_back("Store_ResultWriter.dll");
+	dllNames.push_back("Store_Vernissage.dll");
 	dllNames.push_back("Foundation.dll");
 
-	setLibraryPath();
+	std::string dllDirectory = getVernissagePath();
 
+	HMODULE module;
 	for( std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++){
-		dllName = *it;
+		std::string dllName = ( dllDirectory.empty() ?  *it : dllDirectory + "\\" + *it );
 		module = LoadLibrary( (LPCSTR) dllName.c_str());
 
 		if(module != NULL){
@@ -143,28 +145,21 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 			debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		}
 		else{
-			sprintf(GlobalData::Instance().outputBuffer,"Something went wrong loading the DLL %s",dllName.c_str());
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
+			sprintf(GlobalData::Instance().outputBuffer,"Something went wrong (windows error code %d) loading the DLL %s", GetLastError(), dllName.c_str());
+			outputToHistory(GlobalData::Instance().outputBuffer);
 			return pSession;
 		}
 	}
-	ASSERT_RETURN_ZERO(module);
-
 	// module is now pointing to Foundation.dll
 	m_foundationModule		= module;
+	ASSERT_RETURN_ZERO(m_foundationModule);
 
 	m_pGetSessionFunc		= (GetSessionFunc)		GetProcAddress(m_foundationModule, "getSession");
 	m_pReleaseSessionFunc	= (ReleaseSessionFunc)  GetProcAddress(m_foundationModule, "releaseSession");
 
-	ASSERT_RETURN_ZERO(m_foundationModule);
 	ASSERT_RETURN_ZERO(m_pGetSessionFunc);
 	ASSERT_RETURN_ZERO(m_pReleaseSessionFunc);
 
-	if(m_pGetSessionFunc != NULL)
-	{
-		pSession = (*m_pGetSessionFunc) ();
-	}
-
-	ASSERT_RETURN_ZERO(pSession);
+	pSession = (*m_pGetSessionFunc) ();
 	return pSession;
 }

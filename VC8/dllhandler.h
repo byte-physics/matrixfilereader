@@ -29,7 +29,7 @@ class DLLHandler{
 		const std::string& getVernissageVersion()const{ return m_vernissageVersion; };
 
 	private:
-		void setLibraryPath();
+		std::string getVernissagePath();
 
 	private:
 		// variables

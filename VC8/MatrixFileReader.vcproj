@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;VernissageSDK_V2.0-1/src/Incl"
+				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;VernissageSDK_T2.1_5/src/Incl"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				GeneratePreprocessedFile="0"
 				StringPooling="false"
@@ -75,10 +75,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="version.lib"
+				AdditionalDependencies="version.lib Igor.lib XOPSupport.lib"
 				OutputFile="$(ConfigurationName)/matrixfilereader.xop"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories=""
+				AdditionalLibraryDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8"
 				IgnoreDefaultLibraryNames="libcmt.lib"
 				DelayLoadDLLs=""
 				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"

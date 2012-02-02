@@ -12,10 +12,13 @@
 #include "extremadata.h"
 #include "utils_generic.h"
 
-BrickletClass::BrickletClass(void* const pBricklet,int brickletID):m_brickletPtr(pBricklet),m_rawBufferContents(NULL),m_brickletID(brickletID){
-
-	m_VernissageSession = GlobalData::Instance().getVernissageSession();
-	m_extrema = ExtremaData();
+BrickletClass::BrickletClass(void* const pBricklet,int brickletID)
+:
+m_brickletPtr(pBricklet),
+m_rawBufferContents(NULL),
+m_brickletID(brickletID),
+m_VernissageSession(GlobalData::Instance().getVernissageSession()),
+m_extrema(ExtremaData()){
 
 	ASSERT_RETURN_VOID(m_VernissageSession);
 }

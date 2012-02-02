@@ -60,6 +60,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		sprintf(GlobalData::Instance().outputBuffer,"dir=%s,index=%d",GlobalData::Instance().openDlgInitialDir,GlobalData::Instance().openDlgFileIndex);
 		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 
+		// empty initial filename
+		fullPath[0]='\0';
 		ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(GlobalData::Instance().openDlgFileIndex), GlobalData::Instance().openDlgInitialDir, fullPath);
 		if(ret == -1){ //the user cancelled the dialog
 			GlobalData::Instance().setError(WRONG_PARAMETER,"fileNameOrPath");

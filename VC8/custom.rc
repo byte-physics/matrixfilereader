@@ -19,6 +19,14 @@ BEGIN
 	0,
 END
 
+1101 STR#
+BEGIN // Misc strings that Igor looks for.
+	"-1\0",
+	"---\0",
+	"matrixfilereader Help\0",		// Name of XOP's help file.
+	"\0"							// 0 required to terminate the resource.
+END
+
 1100 XOPI
 BEGIN
 	XOP_VERSION,				

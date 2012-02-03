@@ -75,7 +75,11 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	}
 
 	ret = GetDirectoryAndFileNameFromFullPath(fullPath,dirPath,fileName);
-	if( ret != 0){
+	if( ret == WM_BAD_FILE_NAME){
+		GlobalData::Instance().setError(FILE_NOT_READABLE,fullPath);
+		return 0;
+	}
+	else if( ret != 0){
 		GlobalData::Instance().setInternalError(ret);
 		return 0;
 	}

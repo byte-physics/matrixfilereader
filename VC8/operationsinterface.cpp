@@ -12,7 +12,7 @@
 #include "globaldata.h"
 #include "preferences.h"
 
-static int RegisterGetResultFileMetaData(void){
+static int RegisterGetResultFileMetaData(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -24,7 +24,7 @@ static int RegisterGetResultFileMetaData(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetResultFileMetaDataRuntimeParams), (void*)ExecuteGetResultFileMetaData, 0);
 }
 
-static int RegisterGetMtrxFileReaderVersion(void){
+static int RegisterGetMtrxFileReaderVersion(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -36,7 +36,7 @@ static int RegisterGetMtrxFileReaderVersion(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetVersionRuntimeParams), (void*)ExecuteGetVersion, 0);
 }
 
-static int RegisterGetVernissageVersion(void){
+static int RegisterGetVernissageVersion(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -48,7 +48,7 @@ static int RegisterGetVernissageVersion(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetVernissageVersionRuntimeParams), (void*)ExecuteGetVernissageVersion, 0);
 }
 
-static int RegisterGetXOPErrorMessage(void){
+static int RegisterGetXOPErrorMessage(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -60,7 +60,7 @@ static int RegisterGetXOPErrorMessage(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetXOPErrorMessageRuntimeParams), (void*)ExecuteGetXOPErrorMessage, 0);
 }
 
-static int RegisterOpenResultFile(void){
+static int RegisterOpenResultFile(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -72,7 +72,7 @@ static int RegisterOpenResultFile(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(OpenResultFileRuntimeParams), (void*)ExecuteOpenResultFile, 0);
 }
 
-static int RegisterCloseResultFile(void){
+static int RegisterCloseResultFile(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -84,7 +84,7 @@ static int RegisterCloseResultFile(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(CloseResultFileRuntimeParams), (void*)ExecuteCloseResultFile, 0);
 }
 
-static int RegisterGetBrickletCount(void){
+static int RegisterGetBrickletCount(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -96,7 +96,7 @@ static int RegisterGetBrickletCount(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletCountRuntimeParams), (void*)ExecuteGetBrickletCount, 0);
 }
 
-static int RegisterGetResultFileName(void){
+static int RegisterGetResultFileName(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -108,7 +108,7 @@ static int RegisterGetResultFileName(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetResultFileNameRuntimeParams), (void*)ExecuteGetResultFileName, 0);
 }
 
-static int RegisterGetBrickletData(void){
+static int RegisterGetBrickletData(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -121,7 +121,7 @@ static int RegisterGetBrickletData(void){
 }
 
 
-static int RegisterGetBrickletMetaData(void){
+static int RegisterGetBrickletMetaData(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -133,7 +133,7 @@ static int RegisterGetBrickletMetaData(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletMetaDataRuntimeParams), (void*)ExecuteGetBrickletMetaData, 0);
 }
 
-static int RegisterGetBrickletRawData(void){
+static int RegisterGetBrickletRawData(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -145,7 +145,7 @@ static int RegisterGetBrickletRawData(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletRawDataRuntimeParams), (void*)ExecuteGetBrickletRawData, 0);
 }
 
-static int RegisterGetReportTemplate(void){
+static int RegisterGetReportTemplate(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -157,7 +157,7 @@ static int RegisterGetReportTemplate(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetReportTemplateRuntimeParams), (void*)ExecuteGetReportTemplate, 0);
 }
 
-static int RegisterCreateOverviewTable(void){
+static int RegisterCreateOverviewTable(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -169,7 +169,7 @@ static int RegisterCreateOverviewTable(void){
 	return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(CreateOverviewTableRuntimeParams), (void*)ExecuteCreateOverviewTable, 0);
 }
 
-static int RegisterCheckForNewBricklets(void){
+static int RegisterCheckForNewBricklets(){
 	const char* cmdTemplate;
 	const char* runtimeNumVarList;
 	const char* runtimeStrVarList;
@@ -185,7 +185,7 @@ static int RegisterCheckForNewBricklets(void){
 This is the entry point from the host application to the XOP for all messages after the
 INIT message.
 */
-extern "C" void XOPEntry(void){
+extern "C" void XOPEntry(){
 	XOPIORecResult result = 0;
 
 	try{

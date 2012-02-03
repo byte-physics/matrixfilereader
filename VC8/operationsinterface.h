@@ -17,7 +17,7 @@
 
 /* Prototypes */
 HOST_IMPORT int XOPMain(IORecHandle ioRecHandle);
-extern "C" void XOPEntry(void);
+extern "C" void XOPEntry();
 
 // Igor aborts if it encounters an unhandled exception, therefore every operation
 // needs enclosing BEGIN_OUTER_CATCH and END_OUTER_CATCH macros

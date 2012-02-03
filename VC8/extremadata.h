@@ -25,16 +25,14 @@ public:
 		{}
 
 public:
-	void setRawMin(int rawMin){ m_rawMin = rawMin; };
-	void setRawMax(int rawMax){ m_rawMax = rawMax; };
-	void setPhysValRawMin(double physValRawMin){ m_physValRawMin = physValRawMin; };
-	void setPhysValRawMax(double physValRawMax){ m_physValRawMax = physValRawMax; };
+	void setMinimum(int rawMin, double physValRawMin){ m_rawMin = rawMin; m_physValRawMin = physValRawMin; };
+	void setMaximum(int rawMax, double physValRawMax){ m_rawMax = rawMax; m_physValRawMax = physValRawMax; };
 
 	// const getters
-	int getRawMin ()const{ return m_rawMin ; };
-	int getRawMax ()const{ return m_rawMax; };
-	double getPhysValRawMin ()const{ return m_physValRawMin; };
-	double getPhysValRawMax ()const{ return m_physValRawMax; };
+	int getRawMin() const{ return m_rawMin ; };
+	int getRawMax() const{ return m_rawMax; };
+	double getPhysValRawMin() const{ return m_physValRawMin; };
+	double getPhysValRawMax() const{ return m_physValRawMax; };
 
 private:
 	int		m_rawMin;

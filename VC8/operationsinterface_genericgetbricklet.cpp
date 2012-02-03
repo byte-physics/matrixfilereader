@@ -104,6 +104,7 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p){
 
 int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	BEGIN_OUTER_CATCH
+
 	// due to our special handling of the /DEST flag we read the settigs later
 	GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
 	SetOperationStrVar(S_waveNames,"");
@@ -253,7 +254,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 			// in destDataFolderHndl, see DEST flag handling above
 			brickletDataFolderHndl = destDataFolderHndl;
 		}
-		
+
 		switch(typeOfData){
 			case RAW_DATA:
 				ret = createRawDataWave(brickletDataFolderHndl,waveName,brickletID,fullPathOfCreatedWaves);
@@ -262,7 +263,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				ret = createWaves(brickletDataFolderHndl,waveName,brickletID,resampleData,pixelSize,fullPathOfCreatedWaves);		
 				break;
 			case META_DATA:
-				ret = createAndFillTextWave(bricklet->getBrickletMetaDataKeys(),bricklet->getBrickletMetaDataValues()\
+				ret = createAndFillTextWave(bricklet->getBrickletMetaDataKeys(),bricklet->getBrickletMetaDataValues()
 											,brickletDataFolderHndl,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			default:
@@ -295,8 +296,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 
 	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
 
-	bool clearCache=true;
-	GlobalData::Instance().finalize(clearCache,ret);
+	bool filledCache=true;
+	GlobalData::Instance().finalize(filledCache,ret);
 	END_OUTER_CATCH
 	return 0;
 }

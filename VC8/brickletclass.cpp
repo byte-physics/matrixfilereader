@@ -23,7 +23,7 @@ m_extrema(ExtremaData()){
 	ASSERT_RETURN_VOID(m_VernissageSession);
 }
 
-BrickletClass::~BrickletClass(void){
+BrickletClass::~BrickletClass(){
 	this->clearCache();
 }
 
@@ -31,7 +31,7 @@ BrickletClass::~BrickletClass(void){
 	delete our internally cached data, is called at destruction time and if we want keep memory
 	consumption low
 */
-void BrickletClass::clearCache(void){
+void BrickletClass::clearCache(){
 
 	if(m_rawBufferContents != NULL){
 		sprintf(GlobalData::Instance().outputBuffer,"Deleting raw data from bricklet %d",m_brickletID);
@@ -95,11 +95,13 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
 		// implicitly which is quite expensive
-		m_extrema.setRawMin(m_VernissageSession->getRawMin(m_brickletPtr));
-		m_extrema.setRawMax(m_VernissageSession->getRawMax(m_brickletPtr));
+		m_extrema.setMinimum(m_VernissageSession->getRawMin(m_brickletPtr),
+							 m_VernissageSession->toPhysical(m_extrema.getRawMin(), m_brickletPtr)
+							 );
 
-		m_extrema.setPhysValRawMin(m_VernissageSession->toPhysical(m_extrema.getRawMin(), m_brickletPtr));
-		m_extrema.setPhysValRawMax(m_VernissageSession->toPhysical(m_extrema.getRawMax(), m_brickletPtr));
+		m_extrema.setMaximum(m_VernissageSession->getRawMax(m_brickletPtr),
+							 m_VernissageSession->toPhysical(m_extrema.getRawMax(), m_brickletPtr)
+							 );
 
 		sprintf(GlobalData::Instance().outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
 			m_extrema.getRawMin(),m_extrema.getRawMax(),m_extrema.getPhysValRawMin(),m_extrema.getPhysValRawMax());

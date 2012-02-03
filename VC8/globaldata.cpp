@@ -83,7 +83,7 @@ void GlobalData::closeSession(){
 }
 
 // return a version string identifying the vernissage DLL version
-std::string GlobalData::getVernissageVersion(){
+const std::string& GlobalData::getVernissageVersion(){
 
 	if(m_VernissageSession == NULL){
 		this->getVernissageSession();
@@ -94,23 +94,25 @@ std::string GlobalData::getVernissageVersion(){
 
 bool GlobalData::resultFileOpen() const{
 
-	return !m_resultFileName.empty();
+	return ( !m_resultFileName.empty() );
 }
 
 std::string GlobalData::getDirPath() const{
 
 	return WStringToString(m_resultDirPath);
 }
+
 std::string GlobalData::getFileName() const{
 
 	return WStringToString(m_resultFileName);
 }
 
-std::wstring GlobalData::getDirPathWString() const{
+const std::wstring& GlobalData::getDirPathWString() const{
 
 	return m_resultDirPath;
 }
-std::wstring GlobalData::getFileNameWString() const{
+
+const std::wstring& GlobalData::getFileNameWString() const{
 
 	return m_resultFileName;
 }
@@ -121,15 +123,7 @@ std::wstring GlobalData::getFileNameWString() const{
 */
 int GlobalData::getIgorWaveType() const{
 
-	int waveType;
-
-	if(m_doubleWave){
-		waveType = NT_FP64;
-	}
-	else{
-		waveType = NT_FP32;
-	}
-	return waveType;
+	return ( m_doubleWave ? NT_FP64 : NT_FP32 );
 }
 
 /*	
@@ -195,10 +189,9 @@ void GlobalData::finalize(bool filledCache /* = false */, int errorCode /* = SUC
 	this->setError(errorCode);
 
 	if(!dataCacheEnabled() && filledCache){
-		BrickletClass *bricklet = NULL;
 		int totalBrickletCount = m_VernissageSession->getBrickletCount();
 		for(int i=1; i <= totalBrickletCount; i++){
-			bricklet = GlobalData::Instance().getBrickletClassObject(i);
+			BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(i);
 			ASSERT_RETURN_VOID(bricklet);
 			bricklet->clearCache();
 		}
@@ -234,8 +227,8 @@ void GlobalData::initialize(int calledFromMacro, const int calledFromFunction){
 	Takes care of setting V_flag to the current error value
 	Should be called immediately before calling return in a operation
 */
-void GlobalData::setError(int errorCode, std::string argument){
-
+void GlobalData::setError( int errorCode, const std::string& argument /*= std::string()*/ )
+{
 	if(errorCode < SUCCESS || errorCode > WAVE_EXIST){
 		outputToHistory("BUG: errorCode is out of range");
 		m_lastError = UNKNOWN_ERROR;

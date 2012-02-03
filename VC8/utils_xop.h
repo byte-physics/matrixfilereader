@@ -44,8 +44,8 @@ void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle);
 
 int stringVectorToTextWave(const std::vector<std::string>& metaData,waveHndl waveHandle);
 
-void waveClearNaN64(double *wavePtr, const CountInt &length);
-void waveClearNaN32(float  *wavePtr, const CountInt &length);
+void waveClearNaN64(double *wavePtr, CountInt length);
+void waveClearNaN32(float *wavePtr, CountInt length);
 
 std::string getFullWavePath(const DataFolderHandle& df, const waveHndl& wv);
 void appendToWaveList(const DataFolderHandle& df, const WaveClass& wave, std::string& waveList);

@@ -20,6 +20,17 @@
 #define ASSERT_RETURN_ONE(A) { MYASSERT(A,1)}
 #define ASSERT_RETURN_VOID(A) { MYASSERT(A,)}
 
+//#define START_TIMER(A) \
+//	sprintf(GlobalData::Instance().outputBuffer,"Starting timer %d: line %d, function %s,  file %s", A, __LINE__, __FUNCTION__, __FILE__);\
+//	outputToHistory(GlobalData::Instance().outputBuffer);\
+//	CStopWatch sw##A; sw##A.startTimer();
+//	
+//
+//#define STOP_TIMER(A)  { sw##A.stopTimer();\
+//	sprintf(GlobalData::Instance().outputBuffer,"Elapsed time of timer %d [s]: %g, line %d, function %s,  file %s", A, sw##A.getElapsedTime(), __LINE__, __FUNCTION__, __FILE__);\
+//	outputToHistory(GlobalData::Instance().outputBuffer);\
+//	}
+
 //#define DEBUGCODE \
 //	sprintf(GlobalData::Instance().outputBuffer,"line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);\
 //	outputToHistory(GlobalData::Instance().outputBuffer);

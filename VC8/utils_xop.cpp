@@ -157,13 +157,11 @@ void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle){
 /*
 	Sets the complete wave data to which data points to NaN (double precision version)
 */
-void waveClearNaN64(double* data, const CountInt &size){
-
-	long i;
-
+void waveClearNaN64( double* data, CountInt length )
+{
 	ASSERT_RETURN_VOID(data);
 
-	for (i = 0; i < size; i++){
+	for (long i = 0; i < length; i++){
 		*data++ = DOUBLE_NAN;
 	}
 }
@@ -171,13 +169,11 @@ void waveClearNaN64(double* data, const CountInt &size){
 /*
 	Sets the complete wave data to which data points to NaN (single precision version)
 */
-void waveClearNaN32(float *data, const CountInt &size){
-
-	long i;
-
+void waveClearNaN32( float* data, CountInt length )
+{
 	ASSERT_RETURN_VOID(data);
 	
-	for (i = 0; i < size; i++){
+	for (long i = 0; i < length; i++){
 		*data++ = SINGLE_NAN;
 	}
 }

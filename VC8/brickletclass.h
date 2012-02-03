@@ -17,13 +17,13 @@ class BrickletClass
 {
 public:
 	BrickletClass(void* const pBricklet,int brickletID);
-	~BrickletClass(void);
+	~BrickletClass();
 
 public:
 	// resetting *pBricklet is only needed after the same result file is loaded again to check for new bricklets
 	void setBrickletPointer(void* const pBricklet){ m_brickletPtr = pBricklet; };
 
-	void clearCache(void);
+	void clearCache();
 	void getBrickletContentsBuffer(const int** pBuffer, int &count);
 
 	const std::vector<std::string>& getBrickletMetaDataValues();

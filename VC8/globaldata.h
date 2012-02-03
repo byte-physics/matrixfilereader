@@ -24,11 +24,11 @@ public:
 	void closeSession();
 	void closeResultFile();
 	void createBrickletClassObject(int brickletID, void* const pBricklet);
-	void setError(int errorCode, std::string msgArgument = std::string());
+	void setError(int errorCode, const std::string& msgArgument = std::string());
 	void setInternalError(int errorCode);
 
 	Vernissage::Session* getVernissageSession();
-	std::string getVernissageVersion();
+	const std::string& getVernissageVersion();
 
 	void initializeWithoutReadSettings(int calledFromMacro,int calledFromFunction);
 	void initialize(int calledFromMacro,int calledFromFunction);
@@ -43,8 +43,8 @@ public:
 	char openDlgInitialDir[MAX_PATH_LEN+1];
 
 	// const functions
-	std::wstring getFileNameWString() const;
-	std::wstring getDirPathWString() const;
+	const std::wstring& getFileNameWString() const;
+	const std::wstring& getDirPathWString() const;
 	std::string getFileName() const;
 	std::string getDirPath() const;
 
@@ -92,8 +92,6 @@ private:
 	int m_lastError;
 	std::string m_lastErrorArgument;
 	IntBrickletClassPtrMap m_brickletIDBrickletClassMap;
-
-	void setLastError(int errorCode, std::string argument = std::string());
 
 	void enableDatafolder(bool var){ m_datafolder = var; };
 	void enableDoubleWave(bool var){ m_doubleWave = var; };

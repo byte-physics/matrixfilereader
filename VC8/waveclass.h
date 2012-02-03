@@ -38,7 +38,7 @@ public:
 	const ExtremaData& getExtrema()const{ return m_extrema; };
 
 	// inlined, has to be very fast
-	void fillWave(const int &index, const int &rawValue, const double &scaledValue);
+	void fillWave( int index, int rawValue, double scaledValue);
 
 public:
 	bool moreData;
@@ -58,27 +58,22 @@ private:
 	It will _not_ be checked if index is out-of-range
 	Here we also determine the extrema values
 */
-__forceinline void WaveClass::fillWave(const int &index, const int &rawValue, const double &scaledValue){
-		
-		if(m_doublePtr){
-			m_doublePtr[index] = scaledValue;
-		}
-		else if(m_floatPtr){
-			m_floatPtr[index]  = static_cast<float>(scaledValue);
-		}
-		else{
-			return;
-		}
-
-		//check if it is a new minimium
-		if(rawValue < m_extrema.getRawMin()){
-			m_extrema.setRawMin(rawValue);
-			m_extrema.setPhysValRawMin(scaledValue);
-		}
-
-		//check if it is a new maximum
-		if(rawValue > m_extrema.getRawMax()){
-			m_extrema.setRawMax(rawValue);
-			m_extrema.setPhysValRawMax(scaledValue);
-		}
+inline void WaveClass::fillWave( int index, int rawValue, double scaledValue )
+{
+	if(m_floatPtr){
+		m_floatPtr[index]  = static_cast<float>(scaledValue);
 	}
+	else if(m_doublePtr){
+		m_doublePtr[index] = scaledValue;
+	}
+
+	//check if it is a new minimium
+	if(rawValue < m_extrema.getRawMin()){
+		m_extrema.setMinimum(rawValue,scaledValue);
+	}
+
+	//check if it is a new maximum
+	if(rawValue > m_extrema.getRawMax()){
+		m_extrema.setMaximum(rawValue,scaledValue);
+	}
+}

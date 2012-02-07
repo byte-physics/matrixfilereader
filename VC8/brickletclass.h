@@ -42,7 +42,7 @@ public:
 	const ExtremaData& getExtrema()const{ return m_extrema; };
 
 private:
-	void BrickletClass::loadBrickletMetaDataFromResultFile();
+	void loadBrickletMetaDataFromResultFile();
 	void generateAllAxesVector();
 
 private:

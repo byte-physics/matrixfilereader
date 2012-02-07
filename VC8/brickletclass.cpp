@@ -95,13 +95,11 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
 		// implicitly which is quite expensive
-		m_extrema.setMinimum(m_VernissageSession->getRawMin(m_brickletPtr),
-							 m_VernissageSession->toPhysical(m_extrema.getRawMin(), m_brickletPtr)
-							 );
+		const int rawMin = m_VernissageSession->getRawMin(m_brickletPtr);
+		m_extrema.setMinimum(rawMin, m_VernissageSession->toPhysical(rawMin, m_brickletPtr));
 
-		m_extrema.setMaximum(m_VernissageSession->getRawMax(m_brickletPtr),
-							 m_VernissageSession->toPhysical(m_extrema.getRawMax(), m_brickletPtr)
-							 );
+		const int rawMax = m_VernissageSession->getRawMax(m_brickletPtr);
+		m_extrema.setMaximum(rawMax, m_VernissageSession->toPhysical(rawMax, m_brickletPtr));
 
 		sprintf(GlobalData::Instance().outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
 			m_extrema.getRawMin(),m_extrema.getRawMax(),m_extrema.getPhysValRawMin(),m_extrema.getPhysValRawMax());

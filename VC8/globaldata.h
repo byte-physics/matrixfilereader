@@ -56,6 +56,11 @@ public:
 
 	BrickletClass* getBrickletClassObject(int brickletID) const;
 
+	std::vector<int> convertBrickletPtr(const std::vector<void*>&);
+	int convertBrickletPtr(void*);
+
+	std::vector<void*> getBrickletSeries( void* rawBrickletPtr );
+
 	// debug
 	bool debuggingEnabled() const{ return m_debug; };
 	// double

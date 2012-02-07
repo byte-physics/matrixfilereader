@@ -10,6 +10,7 @@
 */
 
 std::string viewTypeCodeToString(unsigned int idx);
+std::string brickletTypeToString(unsigned int idx);
 
 void setDataWaveNote(int brickletID, WaveClass &waveData);
 void setOtherWaveNote(waveHndl waveHandle,int brickletID  = -1,int traceDir  = -1);
@@ -21,4 +22,3 @@ bool isValidTraceDir(int traceDir);
 
 int createAndFillTextWave(const std::vector<std::string> &firstColumn, const std::vector<std::string> &secondColumn,
 						  DataFolderHandle dataFolderHandle,const char *waveName, int brickletID, std::string &fullPathOfCreatedWaves);
-

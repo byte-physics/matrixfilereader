@@ -231,6 +231,18 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 		metaDataValues.push_back(WStringToString(dataComments[i]));
 	}
 
+	// introduced with vernissage 2.1
+	metaDataKeys.push_back("visualMateNode");
+	metaDataValues.push_back(WStringToString(m_VernissageSession->getVisualMateNode(m_brickletPtr)));
+	
+	// dito
+	metaDataKeys.push_back("channelGroupName");
+	metaDataValues.push_back(WStringToString(m_VernissageSession->getChannelGroupName(m_brickletPtr)));
+
+	// introduced with vernissage 2.0 (but forgotten until release 2.1)
+	metaDataKeys.push_back("brickletType");
+	metaDataValues.push_back(brickletTypeToString(m_VernissageSession->getType(m_brickletPtr)));
+
 	// BEGIN m_VernissageSession->getBrickletMetaData
 	brickletMetaData = m_VernissageSession->getMetaData(m_brickletPtr);
 	metaDataKeys.push_back("brickletMetaData.fileCreatorName");
@@ -258,9 +270,17 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 	metaDataKeys.push_back("rootAxis");
 	metaDataValues.push_back(WStringToString(m_VernissageSession->getRootAxisName(m_brickletPtr)));
 
+	// new in vernissage 2.1
+	metaDataKeys.push_back("rootAxisQualified");
+	metaDataValues.push_back(WStringToString(m_VernissageSession->getRootAxisQualifiedName(m_brickletPtr)));
+
 	metaDataKeys.push_back("triggerAxis");
 	metaDataValues.push_back(WStringToString(m_VernissageSession->getTriggerAxisName(m_brickletPtr)));
 
+	// new in vernissage 2.1
+	metaDataKeys.push_back("triggerAxisQualified");
+	metaDataValues.push_back(WStringToString(m_VernissageSession->getTriggerAxisQualifiedName(m_brickletPtr)));
+	
 	metaDataKeys.push_back("channelName");
 	metaDataValues.push_back(WStringToString(m_VernissageSession->getChannelName(m_brickletPtr)));
 
@@ -275,6 +295,41 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 
 	metaDataKeys.push_back("scanCycleCount");
 	metaDataValues.push_back(anyTypeToString<int>(m_VernissageSession->getScanCycleCount(m_brickletPtr)));
+
+	// new in vernissage 2.1
+	{
+		const std::vector<void*> dependentBrickletsVoidVector = m_VernissageSession->getDependingBricklets(m_brickletPtr);
+		const std::vector<int> dependentBrickletsIntVector    = GlobalData::Instance().convertBrickletPtr(dependentBrickletsVoidVector);
+		std::string dependentBricklets;
+		joinString(dependentBrickletsIntVector,listSepChar,dependentBricklets);
+
+		metaDataKeys.push_back("dependentBricklets");
+		metaDataValues.push_back(dependentBricklets);
+	}
+
+	// new in vernissage 2.1
+	{
+		const std::vector<void*> referencedBrickletsVoidVector = m_VernissageSession->getReferencedBricklets(m_brickletPtr);
+		const std::vector<int> referencedBrickletsIntVector    = GlobalData::Instance().convertBrickletPtr(referencedBrickletsVoidVector);
+		std::string referencedBricklets;
+		joinString(referencedBrickletsIntVector,listSepChar,referencedBricklets);
+
+		metaDataKeys.push_back("referencedBricklets");
+		metaDataValues.push_back(referencedBricklets);
+	}
+
+	// new in vernissage 2.1
+	{
+		const std::vector<void*> brickletSeriesVoidVector = GlobalData::Instance().getBrickletSeries(m_brickletPtr);
+		std::vector<int> brickletSeriesIntVector    = GlobalData::Instance().convertBrickletPtr(brickletSeriesVoidVector);
+		// we want to have a sorted list of bricklets
+		std::sort(brickletSeriesIntVector.begin(),brickletSeriesIntVector.end());
+		std::string brickletSeries;
+		joinString(brickletSeriesIntVector,listSepChar,brickletSeries);
+
+		metaDataKeys.push_back("brickletSeries");
+		metaDataValues.push_back(brickletSeries);
+	}
 
 	elementInstanceNames = m_VernissageSession->getExperimentElementInstanceNames(m_brickletPtr,L"");
 

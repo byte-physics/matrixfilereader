@@ -402,3 +402,70 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */){
 
 	return;
 }
+
+/*
+	Converts a vector of vernissage APIs raw bricklet pointers to a vector of brickletIDs
+*/
+std::vector<int> GlobalData::convertBrickletPtr(const std::vector<void*>& rawBrickletPtrs)
+{
+	std::vector<int> brickletIDs;
+	brickletIDs.reserve(rawBrickletPtrs.size());
+
+	for (std::vector<void*>::const_iterator it = rawBrickletPtrs.begin(); it != rawBrickletPtrs.end(); it++)
+	{
+		const int brickletID = convertBrickletPtr(*it);
+		brickletIDs.push_back(brickletID);
+	}
+	return brickletIDs;
+}
+
+/*
+	Returns a brickletID for the vernissage APIs raw bricklet pointer
+*/
+int GlobalData::convertBrickletPtr(void* rawBrickletPtr)
+{
+	for (IntBrickletClassPtrMap::const_iterator it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++)
+	{
+		if (it->second->getBrickletPointer() == rawBrickletPtr)
+		{
+			return it->first;
+		}
+	}
+
+	sprintf(outputBuffer,"BUG: Could not find a corresponding brickletID for the raw pointer %p",rawBrickletPtr);
+	outputToHistory(outputBuffer);
+	return INVALID_BRICKLETID;
+}
+
+/*
+	Returns a vector of all bricklets which are part of the series of rawBrickletPtr (also included).
+	The returned vector is not sorted.
+*/
+std::vector<void*> GlobalData::getBrickletSeries( void* rawBrickletPtr )
+{
+	void* p = NULL;
+	std::vector<void*> brickeltSeries;
+
+	if (rawBrickletPtr == NULL)
+	{
+		return brickeltSeries;
+	}
+
+	// get all predecessors
+	p =	rawBrickletPtr;
+	while( ( p = m_VernissageSession->getPredecessorBricklet(p) ) != NULL )
+	{
+		brickeltSeries.push_back(p);
+	}
+
+	// add the bricklet itself
+	brickeltSeries.push_back(rawBrickletPtr);
+
+	// get all successors
+	p =	rawBrickletPtr;
+	while( ( p = m_VernissageSession->getSuccessorBricklet(p) ) != NULL )
+	{
+		brickeltSeries.push_back(p);
+	}
+	return brickeltSeries;
+}

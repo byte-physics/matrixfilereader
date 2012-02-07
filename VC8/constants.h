@@ -34,6 +34,24 @@ const char VT_BOOLEAN_STRING[] = "vt_Boolean";
 const char VT_ENUM_STRING[]	   = "vt_Enum";
 const char VT_STRING_STRING[]  = "vt_String";
 
+// bricklet types as string
+// from the vernissage header file
+const char BTC_UNKNOWN[]			= "btc_Unknown";
+const char BTC_SPMSPECTROSCOPY[]	= "btc_SPMSpectroscopy";		
+const char BTC_ATOMMANIPULATION[]	= "btc_AtomManipulation";
+const char BTC_1DCURVE[]			= "btc_1DCurve";
+const char BTC_SPMIMAGE[]			= "btc_SPMImage";
+const char BTC_PATHSPECTROSCOPY[]	= "btc_PathSpectroscopy";
+const char BTC_ESPREGION[]			= "btc_ESpRegion";
+const char BTC_VOLUMECITS[]			= "btc_VolumeCITS";
+const char BTC_DISCRETEENERGYMAP[]	= "btc_DiscreteEnergyMap";
+const char BTC_FORCECURVE[]			= "btc_ForceCurve";
+const char BTC_PHASEAMPLITUDECURVE[]= "btc_PhaseAmplitudeCurve";
+const char BTC_SIGNALOVERTIME[]		= "btc_SignalOverTime";
+const char BTC_RAWPATHSPECTROSCOPY[]= "btc_RawPathSpectroscopy";
+const char BTC_ESPSNAPSHOTSEQUENCE[]= "btc_ESpSnapshotSequence";
+const char BTC_ESPIMAGEMAP[]		= "btc_ESpImageMap";
+
 // viewtype codes as strings
 // from the vernissage header file
 const char VTC_OTHER_STRING[]		= "vtc_Other";
@@ -45,6 +63,12 @@ const char VTC_SPECTROSCOPY_STRING[]= "vtc_Spectroscopy";
 const char VTC_FORCECURVE_STRING[]	= "vtc_ForceCurve";
 const char VTC_1DPROFILE_STRING[]	= "vtc_1DProfile";
 const char VTC_INTERFEROMETER[]		= "vtc_Interferometer";
+const char VTC_CONTINUOUSCURVE[]	= "vtc_ContinuousCurve";
+const char VTC_PHASEAMPLITUDECURVE[]= "vtc_PhaseAmplitudeCurve"; 
+const char VTC_CURVESET[]			= "vtc_CurveSet";
+const char VTC_PARAMETERISEDCURVESET[] = "vtc_ParameterisedCurveSet";
+const char VTC_DISCRETEENERGYMAP[]	= "vtc_DiscreteEnergyMap";
+const char VTC_ESPIMAGEMAP[]		= "vtc_ESpImageMap";
 
 // wave name suffixes
 const char TRACE_UP_STRING[]		= "_Up";
@@ -69,6 +93,9 @@ const int  METADATA_RESERVE_SIZE	= 1024;
 
 // useful for MDSetWaveUnits, defined in accordance to ROWS, COLUMNS, etc.
 const int DATA = -1;
+
+// functions returning a brickletID should return that on failure
+const int INVALID_BRICKLETID = -1;
 
 // default values for the options
 const bool debug_default		= false;

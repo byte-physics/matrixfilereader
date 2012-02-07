@@ -97,9 +97,48 @@ std::string viewTypeCodeToString(unsigned int idx){
 	names.push_back(VTC_FORCECURVE_STRING);
 	names.push_back(VTC_1DPROFILE_STRING);
 	names.push_back(VTC_INTERFEROMETER);
+	names.push_back(VTC_CONTINUOUSCURVE);
+	names.push_back(VTC_PHASEAMPLITUDECURVE);
+	names.push_back(VTC_CURVESET);
+	names.push_back(VTC_PARAMETERISEDCURVESET);
+	names.push_back(VTC_DISCRETEENERGYMAP);
+	names.push_back(VTC_ESPIMAGEMAP);
 
 	if(idx < 0 || idx >= names.size()){
 		sprintf(GlobalData::Instance().outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		return std::string();
+	}
+	else{
+		return names.at(idx);
+	}
+}
+
+/*
+	Convert the bricklet type enumeration value into a human readable string
+*/
+std::string brickletTypeToString(unsigned int idx){
+
+	std::vector<std::string> names;
+
+	names.push_back(BTC_UNKNOWN);
+	names.push_back(BTC_SPMSPECTROSCOPY);
+	names.push_back(BTC_ATOMMANIPULATION);
+	names.push_back(BTC_1DCURVE);
+	names.push_back(BTC_SPMIMAGE);
+	names.push_back(BTC_PATHSPECTROSCOPY);
+	names.push_back(BTC_ESPREGION);
+	names.push_back(BTC_VOLUMECITS);
+	names.push_back(BTC_DISCRETEENERGYMAP);
+	names.push_back(BTC_FORCECURVE);
+	names.push_back(BTC_PHASEAMPLITUDECURVE);
+	names.push_back(BTC_SIGNALOVERTIME);
+	names.push_back(BTC_RAWPATHSPECTROSCOPY);
+	names.push_back(BTC_ESPSNAPSHOTSEQUENCE);
+	names.push_back(BTC_ESPIMAGEMAP);
+
+	if(idx < 0 || idx >= names.size()){
+		sprintf(GlobalData::Instance().outputBuffer,"BUG: brickletTypeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
 		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 		return std::string();
 	}

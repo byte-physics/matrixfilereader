@@ -58,7 +58,25 @@ std::string anyTypeToString(const T& t){
 void  splitString(const char* stringChar, const char* sepChar, std::vector<std::string> &list);
 void  splitString(const std::string &str, const char* sepChar, std::vector<std::string> &list);
 
-void joinString(const std::vector<std::string> &list,const char* sepChar, std::string &joinedList);
+/*
+	Undos a former split string, therefore concatenating each element plus sepchar of list into one string
+*/
+template <class T>
+void joinString(const std::vector<T> &list,const char* sepChar, std::string &joinedList){
+
+	joinedList.clear();
+	for(std::vector<T>::const_iterator it = list.begin(); it != list.end(); it++)
+	{
+		joinedList.append(anyTypeToString<T>(*it));
+		joinedList.append(sepChar);	
+	}
+}
+
+/*
+	Specialization for std::string as we don't need to convert them
+*/
+template<>
+void joinString<std::string>(const std::vector<std::string> &list, const char* sepChar, std::string &joinedList);
 
 bool doubleToBool(double value);
 

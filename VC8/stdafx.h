@@ -14,6 +14,11 @@
 	#define _WIN32_WINNT 0x0502
 #endif					
 
+#include <afx.h>
+
+#undef max
+#undef min
+
 #pragma  warning(push)
 #pragma  warning(disable: 4244) // conversion from 'const wchar_t' to 'char', possible loss of data
 #include <string>
@@ -23,11 +28,6 @@
 #include <sstream>
 #include <vector>
 #include <map>
-
-#include <afx.h>
-
-#undef max
-#undef min
 
 #include <limits>
 

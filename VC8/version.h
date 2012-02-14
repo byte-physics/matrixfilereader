@@ -11,4 +11,6 @@
 */
 
 #define MatrixFileReader_XOP_VERSION 0,1,8,9
+
+// must be convertible to a double
 #define MatrixFileReader_XOP_VERSION_STR "0.19-beta1\0"

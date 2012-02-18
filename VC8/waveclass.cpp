@@ -43,7 +43,7 @@ void WaveClass::setWaveHandle(const waveHndl &waveHandle){
 		m_floatPtr = NULL;
 
 		if(m_doublePtr == NULL){
-			outputToHistory("BUG: setWaveHandle(...) m_doublePtr is NULL, this should not happen...");
+			HISTPRINT("BUG: setWaveHandle(...) m_doublePtr is NULL, this should not happen...");
 		}
 		else{
 			moreData = true;
@@ -55,7 +55,7 @@ void WaveClass::setWaveHandle(const waveHndl &waveHandle){
 		m_floatPtr = getWaveDataPtr<float>(waveHandle);
 
 		if(m_floatPtr == NULL){
-			outputToHistory("BUG: setWaveHandle(...) m_floatPtr is NULL, this should not happen...");
+			HISTPRINT("BUG: setWaveHandle(...) m_floatPtr is NULL, this should not happen...");
 		}
 		else{
 			moreData = true;
@@ -69,7 +69,7 @@ void WaveClass::setWaveHandle(const waveHndl &waveHandle){
 		m_waveHandle = waveHandle;
 	}
 	else{
-		outputToHistory("wrong datatype in setWaveHandle");
+		HISTPRINT("wrong datatype in setWaveHandle");
 	}
 }
 
@@ -97,7 +97,7 @@ void WaveClass::setNameAndTraceDir(const std::string &basename, int traceDir){
 			m_wavename = basename + RE_TRACE_DOWN_STRING;
 			break;
 		default:
-			outputToHistory("BUG: setNameAndTraceDir() tracedir is out of range");
+			HISTPRINT("BUG: setNameAndTraceDir() tracedir is out of range");
 			break;
 	}
 }
@@ -106,10 +106,9 @@ void WaveClass::setNameAndTraceDir(const std::string &basename, int traceDir){
 	Output debug info
 */
 void WaveClass::printDebugInfo(){
-	sprintf(GlobalData::Instance().outputBuffer,"%s: waveHandle=%p, float=%p, double=%p, moreData=%s",
+	DEBUGPRINT("%s: waveHandle=%p, float=%p, double=%p, moreData=%s",
 		m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr, moreData ? "true" : "false");
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-}
+	}
 
 /*
 	Sets the complete wave to NaN
@@ -132,8 +131,7 @@ void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double
 
 	int ret = MDSetWaveScaling(m_waveHandle,dimension,sfAPtr,sfBPtr);
 	if(ret != 0){
-		sprintf(GlobalData::Instance().outputBuffer,"WaveClass::setWaveScaling returned error %d",ret);
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("WaveClass::setWaveScaling returned error %d",ret);
 	}
 }
 
@@ -145,8 +143,7 @@ void WaveClass::setWaveUnits(int dimension, const std::string& units){
 
 	int ret = MDSetWaveUnits(m_waveHandle,dimension,units.c_str());
 	if(ret != 0){
-		sprintf(GlobalData::Instance().outputBuffer,"WaveClass::setWaveUnits returned error %d",ret);
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("WaveClass::setWaveUnits returned error %d",ret);
 	}
 }
 

@@ -103,9 +103,8 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
 	ret = MDMakeWave(&waveHandle,waveName.c_str(),destDataFolderHndl,dimensionSizes,TEXT_WAVE_TYPE,GlobalData::Instance().overwriteEnabledAsInt());
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",waveName.c_str());
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		GlobalData::Instance().setError(WAVE_EXIST,waveName);
+		DEBUGPRINT("Wave %s already exists.",waveName.c_str());
+				GlobalData::Instance().setError(WAVE_EXIST,waveName);
 		return 0;
 	}
 	else if(ret != 0 ){
@@ -119,18 +118,16 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
 		key = keys.at(j);
 		MDSetDimensionLabel(waveHandle,COLUMNS,j,key.c_str());
-		sprintf(GlobalData::Instance().outputBuffer,"key=%s",key.c_str());
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT("key=%s",key.c_str());
+		
 		for(i=1; i <= numberOfBricklets; i++){
 			bricklet = GlobalData::Instance().getBrickletClassObject(i);
 			ASSERT_RETURN_ZERO(bricklet);
 			value = bricklet->getMetaDataValueAsString(key);
 			textWaveContents.push_back(value);
 
-			sprintf(GlobalData::Instance().outputBuffer,"   value=%s",value.c_str());
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		}
+			DEBUGPRINT("   value=%s",value.c_str());
+					}
 	}
 
 	ret = stringVectorToTextWave(textWaveContents,waveHandle);

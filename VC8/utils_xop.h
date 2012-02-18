@@ -13,11 +13,38 @@
 	Utility functions which are xop specific
 */
 
-const char outputFormat[]			= "%s\r";	//  outputToHistory
-const char debugOutputFormat[]		= "DEBUG: %s\r"; // debugOutputToHistory
+// Accepts multipe arguments like printf and prints them to the history
+// Copies only ARRAY_SIZE-2 characters in _snprintf, because we want to have space for the terminating \0 (1) and for the CR (1)
+// @param A prints only if A evaluates to true
+// @param B use silent printing (does not mark the experiment as changed) if true
+#define PRINT_TO_HISTORY(A,B,...)								\
+	if (A)														\
+	{															\
+		char* buf = &GlobalData::Instance().outputBuffer[0];	\
+		_snprintf(buf,ARRAY_SIZE-2, __VA_ARGS__);				\
+		buf[ARRAY_SIZE-2] = '\0';								\
+		strcat(buf,CR_STR);										\
+		if (!B)													\
+		{														\
+			XOPNotice(buf);										\
+		}														\
+		else													\
+		{														\
+			XOPNotice2(buf,0);									\
+		}														\
+	}
 
-void debugOutputToHistory(const char *str, bool silent = false);
-void outputToHistory(const char *str);
+// Convenience wrapper using silent debug print
+#define DEBUGPRINT_SILENT(...) \
+	PRINT_TO_HISTORY(GlobalData::Instance().debuggingEnabled(),true,"DEBUG: "__VA_ARGS__)
+
+// Convenience wrapper using debug print
+#define DEBUGPRINT(...) \
+	PRINT_TO_HISTORY(GlobalData::Instance().debuggingEnabled(),false,"DEBUG: "__VA_ARGS__)
+
+// Convenience wrapper which always prints
+#define HISTPRINT(...) \
+	PRINT_TO_HISTORY(true,false,__VA_ARGS__)
 
 // be sure to check the return value for NULL
 template <class T> T* getWaveDataPtr(waveHndl waveH){

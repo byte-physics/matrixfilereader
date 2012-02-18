@@ -54,7 +54,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p){
 
 	SetOperationStrVar(S_value,str.c_str());
 
-	outputToHistory(str.c_str());
+	HISTPRINT(str.c_str());
 
 	// set errorCode to SUCCESS
 	GlobalData::Instance().finalize();

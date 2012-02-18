@@ -55,16 +55,15 @@ std::string DLLHandler::getVernissagePath(){
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regBaseKeyName.c_str(),0,KEY_READ,&hregBaseKey);
 
 	if(result != ERROR_SUCCESS){
-		outputToHistory("Opening a registry key failed. Is Vernissage installed?");
+		HISTPRINT("Opening a registry key failed. Is Vernissage installed?");
 		return std::string();
 	}
 
 	result = RegEnumKeyEx(hregBaseKey,subKeyIndex, subKeyName, &subKeyLength,NULL,NULL,NULL,NULL);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(GlobalData::Instance().outputBuffer,"Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return std::string();
+		DEBUGPRINT("Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.",regBaseKeyName.c_str(),subKeyName,result);
+				return std::string();
 	}
 
 	regKey  = regBaseKeyName;
@@ -72,15 +71,13 @@ std::string DLLHandler::getVernissagePath(){
 	regKey += subKeyName;
 	regKey += "\\Main";
 
-	sprintf(GlobalData::Instance().outputBuffer,"Checking registry key %s",regKey.c_str());
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		
+	DEBUGPRINT("Checking registry key %s",regKey.c_str());
+			
 	result = RegOpenKeyEx(HKEY_LOCAL_MACHINE,regKey.c_str(),0,KEY_READ,&hKey);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(GlobalData::Instance().outputBuffer,"Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return std::string();
+		DEBUGPRINT("Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.",result);
+				return std::string();
 	}
 
 	result = RegQueryValueEx(hKey,"InstallDirectory",NULL,NULL,(LPBYTE) data,&dataLength);
@@ -89,29 +86,26 @@ std::string DLLHandler::getVernissagePath(){
 	RegCloseKey(hregBaseKey);
 
 	if(result != ERROR_SUCCESS){
-		sprintf(GlobalData::Instance().outputBuffer,"Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return std::string();
+		DEBUGPRINT("Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.",result);
+				return std::string();
 	}
 
 	std::string version = subKeyName;
 	m_vernissageVersion = version.substr(1,version.length()-1);
 
 	if(m_vernissageVersion.compare(properVernissageVersion) != 0 ){
-		sprintf(GlobalData::Instance().outputBuffer,"Vernissage version %s can not be used. Please install version %s and try again.",m_vernissageVersion.c_str(),properVernissageVersion);
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("Vernissage version %s can not be used. Please install version %s and try again.",m_vernissageVersion.c_str(),properVernissageVersion);
 		return std::string();
 	}
 	else{
-		sprintf(GlobalData::Instance().outputBuffer,"Vernissage version %s",m_vernissageVersion.c_str());
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);	
+		DEBUGPRINT("Vernissage version %s",m_vernissageVersion.c_str());
+		;;;	
 	}
 
 	std::string dllDirectory(data);
 	dllDirectory += "Bin";
-	sprintf(GlobalData::Instance().outputBuffer, "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT( "The path to look for the vernissage DLLs is %s",dllDirectory.c_str());
+	
 	return dllDirectory;
 }
 
@@ -141,12 +135,10 @@ Vernissage::Session* DLLHandler::createSessionObject(){
 		module = LoadLibrary( (LPCSTR) dllName.c_str());
 
 		if(module != NULL){
-			sprintf(GlobalData::Instance().outputBuffer,"Successfully loaded DLL %s",dllName.c_str());
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		}
+			DEBUGPRINT("Successfully loaded DLL %s",dllName.c_str());
+					}
 		else{
-			sprintf(GlobalData::Instance().outputBuffer,"Something went wrong (windows error code %d) loading the DLL %s", GetLastError(), dllName.c_str());
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			HISTPRINT("Something went wrong (windows error code %d) loading the DLL %s", GetLastError(), dllName.c_str());
 			return pSession;
 		}
 	}

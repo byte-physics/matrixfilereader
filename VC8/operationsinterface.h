@@ -24,8 +24,7 @@ extern "C" void XOPEntry();
 #define BEGIN_OUTER_CATCH	try{
 #define END_OUTER_CATCH		}\
 							catch(...){\
-								sprintf(GlobalData::Instance().outputBuffer,"Unexpected exception caught in line %d, function %s,  file %s\r", __LINE__, __FUNCTION__, __FILE__);\
-								XOPNotice(GlobalData::Instance().outputBuffer);\
+								DEBUGPRINT("Unexpected exception caught in line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);\
 								GlobalData::Instance().setError(UNKNOWN_ERROR);\
 								return 0;\
 							}

@@ -34,9 +34,8 @@ BrickletClass::~BrickletClass(){
 void BrickletClass::clearCache(){
 
 	if(m_rawBufferContents != NULL){
-		sprintf(GlobalData::Instance().outputBuffer,"Deleting raw data from bricklet %d",m_brickletID);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		delete[] m_rawBufferContents;
+		DEBUGPRINT("Deleting raw data from bricklet %d",m_brickletID);
+				delete[] m_rawBufferContents;
 		m_rawBufferContents=NULL;
 		m_rawBufferContentsSize=0;
 	}
@@ -57,42 +56,37 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 
 	// we are not called the first time
 	if(m_rawBufferContents != NULL){
-		debugOutputToHistory("GlobalData::getBrickletContentsBuffer Using cached values");
+		DEBUGPRINT("GlobalData::getBrickletContentsBuffer Using cached values");
 
-		sprintf(GlobalData::Instance().outputBuffer,"before: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT("before: pBuffer=%d,count=%d",*pBuffer,count);
+		
 		*pBuffer = m_rawBufferContents;
 		count    = m_rawBufferContentsSize;
 
-		sprintf(GlobalData::Instance().outputBuffer,"after: pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-	}
+		DEBUGPRINT("after: pBuffer=%d,count=%d",*pBuffer,count);
+			}
 	else{ // we are called the first time
 
 		try{
 			m_VernissageSession->loadBrickletContents(m_brickletPtr,pBuffer,count);
 		}
 		catch(...){
-			sprintf(GlobalData::Instance().outputBuffer,"Could not load the bricklet contents, probably out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			HISTPRINT("Could not load the bricklet contents, probably out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
 			*pBuffer = NULL;
 			count = 0;
 			return;	
 		}
 		// loadBrickletContents either throws an exception or returns pBuffer == 0 || count == 0
 		if(*pBuffer == NULL || count == 0){
-			sprintf(GlobalData::Instance().outputBuffer,"Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			HISTPRINT("Out of memory in getBrickletContentsBuffer() with bricklet %d",m_brickletID);
 			m_VernissageSession->unloadBrickletContents(m_brickletPtr);
 			*pBuffer = NULL;
 			count=0;
 			return;
 		}
 
-		sprintf(GlobalData::Instance().outputBuffer,"pBuffer=%d,count=%d",*pBuffer,count);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT("pBuffer=%d,count=%d",*pBuffer,count);
+		
 		// these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
 		// implicitly which is quite expensive
 		const int rawMin = m_VernissageSession->getRawMin(m_brickletPtr);
@@ -101,10 +95,9 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		const int rawMax = m_VernissageSession->getRawMax(m_brickletPtr);
 		m_extrema.setMaximum(rawMax, m_VernissageSession->toPhysical(rawMax, m_brickletPtr));
 
-		sprintf(GlobalData::Instance().outputBuffer,"rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
+		DEBUGPRINT("rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
 			m_extrema.getRawMin(),m_extrema.getRawMax(),m_extrema.getPhysValRawMin(),m_extrema.getPhysValRawMax());
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		
 		// copy the raw data to our own cache
 		m_rawBufferContentsSize = count;
 		try{
@@ -112,7 +105,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int &count){
 		}
 		catch(CMemoryException* e){
 			e->Delete();
-			outputToHistory("Out of memory in getBrickletContentsBuffer()");
+			HISTPRINT("Out of memory in getBrickletContentsBuffer()");
 			*pBuffer = NULL;
 			count=0;
 			m_VernissageSession->unloadBrickletContents(m_brickletPtr);
@@ -137,7 +130,7 @@ const std::vector<std::string>& BrickletClass::getBrickletMetaDataValues(){
 		}
 		catch(CMemoryException* e){
 			e->Delete();
-			XOPNotice("Out of memory in getBrickletMetaDataValues()");
+			HISTPRINT("Out of memory in getBrickletMetaDataValues()");
 			return m_metaDataValues;
 		}
 	}
@@ -155,7 +148,7 @@ const std::vector<std::string>& BrickletClass::getBrickletMetaDataKeys(){
 		}
 		catch(CMemoryException* e){
 			e->Delete();
-			XOPNotice("Out of memory in getBrickletMetaData()");
+			HISTPRINT("Out of memory in getBrickletMetaData()");
 			return m_metaDataKeys;
 		}
 	}
@@ -545,11 +538,10 @@ void BrickletClass::loadBrickletMetaDataFromResultFile(){
 		// END Vernissage::Session:AxisTableSet
 	}
 
-	sprintf(GlobalData::Instance().outputBuffer,"Loaded %d keys and %d values as brickletMetaData for bricklet %d",metaDataKeys.size(), metaDataValues.size(),m_brickletID);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT("Loaded %d keys and %d values as brickletMetaData for bricklet %d",metaDataKeys.size(), metaDataValues.size(),m_brickletID);
+	
 	if(metaDataKeys.size() != metaDataValues.size()){
-		outputToHistory("BUG: key value lists don't have the same size, aborting");
+		HISTPRINT("BUG: key value lists don't have the same size, aborting");
 		metaDataKeys.clear();
 		metaDataValues.clear();
 	}
@@ -588,7 +580,7 @@ void BrickletClass::generateAllAxesVector(){
 
 		numRuns++;
 		if(numRuns > maxRuns){
-			outputToHistory("Found more than 100 axes in the axis hierachy. This is highly unlikely and therefore a bug in this XOP or in Vernissage.");
+			HISTPRINT("Found more than 100 axes in the axis hierachy. This is highly unlikely and therefore a bug in this XOP or in Vernissage.");
 			break;
 		}
 	}
@@ -640,7 +632,7 @@ std::string BrickletClass::getMetaDataValueAsString(const std::string &key){
 	std::string value;
 
 	if(key.empty()){
-		outputToHistory("BUG: getMetaDataValueAsString called with empty parameter");
+		HISTPRINT("BUG: getMetaDataValueAsString called with empty parameter");
 		return value;
 	}
 

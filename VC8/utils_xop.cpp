@@ -12,40 +12,6 @@
 #include "utils_generic.h"
 
 /*
-	Outputs str if debugging is enabled, silent = true will not mark the experiment as modified
-*/
-void debugOutputToHistory(const char* str, bool silent /* = false */){
-
-	if(!GlobalData::Instance().debuggingEnabled()){
-		return;
-	}
-
-	ASSERT_RETURN_VOID(str);
-	char buf[ARRAY_SIZE];
-
-	sprintf(buf,debugOutputFormat,str);
-
-	if(silent){
-		XOPNotice2(buf,0);
-	}
-	else{
-		XOPNotice(buf);
-	}
-}
-
-/*
-	Outputs str, a CR is added automatically
-*/
-void outputToHistory(const char *str){
-
-	ASSERT_RETURN_VOID(str);
-	char buf[ARRAY_SIZE];
-	
-	sprintf(buf,outputFormat,str);
-	XOPNotice(buf);
-}
-
-/*
 	Write stringVector to the textwave waveHandle, using memcpy this is quite fast
 */
 int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHndl waveHandle){
@@ -80,9 +46,8 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 		return NOMEM;
 	}
 
-	//sprintf(GlobalData::Instance().outputBuffer,"totalSize of strings %d",GetHandleSize(textHandle));
-	//debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	//DEBUGPRINT("totalSize of strings %d",GetHandleSize(textHandle));
+	//
 	for(i=0; i < numEntriesPlusOne; i++){
 
 		if(i == 0){// position of the first string
@@ -91,17 +56,15 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 		else{ // and of all the others
 			offset+=stringSizes[i-1];
 		}
-		//sprintf(GlobalData::Instance().outputBuffer,"offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
-		//debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		//DEBUGPRINT("offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
+		//
 		// write offsets
 		memcpy(*textHandle+i*sizeof(long),&offset,sizeof(long));
 
 		if(i < stringVector.size()){
 
-			//sprintf(GlobalData::Instance().outputBuffer,"string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
-			//debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+			//DEBUGPRINT("string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
+			//
 			// write strings
 			memcpy(*textHandle+offset,stringVector[i].c_str(),stringSizes[i]);
 		}
@@ -118,9 +81,8 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 
 	ret = SetTextWaveData(waveHandle,mode,textHandle);
 	
-	//sprintf(GlobalData::Instance().outputBuffer,"SetTextWaveData returned %d",ret);
-	//debugOutputToHistory(GlobalData::Instance().outputBuffer);
-	DisposeHandle(textHandle);
+	//DEBUGPRINT("SetTextWaveData returned %d",ret);
+	//	DisposeHandle(textHandle);
 
 	return ret;
 }
@@ -134,7 +96,7 @@ void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle){
 	Handle noteHandle;
 
 	if(waveNote.empty()){
-		outputToHistory("BUG: got empty waveNote in setWaveNoteAsString.");
+		HISTPRINT("BUG: got empty waveNote in setWaveNoteAsString.");
 		return;
 	}
 
@@ -145,8 +107,7 @@ void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle){
 
 	ret = PutCStringInHandle(waveNote.c_str(),noteHandle);
 	if(ret != 0){
-		sprintf(GlobalData::Instance().outputBuffer,"internal error %d, aborting",ret);
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("internal error %d, aborting",ret);
 		return;
 	}
 
@@ -206,7 +167,7 @@ std::string getFullWavePath(const DataFolderHandle& df, const waveHndl& wv){
 	// flags=3 returns the full path to the datafolder and including quotes if needed
 	ret = GetDataFolderNameOrPath(df, 3,dataFolderPath);
 	if(ret != 0){
-		debugOutputToHistory("BUG: Could not query the datafolder for its name");
+		HISTPRINT("BUG: Could not query the datafolder for its name");
 		return fullPath;
 	}
 	
@@ -235,6 +196,6 @@ void convertHandleToString(Handle strHandle,std::string &str){
 	}
 	catch(CMemoryException* e){
 		e->Delete();
-		XOPNotice("Out of memory in convertHandleToString()");
+		HISTPRINT("Out of memory in convertHandleToString()");
 	}
 }

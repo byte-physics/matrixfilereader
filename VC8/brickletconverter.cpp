@@ -37,12 +37,10 @@ namespace  {
 			yIntercept = yOne;
 		}
 
-		sprintf(GlobalData::Instance().outputBuffer,"raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%g,yTwo=%g",xOne,xTwo,yOne,yTwo);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-		sprintf(GlobalData::Instance().outputBuffer,"raw->scaled transformation: slope=%g,yIntercept=%g",slope,yIntercept);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-	}
+		DEBUGPRINT("raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%g,yTwo=%g",xOne,xTwo,yOne,yTwo);
+		
+		DEBUGPRINT("raw->scaled transformation: slope=%g,yIntercept=%g",slope,yIntercept);
+			}
 
 	int createWaves1D(DataFolderHandle dfHandle, const char *waveBaseName, int brickletID, std::string &fullPathOfCreatedWave)
 	{
@@ -63,7 +61,7 @@ namespace  {
 		const int *rawBrickletDataPtr;
 		bricklet->getBrickletContentsBuffer(&rawBrickletDataPtr ,rawBrickletSize);
 		if(rawBrickletSize == 0 || &rawBrickletDataPtr == NULL){
-			outputToHistory("Could not load bricklet contents.");
+			HISTPRINT("Could not load bricklet contents.");
 			return UNKNOWN_ERROR;
 		}
 
@@ -84,13 +82,11 @@ namespace  {
 		int ret = MDMakeWave(&waveHandle, wave1D.getWaveName(),dfHandle,dimensionSizes,
 			GlobalData::Instance().getIgorWaveType(),GlobalData::Instance().overwriteEnabledAsInt());
 		if(ret == NAME_WAV_CONFLICT){
-			sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",wave1D.getWaveName());
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
-			return WAVE_EXIST;
+			DEBUGPRINT("Wave %s already exists.",wave1D.getWaveName());
+						return WAVE_EXIST;
 		}
 		else if(ret != 0 ){
-			sprintf(GlobalData::Instance().outputBuffer,"Error %d in creating wave %s.",ret, wave1D.getWaveName());
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			HISTPRINT("Error %d in creating wave %s.",ret, wave1D.getWaveName());
 			return UNKNOWN_ERROR;
 		}
 
@@ -138,7 +134,7 @@ namespace  {
 		const int *rawBrickletDataPtr;
 		bricklet->getBrickletContentsBuffer(&rawBrickletDataPtr ,rawBrickletSize);
 		if(rawBrickletSize == 0 || &rawBrickletDataPtr == NULL){
-			outputToHistory("Could not load bricklet contents.");
+			HISTPRINT("Could not load bricklet contents.");
 			return UNKNOWN_ERROR;
 		}
 
@@ -169,12 +165,10 @@ namespace  {
 			numPointsRootAxis/= 2;
 		}
 
-		sprintf(GlobalData::Instance().outputBuffer,"numPointsRootAxis=%d",numPointsRootAxis);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-		sprintf(GlobalData::Instance().outputBuffer,"numPointsTriggerAxis=%d",numPointsTriggerAxis);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT("numPointsRootAxis=%d",numPointsRootAxis);
+		
+		DEBUGPRINT("numPointsTriggerAxis=%d",numPointsTriggerAxis);
+		
 		dimensionSizes[ROWS] = numPointsTriggerAxis;
 		dimensionSizes[COLUMNS] = numPointsRootAxis;
 		const int waveSize = dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
@@ -229,13 +223,11 @@ namespace  {
 				GlobalData::Instance().getIgorWaveType(),GlobalData::Instance().overwriteEnabledAsInt());
 
 			if(ret == NAME_WAV_CONFLICT){
-				sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",wave[i].getWaveName());
-				debugOutputToHistory(GlobalData::Instance().outputBuffer);
-				return WAVE_EXIST;
+				DEBUGPRINT("Wave %s already exists.",wave[i].getWaveName());
+								return WAVE_EXIST;
 			}
 			else if(ret != 0 ){
-				sprintf(GlobalData::Instance().outputBuffer,"Error %d in creating wave %s.",ret, wave[i].getWaveName());
-				outputToHistory(GlobalData::Instance().outputBuffer);
+				HISTPRINT("Error %d in creating wave %s.",ret, wave[i].getWaveName());
 				return UNKNOWN_ERROR;
 			}
 
@@ -264,20 +256,40 @@ namespace  {
 		// - the wave is linear in the memory
 		// - going along the arrray will first fill the first column from row 0 to end and then the second column and so on
 
-		//// TraceUp aka Forward/Up
-		//// ReTraceUp aka Backward/Up
-		//// TraceDown aka Forward/Down
-		//// ReTraceDown aka Backward/Down
-		//// horizontal axis aka X axis in Pascal's Scala Routines aka triggerAxis 		aka 	ROWS
-		//// vertical   axis aka Y axis in Pascal's Scala Routines aka rootAxis 		aka		COLUMNS
+		// TraceUp aka Forward/Up
+		// ReTraceUp aka Backward/Up
+		// TraceDown aka Forward/Down
+		// ReTraceDown aka Backward/Down
+		// horizontal axis aka X axis in Pascal's Scala Routines aka triggerAxis aka ROWS
+		// vertical   axis aka Y axis in Pascal's Scala Routines aka rootAxis aka COLUMNS
 		
+		// Definitions:
+		// raw data index (the array from wich the data is read): r(i,j)
+		// wave data index (the array to which the data is written after conversion to physical values): w(i,j)
+		// conversion routine: c(r,s,y) = rawData[r(i,j)] * s + y
+		// writing data algorithm: waveData[w(i,j)] = c(r,s,y)
+		// COLUMNS index: 0 <= i < numPointsRootAxis
+		// ROW index: 0 <= j < numPointsTriggerAxis
+		// t_{bs}: triggerAxisBlockSize
+		// t_{np}: numPointsTriggerAxis
+		// r_{np}: numPointsRootAxis
+		// f_{bo}: offset position into the rawdata array denoting where the traceDown data starts
+		// TRACE_UP
+		// r(i,j) = i * t_{bs} + j
+		// w(i,j) = i * t_{np} + j
+		// TRACE_DOWN
+		// r(i,j) = f_{bo} + i * t_{bs} + j
+		// w(i,j) = ( r_{np} - ( i + 1 ) ) * t_{np} + j
+		// RETRACE_UP
+		// r(i,j) = ( i + 1 ) * t_{bs} - ( j + 1 )
+		// w(i,j) = i * t_{np} + j
+		// RETRACE_DOWN
+		// r(i,j) = f_{bo} + ( i + 1 ) * t_{bs} - ( j + 1 )
+		// w(i,j) = ( r_{np} - ( i + 1 ) ) * t_{np} + j
+
 		double scaledValue;
 		int rawValue;
-		int traceUpDataIndex, traceUpRawBrickletIndex;
-		int traceDownDataIndex, traceDownRawBrickletIndex;		
-		int reTraceUpDataIndex, reTraceUpRawBrickletIndex;
-		int reTraceDownDataIndex, reTraceDownRawBrickletIndex;
-
+		int dataIndex, rawIndex;
 		// COLUMNS
 		for(int i = 0; i < numPointsRootAxis; i++){
 			// ROWS
@@ -285,28 +297,26 @@ namespace  {
 
 				// traceUp
 				if(traceUpData->moreData){
-					traceUpRawBrickletIndex = i*triggerAxisBlockSize+ j;
-					traceUpDataIndex		  = i*numPointsTriggerAxis   + j;
+					rawIndex  = i*triggerAxisBlockSize + j;
+					dataIndex = i*numPointsTriggerAxis + j;
 
-					if(	traceUpDataIndex >= 0 &&
-						traceUpDataIndex < waveSize &&
-						traceUpRawBrickletIndex < rawBrickletSize &&
-						traceUpRawBrickletIndex >= 0
+					if(	dataIndex >= 0 &&
+						dataIndex < waveSize &&
+						rawIndex < rawBrickletSize &&
+						rawIndex >= 0
 						){
-							rawValue		  = rawBrickletDataPtr[traceUpRawBrickletIndex];
+							rawValue	= rawBrickletDataPtr[rawIndex];
 							scaledValue = rawValue*slope + yIntercept;
 
-							traceUpData->fillWave(traceUpDataIndex,rawValue,scaledValue);
+							traceUpData->fillWave(dataIndex,rawValue,scaledValue);
 					}
 					else{
-						debugOutputToHistory("Index out of range in traceUp");
+						DEBUGPRINT("Index out of range in traceUp");
 
-						sprintf(GlobalData::Instance().outputBuffer,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-						sprintf(GlobalData::Instance().outputBuffer,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+						DEBUGPRINT("traceUpDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+						
+						DEBUGPRINT("traceUpRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+						
 						traceUpData->moreData = false;
 					}
 				}
@@ -314,30 +324,28 @@ namespace  {
 				// traceDown
 				if(traceDownData->moreData){
 
-					traceDownRawBrickletIndex	= firstBlockOffset + i*triggerAxisBlockSize + j;
+					rawIndex = firstBlockOffset + i*triggerAxisBlockSize + j;
 					// compared to the traceUpData->dbl the index i is shifted
 					// this takes into account that the data in the traceDown is aquired from the highest y value to the lowest y value
-					traceDownDataIndex			= ( numPointsRootAxis -( i+1) ) * numPointsTriggerAxis   + j;
+					dataIndex = ( numPointsRootAxis -( i+1) ) * numPointsTriggerAxis + j;
 
-					if(	traceDownDataIndex >= 0 &&
-						traceDownDataIndex < waveSize &&
-						traceDownRawBrickletIndex < rawBrickletSize &&
-						traceDownRawBrickletIndex >= 0
+					if(	dataIndex >= 0 &&
+						dataIndex < waveSize &&
+						rawIndex < rawBrickletSize &&
+						rawIndex >= 0
 						){
-							rawValue	= rawBrickletDataPtr[traceDownRawBrickletIndex];
-							scaledValue= rawValue*slope + yIntercept;
+							rawValue	= rawBrickletDataPtr[rawIndex];
+							scaledValue = rawValue*slope + yIntercept;
 
-							traceDownData->fillWave(traceDownDataIndex,rawValue,scaledValue);
+							traceDownData->fillWave(dataIndex,rawValue,scaledValue);
 					}
 					else{
-						debugOutputToHistory("Index out of range in traceDown");
+						DEBUGPRINT("Index out of range in traceDown");
 
-						sprintf(GlobalData::Instance().outputBuffer,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-						sprintf(GlobalData::Instance().outputBuffer,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+						DEBUGPRINT("traceDownDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+						
+						DEBUGPRINT("traceDownRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+						
 						traceDownData->moreData = false;
 					}
 				}
@@ -346,28 +354,26 @@ namespace  {
 				if(reTraceUpData->moreData){
 
 					// here we shift the j index, because the data is now acquired from high column number to low column number
-					reTraceUpRawBrickletIndex	= i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
-					reTraceUpDataIndex		= i *  numPointsTriggerAxis + j;
+					rawIndex  = i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
+					dataIndex = i *  numPointsTriggerAxis + j;
 
-					if(	reTraceUpDataIndex >= 0 &&
-						reTraceUpDataIndex < waveSize &&
-						reTraceUpRawBrickletIndex < rawBrickletSize &&
-						reTraceUpRawBrickletIndex >= 0
+					if(	dataIndex >= 0 &&
+						dataIndex < waveSize &&
+						rawIndex < rawBrickletSize &&
+						rawIndex >= 0
 						){
-							rawValue	= rawBrickletDataPtr[reTraceUpRawBrickletIndex];
+							rawValue	= rawBrickletDataPtr[rawIndex];
 							scaledValue	= rawValue*slope + yIntercept;
 
-							reTraceUpData->fillWave(reTraceUpDataIndex,rawValue,scaledValue);
+							reTraceUpData->fillWave(dataIndex,rawValue,scaledValue);
 					}
 					else{
-						debugOutputToHistory("Index out of range in reTraceUp");
+						DEBUGPRINT("Index out of range in reTraceUp");
 
-						sprintf(GlobalData::Instance().outputBuffer,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-						sprintf(GlobalData::Instance().outputBuffer,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+						DEBUGPRINT("reTraceUpDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+						
+						DEBUGPRINT("reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+						
 						reTraceUpData->moreData = false;
 					}
 				}
@@ -375,28 +381,26 @@ namespace  {
 				// reTraceDown
 				if(reTraceDownData->moreData){
 
-					reTraceDownRawBrickletIndex = firstBlockOffset + i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
-					reTraceDownDataIndex		= ( numPointsRootAxis -( i+1) ) * numPointsTriggerAxis   + j;
+					rawIndex  = firstBlockOffset + i*triggerAxisBlockSize + triggerAxisBlockSize - (j+1);
+					dataIndex = ( numPointsRootAxis -( i+1) ) * numPointsTriggerAxis   + j;
 
-					if(	reTraceDownDataIndex >= 0 &&
-						reTraceDownDataIndex < waveSize &&
-						reTraceDownRawBrickletIndex < rawBrickletSize &&
-						reTraceDownRawBrickletIndex >= 0
+					if(	dataIndex >= 0 &&
+						dataIndex < waveSize &&
+						rawIndex < rawBrickletSize &&
+						rawIndex >= 0
 						){
 
-							rawValue = rawBrickletDataPtr[reTraceDownRawBrickletIndex];
+							rawValue = rawBrickletDataPtr[rawIndex];
 							scaledValue= rawValue*slope + yIntercept;
-							reTraceDownData->fillWave(reTraceDownDataIndex,rawValue,scaledValue);
+							reTraceDownData->fillWave(dataIndex,rawValue,scaledValue);
 					}
 					else{
-						debugOutputToHistory("Index out of range in reTraceDown");
+						DEBUGPRINT("Index out of range in reTraceDown");
 
-						sprintf(GlobalData::Instance().outputBuffer,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-						sprintf(GlobalData::Instance().outputBuffer,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
-						debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+						DEBUGPRINT("reTraceDownDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+						
+						DEBUGPRINT("reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+						
 						reTraceDownData->moreData = false;
 					}
 				}
@@ -413,9 +417,8 @@ namespace  {
 			if( resampleData ){
 				wave[i].pixelSize = pixelSize;
 
-				sprintf(GlobalData::Instance().outputBuffer,"Resampling wave %s with pixelSize=%d",wave[i].getWaveName(),pixelSize);
-				debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+				DEBUGPRINT("Resampling wave %s with pixelSize=%d",wave[i].getWaveName(),pixelSize);
+				
 				char dataFolderPath[MAXCMDLEN+1];
 				// flag=3 results in the full path being returned including a trailing colon
 				int ret = GetDataFolderNameOrPath(dfHandle, 3, dataFolderPath);
@@ -428,13 +431,10 @@ namespace  {
 					pixelSize,pixelSize,dataFolderPath,dataFolderPath);
 				// quote waveName properly, it might be a liberal name
 				CatPossiblyQuotedName(cmd,wave[i].getWaveName());
-				if(GlobalData::Instance().debuggingEnabled()){
-					debugOutputToHistory(cmd);
-				}
+
 				ret = XOPSilentCommand(cmd);
 				if(ret != 0){
-					sprintf(GlobalData::Instance().outputBuffer,"The command _%s_ failed to execute. So the XOP has to be fixed...",cmd);
-					outputToHistory(GlobalData::Instance().outputBuffer);
+					HISTPRINT("The command _%s_ failed to execute. So the XOP has to be fixed...",cmd);
 					continue;
 				}
 
@@ -504,12 +504,9 @@ namespace  {
 		const int *rawBrickletDataPtr;
 		bricklet->getBrickletContentsBuffer(&rawBrickletDataPtr ,rawBrickletSize);
 		if(rawBrickletSize == 0 || &rawBrickletDataPtr == NULL){
-			outputToHistory("Could not load bricklet contents.");
+			HISTPRINT("Could not load bricklet contents.");
 			return UNKNOWN_ERROR;
 		}
-
-		int traceUpRawBrickletIndex, traceUpDataIndex,reTraceUpDataIndex,reTraceUpRawBrickletIndex;
-		int traceDownRawBrickletIndex,traceDownDataIndex, reTraceDownRawBrickletIndex,reTraceDownDataIndex;
 
 		// V triggerAxis -> V is triggered by X , X is triggered by Y and Y is the root axis
 
@@ -526,7 +523,7 @@ namespace  {
 		}
 
 		if(found != 3){
-			debugOutputToHistory("The 3D data is not of the type vtc_2Dof3D and vtc_Spectroscopy.");
+			DEBUGPRINT("The 3D data is not of the type vtc_2Dof3D and vtc_Spectroscopy.");
 		}
 
 		const Vernissage::Session::AxisDescriptor specAxis = pSession->getAxisDescriptor(pBricklet,pSession->getTriggerAxisName(pBricklet));
@@ -644,25 +641,20 @@ namespace  {
 
 		// END Borrowed from SCALA exporter plugin
 
-		sprintf(GlobalData::Instance().outputBuffer,"V Axis # points: %d",numPointsVAxis);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-		sprintf(GlobalData::Instance().outputBuffer,"X Axis # points with tableSet: Total=%d, Forward=%d, Backward=%d",
+		DEBUGPRINT("V Axis # points: %d",numPointsVAxis);
+		
+		DEBUGPRINT("X Axis # points with tableSet: Total=%d, Forward=%d, Backward=%d",
 			numPointsXAxisWithTableBoth,numPointsXAxisWithTableFWD,numPointsXAxisWithTableBWD);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-		sprintf(GlobalData::Instance().outputBuffer,"Y Axis # points with tableSet: Total=%d, Up=%d, Down=%d",
+		
+		DEBUGPRINT("Y Axis # points with tableSet: Total=%d, Up=%d, Down=%d",
 			numPointsYAxisWithTableBoth,numPointsYAxisWithTableUp,numPointsYAxisWithTableDown);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		
 		// Theoretical the sizes of the cubes could be different but we are igoring that for now
 		if(numPointsXAxisWithTableBWD != 0 && numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableFWD != numPointsXAxisWithTableBWD){
-			sprintf(GlobalData::Instance().outputBuffer,"BUG: Number of X axis points is different in forward and backward direction. Keep fingers crossed.");
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			HISTPRINT("BUG: Number of X axis points is different in forward and backward direction. Keep fingers crossed.");
 		}
 		if(numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableDown != 0 && numPointsYAxisWithTableUp != numPointsYAxisWithTableDown){
-			sprintf(GlobalData::Instance().outputBuffer,"BUG: Number of Y axis points is different in up and down direction. Keep fingers crossed.");
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			HISTPRINT("BUG: Number of Y axis points is different in up and down direction. Keep fingers crossed.");
 		}
 
 		double xAxisDelta, yAxisDelta;
@@ -700,26 +692,21 @@ namespace  {
 
 		if(GlobalData::Instance().debuggingEnabled()){
 
-			sprintf(GlobalData::Instance().outputBuffer,"Number of axes we have table sets for: %d",sets.size());
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-			debugOutputToHistory("Tablesets: xAxis");
+			DEBUGPRINT("Number of axes we have table sets for: %d",sets.size());
+			
+			DEBUGPRINT("Tablesets: xAxis");
 			for(Vernissage::Session::TableSet::const_iterator  it= xSet.begin(); it != xSet.end(); it++){
-				sprintf(GlobalData::Instance().outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
-				debugOutputToHistory(GlobalData::Instance().outputBuffer);
-			}
+				DEBUGPRINT("start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
+							}
 
-			debugOutputToHistory("Tablesets: yAxis");
+			DEBUGPRINT("Tablesets: yAxis");
 			for(Vernissage::Session::TableSet::const_iterator it = ySet.begin(); it != ySet.end(); it++){
-				sprintf(GlobalData::Instance().outputBuffer,"start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
-				debugOutputToHistory(GlobalData::Instance().outputBuffer);
-			}
+				DEBUGPRINT("start=%d, step=%d, stop=%d",it->start,it->step,it->stop);
+							}
 
-			sprintf(GlobalData::Instance().outputBuffer,"xAxisDelta=%g, yAxisDelta=%g",xAxisDelta,yAxisDelta);
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
-			sprintf(GlobalData::Instance().outputBuffer,"xAxisOffset=%g, yAxisOffset=%g",xAxisOffset,yAxisOffset);
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		}
+			DEBUGPRINT("xAxisDelta=%g, yAxisDelta=%g",xAxisDelta,yAxisDelta);
+						DEBUGPRINT("xAxisOffset=%g, yAxisOffset=%g",xAxisOffset,yAxisOffset);
+					}
 
 		// dimensions of the cube
 		if(numPointsXAxisWithTableFWD != 0){
@@ -736,10 +723,9 @@ namespace  {
 
 		const int waveSize = dimensionSizes[ROWS]*dimensionSizes[COLUMNS]*dimensionSizes[LAYERS];
 
-		sprintf(GlobalData::Instance().outputBuffer,"dimensions of the cube: rows=%d,cols=%d,layers=%d",
+		DEBUGPRINT("dimensions of the cube: rows=%d,cols=%d,layers=%d",
 			dimensionSizes[ROWS],dimensionSizes[COLUMNS],dimensionSizes[LAYERS]);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		
 		WaveClass wave[MAX_NUM_TRACES];
 		WaveClass *traceUpData = &wave[TRACE_UP];
 		WaveClass *reTraceUpData = &wave[RE_TRACE_UP];
@@ -779,7 +765,7 @@ namespace  {
 		}
 		// not possible
 		else{
-			outputToHistory("BUG: Error in determining the number of cubes.");
+			HISTPRINT("BUG: Error in determining the number of cubes.");
 			return INTERNAL_ERROR_CONVERTING_DATA;
 		}
 		// numPointsXAxisWithTableBWD or numPointsXAxisWithTableFWD being zero makes it correct
@@ -789,9 +775,8 @@ namespace  {
 		// in case the traceDown scan does not exist this is also no problem
 		const int firstBlockOffset = numPointsYAxisWithTableUp*xAxisBlockSize;
 
-		sprintf(GlobalData::Instance().outputBuffer,"xAxisBlockSize=%d,firstBlockOffset=%d",xAxisBlockSize,firstBlockOffset);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT("xAxisBlockSize=%d,firstBlockOffset=%d",xAxisBlockSize,firstBlockOffset);
+		
 		for(int i=0; i < MAX_NUM_TRACES; i++){
 			// skip empty entries
 			if(wave[i].isEmpty()){
@@ -802,13 +787,11 @@ namespace  {
 			int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(),dfHandle,dimensionSizes,GlobalData::Instance().getIgorWaveType(),GlobalData::Instance().overwriteEnabledAsInt());
 
 			if(ret == NAME_WAV_CONFLICT){
-				sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",wave[i].getWaveName());
-				debugOutputToHistory(GlobalData::Instance().outputBuffer);
-				return WAVE_EXIST;
+				DEBUGPRINT("Wave %s already exists.",wave[i].getWaveName());
+								return WAVE_EXIST;
 			}
 			else if(ret != 0 ){
-				sprintf(GlobalData::Instance().outputBuffer,"Error %d in creating wave %s.",ret, wave[i].getWaveName());
-				outputToHistory(GlobalData::Instance().outputBuffer);
+				HISTPRINT("Error %d in creating wave %s.",ret, wave[i].getWaveName());
 				return UNKNOWN_ERROR;
 			}
 			ASSERT_RETURN_ONE(waveHandle);
@@ -823,6 +806,7 @@ namespace  {
 		double slope,yIntercept;
 		CalculateTransformationParameter(bricklet,slope,yIntercept);
 
+		int rawIndex, dataIndex;
 		int rawValue;
 		double scaledValue;
 		// COLUMNS
@@ -834,118 +818,105 @@ namespace  {
 
 					// traceUp
 					if(traceUpData->moreData){
-						traceUpRawBrickletIndex	= i*xAxisBlockSize + j*dimensionSizes[LAYERS] + k;
-						traceUpDataIndex		= i*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
+						rawIndex  = i*xAxisBlockSize + j*dimensionSizes[LAYERS] + k;
+						dataIndex = i*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
 
-						if(	traceUpDataIndex >= 0 &&
-							traceUpDataIndex < waveSize &&
-							traceUpRawBrickletIndex < rawBrickletSize &&
-							traceUpRawBrickletIndex >= 0 ){
+						if(	dataIndex >= 0 &&
+							dataIndex < waveSize &&
+							rawIndex < rawBrickletSize &&
+							rawIndex >= 0 ){
 
-								rawValue	= rawBrickletDataPtr[traceUpRawBrickletIndex];
+								rawValue	= rawBrickletDataPtr[rawIndex];
 								scaledValue = rawValue*slope + yIntercept;
 
-								traceUpData->fillWave(traceUpDataIndex,rawValue,scaledValue);
+								traceUpData->fillWave(dataIndex,rawValue,scaledValue);
 						}
 						else{
-							debugOutputToHistory("Index out of range in traceUp");
+							DEBUGPRINT("Index out of range in traceUp");
 
-							sprintf(GlobalData::Instance().outputBuffer,"traceUpDataIndex=%d,waveSize=%d",traceUpDataIndex,waveSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-							sprintf(GlobalData::Instance().outputBuffer,"traceUpRawBrickletIndex=%d,rawBrickletSize=%d",traceUpRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+							DEBUGPRINT("traceUpDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+							
+							DEBUGPRINT("traceUpRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+							
 							traceUpData->moreData = false;
 						}
 					}// if traceUpDataPtr
 
 					if(traceDownData->moreData){
 
-						traceDownRawBrickletIndex = firstBlockOffset + i*xAxisBlockSize + j*dimensionSizes[LAYERS] + k;
-						traceDownDataIndex		  = (dimensionSizes[COLUMNS] -(i+1))*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
+						rawIndex  = firstBlockOffset + i*xAxisBlockSize + j*dimensionSizes[LAYERS] + k;
+						dataIndex = (dimensionSizes[COLUMNS] -(i+1))*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
 
-						if(	traceDownDataIndex >= 0 &&
-							traceDownDataIndex < waveSize &&
-							traceDownRawBrickletIndex < rawBrickletSize &&
-							traceDownRawBrickletIndex >= 0
+						if(	dataIndex >= 0 &&
+							dataIndex < waveSize &&
+							rawIndex < rawBrickletSize &&
+							rawIndex >= 0
 							){
-								rawValue	= rawBrickletDataPtr[traceDownRawBrickletIndex];
+								rawValue	= rawBrickletDataPtr[rawIndex];
 								scaledValue = rawValue*slope + yIntercept;
 
-								traceDownData->fillWave(traceDownDataIndex,rawValue,scaledValue);
+								traceDownData->fillWave(dataIndex,rawValue,scaledValue);
 						}
 						else{
-							debugOutputToHistory("Index out of range in traceDown");
+							DEBUGPRINT("Index out of range in traceDown");
 
-							sprintf(GlobalData::Instance().outputBuffer,"traceDownDataIndex=%d,waveSize=%d",traceDownDataIndex,waveSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-							sprintf(GlobalData::Instance().outputBuffer,"traceDownRawBrickletIndex=%d,rawBrickletSize=%d",traceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+							DEBUGPRINT("traceDownDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+							
+							DEBUGPRINT("traceDownRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+							
 							traceDownData->moreData = false;
 						}
 					}// if traceDownDataPtr
 
 					if(reTraceUpData->moreData){
 
-						reTraceUpRawBrickletIndex = i*xAxisBlockSize + (dimensionSizes[ROWS] - (j+1))*dimensionSizes[LAYERS] + k;
-						reTraceUpDataIndex		  = i*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
+						rawIndex  = i*xAxisBlockSize + (dimensionSizes[ROWS] - (j+1))*dimensionSizes[LAYERS] + k;
+						dataIndex = i*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
 
-						if(	reTraceUpDataIndex >= 0 &&
-							reTraceUpDataIndex < waveSize &&
-							reTraceUpRawBrickletIndex < rawBrickletSize &&
-							reTraceUpRawBrickletIndex >= 0
+						if(	dataIndex >= 0 &&
+							dataIndex < waveSize &&
+							rawIndex < rawBrickletSize &&
+							rawIndex >= 0
 							){
-								rawValue	= rawBrickletDataPtr[reTraceUpRawBrickletIndex];
+								rawValue	= rawBrickletDataPtr[rawIndex];
 								scaledValue = rawValue*slope + yIntercept;
 
-								reTraceUpData->fillWave(reTraceUpDataIndex,rawValue,scaledValue);
+								reTraceUpData->fillWave(dataIndex,rawValue,scaledValue);
 						}
 						else{
-							debugOutputToHistory("Index out of range in reTraceUp");
+							DEBUGPRINT("Index out of range in reTraceUp");
 
-							sprintf(GlobalData::Instance().outputBuffer,"reTraceUpDataIndex=%d,waveSize=%d",reTraceUpDataIndex,waveSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-							sprintf(GlobalData::Instance().outputBuffer,"reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",reTraceUpRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+							DEBUGPRINT("reTraceUpDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+							
+							DEBUGPRINT("reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+							
 							reTraceUpData->moreData = false;
 						}
 					}// if reTraceUpDataPtr
 
 					if(reTraceDownData->moreData){
 
-						reTraceDownRawBrickletIndex	= firstBlockOffset + i*xAxisBlockSize + (dimensionSizes[ROWS] - (j+1))*dimensionSizes[LAYERS] + k;
-						reTraceDownDataIndex		= ( dimensionSizes[COLUMNS] - (i+1) )*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
+						rawIndex  = firstBlockOffset + i*xAxisBlockSize + (dimensionSizes[ROWS] - (j+1))*dimensionSizes[LAYERS] + k;
+						dataIndex = ( dimensionSizes[COLUMNS] - (i+1) )*dimensionSizes[ROWS] + j + k*dimensionSizes[ROWS]*dimensionSizes[COLUMNS];
 
-						if(	reTraceDownDataIndex >= 0 &&
-							reTraceDownDataIndex < waveSize &&
-							reTraceDownRawBrickletIndex < rawBrickletSize &&
-							reTraceDownRawBrickletIndex >= 0
+						if(	dataIndex >= 0 &&
+							dataIndex < waveSize &&
+							rawIndex < rawBrickletSize &&
+							rawIndex >= 0
 							){
 
-								rawValue	= rawBrickletDataPtr[reTraceDownRawBrickletIndex];
+								rawValue	= rawBrickletDataPtr[rawIndex];
 								scaledValue = rawValue*slope + yIntercept;
-								reTraceDownData->fillWave(reTraceDownDataIndex,rawValue,scaledValue);
 
-								//if(k < 10 && i < 2 && j < 2){
-								//	sprintf(GlobalData::Instance().outputBuffer,"j(rows)=%d,i(cols)=%d,k(layers)=%d,reTraceDownRawBrickletIndex=%d,reTraceDownDataIndex=%d,rawValue=%d,scaledValue=%g",
-								//		j,i,k,reTraceDownRawBrickletIndex,reTraceDownDataIndex,rawValue,scaledValue);
-								//	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-								//}
+								reTraceDownData->fillWave(dataIndex,rawValue,scaledValue);
 						}
 						else{
-							debugOutputToHistory("Index out of range in reTraceDown");
+							DEBUGPRINT("Index out of range in reTraceDown");
 
-							sprintf(GlobalData::Instance().outputBuffer,"reTraceDownDataIndex=%d,waveSize=%d",reTraceDownDataIndex,waveSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-							sprintf(GlobalData::Instance().outputBuffer,"reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",reTraceDownRawBrickletIndex,rawBrickletSize);
-							debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+							DEBUGPRINT("reTraceDownDataIndex=%d,waveSize=%d",dataIndex,waveSize);
+							
+							DEBUGPRINT("reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d",rawIndex,rawBrickletSize);
+							
 							reTraceDownData->moreData = false;
 						}
 					}// if reTraceDownDataPtr
@@ -990,25 +961,20 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseName, int brickle
 		void *pBricklet = bricklet->getBrickletPointer();
 		ASSERT_RETURN_ONE(pBricklet);
 
-		sprintf(GlobalData::Instance().outputBuffer,"### BrickletID %d ###",brickletID);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-		sprintf(GlobalData::Instance().outputBuffer,"dimension %d",bricklet->getMetaDataValueAsInt("dimension"));
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
+		DEBUGPRINT("### BrickletID %d ###",brickletID);
+		DEBUGPRINT("dimension %d",bricklet->getMetaDataValueAsInt("dimension"));
 
 		std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes = bricklet->getViewTypeCodes();
 		std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCodes;
 		for(itViewTypeCodes = viewTypeCodes.begin(); itViewTypeCodes != viewTypeCodes.end(); itViewTypeCodes++){
-			sprintf(GlobalData::Instance().outputBuffer,"viewType %s",viewTypeCodeToString(*itViewTypeCodes).c_str());
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
+			DEBUGPRINT("viewType %s",viewTypeCodeToString(*itViewTypeCodes).c_str());
 		}
 		
-		debugOutputToHistory("Axis order is from triggerAxis to rootAxis");
+		DEBUGPRINT("Axis order is from triggerAxis to rootAxis");
 
 		std::vector<std::string> allAxes = bricklet->getAxesString();
 		for(std::vector<std::string>::const_iterator itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++){
-			sprintf(GlobalData::Instance().outputBuffer,"Axis %s",itAllAxes->c_str());
-			debugOutputToHistory(GlobalData::Instance().outputBuffer);
+			DEBUGPRINT("Axis %s",itAllAxes->c_str());
 		}
 	}
 
@@ -1027,8 +993,7 @@ int createWaves(DataFolderHandle dfHandle, const char *waveBaseName, int brickle
 				return createWaves3D(dfHandle, waveBaseName, brickletID, fullPathOfCreatedWave);
 				break;
 		default:
-				sprintf(GlobalData::Instance().outputBuffer,"Dimension %d can not be handled. Please file a bug report at %s and attach the measured data.",dimension,PROJECTURL);
-				outputToHistory(GlobalData::Instance().outputBuffer);
+				HISTPRINT("Dimension %d can not be handled. Please file a bug report at %s and attach the measured data.",dimension,PROJECTURL);
 				return INTERNAL_ERROR_CONVERTING_DATA;
 				break;
 	}
@@ -1055,7 +1020,7 @@ int createRawDataWave(DataFolderHandle dfHandle,const char *waveName, int brickl
 	bricklet ->getBrickletContentsBuffer(&pBuffer,count);
 
 	if(count == 0 || pBuffer == NULL){
-		outputToHistory("Could not load bricklet contents.");
+		HISTPRINT("Could not load bricklet contents.");
 		return 0;
 	}
 	// create 1D wave with count points
@@ -1064,9 +1029,8 @@ int createRawDataWave(DataFolderHandle dfHandle,const char *waveName, int brickl
 	waveHndl waveHandle;
 	ret = MDMakeWave(&waveHandle,wave.getWaveName(),dfHandle,dimensionSizes,NT_I32,GlobalData::Instance().overwriteEnabledAsInt());
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",wave.getWaveName());
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return WAVE_EXIST;	
+		DEBUGPRINT("Wave %s already exists.",wave.getWaveName());
+				return WAVE_EXIST;	
 	}
 	else if(ret != 0 ){
 		return ret;

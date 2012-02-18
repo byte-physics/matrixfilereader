@@ -44,8 +44,8 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
 	loadSuccess = pSession->loadResultSet(dirPath,fileName,false);
 
 	if(!loadSuccess){
-		outputToHistory("Could not check for updates of the result file. Maybe it was moved?");
-		outputToHistory("Try closing and opening the result file again.");
+		HISTPRINT("Could not check for updates of the result file. Maybe it was moved?");
+		HISTPRINT("Try closing and opening the result file again.");
 		return 0;
 	}
 
@@ -70,7 +70,7 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
 
 	// should not happen
 	if(numberOfBricklets < oldNumberOfBricklets){
-		outputToHistory("Error in udating the result file. Please close and reopen it.");
+		HISTPRINT("Error in udating the result file. Please close and reopen it.");
 		return 0;
 	}
 

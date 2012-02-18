@@ -25,16 +25,14 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 
 	// create 2D textwave with firstColumn.size() rows and 2 columns
 	if(firstColumn.empty() || secondColumn.empty() ){
-		sprintf(GlobalData::Instance().outputBuffer,"BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("BUG: list sizes may not be zero: first column size %d, second column size %d",firstColumn.size(), secondColumn.size());
 		return UNKNOWN_ERROR;
 	}
 	else if(firstColumn.size() == secondColumn.size() ){
 		dimensionSizes[ROWS] = firstColumn.size();
 	}
 	else{
-		sprintf(GlobalData::Instance().outputBuffer,"BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("BUG: size mismatch of first column %d and second column %d",firstColumn.size(), secondColumn.size());
 		return UNKNOWN_ERROR;
 	}
 
@@ -43,13 +41,11 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 	ret = MDMakeWave(&waveHandle,waveName,dataFolderHandle,dimensionSizes,TEXT_WAVE_TYPE,GlobalData::Instance().overwriteEnabledAsInt());
 
 	if(ret == NAME_WAV_CONFLICT){
-		sprintf(GlobalData::Instance().outputBuffer,"Wave %s already exists.",waveName);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return WAVE_EXIST;
+		DEBUGPRINT("Wave %s already exists.",waveName);
+				return WAVE_EXIST;
 	}
 	else if(ret != 0 ){
-		sprintf(GlobalData::Instance().outputBuffer,"Error %d in creating wave %s.",ret, waveName);
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("Error %d in creating wave %s.",ret, waveName);
 		return UNKNOWN_ERROR;
 	}
 	ASSERT_RETURN_ONE(waveHandle);
@@ -62,7 +58,7 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 	}
 	catch(CMemoryException* e){
 		e->Delete();
-		XOPNotice("Out of memory in createAndFillTextWave()\r");
+		HISTPRINT("Out of memory in createAndFillTextWave()");
 		return UNKNOWN_ERROR;
 	}
 	allColumns.insert(allColumns.begin(),firstColumn.begin(),firstColumn.end());
@@ -71,8 +67,7 @@ int createAndFillTextWave(const std::vector<std::string>& firstColumn, const std
 	ret = stringVectorToTextWave(allColumns,waveHandle);
 
 	if(ret != 0){
-		sprintf(GlobalData::Instance().outputBuffer,"stringVectorToTextWave returned %d",ret);
-		outputToHistory(GlobalData::Instance().outputBuffer);
+		HISTPRINT("stringVectorToTextWave returned %d",ret);
 		return ret;
 	}
 	setOtherWaveNote(waveHandle,brickletID);
@@ -105,9 +100,8 @@ std::string viewTypeCodeToString(unsigned int idx){
 	names.push_back(VTC_ESPIMAGEMAP);
 
 	if(idx < 0 || idx >= names.size()){
-		sprintf(GlobalData::Instance().outputBuffer,"BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return std::string();
+		DEBUGPRINT("BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+				return std::string();
 	}
 	else{
 		return names.at(idx);
@@ -138,9 +132,8 @@ std::string brickletTypeToString(unsigned int idx){
 	names.push_back(BTC_ESPIMAGEMAP);
 
 	if(idx < 0 || idx >= names.size()){
-		sprintf(GlobalData::Instance().outputBuffer,"BUG: brickletTypeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		return std::string();
+		DEBUGPRINT("BUG: brickletTypeToString got %d as parameter, but it should be between 0 and %d",idx,names.size()-1);
+				return std::string();
 	}
 	else{
 		return names.at(idx);

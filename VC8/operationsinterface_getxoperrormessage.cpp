@@ -20,6 +20,6 @@ extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
 	else{// get last error message
 		errorMessage = GlobalData::Instance().getLastErrorMessage();
 	}
-	outputToHistory(errorMessage.c_str());
+	HISTPRINT(errorMessage.c_str());
 	return 0;
 }

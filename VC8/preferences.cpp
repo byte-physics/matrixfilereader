@@ -21,7 +21,7 @@ void loadXOPPreferences(){
 
 	if( prefHandle && (*prefHandle)->version == XOPprefStruct_VERSION ){
 
-		debugOutputToHistory("Loading preferences from file",true);
+		DEBUGPRINT_SILENT("Loading preferences from file");
 
 		size_t len = sizeof(GlobalData::Instance().openDlgInitialDir);
 		strncpy(GlobalData::Instance().openDlgInitialDir,(*prefHandle)->openDlgInitialDir,len);
@@ -29,14 +29,12 @@ void loadXOPPreferences(){
 
 		GlobalData::Instance().openDlgFileIndex = (*prefHandle)->openDlgFileIndex;
 
-		sprintf(GlobalData::Instance().outputBuffer,"openDlgFileIndex=%d",(*prefHandle)->openDlgFileIndex);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-		sprintf(GlobalData::Instance().outputBuffer,"openDlgInitialDir=%s",(*prefHandle)->openDlgInitialDir);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT_SILENT("openDlgFileIndex=%d",(*prefHandle)->openDlgFileIndex);
+		DEBUGPRINT_SILENT("openDlgInitialDir=%s",(*prefHandle)->openDlgInitialDir);
+		
 	}
 	else{
-		debugOutputToHistory("No preferences saved or the internal structure has changed, loading defaults",true);
+		DEBUGPRINT_SILENT("No preferences saved or the internal structure has changed, loading defaults");
 		GlobalData::Instance().openDlgFileIndex=1;
 		strcpy(GlobalData::Instance().openDlgInitialDir,"");
 	}
@@ -55,7 +53,7 @@ void saveXOPPreferences(){
 	if(prefHandle != NULL){
 		MemClear((char*) *prefHandle,sizeof(XOPprefStruct));
 
-		debugOutputToHistory("Saving preferences to file",true);
+		DEBUGPRINT_SILENT("Saving preferences to file");
 
 		//write structure version
 		(*prefHandle)->version = XOPprefStruct_VERSION;

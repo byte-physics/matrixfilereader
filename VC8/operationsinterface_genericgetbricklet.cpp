@@ -168,9 +168,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 		}
 	}
 
-	sprintf(GlobalData::Instance().outputBuffer,"startBrickletID=%d, endBrickletID=%d",startBrickletID,endBrickletID);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT("startBrickletID=%d, endBrickletID=%d",startBrickletID,endBrickletID);
+	
 	if(!isValidBrickletRange(startBrickletID,endBrickletID,numberOfBricklets)){
 		GlobalData::Instance().setError(INVALID_RANGE);
 		return 0;
@@ -199,7 +198,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 				baseName = brickletMetaDefault;
 				break;
 			default:
-				outputToHistory("BUG: Error in GenericGetBricklet");
+				HISTPRINT("BUG: Error in GenericGetBricklet");
 				return 0;
 				break;
 		}
@@ -218,9 +217,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 	else{
 		resampleData = false;
 	}
-	sprintf(GlobalData::Instance().outputBuffer,"pixelSize=%d",pixelSize);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT("pixelSize=%d",pixelSize);
+	
 	for(brickletID=startBrickletID; brickletID <= endBrickletID; brickletID++){
 
 		bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
@@ -267,7 +265,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p,int typeOfData){
 											,brickletDataFolderHndl,waveName,brickletID,fullPathOfCreatedWaves);
 				break;
 			default:
-				outputToHistory("Error in GenericGetBricklet");
+				HISTPRINT("Error in GenericGetBricklet");
 				return 0;
 				break;
 		}

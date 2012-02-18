@@ -24,7 +24,7 @@ GlobalData::~GlobalData(){}
 void GlobalData::setResultFile(const std::wstring &dirPath, const std::wstring &fileName){
 	
 	if(this->resultFileOpen()){
-		outputToHistory("BUG: there is already a result file open, please close that first");
+		HISTPRINT("BUG: there is already a result file open, please close that first");
 		return;
 	}
 	
@@ -154,15 +154,14 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet
 	}
 	catch(CMemoryException* e){
 		e->Delete();
-		XOPNotice("Out of memory in createBrickletClassObject\r");
+		HISTPRINT("Out of memory in createBrickletClassObject\r");
 		throw e;
 	}
 
 	m_brickletIDBrickletClassMap[brickletID] = bricklet;
 
-	sprintf(GlobalData::Instance().outputBuffer,"setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-}
+	DEBUGPRINT("setBrickletPointerMap brickletID=%d,pBricklet=%p",brickletID,pBricklet);
+	}
 
 /*
 	errors which are not recoverable should be told the user by calling setInternalError
@@ -173,12 +172,11 @@ void GlobalData::setInternalError(int errorValue){
 	char errorMessage[256];
 	int ret;
 
-	sprintf(GlobalData::Instance().outputBuffer,"BUG: xop internal error %d returned.",errorValue);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT("BUG: xop internal error %d returned.",errorValue);
+	
 	ret = GetIgorErrorMessage(errorValue,errorMessage);
 	if(ret == 0){
-		outputToHistory(errorMessage);		
+		HISTPRINT(errorMessage);		
 	}
 }
 /*
@@ -230,7 +228,7 @@ void GlobalData::initialize(int calledFromMacro, const int calledFromFunction){
 void GlobalData::setError( int errorCode, const std::string& argument /*= std::string()*/ )
 {
 	if(errorCode < SUCCESS || errorCode > WAVE_EXIST){
-		outputToHistory("BUG: errorCode is out of range");
+		HISTPRINT("BUG: errorCode is out of range");
 		m_lastError = UNKNOWN_ERROR;
 		return;
 	}
@@ -249,11 +247,10 @@ void GlobalData::setError( int errorCode, const std::string& argument /*= std::s
 	else{
 		m_lastErrorArgument = argument;
 	}
-	sprintf(GlobalData::Instance().outputBuffer,"lastErrorCode %d, argument %s", errorCode, argument.c_str());
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-	
+	DEBUGPRINT("lastErrorCode %d, argument %s", errorCode, argument.c_str());
+		
 	if(m_errorToHistory && errorCode != SUCCESS){
-		outputToHistory(getLastErrorMessage().c_str());
+		HISTPRINT(getLastErrorMessage().c_str());
 	}
 }
 
@@ -329,77 +326,70 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */){
 	ret = GetDataFolderObject(dataFolderHndl,debug_option_name,&objType,&objValue);
 	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDebugging(debug_default);
-		sprintf(GlobalData::Instance().outputBuffer,"debug=%d (default)",debug_default);
+		DEBUGPRINT("debug=%d (default)",debug_default);
 	}
 	else{
 		setting = doubleToBool(objValue.nv.realValue);
 		enableDebugging(setting);
-		sprintf(GlobalData::Instance().outputBuffer,"debug=%d",setting);
+		DEBUGPRINT("debug=%d",setting);
 	}
 	if(debuggingEnabled()){
-		char dataFolderPath[MAXCMDLEN+1], buf[ARRAY_SIZE];
+		char dataFolderPath[MAXCMDLEN+1];
 		// flags=3 returns the full path to the datafolder and including quotes if needed
 		ret = GetDataFolderNameOrPath(dataFolderHndl, 3,dataFolderPath);
 		if(ret == 0){
-			// the additional buf array is needed here because GlobalData::Instance().outputBuffer is still occupied
-			sprintf(buf,"V_MatrixFileReader* variables in the folder %s:",dataFolderPath);
-			debugOutputToHistory(buf);
+			DEBUGPRINT("V_MatrixFileReader* variables in the folder %s:",dataFolderPath);
 		}
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
 	}
 
 	//overwrite setting
 	ret = GetDataFolderObject(dataFolderHndl,overwrite_option_name,&objType,&objValue);
 	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableOverwrite(overwrite_default);
-		sprintf(GlobalData::Instance().outputBuffer,"overwrite=%d (default)",overwrite_default);
+		DEBUGPRINT("overwrite=%d (default)",overwrite_default);
 	}
 	else{
 		setting = doubleToBool(objValue.nv.realValue);
 		enableOverwrite(setting);
-		sprintf(GlobalData::Instance().outputBuffer,"overwrite=%d",setting);
+		DEBUGPRINT("overwrite=%d",setting);
 	}
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	
 	// double setting
 	ret = GetDataFolderObject(dataFolderHndl,double_option_name,&objType,&objValue);
 	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDoubleWave(double_default);
-		sprintf(GlobalData::Instance().outputBuffer,"double=%d (default)",double_default);
+		DEBUGPRINT("double=%d (default)",double_default);
 	}
 	else{
 		setting = doubleToBool(objValue.nv.realValue);
 		enableDoubleWave(setting);
-		sprintf(GlobalData::Instance().outputBuffer,"double=%d",setting);
+		DEBUGPRINT("double=%d",setting);
 	}
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	
 	// folder setting
 	ret = GetDataFolderObject(dataFolderHndl,datafolder_option_name,&objType,&objValue);
 	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDatafolder(datafolder_default);
-		sprintf(GlobalData::Instance().outputBuffer,"datafolder=%d (default)",datafolder_default);
+		DEBUGPRINT("datafolder=%d (default)",datafolder_default);
 	}
 	else{
 		setting = doubleToBool(objValue.nv.realValue);
 		enableDatafolder(setting);
-		sprintf(GlobalData::Instance().outputBuffer,"datafolder=%d",setting);
+		DEBUGPRINT("datafolder=%d",setting);
 	}
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	
 	// chache setting
 	ret = GetDataFolderObject(dataFolderHndl,cache_option_name,&objType,&objValue);
 	if(ret != 0 || objType != VAR_OBJECT){// variable does not exist or is of wrong type
 		enableDataCaching(cache_default);
-		sprintf(GlobalData::Instance().outputBuffer,"cache=%d (default)",cache_default);
+		DEBUGPRINT("cache=%d (default)",cache_default);
 	}
 	else{
 		setting = doubleToBool(objValue.nv.realValue);
 		enableDataCaching(setting);
-		sprintf(GlobalData::Instance().outputBuffer,"cache=%d",setting);
+		DEBUGPRINT("cache=%d",setting);
 	}
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	
 	return;
 }
 
@@ -432,8 +422,7 @@ int GlobalData::convertBrickletPtr(void* rawBrickletPtr)
 		}
 	}
 
-	sprintf(outputBuffer,"BUG: Could not find a corresponding brickletID for the raw pointer %p",rawBrickletPtr);
-	outputToHistory(outputBuffer);
+	HISTPRINT(outputBuffer,"BUG: Could not find a corresponding brickletID for the raw pointer %p",rawBrickletPtr);
 	return INVALID_BRICKLETID;
 }
 

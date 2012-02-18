@@ -199,7 +199,7 @@ extern "C" void XOPEntry(){
 		}
 	}
 	catch(...){
-		XOPNotice("Unexpected exception in XOPEntry");
+		HISTPRINT("Unexpected exception in XOPEntry");
 	}
 	SetXOPResult(result);
 }

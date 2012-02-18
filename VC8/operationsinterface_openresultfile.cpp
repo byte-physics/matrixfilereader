@@ -58,9 +58,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	}
 	// an empty or missing fileNameOrPath parameter results in an openfile dialog being displayed
 	else{
-		sprintf(GlobalData::Instance().outputBuffer,"dir=%s,index=%d",GlobalData::Instance().openDlgInitialDir,GlobalData::Instance().openDlgFileIndex);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT("dir=%s,index=%d",GlobalData::Instance().openDlgInitialDir,GlobalData::Instance().openDlgFileIndex);
+		
 		// empty initial filename
 		fullPath[0]='\0';
 		ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(GlobalData::Instance().openDlgFileIndex), GlobalData::Instance().openDlgInitialDir, fullPath);
@@ -89,15 +88,12 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	// dirPath c:\data
 	// fullPath c:\data\myName.test
 
-	sprintf(GlobalData::Instance().outputBuffer,"fullPath %s",fullPath);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-	sprintf(GlobalData::Instance().outputBuffer,"filename %s",fileName);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
-	sprintf(GlobalData::Instance().outputBuffer,"dirPath %s",dirPath);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT("fullPath %s",fullPath);
+	
+	DEBUGPRINT("filename %s",fileName);
+	
+	DEBUGPRINT("dirPath %s",dirPath);
+	
 	if( !FullPathPointsToFolder(dirPath) ){
 		GlobalData::Instance().setError(FILE_NOT_READABLE,dirPath);
 		return 0;
@@ -126,7 +122,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	loadSuccess = pSession->loadResultSet(dirPathWString,fileNameWString,false);
 
 	if(!loadSuccess){
-		outputToHistory("Could not load the result file");
+		HISTPRINT("Could not load the result file");
 		return 0;
 	}
 
@@ -134,9 +130,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 	GlobalData::Instance().setResultFile(dirPathWString,fileNameWString);
 
 	totalNumBricklets = pSession->getBrickletCount();
-	sprintf(GlobalData::Instance().outputBuffer,"totalNumBricklets=%d",totalNumBricklets);
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT("totalNumBricklets=%d",totalNumBricklets);
+	
 	// brickletIDs are 1-based
 	for( i=1; i <= totalNumBricklets; i++){
 		pBricklet = pSession->getNextBricklet(&pContext);
@@ -146,8 +141,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p){
 		}
 		catch(CMemoryException* e){
 			e->Delete();
-			sprintf(GlobalData::Instance().outputBuffer,"Could not reserve memory for brickletID %d, giving up",i);
-			outputToHistory(GlobalData::Instance().outputBuffer);
+			HISTPRINT("Could not reserve memory for brickletID %d, giving up",i);
 			break;
 		}
 	}

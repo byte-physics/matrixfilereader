@@ -70,9 +70,8 @@ void splitString(const std::string &string, const char* sepChar, std::vector<std
 
 	stringCopy.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
 
-	sprintf(GlobalData::Instance().outputBuffer,"keyList=%s",stringCopy.c_str());
-	debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+	DEBUGPRINT("keyList=%s",stringCopy.c_str());
+	
 	while( ( pos = stringCopy.find(sepChar,offset) ) != std::string::npos ){
 
 		if(pos == offset){// skip empty element
@@ -81,9 +80,8 @@ void splitString(const std::string &string, const char* sepChar, std::vector<std
 		}
 
 		list.push_back(stringCopy.substr(offset,pos-offset));
-		sprintf(GlobalData::Instance().outputBuffer,"key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
-		debugOutputToHistory(GlobalData::Instance().outputBuffer);
-
+		DEBUGPRINT("key=%s,pos=%d,offset=%d",list.back().c_str(),pos,offset);
+		
 		offset = pos+1;
 	}
 }

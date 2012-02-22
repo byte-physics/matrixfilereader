@@ -6,10 +6,10 @@
 
 #include "stdafx.h"
 
-#include "utils_bricklet.h"
-#include "waveclass.h"
-#include "globaldata.h"
-#include "utils_generic.h"
+#include "utils_bricklet.hpp"
+#include "waveclass.hpp"
+#include "globaldata.hpp"
+#include "utils_generic.hpp"
 
 /*
 	Create a two column text wave from two string vectors

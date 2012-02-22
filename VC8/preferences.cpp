@@ -6,8 +6,8 @@
 
 #include "stdafx.h"
 
-#include "preferences.h"
-#include "globaldata.h"
+#include "preferences.hpp"
+#include "globaldata.hpp"
 
 /*
 	Load the preferences from the internal igor storage currently (Igor 6.22) located in

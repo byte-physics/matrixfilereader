@@ -6,11 +6,11 @@
 
 #include "stdafx.h"
 
-#include "operationstructs.h"
-#include "operationsinterface.h"
-#include "utils_bricklet.h"
-#include "globaldata.h"
-#include "preferences.h"
+#include "operationstructs.hpp"
+#include "operationsinterface.hpp"
+#include "utils_bricklet.hpp"
+#include "globaldata.hpp"
+#include "preferences.hpp"
 
 static int RegisterGetResultFileMetaData(){
 	const char* cmdTemplate;

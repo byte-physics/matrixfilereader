@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#include "ForwardDecl.h"
+#include "ForwardDecl.hpp"
 
 /*
 	Everything related to loading the Vernissage DLLs.

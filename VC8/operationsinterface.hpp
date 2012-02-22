@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#include "operationstructs.h"
+#include "operationstructs.hpp"
 
 /*
 	Takes care of xop initialization, igor message handling and registering all operations

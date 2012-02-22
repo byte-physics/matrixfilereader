@@ -6,9 +6,9 @@
 
 #include "stdafx.h"
 
-#include "operationstructs.h"
-#include "operationsinterface.h"
-#include "globaldata.h"
+#include "operationstructs.hpp"
+#include "operationsinterface.hpp"
+#include "globaldata.hpp"
 
 extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p){
 	std::string errorMessage;

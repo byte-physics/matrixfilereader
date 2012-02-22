@@ -6,11 +6,11 @@
 
 #include "stdafx.h"
 
-#include "brickletclass.h"
-#include "globaldata.h"
-#include "utils_bricklet.h"
-#include "extremadata.h"
-#include "utils_generic.h"
+#include "brickletclass.hpp"
+#include "globaldata.hpp"
+#include "utils_bricklet.hpp"
+#include "extremadata.hpp"
+#include "utils_generic.hpp"
 
 BrickletClass::BrickletClass(void* const pBricklet,int brickletID)
 :

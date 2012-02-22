@@ -6,9 +6,9 @@
 
 #include "stdafx.h"
 
-#include "dllhandler.h"
-#include "globaldata.h"
-#include "utils_generic.h"
+#include "dllhandler.hpp"
+#include "globaldata.hpp"
+#include "utils_generic.hpp"
 
 DLLHandler::DLLHandler():
 	m_foundationModule(NULL),

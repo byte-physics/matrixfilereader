@@ -6,13 +6,13 @@
 
 #include "stdafx.h"
 
-#include "brickletconverter.h"
-#include "utils_bricklet.h"
-#include "globaldata.h"
-#include "waveclass.h"
-#include "brickletclass.h"
-#include "extremadata.h"
-#include "utils_generic.h"
+#include "brickletconverter.hpp"
+#include "utils_bricklet.hpp"
+#include "globaldata.hpp"
+#include "waveclass.hpp"
+#include "brickletclass.hpp"
+#include "extremadata.hpp"
+#include "utils_generic.hpp"
 
 namespace  {
 

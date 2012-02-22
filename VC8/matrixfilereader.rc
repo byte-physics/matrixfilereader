@@ -9,7 +9,7 @@
 
 #include "resource.h"
 
-#include "version.h"
+#include "version.hpp"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////

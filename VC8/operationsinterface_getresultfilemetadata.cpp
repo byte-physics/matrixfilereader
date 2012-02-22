@@ -6,12 +6,12 @@
 
 #include "stdafx.h"
 
-#include "operationstructs.h"
-#include "operationsinterface.h"
-#include "utils_bricklet.h"
-#include "globaldata.h"
-#include "brickletclass.h"
-#include "utils_generic.h"
+#include "operationstructs.hpp"
+#include "operationsinterface.hpp"
+#include "utils_bricklet.hpp"
+#include "globaldata.hpp"
+#include "brickletclass.hpp"
+#include "utils_generic.hpp"
 
 extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
 	BEGIN_OUTER_CATCH

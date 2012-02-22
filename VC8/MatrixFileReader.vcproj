@@ -522,51 +522,51 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\brickletclass.h"
+				RelativePath=".\brickletclass.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\brickletconverter.h"
+				RelativePath=".\brickletconverter.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\constants.h"
+				RelativePath=".\constants.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\dllhandler.h"
+				RelativePath=".\dllhandler.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\errorcodes.h"
+				RelativePath=".\errorcodes.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\extremadata.h"
+				RelativePath=".\extremadata.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ForwardDecl.h"
+				RelativePath=".\ForwardDecl.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\globaldata.h"
+				RelativePath=".\globaldata.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\keynames.h"
+				RelativePath=".\keynames.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\operationsinterface.h"
+				RelativePath=".\operationsinterface.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\operationstructs.h"
+				RelativePath=".\operationstructs.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\preferences.h"
+				RelativePath=".\preferences.hpp"
 				>
 			</File>
 			<File
@@ -574,27 +574,27 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utils_bricklet.h"
+				RelativePath=".\utils_bricklet.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\utils_generic.h"
+				RelativePath=".\utils_generic.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\utils_xop.h"
+				RelativePath=".\utils_xop.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\version.h"
+				RelativePath=".\version.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\waveclass.h"
+				RelativePath=".\waveclass.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\xop_const_wrappers.h"
+				RelativePath=".\xop_const_wrappers.hpp"
 				>
 			</File>
 		</Filter>

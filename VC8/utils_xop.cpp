@@ -6,10 +6,10 @@
 
 #include "stdafx.h"
 
-#include "utils_xop.h"
-#include "globaldata.h"
-#include "waveclass.h"
-#include "utils_generic.h"
+#include "utils_xop.hpp"
+#include "globaldata.hpp"
+#include "waveclass.hpp"
+#include "utils_generic.hpp"
 
 /*
 	Write stringVector to the textwave waveHandle, using memcpy this is quite fast

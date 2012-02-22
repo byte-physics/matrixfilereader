@@ -6,10 +6,10 @@
 
 #include "stdafx.h"
 
-#include "globaldata.h"
-#include "dllhandler.h"
-#include "brickletclass.h"
-#include "utils_generic.h"
+#include "globaldata.hpp"
+#include "dllhandler.hpp"
+#include "brickletclass.hpp"
+#include "utils_generic.hpp"
 
 GlobalData::GlobalData(): m_VernissageSession(NULL),
 	m_DLLHandler(DLLHandler()), m_lastError(UNKNOWN_ERROR),

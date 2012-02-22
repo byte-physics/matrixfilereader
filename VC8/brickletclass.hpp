@@ -1,5 +1,5 @@
 /*
-	The file brickletclass.h is part of the "MatrixFileReader XOP".
+	The file brickletclass.hpp is part of the "MatrixFileReader XOP".
 	It is licensed under the LGPLv3 with additional permissions,
 	see License.txt	in the source folder for details.
 */
@@ -7,8 +7,8 @@
 
 #include <vector>
 #include <string>
-#include "ForwardDecl.h"
-#include "extremadata.h"
+#include "ForwardDecl.hpp"
+#include "extremadata.hpp"
 
 /*
 	Internal representation of a bricklet

@@ -6,13 +6,13 @@
 
 #include "stdafx.h"
 
-#include "operationstructs.h"
-#include "operationsinterface.h"
-#include "utils_bricklet.h"
-#include "brickletconverter.h"
-#include "globaldata.h"
-#include "brickletclass.h"
-#include "utils_generic.h"
+#include "operationstructs.hpp"
+#include "operationsinterface.hpp"
+#include "utils_bricklet.hpp"
+#include "brickletconverter.hpp"
+#include "globaldata.hpp"
+#include "brickletclass.hpp"
+#include "utils_generic.hpp"
 
 namespace{
 	enum TYPE{ RAW_DATA=1, CONVERTED_DATA=2, META_DATA=4 };

@@ -5,8 +5,8 @@
 */
 #include "stdafx.h"
 
-#include "utils_generic.h"
-#include "globaldata.h"
+#include "utils_generic.hpp"
+#include "globaldata.hpp"
 
 /*
 	Convert a string to a wstring

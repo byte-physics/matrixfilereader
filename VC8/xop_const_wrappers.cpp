@@ -6,7 +6,7 @@
 
 #include "stdafx.h"
 
-#include "xop_const_wrappers.h"
+#include "xop_const_wrappers.hpp"
 
 int MDSetDimensionLabel(waveHndl waveH, int dimension, IndexInt element, const char constLabel[MAX_DIM_LABEL_CHARS+1]){
 

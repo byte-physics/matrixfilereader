@@ -6,9 +6,9 @@
 
 #include "stdafx.h"
 
-#include "waveclass.h"
-#include "globaldata.h"
-#include "utils_generic.h"
+#include "waveclass.hpp"
+#include "globaldata.hpp"
+#include "utils_generic.hpp"
 
 WaveClass::WaveClass()
 :

@@ -8,8 +8,8 @@
 #include "stdafx.h"
 
 #include <string>
-#include "ForwardDecl.h"
-#include "extremadata.h"
+#include "ForwardDecl.hpp"
+#include "extremadata.hpp"
 
 /*
 	Internal representation of a igor wave

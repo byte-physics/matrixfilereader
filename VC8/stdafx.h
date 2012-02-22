@@ -33,14 +33,14 @@
 
 #include "XOPStandardHeaders.h"
 
-#include "utils_xop.h"
+#include "utils_xop.hpp"
 
-#include "constants.h"
-#include "keynames.h"
-#include "errorcodes.h"
-#include "version.h"
+#include "constants.hpp"
+#include "keynames.hpp"
+#include "errorcodes.hpp"
+#include "version.hpp"
 
-#include "xop_const_wrappers.h"
+#include "xop_const_wrappers.hpp"
 
 //#include "VernissageSDK_V2.0-1/src/Incl/Vernissage.h"
 #include "VernissageSDK_T2.1_7/src/Incl/Vernissage.h"

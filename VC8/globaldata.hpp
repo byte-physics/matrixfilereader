@@ -9,8 +9,8 @@
 */
 #pragma once
 
-#include "ForwardDecl.h"
-#include "dllhandler.h"
+#include "ForwardDecl.hpp"
+#include "dllhandler.hpp"
 
 class GlobalData{
 

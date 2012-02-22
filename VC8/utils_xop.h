@@ -14,9 +14,11 @@
 */
 
 // Accepts multipe arguments like printf and prints them to the history
+// Custom prefixes can be also inserted, see DEBUGPRINT
 // Copies only ARRAY_SIZE-2 characters in _snprintf, because we want to have space for the terminating \0 (1) and for the CR (1)
+// Checking the return value of _snprintf is not done on purpose, we just always append a \0 to be safe
 // @param A prints only if A evaluates to true
-// @param B use silent printing (does not mark the experiment as changed) if true
+// @param B uses silent printing (does not mark the experiment as changed) if true
 #define PRINT_TO_HISTORY(A,B,...)								\
 	if (A)														\
 	{															\
@@ -42,9 +44,13 @@
 #define DEBUGPRINT(...) \
 	PRINT_TO_HISTORY(GlobalData::Instance().debuggingEnabled(),false,"DEBUG: "__VA_ARGS__)
 
-// Convenience wrapper which always prints
+// Convenience wrapper for printing
 #define HISTPRINT(...) \
 	PRINT_TO_HISTORY(true,false,__VA_ARGS__)
+
+// Convenience wrapper for silent printing
+#define HISTPRINT_SILENT(...) \
+	PRINT_TO_HISTORY(true,true,__VA_ARGS__)
 
 // be sure to check the return value for NULL
 template <class T> T* getWaveDataPtr(waveHndl waveH){

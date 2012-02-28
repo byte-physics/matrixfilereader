@@ -101,7 +101,7 @@ namespace  {
 		double slope,yIntercept;
 		CalculateTransformationParameter(bricklet,slope,yIntercept);
 
-		for(int i=0; i < numPointsTriggerAxis ; i++){
+		for(int i=0; i < rawBrickletSize ; i++){
 			const int rawValue = rawBrickletDataPtr[i];
 			wave1D.fillWave(i,rawValue,rawValue*slope + yIntercept);
 		}

@@ -7,8 +7,8 @@ if [ ! -z "$(git status -s --untracked-files=no .)" ]; then
 	exit 0
 fi
 
-lastVersion=0.18
-newVersion=0.19-beta3
+lastVersion=0.19-beta3
+newVersion=0.19
 
 baseName=matrixFileReaderXOP-v$newVersion
 folder=public-releases/$baseName

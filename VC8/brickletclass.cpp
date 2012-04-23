@@ -564,7 +564,8 @@ void BrickletClass::generateAllAxesVector(){
 	std::vector<std::wstring> allAxesWString;
 	std::vector<std::string> allAxesString;
 
-	int numRuns=0,maxRuns=100;
+	unsigned int numRuns = 0;
+	const unsigned int maxRuns = 100;
 
 	rootAxis= m_VernissageSession->getRootAxisName(m_brickletPtr);
 	triggerAxis = m_VernissageSession->getTriggerAxisName(m_brickletPtr);

@@ -42,5 +42,4 @@
 
 #include "xop_const_wrappers.hpp"
 
-//#include "VernissageSDK_V2.0-1/src/Incl/Vernissage.h"
-#include "VernissageSDK_T2.1_7/src/Incl/Vernissage.h"
+#include "VernissageSDK_2.1/src/Incl/Vernissage.h"

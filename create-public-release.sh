@@ -2,13 +2,16 @@
 
 set -e
 
-if [ ! -z "$(git status -s --untracked-files=no .)" ]; then
+
+lastVersion=0.19-beta2
+newVersion=0.19
+
+filesToWatch="VC8 *.txt matrixfilereader-basic-gui.pxp Operation-Template-Generator.pxp *.ihf"
+
+if [ ! -z "$(git status -s --untracked-files=no $filesToWatch)" ]; then
 	echo "Aborting, please commit the changes first"
 	exit 0
 fi
-
-lastVersion=0.19-beta3
-newVersion=0.19
 
 baseName=matrixFileReaderXOP-v$newVersion
 folder=public-releases/$baseName
@@ -42,7 +45,6 @@ cp VC8/Release/matrixfilereader.xop $folder
 cp VC8/VC2005_Redist_package_x86/vcredist_x86.exe $folder
 
 
-filesToWatch="VC8 *.txt matrixfilereader-basic-gui.pxp Operation-Template-Generator.pxp *.ihf"
 git rev-parse HEAD > $folder/internalVersionString.txt
 rm -f changelog
 git log --pretty="%B" $(cat public-releases/matrixFileReaderXOP-v$lastVersion/internalVersionString.txt)..HEAD $filesToWatch >> changelog

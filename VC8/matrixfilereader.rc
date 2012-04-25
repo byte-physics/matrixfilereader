@@ -7,8 +7,6 @@
 	resources that IGOR looks for in an XOP module.
 */
 
-#include "resource.h"
-
 #include "version.hpp"
 
 #define APSTUDIO_READONLY_SYMBOLS

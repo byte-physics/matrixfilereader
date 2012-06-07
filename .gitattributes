@@ -1,4 +1,7 @@
-VC9_not_working    	export-ignore
-releases    		export-ignore
-public-releases    	export-ignore
+VC9_not_working     	export-ignore
+releases    		      export-ignore
+public-releases    	  export-ignore
 regression_tests    	export-ignore
+todo.txt              export-ignore
+.git*                 export-ignore
+*.sh                  export-ignore

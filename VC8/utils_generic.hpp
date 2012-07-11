@@ -7,7 +7,6 @@
 /*
   Place for generic functions which are neither XOP nor vernissage specific
 */
-
 #pragma once
 
 #include <sstream>
@@ -42,16 +41,33 @@ T stringToAnyType(std::string str)
 }
 
 std::wstring StringToWString(const std::string& s);
-std::string WStringToString(const std::wstring& s);
 std::wstring CharPtrToWString(char* cStr);
 
-template <class T>
-std::string anyTypeToString(const T& t)
+/*
+  Converts any type to a std::string
+*/
+template <typename T>
+std::string toString(const T& t)
 {
   std::stringstream ss;
   ss.precision(DBL_DIG);
   ss << t;
   return ss.str();
+}
+
+/*
+  Specialization
+*/
+template<>
+std::string toString<std::wstring>(const std::wstring& s);
+
+/*
+  Specialization (which does nothing)
+*/
+template<>
+inline std::string toString<>( const std::string& s )
+{
+  return s;
 }
 
 void  splitString(const char* stringChar, const char* sepChar, std::vector<std::string> &list);
@@ -63,21 +79,14 @@ void  splitString(const std::string& str, const char* sepChar, std::vector<std::
 template <class T>
 void joinString(const std::vector<T> &list, const char* sepChar, std::string& joinedList)
 {
-
   joinedList.clear();
 
   for (std::vector<T>::const_iterator it = list.begin(); it != list.end(); it++)
   {
-    joinedList.append(anyTypeToString<T>(*it));
+    joinedList.append(toString<T>(*it));
     joinedList.append(sepChar);
   }
 }
-
-/*
-  Specialization for std::string as we don't need to convert them
-*/
-template<>
-void joinString<std::string>(const std::vector<std::string> &list, const char* sepChar, std::string& joinedList);
 
 bool doubleToBool(double value);
 void RemoveAllBackslashesAtTheEnd(char* str);

@@ -174,7 +174,7 @@ void WaveClass::setWaveUnits(int dimension, const std::string& units)
 
 void WaveClass::setWaveUnits(int dimension, const std::wstring& units)
 {
-  setWaveUnits(dimension, WStringToString(units));
+  setWaveUnits(dimension, toString(units));
 }
 
 const ExtremaData& WaveClass::getExtrema() const

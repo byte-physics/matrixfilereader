@@ -19,16 +19,6 @@ std::wstring StringToWString(const std::string& s)
 }
 
 /*
-  Convert a wstring to a string
-*/
-std::string WStringToString(const std::wstring& s)
-{
-  std::string temp(s.length(), ' ');
-  std::copy(s.begin(), s.end(), temp.begin());
-  return temp;
-}
-
-/*
   Convert a char ptr to a string
 */
 std::wstring CharPtrToWString(char* cStr)
@@ -72,7 +62,6 @@ void splitString(const std::string& string, const char* sepChar, std::vector<std
   int offset = 0;
 
   stringCopy.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
-
   DEBUGPRINT("keyList=%s", stringCopy.c_str());
 
   while ((pos = stringCopy.find(sepChar, offset)) != std::string::npos)
@@ -85,7 +74,6 @@ void splitString(const std::string& string, const char* sepChar, std::vector<std
 
     list.push_back(stringCopy.substr(offset, pos - offset));
     DEBUGPRINT("key=%s,pos=%d,offset=%d", list.back().c_str(), pos, offset);
-
     offset = pos + 1;
   }
 }
@@ -142,13 +130,9 @@ bool doubleToBool(double value)
 }
 
 template<>
-void joinString<std::string>(const std::vector<std::string> &list, const char* sepChar, std::string& joinedList)
+std::string toString<>( const std::wstring& s )
 {
-  joinedList.clear();
-
-  for (std::vector<std::string>::const_iterator it = list.begin(); it != list.end(); it++)
-  {
-    joinedList.append(*it);
-    joinedList.append(sepChar);
-  }
+  std::string temp(s.length(), ' ');
+  std::copy(s.begin(), s.end(), temp.begin());
+  return temp;
 }

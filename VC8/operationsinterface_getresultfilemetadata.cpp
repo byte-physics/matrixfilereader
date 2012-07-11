@@ -77,7 +77,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   std::vector<std::pair<std::string,std::string> > data;
   data.push_back(std::make_pair(RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath<std::string>()));
   data.push_back(std::make_pair(RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName<std::string>()));
-  data.push_back(std::make_pair("totalNumberOfBricklets",anyTypeToString<int>(numberOfBricklets)));
+  data.push_back(std::make_pair("totalNumberOfBricklets",toString(numberOfBricklets)));
 
   if (numberOfBricklets > 0)
   {
@@ -94,11 +94,11 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d", ctime.tm_mon + 1, ctime.tm_mday, ctime.tm_year + 1900, ctime.tm_hour, ctime.tm_min, ctime.tm_sec);
 
     data.push_back(std::make_pair("dateOfLastChange",buf));
-    data.push_back(std::make_pair("timeStampOfLastChange",anyTypeToString<time_t>(mktime(&ctime))));
-    data.push_back(std::make_pair("BrickletMetaData.fileCreatorName",WStringToString(brickletMetaData.fileCreatorName)));
-    data.push_back(std::make_pair("BrickletMetaData.fileCreatorVersion",WStringToString(brickletMetaData.fileCreatorVersion)));
-    data.push_back(std::make_pair("BrickletMetaData.userName",WStringToString(brickletMetaData.userName)));
-    data.push_back(std::make_pair("BrickletMetaData.accountName",WStringToString(brickletMetaData.accountName)));
+    data.push_back(std::make_pair("timeStampOfLastChange",toString<time_t>(mktime(&ctime))));
+    data.push_back(std::make_pair("BrickletMetaData.fileCreatorName",toString(brickletMetaData.fileCreatorName)));
+    data.push_back(std::make_pair("BrickletMetaData.fileCreatorVersion",toString(brickletMetaData.fileCreatorVersion)));
+    data.push_back(std::make_pair("BrickletMetaData.userName",toString(brickletMetaData.userName)));
+    data.push_back(std::make_pair("BrickletMetaData.accountName",toString(brickletMetaData.accountName)));
   }
   else
   {

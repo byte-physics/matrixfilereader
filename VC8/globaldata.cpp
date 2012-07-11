@@ -136,7 +136,7 @@ bool GlobalData::resultFileOpen() const
 template<>
 std::string GlobalData::getDirPath<std::string>() const
 {
-  return WStringToString(m_resultDirPath);
+  return toString(m_resultDirPath);
 }
 
 template<>
@@ -148,7 +148,7 @@ std::wstring GlobalData::getDirPath<std::wstring>() const
 template<>
 std::string GlobalData::getFileName<std::string>() const
 {
-  return WStringToString(m_resultFileName);
+  return toString(m_resultFileName);
 }
 
 template<>

@@ -10,6 +10,4 @@
 
 #pragma once
 
-#include <string>
-
 int MDSetDimensionLabel(waveHndl waveH, int dimension, IndexInt element, const char label[MAX_DIM_LABEL_CHARS + 1]);

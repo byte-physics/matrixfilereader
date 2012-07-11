@@ -9,8 +9,8 @@
 #include "operationstructs.hpp"
 #include "operationsinterface.hpp"
 #include "globaldata.hpp"
-
 #include "utils_generic.hpp"
+
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
 {
   BEGIN_OUTER_CATCH
@@ -32,7 +32,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   // non zero is success here
   if (retValue != 0)
   {
-    str.append("Windows version: " + anyTypeToString<int>(osvi.dwMajorVersion) + "." + anyTypeToString<int>(osvi.dwMinorVersion) + " (Build " + anyTypeToString<int>(osvi.dwBuildNumber) + ")\r");
+    str.append("Windows version: " + toString(osvi.dwMajorVersion) + "." + toString(osvi.dwMinorVersion) + " (Build " + toString(osvi.dwBuildNumber) + ")\r");
   }
   else
   {
@@ -40,14 +40,14 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   }
 
 #if defined(_MSC_VER)
-  str.append("Visual Studio version: " + anyTypeToString<int>(_MSC_VER) + "\r");
+  str.append("Visual Studio version: " + toString(_MSC_VER) + "\r");
 #elif defined(__GNUC__)
   str.append("GCC version: " __VERSION__ "\r");
 #else
   str.append("Unknown compiler version\r");
 #endif
 
-  str.append("Igor Pro Version: " + anyTypeToString<int>(igorVersion) + "\r");
+  str.append("Igor Pro Version: " + toString(igorVersion) + "\r");
   str.append("Vernissage version: " + GlobalData::Instance().getVernissageVersion() + "\r");
   str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
   str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");

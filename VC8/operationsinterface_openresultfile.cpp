@@ -9,7 +9,6 @@
 #include "operationstructs.hpp"
 #include "operationsinterface.hpp"
 #include "globaldata.hpp"
-
 #include "utils_generic.hpp"
 
 extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)

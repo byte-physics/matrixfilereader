@@ -37,7 +37,7 @@ cp matrixfilereader-basic-gui.pxp $pxpFolder
 
 cp regression_tests/readme.txt regression_tests/*.pxp $regressFolder
 
-cp VC8/*.bat VC8/*.cpp VC8/*.h VC8/*.rc VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcproj $srcFolder
+cp VC8/*.bat VC8/*.cpp VC8/*.h VC8/*.hpp VC8/*.rc VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcproj $srcFolder
 
 cp Operation-Template-Generator.pxp $srcFolder
 

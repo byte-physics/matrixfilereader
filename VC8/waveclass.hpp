@@ -5,8 +5,6 @@
 */
 #pragma once
 
-#include "stdafx.h"
-
 #include <string>
 #include "ForwardDecl.hpp"
 #include "extremadata.hpp"

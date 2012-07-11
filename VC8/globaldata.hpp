@@ -9,6 +9,7 @@
 */
 #pragma once
 
+#include <string>
 #include "ForwardDecl.hpp"
 #include "dllhandler.hpp"
 

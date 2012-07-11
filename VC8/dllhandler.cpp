@@ -10,7 +10,8 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
-DLLHandler::DLLHandler():
+DLLHandler::DLLHandler()
+  :
   m_foundationModule(NULL),
   m_pGetSessionFunc(NULL),
   m_pReleaseSessionFunc(NULL),

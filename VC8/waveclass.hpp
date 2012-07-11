@@ -33,7 +33,6 @@ public:
   bool isEmpty() const;
   const ExtremaData& getExtrema() const;;
 
-  // inlined, has to be very fast
   void fillWave(int index, int rawValue, double scaledValue);
 
 public:

@@ -37,7 +37,6 @@ namespace  {
 GlobalData::GlobalData()
   :
   m_VernissageSession(NULL),
-  m_DLLHandler(DLLHandler()),
   m_lastError(UNKNOWN_ERROR),
   m_debug(debug_default),
   m_doubleWave(double_default),
@@ -249,7 +248,7 @@ void GlobalData::finalize(bool filledCache /* = false */, int errorCode /* = SUC
 */
 void GlobalData::initializeWithoutReadSettings(int calledFromMacro, int calledFromFunction)
 {
-  // otherwise the setError in the next line causes the error message to be printed
+  // set it temporary to false, otherwise the setError in the next line causes the error message to be printed
   m_errorToHistory = false;
 
   this->setError(UNKNOWN_ERROR);

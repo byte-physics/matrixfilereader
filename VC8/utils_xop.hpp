@@ -7,6 +7,7 @@
 
 #include <string>
 
+#include "globaldata.hpp"
 #include "ForwardDecl.hpp"
 
 /*
@@ -75,7 +76,7 @@ T* getWaveDataPtr(waveHndl waveH)
 
 void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle);
 
-int stringVectorToTextWave(const std::vector<std::string>& metaData, waveHndl waveHandle);
+int stringVectorToTextWave(const std::vector<std::string>& data, waveHndl waveHandle);
 
 void waveClearNaN64(double* wavePtr, CountInt length);
 void waveClearNaN32(float* wavePtr, CountInt length);

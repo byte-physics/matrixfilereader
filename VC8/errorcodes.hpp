@@ -4,11 +4,10 @@
   see License.txt in the source folder for details.
 */
 
-#pragma once
-
 /*
   error codes which are returned in V_flag by the operations
 */
+#pragma once
 
 // If this enum is changed, check GlobalData::setError(...) to see if it needs adaption
 // the values start at 10000 because these are reserved for custom XOP error codes according to the XOP Toolkit manual

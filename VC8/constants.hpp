@@ -9,7 +9,6 @@
   Most strings are part of the Igor interface
   The total number of bricklets is limited to 10^5, see brickletDataFormat and friends
 */
-
 #pragma once
 
 const int ARRAY_SIZE = 1024;

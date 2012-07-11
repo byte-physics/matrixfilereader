@@ -14,35 +14,35 @@
 #include "brickletclass.hpp"
 #include "utils_generic.hpp"
 
-namespace
-{
+namespace  {
+
   enum TYPE { RAW_DATA = 1, CONVERTED_DATA = 2, META_DATA = 4 };
-}
+} // anonymous namespace 
 
 extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p)
 {
   GenericGetBrickletParams params;
 
-  params.calledFromFunction  = p->calledFromFunction;
-  params.calledFromMacro    = p->calledFromMacro;
+  params.calledFromFunction   = p->calledFromFunction;
+  params.calledFromMacro      = p->calledFromMacro;
 
-  params.NFlagEncountered    = p->NFlagEncountered;
-  params.NFlagParamsSet[0]  = p->NFlagParamsSet[0];
-  params.baseName        = p->baseName;
+  params.NFlagEncountered     = p->NFlagEncountered;
+  params.NFlagParamsSet[0]    = p->NFlagParamsSet[0];
+  params.baseName             = p->baseName;
 
-  params.RFlagEncountered    = p->RFlagEncountered;
-  params.RFlagParamsSet[0]  = p->RFlagParamsSet[0];
-  params.RFlagParamsSet[1]  = p->RFlagParamsSet[1];
-  params.startBrickletID    = p->startBrickletID;
-  params.endBrickletID    = p->endBrickletID;
+  params.RFlagEncountered     = p->RFlagEncountered;
+  params.RFlagParamsSet[0]    = p->RFlagParamsSet[0];
+  params.RFlagParamsSet[1]    = p->RFlagParamsSet[1];
+  params.startBrickletID      = p->startBrickletID;
+  params.endBrickletID        = p->endBrickletID;
 
-  params.SFlagEncountered    = p->SFlagEncountered;
-  params.SFlagParamsSet[0]  = p->SFlagParamsSet[0];
-  params.pixelSize      = p->pixelSize;
+  params.SFlagEncountered     = p->SFlagEncountered;
+  params.SFlagParamsSet[0]    = p->SFlagParamsSet[0];
+  params.pixelSize            = p->pixelSize;
 
   params.DESTFlagEncountered  = p->DESTFlagEncountered;
   params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
-  params.dfref        = p->dfref;
+  params.dfref                = p->dfref;
 
   return GenericGetBricklet(&params, CONVERTED_DATA);
 }
@@ -51,26 +51,26 @@ int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p)
 {
   GenericGetBrickletParams params;
 
-  params.calledFromFunction  = p->calledFromFunction;
-  params.calledFromMacro    = p->calledFromMacro;
+  params.calledFromFunction   = p->calledFromFunction;
+  params.calledFromMacro      = p->calledFromMacro;
 
-  params.NFlagEncountered    = p->NFlagEncountered;
-  params.NFlagParamsSet[0]  = p->NFlagParamsSet[0];
-  params.baseName        = p->baseName;
+  params.NFlagEncountered     = p->NFlagEncountered;
+  params.NFlagParamsSet[0]    = p->NFlagParamsSet[0];
+  params.baseName             = p->baseName;
 
-  params.RFlagEncountered    = p->RFlagEncountered;
-  params.RFlagParamsSet[0]  = p->RFlagParamsSet[0];
-  params.RFlagParamsSet[1]  = p->RFlagParamsSet[1];
-  params.startBrickletID    = p->startBrickletID;
-  params.endBrickletID    = p->endBrickletID;
+  params.RFlagEncountered     = p->RFlagEncountered;
+  params.RFlagParamsSet[0]    = p->RFlagParamsSet[0];
+  params.RFlagParamsSet[1]    = p->RFlagParamsSet[1];
+  params.startBrickletID      = p->startBrickletID;
+  params.endBrickletID        = p->endBrickletID;
 
-  params.SFlagEncountered    = 0;
-  params.SFlagParamsSet[0]  = 0;
-  params.pixelSize      = 0.0;
+  params.SFlagEncountered     = 0;
+  params.SFlagParamsSet[0]    = 0;
+  params.pixelSize            = 0.0;
 
   params.DESTFlagEncountered  = p->DESTFlagEncountered;
   params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
-  params.dfref        = p->dfref;
+  params.dfref                = p->dfref;
 
   return GenericGetBricklet(&params, META_DATA);
 }
@@ -79,26 +79,26 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p)
 {
   GenericGetBrickletParams params;
 
-  params.calledFromFunction  = p->calledFromFunction;
-  params.calledFromMacro    = p->calledFromMacro;
+  params.calledFromFunction   = p->calledFromFunction;
+  params.calledFromMacro      = p->calledFromMacro;
 
-  params.NFlagEncountered    = p->NFlagEncountered;
-  params.NFlagParamsSet[0]  = p->NFlagParamsSet[0];
-  params.baseName        = p->baseName;
+  params.NFlagEncountered     = p->NFlagEncountered;
+  params.NFlagParamsSet[0]    = p->NFlagParamsSet[0];
+  params.baseName             = p->baseName;
 
-  params.RFlagEncountered    = p->RFlagEncountered;
-  params.RFlagParamsSet[0]  = p->RFlagParamsSet[0];
-  params.RFlagParamsSet[1]  = p->RFlagParamsSet[1];
-  params.startBrickletID    = p->startBrickletID;
-  params.endBrickletID    = p->endBrickletID;
+  params.RFlagEncountered     = p->RFlagEncountered;
+  params.RFlagParamsSet[0]    = p->RFlagParamsSet[0];
+  params.RFlagParamsSet[1]    = p->RFlagParamsSet[1];
+  params.startBrickletID      = p->startBrickletID;
+  params.endBrickletID        = p->endBrickletID;
 
-  params.SFlagEncountered    = 0;
-  params.SFlagParamsSet[0]  = 0;
-  params.pixelSize      = 0.0;
+  params.SFlagEncountered     = 0;
+  params.SFlagParamsSet[0]    = 0;
+  params.pixelSize            = 0.0;
 
   params.DESTFlagEncountered  = p->DESTFlagEncountered;
   params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
-  params.dfref        = p->dfref;
+  params.dfref                = p->dfref;
 
   return GenericGetBricklet(&params, RAW_DATA);
 }

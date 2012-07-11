@@ -3,7 +3,6 @@
   It is licensed under the LGPLv3 with additional permissions,
   see License.txt in the source folder for details.
 */
-
 #pragma once
 #include <limits>
 
@@ -29,6 +28,7 @@ public:
     m_rawMin = rawMin;
     m_physValRawMin = physValRawMin;
   }
+
   void setMaximum(int rawMax, double physValRawMax)
   {
     m_rawMax = rawMax;
@@ -39,6 +39,7 @@ public:
   {
     return m_rawMin;
   }
+
   int getRawMax() const
   {
     return m_rawMax;
@@ -48,6 +49,7 @@ public:
   {
     return m_physValRawMin;
   }
+
   double getPhysValRawMax() const
   {
     return m_physValRawMax;

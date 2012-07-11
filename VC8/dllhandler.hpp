@@ -4,7 +4,6 @@
   see License.txt in the source folder for details.
 */
 #pragma once
-
 #include "ForwardDecl.hpp"
 
 /*

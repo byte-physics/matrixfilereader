@@ -33,7 +33,6 @@ BrickletClass::~BrickletClass()
 */
 void BrickletClass::clearCache()
 {
-
   if (m_rawBufferContents != NULL)
   {
     DEBUGPRINT("Deleting raw data from bricklet %d", m_brickletID);
@@ -51,7 +50,6 @@ void BrickletClass::clearCache()
 */
 void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
 {
-
   ASSERT_RETURN_VOID(pBuffer);
   ASSERT_RETURN_VOID(m_vernissageSession);
   count = 0;
@@ -70,7 +68,6 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
   }
   else  // we are called the first time
   {
-
     try
     {
       m_vernissageSession->loadBrickletContents(m_brickletPtr, pBuffer, count);
@@ -365,7 +362,7 @@ void BrickletClass::loadBrickletMetaDataFromResultFile()
       metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.axis",""));
       metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.start","1"));
       metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.step","1"));
-      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.stop","1"));
+      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.stop",anyTypeToString(axisDescriptor.clocks)));
     }
     else
     {

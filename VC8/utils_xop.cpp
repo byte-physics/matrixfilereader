@@ -6,7 +6,6 @@
 
 #include "stdafx.h"
 
-#include "utils_xop.hpp"
 #include "globaldata.hpp"
 #include "waveclass.hpp"
 #include "utils_generic.hpp"

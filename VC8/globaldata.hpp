@@ -10,6 +10,8 @@
 #pragma once
 
 #include <string>
+#include "errorcodes.hpp"
+#include "constants.hpp"
 #include "ForwardDecl.hpp"
 #include "dllhandler.hpp"
 

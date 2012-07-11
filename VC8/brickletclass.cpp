@@ -3,7 +3,6 @@
   It is licensed under the LGPLv3 with additional permissions,
   see License.txt in the source folder for details.
 */
-
 #include "stdafx.h"
 
 #include "brickletclass.hpp"
@@ -263,14 +262,15 @@ void BrickletClass::loadBrickletMetaDataFromResultFile()
   }
 
   const std::vector<std::wstring> elementInstanceNames = m_vernissageSession->getExperimentElementInstanceNames(m_brickletPtr, L"");
-  for (std::vector<std::wstring>::const_iterator itElem = elementInstanceNames.begin(); itElem != elementInstanceNames.end(); itElem++)
+  for (std::vector<std::wstring>::const_iterator itInstance = elementInstanceNames.begin(); itInstance != elementInstanceNames.end(); itInstance++)
   {
     typedef std::map<std::wstring, Vernissage::Session::Parameter> MapType;
-    const MapType elementInstanceParamsMap = m_vernissageSession->getExperimentElementParameters(m_brickletPtr, *itElem);
+
+    const MapType elementInstanceParamsMap = m_vernissageSession->getExperimentElementParameters(m_brickletPtr, *itInstance);
 
     for (MapType::const_iterator itParam = elementInstanceParamsMap.begin(); itParam != elementInstanceParamsMap.end(); itParam++)
     {
-      const std::string key = toString(*itElem) + std::string(".") + toString(itParam->first) ;
+      const std::string key = toString(*itInstance) + std::string(".") + toString(itParam->first) ;
       metaData.push_back(std::make_pair(key + std::string(".value"),toString(itParam->second.value)));
       metaData.push_back(std::make_pair(key + std::string(".unit"),toString(itParam->second.unit)));
     }

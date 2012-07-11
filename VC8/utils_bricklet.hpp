@@ -8,7 +8,6 @@
 /*
   Utility functions involving bricklets
 */
-
 std::string viewTypeCodeToString(unsigned int idx);
 std::string brickletTypeToString(unsigned int idx);
 

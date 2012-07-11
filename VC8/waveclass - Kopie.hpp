@@ -11,9 +11,13 @@
 #include "ForwardDecl.hpp"
 #include "extremadata.hpp"
 
+A template version of WaveClass then needs heap waveClass Objects.
+This can only properly done with boost::scoped_ptr or similiar
+
 /*
   Internal representation of a igor wave
 */
+template<typename T>
 class WaveClass
 {
 public:
@@ -58,7 +62,8 @@ private:
   It will _not_ be checked if index is out-of-range
   Here we also determine the extrema values
 */
-inline void WaveClass::fillWave(int index, int rawValue, double scaledValue)
+template<typename T>
+inline void WaveClass<T>::fillWave(int index, int rawValue, double scaledValue)
 {
   if (m_floatPtr)
   {

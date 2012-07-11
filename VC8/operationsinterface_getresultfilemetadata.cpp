@@ -1,7 +1,7 @@
 /*
-	The file operationsinterface_getresultfilemetadata.cpp is part of the "MatrixFileReader XOP".
-	It is licensed under the LGPLv3 with additional permissions,
-	see License.txt	in the source folder for details.
+  The file operationsinterface_getresultfilemetadata.cpp is part of the "MatrixFileReader XOP".
+  It is licensed under the LGPLv3 with additional permissions,
+  see License.txt  in the source folder for details.
 */
 
 #include "stdafx.h"
@@ -13,139 +13,121 @@
 #include "brickletclass.hpp"
 #include "utils_generic.hpp"
 
-extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p){
-	BEGIN_OUTER_CATCH
-	GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro,p->calledFromFunction);
+extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
+{
+  BEGIN_OUTER_CATCH
+  GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro, p->calledFromFunction);
 
-	SetOperationStrVar(S_waveNames,"");
+  SetOperationStrVar(S_waveNames, "");
+  int ret;
 
-	std::string waveName, fullPathOfCreatedWaves;
-	DataFolderHandle destDataFolderHndl = NULL;
-	std::vector<std::string> keys,values;
-	char buf[ARRAY_SIZE];
-	int ret;
-	void *pBricklet = NULL;
-	BrickletClass *bricklet = NULL;
-	tm ctime;
-	Vernissage::Session::BrickletMetaData brickletMetaData;
+  // check of DEST flag which tells us that we should place all output in the supplied datafolder
+  // and also read the variable settings from this folder
+  DataFolderHandle destDataFolderHndl = NULL;
+  if (p->DESTFlagEncountered)
+  {
+    if (p->dfref == NULL)
+    {
+      GlobalData::Instance().setError(WRONG_PARAMETER, "dfref");
+      return 0;
+    }
 
-	// check of DEST flag which tells us that we should place all output in the supplied datafolder
-	// and also read the variable settings from this folder
-	if (p->DESTFlagEncountered){
-		if(p->dfref == NULL){
-			GlobalData::Instance().setError(WRONG_PARAMETER,"dfref");
-			return 0;
-		}
-		destDataFolderHndl = p->dfref;
-		// Here we check again for the config variables, this time in the destDataFolderHndl
-	}
-	else{// no DEST flag given, so we take the current data folder as destination folder
-		ret = GetCurrentDataFolder(&destDataFolderHndl);
-		if(ret != 0){
-			GlobalData::Instance().setInternalError(ret);
-			return 0;
-		}
-	}
-	GlobalData::Instance().readSettings(destDataFolderHndl);
+    destDataFolderHndl = p->dfref;
+    // Here we check again for the config variables, this time in the destDataFolderHndl
+  }
+  else // no DEST flag given, so we take the current data folder as destination folder
+  {
+    ret = GetCurrentDataFolder(&destDataFolderHndl);
 
-	if(!GlobalData::Instance().resultFileOpen()){
-		GlobalData::Instance().setError(NO_FILE_OPEN);
-		return 0;
-	}
+    if (ret != 0)
+    {
+      GlobalData::Instance().setInternalError(ret);
+      return 0;
+    }
+  }
 
-	Vernissage::Session *pSession = GlobalData::Instance().getVernissageSession();
-	ASSERT_RETURN_ZERO(pSession);
+  GlobalData::Instance().readSettings(destDataFolderHndl);
 
-	const int numberOfBricklets = pSession->getBrickletCount();
+  if (!GlobalData::Instance().resultFileOpen())
+  {
+    GlobalData::Instance().setError(NO_FILE_OPEN);
+    return 0;
+  }
 
-	// check waveName parameter
-	if (p->NFlagEncountered){
-		if( GetHandleSize(p->waveName) == 0L ){
-			GlobalData::Instance().setError(WRONG_PARAMETER,"waveName");
-			return 0;
-		}
-		else{
-			convertHandleToString(p->waveName,waveName);
-		}
-	}
-	else{
-		waveName = resultMetaDefault;
-	}
+  Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
+  ASSERT_RETURN_ZERO(pSession);
 
-	keys.push_back(RESULT_DIR_PATH_KEY);
-	values.push_back(GlobalData::Instance().getDirPath());
+  const int numberOfBricklets = pSession->getBrickletCount();
 
-	keys.push_back(RESULT_FILE_NAME_KEY);
-	values.push_back(GlobalData::Instance().getFileName());
+  // check waveName parameter
+  std::string waveName = resultMetaDefault;
+  if (p->NFlagEncountered)
+  {
+    if (GetHandleSize(p->waveName) == 0L)
+    {
+      GlobalData::Instance().setError(WRONG_PARAMETER, "waveName");
+      return 0;
+    }
+    else
+    {
+      convertHandleToString(p->waveName, waveName);
+    }
+  }
 
-	keys.push_back("totalNumberOfBricklets");
-	values.push_back(anyTypeToString<int>(numberOfBricklets));
+  std::vector<std::pair<std::string,std::string> > data;
+  data.push_back(std::make_pair(RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath<std::string>()));
+  data.push_back(std::make_pair(RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName<std::string>()));
+  data.push_back(std::make_pair("totalNumberOfBricklets",anyTypeToString<int>(numberOfBricklets)));
 
-	if(numberOfBricklets > 0){
-		bricklet = GlobalData::Instance().getBrickletClassObject(numberOfBricklets);
-		ASSERT_RETURN_ZERO(bricklet);	
-		pBricklet  = bricklet->getBrickletPointer();
-		ASSERT_RETURN_ZERO(pBricklet);
+  if (numberOfBricklets > 0)
+  {
+    const BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(numberOfBricklets);
+    ASSERT_RETURN_ZERO(bricklet);
+    void* pBricklet = bricklet->getBrickletPointer();
+    ASSERT_RETURN_ZERO(pBricklet);
 
-		// use the timestamp of the last bricklet as dateOfLastChange
-		ctime = pSession->getCreationTimestamp(pBricklet);
+    // use the timestamp of the last bricklet as dateOfLastChange
+    tm ctime = pSession->getCreationTimestamp(pBricklet);
+    const Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
 
-		brickletMetaData = pSession->getMetaData(pBricklet);
+    char buf[ARRAY_SIZE];
+    sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d", ctime.tm_mon + 1, ctime.tm_mday, ctime.tm_year + 1900, ctime.tm_hour, ctime.tm_min, ctime.tm_sec);
 
-		keys.push_back("dateOfLastChange");
-		sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d",ctime.tm_mon+1,ctime.tm_mday,ctime.tm_year+1900, ctime.tm_hour,ctime.tm_min,ctime.tm_sec);
-		values.push_back(buf);
+    data.push_back(std::make_pair("dateOfLastChange",buf));
+    data.push_back(std::make_pair("timeStampOfLastChange",anyTypeToString<time_t>(mktime(&ctime))));
+    data.push_back(std::make_pair("BrickletMetaData.fileCreatorName",WStringToString(brickletMetaData.fileCreatorName)));
+    data.push_back(std::make_pair("BrickletMetaData.fileCreatorVersion",WStringToString(brickletMetaData.fileCreatorVersion)));
+    data.push_back(std::make_pair("BrickletMetaData.userName",WStringToString(brickletMetaData.userName)));
+    data.push_back(std::make_pair("BrickletMetaData.accountName",WStringToString(brickletMetaData.accountName)));
+  }
+  else
+  {
+    data.push_back(std::make_pair("dateOfLastChange",""));
+    data.push_back(std::make_pair("timeStampOfLastChange",""));
+    data.push_back(std::make_pair("BrickletMetaData.fileCreatorName",""));
+    data.push_back(std::make_pair("BrickletMetaData.fileCreatorVersion",""));
+    data.push_back(std::make_pair("BrickletMetaData.userName",""));
+    data.push_back(std::make_pair("BrickletMetaData.accountName",""));
+  }
 
-		keys.push_back("timeStampOfLastChange");
-		values.push_back(anyTypeToString<time_t>(mktime(&ctime)));
+  // brickletID=0 because we are handling resultfile metadata
+  std::string fullPathOfCreatedWaves;
+  ret = createAndFillTextWave(data, destDataFolderHndl, waveName.c_str(), 0, fullPathOfCreatedWaves);
 
-		keys.push_back("BrickletMetaData.fileCreatorName");
-		values.push_back(WStringToString(brickletMetaData.fileCreatorName));
+  if (ret == WAVE_EXIST)
+  {
+    GlobalData::Instance().setError(ret, waveName);
+    return 0;
+  }
+  else if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
-		keys.push_back("BrickletMetaData.fileCreatorVersion");
-		values.push_back(WStringToString(brickletMetaData.fileCreatorVersion));
-
-		keys.push_back("BrickletMetaData.userName");
-		values.push_back(WStringToString(brickletMetaData.userName));
-
-		keys.push_back("BrickletMetaData.accountName");
-		values.push_back(WStringToString(brickletMetaData.accountName));
-	}
-	else{
-		keys.push_back("dateOfLastChange");
-		values.push_back("");
-
-		keys.push_back("timeStampOfLastChange");
-		values.push_back("");
-
-		keys.push_back("BrickletMetaData.fileCreatorName");
-		values.push_back("");
-
-		keys.push_back("BrickletMetaData.fileCreatorVersion");
-		values.push_back("");
-
-		keys.push_back("BrickletMetaData.userName");
-		values.push_back("");
-
-		keys.push_back("BrickletMetaData.accountName");
-		values.push_back("");
-	}
-
-	// brickletID=0 because we are handling resultfile metadata
-	ret = createAndFillTextWave(keys,values,destDataFolderHndl,waveName.c_str(),0,fullPathOfCreatedWaves);
-
-	if(ret == WAVE_EXIST){
-		GlobalData::Instance().setError(ret,waveName);
-		return 0;
-	}
-	else if(ret != 0){
-		GlobalData::Instance().setInternalError(ret);
-		return 0;
-	}
-
-	SetOperationStrVar(S_waveNames,fullPathOfCreatedWaves.c_str());
-	bool clearCache=true;
-	GlobalData::Instance().finalize(clearCache);
-	END_OUTER_CATCH
-	return 0;
+  SetOperationStrVar(S_waveNames, fullPathOfCreatedWaves.c_str());
+  bool clearCache = true;
+  GlobalData::Instance().finalize(clearCache);
+  END_OUTER_CATCH
+  return 0;
 }

@@ -1,10 +1,10 @@
 /*
-	The file matrixfilereader.rc is part of the "MatrixFileReader XOP".
-	It is licensed under the LGPLv3 with additional permissions, see License.txt
-	in the source folder for details.
+  The file matrixfilereader.rc is part of the "MatrixFileReader XOP".
+  It is licensed under the LGPLv3 with additional permissions, see License.txt
+  in the source folder for details.
 
-	This file is compiled by the resource compiler and creates XOP-specific
-	resources that IGOR looks for in an XOP module.
+  This file is compiled by the resource compiler and creates XOP-specific
+  resources that IGOR looks for in an XOP module.
 */
 
 #include "version.hpp"

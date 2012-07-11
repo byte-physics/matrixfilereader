@@ -1,7 +1,7 @@
 /*
-	The file brickletclass.hpp is part of the "MatrixFileReader XOP".
-	It is licensed under the LGPLv3 with additional permissions,
-	see License.txt	in the source folder for details.
+  The file brickletclass.hpp is part of the "MatrixFileReader XOP".
+  It is licensed under the LGPLv3 with additional permissions,
+  see License.txt  in the source folder for details.
 */
 #pragma once
 
@@ -9,59 +9,88 @@
 #include <string>
 #include "ForwardDecl.hpp"
 #include "extremadata.hpp"
-
+#include "utils_xop.hpp"
+#include "globaldata.hpp"
 /*
-	Internal representation of a bricklet
+  Internal representation of a bricklet
 */
 class BrickletClass
 {
 public:
-	BrickletClass(void* const pBricklet,int brickletID);
-	~BrickletClass();
+  BrickletClass(void* const pBricklet, int brickletID);
+  ~BrickletClass();
 
 public:
-	// resetting *pBricklet is only needed after the same result file is loaded again to check for new bricklets
-	void setBrickletPointer(void* const pBricklet){ m_brickletPtr = pBricklet; };
+  void setBrickletPointer(void* const pBricklet);
 
-	void clearCache();
-	void getBrickletContentsBuffer(const int** pBuffer, int &count);
+  void clearCache();
+  void getBrickletContentsBuffer(const int** pBuffer, int& count);
 
-	const std::vector<std::string>& getBrickletMetaDataValues();
-	const std::vector<std::string>& getBrickletMetaDataKeys();
-	std::string getMetaDataValueAsString(const std::string &key);
-	int			getMetaDataValueAsInt(const std::string &key);
-	double		getMetaDataValueAsDouble(const std::string &key);
+  typedef std::pair<std::string,std::string> StringPair;
+  const std::vector<StringPair>& getBrickletMetaData();
 
-	const std::vector<std::wstring>& getAxes();
-	const std::vector<std::string>& getAxesString();
+  template<typename T>
+  T getMetaDataValue(const std::string& key)
+  {
+    return stringToAnyType<T>(this->getMetaDataValue<std::string>(key));
+  }
 
-// const methods
-public:
-	const std::vector<Vernissage::Session::ViewTypeCode>& getViewTypeCodes()const{ return m_viewTypeCodes; };
-	void* getBrickletPointer()const{ return m_brickletPtr; };
-	const ExtremaData& getExtrema()const{ return m_extrema; };
+  template<>
+  std::string BrickletClass::getMetaDataValue( const std::string& key )
+  {
+    if (key.empty())
+    {
+      HISTPRINT("BUG: getMetaDataValueAsString called with empty parameter");
+      return std::string();
+    }
+
+    if (m_metaData.empty())
+    {
+      loadBrickletMetaDataFromResultFile();
+    }
+
+    for (unsigned int i = 0; i < m_metaData.size(); i++)
+    {
+      if (m_metaData[i].first == key)
+      {
+        return m_metaData[i].second;
+      }
+    }
+    return std::string();
+  }
+
+  template<typename T>
+  const std::vector<T>& getAxes(); ///< Empty template definition
+
+  template<>
+  const std::vector<std::string>& getAxes();
+
+  template<>
+  const std::vector<std::wstring>& getAxes();
+
+  const std::vector<Vernissage::Session::ViewTypeCode>& getViewTypeCodes()const;
+  void* getBrickletPointer()const;
+  const ExtremaData& getExtrema()const;
 
 private:
-	void loadBrickletMetaDataFromResultFile();
-	void generateAllAxesVector();
+  void loadBrickletMetaDataFromResultFile();
+  void generateAllAxesVector();
 
-private:
-	void *m_brickletPtr;
-	Vernissage::Session *m_VernissageSession;
-	int m_brickletID;
+  void* m_brickletPtr;
+  Vernissage::Session* m_VernissageSession;
+  int m_brickletID;
 
-	// storage for the raw data
-	int *m_rawBufferContents;
-	int m_rawBufferContentsSize;
+  // storage for the raw data
+  int* m_rawBufferContents;
+  int m_rawBufferContentsSize;
 
-	ExtremaData m_extrema;
+  ExtremaData m_extrema;
 
-	// meta data
-	std::vector<std::string> m_metaDataKeys;
-	std::vector<std::string> m_metaDataValues;
+  // meta data
+  std::vector<StringPair> m_metaData;
 
-	// special meta data
-	std::vector<std::wstring> m_allAxesWString;
-	std::vector<std::string>  m_allAxesString;
-	std::vector<Vernissage::Session::ViewTypeCode> m_viewTypeCodes;
+  // special meta data
+  std::vector<std::wstring> m_allAxesWString;
+  std::vector<std::string>  m_allAxesString;
+  std::vector<Vernissage::Session::ViewTypeCode> m_viewTypeCodes;
 };

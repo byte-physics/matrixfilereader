@@ -10,14 +10,16 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
-WaveClass::WaveClass()
+template<typename T>
+WaveClass<T>::WaveClass()
   :
   m_extrema(ExtremaData())
 {
   Init();
 }
 
-WaveClass::WaveClass( const ExtremaData& extremaData )
+template<typename T>
+WaveClass<T>::WaveClass( const ExtremaData& extremaData )
   :
   m_extrema(extremaData)
 {
@@ -25,7 +27,8 @@ WaveClass::WaveClass( const ExtremaData& extremaData )
 }
 
 // Common initialization routine for all ctors
-void WaveClass::Init()
+template<typename T>
+void WaveClass<T>::Init()
 {
   m_traceDir = NO_TRACE;
   moreData = false;
@@ -35,12 +38,14 @@ void WaveClass::Init()
   pixelSize = 1;
 }
 
-WaveClass::~WaveClass(){}
+template<typename T>
+WaveClass<T>::~WaveClass(){}
 
 /*
   Make a connection between the waveHandle and this class
 */
-void WaveClass::setWaveHandle(const waveHndl& waveHandle)
+template<typename T>
+void WaveClass<T>::setWaveHandle(const waveHndl& waveHandle)
 {
   if (WaveType(waveHandle) & NT_FP64)
   {
@@ -88,7 +93,8 @@ void WaveClass::setWaveHandle(const waveHndl& waveHandle)
 /*
   Set the name and trace direction of the wave, adds then the appropriate suffix to the wave name
 */
-void WaveClass::setNameAndTraceDir(const std::string& basename, int traceDir)
+template<typename T>
+void WaveClass<T>::setNameAndTraceDir(const std::string& basename, int traceDir)
 {
   m_traceDir = traceDir;
 
@@ -123,7 +129,8 @@ void WaveClass::setNameAndTraceDir(const std::string& basename, int traceDir)
 /*
   Output debug info
 */
-void WaveClass::printDebugInfo()
+template<typename T>
+void WaveClass<T>::printDebugInfo()
 {
   DEBUGPRINT("%s: waveHandle=%p, float=%p, double=%p, moreData=%s",
              m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr, moreData ? "true" : "false");
@@ -132,7 +139,8 @@ void WaveClass::printDebugInfo()
 /*
   Sets the complete wave to NaN
 */
-void WaveClass::clearWave()
+template<typename T>
+void WaveClass<T>::clearWave()
 {
   if (m_doublePtr)
   {
@@ -147,7 +155,8 @@ void WaveClass::clearWave()
 /*
   convenience wrapper
 */
-void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr)
+template<typename T>
+void WaveClass<T>::setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr)
 {
   ASSERT_RETURN_VOID(m_waveHandle);
 
@@ -162,7 +171,8 @@ void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double
 /*
   convenience wrapper
 */
-void WaveClass::setWaveUnits(int dimension, const std::string& units)
+template<typename T>
+void WaveClass<T>::setWaveUnits(int dimension, const std::string& units)
 {
   ASSERT_RETURN_VOID(m_waveHandle);
 
@@ -174,32 +184,42 @@ void WaveClass::setWaveUnits(int dimension, const std::string& units)
   }
 }
 
-void WaveClass::setWaveUnits(int dimension, const std::wstring& units)
+template<typename T>
+void WaveClass<T>::setWaveUnits(int dimension, const std::wstring& units)
 {
   setWaveUnits(dimension, WStringToString(units));
 }
 
-const ExtremaData& WaveClass::getExtrema() const
+template<typename T>
+const ExtremaData& WaveClass<T>::getExtrema() const
 {
   return m_extrema;
 }
 
-bool WaveClass::isEmpty() const
+template<typename T>
+bool WaveClass<T>::isEmpty() const
 {
   return m_wavename.empty();
 }
 
-int WaveClass::getTraceDir() const
+template<typename T>
+int WaveClass<T>::getTraceDir() const
 {
   return m_traceDir;
 }
 
-const char* WaveClass::getWaveName() const
+template<typename T>
+const char* WaveClass<T>::getWaveName() const
 {
   return m_wavename.c_str();
 }
 
-waveHndl WaveClass::getWaveHandle() const
+template<typename T>
+waveHndl WaveClass<T>::getWaveHandle() const
 {
   return m_waveHandle;
 }
+
+// eplicit template instantiations
+template<> class WaveClass<double>;
+template<> class WaveClass<float>;

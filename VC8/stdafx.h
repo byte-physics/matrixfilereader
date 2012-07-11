@@ -1,18 +1,21 @@
 /*
-	The file header.h is part of the "MatrixFileReader XOP".
-	It is licensed under the LGPLv3 with additional permissions,
-	see License.txt	in the source folder for details.
+  The file header.h is part of the "MatrixFileReader XOP".
+  It is licensed under the LGPLv3 with additional permissions,
+  see License.txt  in the source folder for details.
 */
 
 /*
-	Main header file which is included by all source files
+  Main header file which is included by all source files
 */
 #pragma once
 
 // allow the system to be equal or newer than Windows Server 2003 with SP1 or Windows XP with SP2
-#ifndef _WIN32_WINNT		
-	#define _WIN32_WINNT 0x0502
-#endif					
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#endif
+
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
 
 #include <afx.h>
 

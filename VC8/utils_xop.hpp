@@ -1,7 +1,7 @@
 /*
-	The file utils_xop.hpp is part of the "MatrixFileReader XOP".
-	It is licensed under the LGPLv3 with additional permissions,
-	see License.txt in the source folder for details.
+  The file utils_xop.hpp is part of the "MatrixFileReader XOP".
+  It is licensed under the LGPLv3 with additional permissions,
+  see License.txt in the source folder for details.
 */
 #pragma once
 
@@ -10,7 +10,7 @@
 #include "ForwardDecl.hpp"
 
 /*
-	Utility functions which are xop specific
+  Utility functions which are xop specific
 */
 
 // Accepts multipe arguments like printf and prints them to the history
@@ -19,69 +19,68 @@
 // Checking the return value of _snprintf is not done on purpose, we just always append a \0 to be safe
 // @param A prints only if A evaluates to true
 // @param B uses silent printing (does not mark the experiment as changed) if true
-#define PRINT_TO_HISTORY(A,B,...)								\
-	if (A)														\
-	{															\
-		char* buf = &GlobalData::Instance().outputBuffer[0];	\
-		_snprintf(buf,ARRAY_SIZE-2, __VA_ARGS__);				\
-		buf[ARRAY_SIZE-2] = '\0';								\
-		strcat(buf,CR_STR);										\
-		if (!B)													\
-		{														\
-			XOPNotice(buf);										\
-		}														\
-		else													\
-		{														\
-			XOPNotice2(buf,0);									\
-		}														\
-	}
+#define PRINT_TO_HISTORY(A,B,...)                         \
+  if (A)                                                  \
+  {                                                       \
+    char* buf = &GlobalData::Instance().outputBuffer[0];  \
+    _snprintf(buf,ARRAY_SIZE-2, __VA_ARGS__);             \
+    buf[ARRAY_SIZE-2] = '\0';                             \
+    strcat(buf,CR_STR);                                   \
+    if (!B)                                               \
+    {                                                     \
+      XOPNotice(buf);                                     \
+    }                                                     \
+    else                                                  \
+    {                                                     \
+      XOPNotice2(buf,0);                                  \
+    }                                                     \
+  }
 
 // Convenience wrapper using silent debug print
 #define DEBUGPRINT_SILENT(...) \
-	PRINT_TO_HISTORY(GlobalData::Instance().debuggingEnabled(),true,"DEBUG: "__VA_ARGS__)
+  PRINT_TO_HISTORY(GlobalData::Instance().isDebuggingEnabled(),true,"DEBUG: "__VA_ARGS__)
 
 // Convenience wrapper using debug print
 #define DEBUGPRINT(...) \
-	PRINT_TO_HISTORY(GlobalData::Instance().debuggingEnabled(),false,"DEBUG: "__VA_ARGS__)
+  PRINT_TO_HISTORY(GlobalData::Instance().isDebuggingEnabled(),false,"DEBUG: "__VA_ARGS__)
 
 // Convenience wrapper for printing
 #define HISTPRINT(...) \
-	PRINT_TO_HISTORY(true,false,__VA_ARGS__)
+  PRINT_TO_HISTORY(true,false,__VA_ARGS__)
 
 // Convenience wrapper for silent printing
 #define HISTPRINT_SILENT(...) \
-	PRINT_TO_HISTORY(true,true,__VA_ARGS__)
+  PRINT_TO_HISTORY(true,true,__VA_ARGS__)
 
 // be sure to check the return value for NULL
-template <class T> T* getWaveDataPtr(waveHndl waveH){
-	int accessMode = kMDWaveAccessMode0;
-	int ret=-1;
-	BCInt dataOffset;
-	T *dataPtr;
+template <class T>
+T* getWaveDataPtr(waveHndl waveH)
+{
+  if (waveH == NULL)
+  {
+    return NULL;
+  }
 
-	if(waveH == NULL){
-		return NULL;
-	}
+  BCInt dataOffset;
+  const int accessMode = kMDWaveAccessMode0;
+  const int ret = MDAccessNumericWaveData(waveH, accessMode, &dataOffset);
 
-	ret = MDAccessNumericWaveData(waveH, accessMode, &dataOffset);
-	if(ret != 0 ){
-		// throw here someting if you want to have it more C++-ish
-		return NULL;
-	}
-
-	dataPtr = reinterpret_cast<T*>( reinterpret_cast<char*>(*waveH) + dataOffset );
-	return dataPtr;
+  if (ret != 0)
+  {
+    // throw here someting if you want to have it more C++-ish
+    return NULL;
+  }
+  return reinterpret_cast<T*>(reinterpret_cast<char*>(*waveH) + dataOffset);
 }
 
 void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle);
 
-int stringVectorToTextWave(const std::vector<std::string>& metaData,waveHndl waveHandle);
+int stringVectorToTextWave(const std::vector<std::string>& metaData, waveHndl waveHandle);
 
-void waveClearNaN64(double *wavePtr, CountInt length);
-void waveClearNaN32(float *wavePtr, CountInt length);
+void waveClearNaN64(double* wavePtr, CountInt length);
+void waveClearNaN32(float* wavePtr, CountInt length);
 
-std::string getFullWavePath(const DataFolderHandle& df, const waveHndl& wv);
-void appendToWaveList(const DataFolderHandle& df, const WaveClass& wave, std::string& waveList);
-void appendToWaveList(const DataFolderHandle& df, const waveHndl& wv, std::string& waveList);
+std::string getFullWavePath(DataFolderHandle df, waveHndl wv);
+void appendToWaveList(DataFolderHandle df, waveHndl wv, std::string& waveList);
 
-void convertHandleToString(Handle strHandle,std::string &str);
+void convertHandleToString(Handle strHandle, std::string& str);

@@ -1,106 +1,97 @@
 /*
-	The file globaldata.h is part of the "MatrixFileReader XOP".
-	It is licensed under the LGPLv3 with additional permissions,
-	see License.txt	in the source folder for details.
+  The file globaldata.h is part of the "MatrixFileReader XOP".
+  It is licensed under the LGPLv3 with additional permissions,
+  see License.txt  in the source folder for details.
 */
 
 /*
-	Global and unique object which keeps track of the internal state
+  Global and unique object which keeps track of the internal state
 */
 #pragma once
 
 #include "ForwardDecl.hpp"
 #include "dllhandler.hpp"
 
-class GlobalData{
-
-	typedef	std::map<int, BrickletClass*, std::less<int>>		IntBrickletClassPtrMap;
+class GlobalData
+{
+  typedef  std::map<int, BrickletClass*, std::less<int>>    IntBrickletClassPtrMap;
 
 public:
-	// functions
+  void setResultFile(const std::wstring& dirPath, const std::wstring& fileName);
+  void closeSession();
+  void closeResultFile();
+  void createBrickletClassObject(int brickletID, void* const pBricklet);
+  void setError(int errorCode, const std::string& msgArgument = std::string());
+  void setInternalError(int errorCode);
 
-	// return the filename and the dirPath of the currently loaded result set
-	void setResultFile(const std::wstring& dirPath, const std::wstring& fileName);
-	void closeSession();
-	void closeResultFile();
-	void createBrickletClassObject(int brickletID, void* const pBricklet);
-	void setError(int errorCode, const std::string& msgArgument = std::string());
-	void setInternalError(int errorCode);
+  Vernissage::Session* getVernissageSession();
+  const std::string& getVernissageVersion();
 
-	Vernissage::Session* getVernissageSession();
-	const std::string& getVernissageVersion();
+  void initializeWithoutReadSettings(int calledFromMacro, int calledFromFunction);
+  void initialize(int calledFromMacro, int calledFromFunction);
 
-	void initializeWithoutReadSettings(int calledFromMacro,int calledFromFunction);
-	void initialize(int calledFromMacro,int calledFromFunction);
+  void finalize(bool filledCache = false, int errorCode = SUCCESS);
 
-	void finalize(bool filledCache = false, int errorCode = SUCCESS);
+  template<typename T>
+  T getFileName() const;
 
-	void readSettings(DataFolderHandle dataFolderHndl = NULL);
+  template<typename T>
+  T getDirPath() const;
 
-	// variables
-	char outputBuffer[ARRAY_SIZE];
-	int  openDlgFileIndex;
-	char openDlgInitialDir[MAX_PATH_LEN+1];
+  bool resultFileOpen() const;
 
-	// const functions
-	const std::wstring& getFileNameWString() const;
-	const std::wstring& getDirPathWString() const;
-	std::string getFileName() const;
-	std::string getDirPath() const;
+  std::string getLastErrorMessage() const;
+  std::string getErrorMessage(int errorCode) const;
 
-	bool resultFileOpen() const;
+  BrickletClass* getBrickletClassObject(int brickletID) const;
 
-	std::string getLastErrorMessage() const;
-	std::string getErrorMessage (int errorCode) const;
-	int getLastError() const{ return m_lastError; }
+  std::vector<int> convertBrickletPtr(const std::vector<void*>&);
+  int convertBrickletPtr(void*);
 
-	BrickletClass* getBrickletClassObject(int brickletID) const;
+  std::vector<void*> getBrickletSeries(void* rawBrickletPtr);
 
-	std::vector<int> convertBrickletPtr(const std::vector<void*>&);
-	int convertBrickletPtr(void*);
+  int getIgorWaveType() const;
 
-	std::vector<void*> getBrickletSeries( void* rawBrickletPtr );
+  ///@name Settings handling
+  ///@{
+  bool isDebuggingEnabled() const;
+  bool isDoubleWaveEnabled() const;
+  bool isDatafolderEnabled() const;
+  bool isDataCacheEnabled() const;
 
-	// debug
-	bool debuggingEnabled() const{ return m_debug; };
-	// double
-	bool doubleWaveEnabled() const{ return m_doubleWave; };
-	int getIgorWaveType() const;
+  template<typename T>
+  T isOverwriteEnabled() const
+  {
+    return static_cast<T>(m_overwrite);
+  }
 
-	// datafolder
-	bool datafolderEnabled() const{ return m_datafolder; };
+  void readSettings(DataFolderHandle dataFolderHndl = NULL);
+  ///@}
 
-	// overwrite
-	bool overwriteEnabled() const{ return m_overwrite; };
-	int overwriteEnabledAsInt() const{ return int(m_overwrite); };
+  /// Access to singleton-type global object
+  static GlobalData& GlobalData::Instance()
+  {
+    static GlobalData globData;
+    return globData;
+  }
 
-	// cache
-	bool dataCacheEnabled() const{ return m_datacache; };
-
-	// Access to singleton-type global object
-	static GlobalData& GlobalData::Instance(){
-		static GlobalData globData;
-		return globData;
-	}
+  // Public member variables
+  char outputBuffer[ARRAY_SIZE];
+  int  openDlgFileIndex;
+  char openDlgInitialDir[MAX_PATH_LEN + 1];
 
 private:
-	GlobalData(); // hide ctor
-	~GlobalData(); // hide dtor
-	GlobalData(const GlobalData&); // hide copy ctor
-	GlobalData& operator=(const GlobalData&); // hide assignment operator
+  GlobalData(); // hide ctor
+  ~GlobalData(); // hide dtor
+  GlobalData(const GlobalData&); // hide copy ctor
+  GlobalData& operator=(const GlobalData&); // hide assignment operator
 
-	bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
-	std::wstring m_resultFileName, m_resultDirPath;
-	Vernissage::Session *m_VernissageSession;
-	DLLHandler m_DLLHandler;
-	bool m_errorToHistory;
-	int m_lastError;
-	std::string m_lastErrorArgument;
-	IntBrickletClassPtrMap m_brickletIDBrickletClassMap;
-
-	void enableDatafolder(bool var){ m_datafolder = var; };
-	void enableDoubleWave(bool var){ m_doubleWave = var; };
-	void enableDebugging(bool var){ m_debug=var; };
-	void enableOverwrite(bool var){ m_overwrite = var; };
-	void enableDataCaching(bool var){m_datacache = var; };
+  bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
+  std::wstring m_resultFileName, m_resultDirPath;
+  Vernissage::Session* m_VernissageSession;
+  DLLHandler m_DLLHandler;
+  bool m_errorToHistory;
+  int m_lastError;
+  std::string m_lastErrorArgument;
+  IntBrickletClassPtrMap m_brickletIDBrickletClassMap;
 };

@@ -276,6 +276,20 @@ void BrickletClass::loadBrickletMetaDataFromResultFile()
     }
   }
 
+  //// handle deployment parameters
+  //for (std::vector<std::wstring>::const_iterator itInstance = elementInstanceNames.begin(); itInstance != elementInstanceNames.end(); itInstance++)
+  //{
+  //  typedef std::map<std::wstring, Vernissage::Session::Parameter> MapType;
+  //  const MapType elementInstanceParamsMap = m_vernissageSession->getExperimentElementParameters(m_brickletPtr, *itInstance);
+  //  for (MapType::const_iterator itParam = elementInstanceParamsMap.begin(); itParam != elementInstanceParamsMap.end(); itParam++)
+  //  {
+  //    const std::wstring parameter = itParam->first;
+  //    const std::string key = toString(*itInstance) + std::string(".") + toString(parameter);
+  //    const std::wstring deployment = m_vernissageSession->getExperimentElementDeploymentParameter(m_brickletPtr,*itInstance,parameter);
+  //    metaData.push_back(std::make_pair(key + std::string(".deployment"),toString(deployment)));
+  //  }
+  //}
+
   // BEGIN Vernissage::Session::SpatialInfo
   const Vernissage::Session::SpatialInfo spatialInfo = m_vernissageSession->getSpatialInfo(m_brickletPtr);
   for (std::vector<double>::const_iterator it = spatialInfo.physicalX.begin(); it != spatialInfo.physicalX.end(); it++)

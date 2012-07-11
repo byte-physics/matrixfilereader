@@ -1,7 +1,7 @@
 /*
   The file brickletclass.hpp is part of the "MatrixFileReader XOP".
   It is licensed under the LGPLv3 with additional permissions,
-  see License.txt  in the source folder for details.
+  see License.txt in the source folder for details.
 */
 #pragma once
 
@@ -11,6 +11,7 @@
 #include "extremadata.hpp"
 #include "utils_xop.hpp"
 #include "globaldata.hpp"
+
 /*
   Internal representation of a bricklet
 */
@@ -77,7 +78,7 @@ private:
   void generateAllAxesVector();
 
   void* m_brickletPtr;
-  Vernissage::Session* m_VernissageSession;
+  Vernissage::Session* m_vernissageSession;
   int m_brickletID;
 
   // storage for the raw data

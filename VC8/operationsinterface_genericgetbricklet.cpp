@@ -1,7 +1,7 @@
 /*
   The file operationsinterface_genericgetbricklet.cpp is part of the "MatrixFileReader XOP".
   It is licensed under the LGPLv3 with additional permissions,
-  see License.txt  in the source folder for details.
+  see License.txt in the source folder for details.
 */
 
 #include "stdafx.h"
@@ -21,7 +21,6 @@ namespace
 
 extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p)
 {
-
   GenericGetBrickletParams params;
 
   params.calledFromFunction  = p->calledFromFunction;
@@ -50,7 +49,6 @@ extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p)
 
 int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p)
 {
-
   GenericGetBrickletParams params;
 
   params.calledFromFunction  = p->calledFromFunction;
@@ -79,7 +77,6 @@ int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p)
 
 extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p)
 {
-
   GenericGetBrickletParams params;
 
   params.calledFromFunction  = p->calledFromFunction;
@@ -110,7 +107,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 {
   BEGIN_OUTER_CATCH
 
-  // due to our special handling of the /DEST flag we read the settigs later
+  // due to our special handling of the /DEST flag we read the settings later
   GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro, p->calledFromFunction);
   SetOperationStrVar(S_waveNames, "");
 
@@ -335,7 +332,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 
   SetOperationStrVar(S_waveNames, fullPathOfCreatedWaves.c_str());
 
-  bool filledCache = true;
+  const bool filledCache = true;
   GlobalData::Instance().finalize(filledCache, ret);
   END_OUTER_CATCH
   return 0;

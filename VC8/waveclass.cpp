@@ -11,8 +11,6 @@
 #include "utils_generic.hpp"
 
 WaveClass::WaveClass()
-  :
-  m_extrema(ExtremaData())
 {
   Init();
 }

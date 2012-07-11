@@ -1,7 +1,7 @@
 /*
   The file operationsinterface_getresultfilemetadata.cpp is part of the "MatrixFileReader XOP".
   It is licensed under the LGPLv3 with additional permissions,
-  see License.txt  in the source folder for details.
+  see License.txt in the source folder for details.
 */
 
 #include "stdafx.h"
@@ -126,8 +126,8 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   }
 
   SetOperationStrVar(S_waveNames, fullPathOfCreatedWaves.c_str());
-  bool clearCache = true;
-  GlobalData::Instance().finalize(clearCache);
+  const bool filledCache = true;
+  GlobalData::Instance().finalize(filledCache);
   END_OUTER_CATCH
   return 0;
 }

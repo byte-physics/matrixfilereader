@@ -19,6 +19,7 @@ BrickletClass::BrickletClass(void* const pBricklet, int brickletID)
   m_vernissageSession(GlobalData::Instance().getVernissageSession())
 {
   ASSERT_RETURN_VOID(m_vernissageSession);
+  ASSERT_RETURN_VOID(pBricklet);
 }
 
 BrickletClass::~BrickletClass()
@@ -480,6 +481,7 @@ const std::vector<std::string>& BrickletClass::getAxes<std::string>()
 */
 void BrickletClass::setBrickletPointer( void* const pBricklet )
 {
+  ASSERT_RETURN_VOID(pBricklet);
   m_brickletPtr = pBricklet;
 }
 

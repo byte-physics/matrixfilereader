@@ -14,15 +14,16 @@
 const int ARRAY_SIZE = 1024;
 
 // format string for wavenames in igor
+const char brickletWaveFormat[]    = "%s_%05d";
+const char dataFolderFormat[]      = "X_%05d";
 
+// default wave and datafolder names
 const char brickletDataDefault[]   = "data";
 const char brickletMetaDefault[]   = "metaData";
+const char brickletDeployDefault[] = "deployData";
 const char resultMetaDefault[]     = "resultFileMetaData";
 const char overViewTableDefault[]  = "overViewTable";
 const char brickletRawDefault[]    = "rawData";
-const char brickletMetaDataFormat[]= "%s_%05d";
-const char brickletDataFormat[]    = "%s_%05d";
-const char dataFolderFormat[]      = "X_%05d";
 
 // value types from element instance parameters
 // from the vernissage header file

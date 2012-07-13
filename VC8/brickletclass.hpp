@@ -30,6 +30,7 @@ public:
 
   typedef std::pair<std::string,std::string> StringPair;
   const std::vector<StringPair>& getBrickletMetaData();
+  const std::vector<StringPair>& getDeploymentParameter();
 
   template<typename T>
   T getMetaDataValue(const std::string& key)
@@ -48,7 +49,7 @@ public:
 
     if (m_metaData.empty())
     {
-      loadBrickletMetaDataFromResultFile();
+      loadMetaData();
     }
 
     for (unsigned int i = 0; i < m_metaData.size(); i++)
@@ -75,7 +76,8 @@ public:
   const ExtremaData& getExtrema()const;
 
 private:
-  void loadBrickletMetaDataFromResultFile();
+  void loadMetaData();
+  void loadDeploymentParameters();
   void generateAllAxesVector();
 
   void* m_brickletPtr;
@@ -89,7 +91,7 @@ private:
   ExtremaData m_extrema;
 
   // meta data
-  std::vector<StringPair> m_metaData;
+  std::vector<StringPair> m_metaData, m_deployParams;
 
   // special meta data
   std::vector<std::wstring> m_allAxesWString;

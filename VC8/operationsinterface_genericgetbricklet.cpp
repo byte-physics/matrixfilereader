@@ -16,8 +16,37 @@
 
 namespace  {
 
-  enum TYPE { RAW_DATA = 1, CONVERTED_DATA = 2, META_DATA = 4 };
+  enum TYPE { RAW_DATA = 1, CONVERTED_DATA = 2, META_DATA = 4, DEPLOY_DATA = 8 };
+
 } // anonymous namespace 
+
+extern "C" int ExecuteGetBrickletDeployData(GetBrickletDeployDataRuntimeParamsPtr p)
+{
+  GenericGetBrickletParams params;
+
+  params.calledFromFunction   = p->calledFromFunction;
+  params.calledFromMacro      = p->calledFromMacro;
+
+  params.NFlagEncountered     = p->NFlagEncountered;
+  params.NFlagParamsSet[0]    = p->NFlagParamsSet[0];
+  params.baseName             = p->baseName;
+
+  params.RFlagEncountered     = p->RFlagEncountered;
+  params.RFlagParamsSet[0]    = p->RFlagParamsSet[0];
+  params.RFlagParamsSet[1]    = p->RFlagParamsSet[1];
+  params.startBrickletID      = p->startBrickletID;
+  params.endBrickletID        = p->endBrickletID;
+
+  params.SFlagEncountered     = 0;
+  params.SFlagParamsSet[0]    = 0;
+  params.pixelSize            = 0.0;
+
+  params.DESTFlagEncountered  = p->DESTFlagEncountered;
+  params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
+  params.dfref                = p->dfref;
+
+  return GenericGetBricklet(&params, DEPLOY_DATA);
+}
 
 extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p)
 {
@@ -158,7 +187,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
     return 0;
   }
 
-  // By default the range is 1 to totalNumberOfBricklets (aka all bricklets)
+  // By default the range is over all bricklets
   int startBrickletID = 1;
   int endBrickletID = numberOfBricklets;
 
@@ -218,6 +247,10 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
       baseName = brickletMetaDefault;
       break;
 
+    case DEPLOY_DATA:
+      baseName = brickletDeployDefault;
+      break;
+
     default:
       HISTPRINT("BUG: Error in GenericGetBricklet");
       return 0;
@@ -238,8 +271,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
       GlobalData::Instance().setError(WRONG_PARAMETER, "pixelSize");
       return 0;
     }
+    DEBUGPRINT("pixelSize=%d", pixelSize);
   }
-  DEBUGPRINT("pixelSize=%d", pixelSize);
 
   for (int brickletID = startBrickletID; brickletID <= endBrickletID; brickletID++)
   {
@@ -258,7 +291,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
     }
 
     char waveName[MAX_OBJ_NAME + 1];
-    sprintf(waveName, brickletDataFormat, baseName.c_str(), brickletID);
+    sprintf(waveName, brickletWaveFormat, baseName.c_str(), brickletID);
 
     // datafolder handling
     DataFolderHandle brickletDataFolderHndl = NULL;
@@ -294,6 +327,10 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 
     case META_DATA:
       ret = createAndFillTextWave(bricklet->getBrickletMetaData(), brickletDataFolderHndl, waveName, brickletID, fullPathOfCreatedWaves);
+      break;
+
+    case DEPLOY_DATA:
+      ret = createAndFillTextWave(bricklet->getDeploymentParameter(), brickletDataFolderHndl, waveName, brickletID, fullPathOfCreatedWaves);
       break;
 
     default:

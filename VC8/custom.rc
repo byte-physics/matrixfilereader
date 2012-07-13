@@ -59,6 +59,8 @@ BEGIN
   XOPOp | utilOp | compilableOp,
   "MFR_GetBrickletMetaData\0",
   XOPOp | utilOp | compilableOp,
+  "MFR_GetBrickletDeployData\0",
+  XOPOp | utilOp | compilableOp,
   "MFR_GetReportTemplate\0",
   XOPOp | utilOp | compilableOp,
   "MFR_CreateOverviewTable\0",

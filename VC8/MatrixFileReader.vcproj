@@ -269,6 +269,204 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\preferences.cpp"
+				>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\stdafx.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\utils_bricklet.cpp"
+				>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\utils_generic.cpp"
+				>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\utils_xop.cpp"
+				>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\waveclass.cpp"
+				>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\xop_const_wrappers.cpp"
+				>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl"
+			>
+			<File
+				RelativePath=".\brickletclass.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\brickletconverter.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\constants.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dllhandler.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\errorcodes.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\extremadata.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ForwardDecl.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\globaldata.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\keynames.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\preferences.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\utils_bricklet.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils_generic.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utils_xop.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\version.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\waveclass.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\xop_const_wrappers.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
+			<File
+				RelativePath=".\custom.rc"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release (static build)|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\matrixfilereader.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Operations"
+			>
+			<File
 				RelativePath=".\operationsinterface.cpp"
 				>
 				<FileConfiguration
@@ -279,6 +477,10 @@
 						UsePrecompiledHeader="2"
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\operationsinterface.hpp"
+				>
 			</File>
 			<File
 				RelativePath=".\operationsinterface_checkfornewbricklets.cpp"
@@ -425,205 +627,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\preferences.cpp"
-				>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\utils_bricklet.cpp"
-				>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\utils_generic.cpp"
-				>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\utils_xop.cpp"
-				>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\waveclass.cpp"
-				>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\xop_const_wrappers.cpp"
-				>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl"
-			>
-			<File
-				RelativePath=".\brickletclass.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\brickletconverter.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\constants.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\dllhandler.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\errorcodes.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\extremadata.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ForwardDecl.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\globaldata.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\keynames.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\operationsinterface.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\operationstructs.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\preferences.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\utils_bricklet.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils_generic.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\utils_xop.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\version.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\waveclass.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\xop_const_wrappers.hpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-			>
-			<File
-				RelativePath=".\custom.rc"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCResourceCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\matrixfilereader.rc"
 				>
 			</File>
 		</Filter>

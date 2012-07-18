@@ -531,14 +531,14 @@ namespace
     BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
     ASSERT_RETURN_ONE(bricklet);
 
-    void* pBricklet = bricklet->getBrickletPointer();
+    void* const pBricklet = bricklet->getBrickletPointer();
     ASSERT_RETURN_ONE(pBricklet);
 
-    Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
-    ASSERT_RETURN_ONE(pSession);
+    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    ASSERT_RETURN_ONE(session);
 
     // pointer to raw data
-    int rawBrickletSize = 0;
+    int rawBrickletSize;
     const int* rawBrickletDataPtr;
     bricklet->getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
 
@@ -552,16 +552,17 @@ namespace
 
     // check for correct view type codes
     int found = 0;
-    std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes = bricklet->getViewTypeCodes();
+    typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
+    const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(pBricklet);
 
-    for (std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCodes = viewTypeCodes.begin(); itViewTypeCodes != viewTypeCodes.end(); itViewTypeCodes++)
+    for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
     {
-      if (*itViewTypeCodes == Vernissage::Session::vtc_Spectroscopy)
+      if (*it == Vernissage::Session::vtc_Spectroscopy)
       {
         found += 1;
       }
 
-      if (*itViewTypeCodes == Vernissage::Session::vtc_2Dof3D)
+      if (*it == Vernissage::Session::vtc_2Dof3D)
       {
         found += 2;
       }
@@ -572,10 +573,10 @@ namespace
       DEBUGPRINT("The 3D data is not of the type vtc_2Dof3D and vtc_Spectroscopy.");
     }
 
-    const Vernissage::Session::AxisDescriptor specAxis = pSession->getAxisDescriptor(pBricklet, pSession->getTriggerAxisName(pBricklet));
-    const Vernissage::Session::AxisDescriptor xAxis = pSession->getAxisDescriptor(pBricklet, specAxis.triggerAxisName);
-    const Vernissage::Session::AxisDescriptor yAxis = pSession->getAxisDescriptor(pBricklet, xAxis.triggerAxisName);
-    const Vernissage::Session::AxisTableSets sets = pSession->getAxisTableSets(pBricklet, pSession->getTriggerAxisName(pBricklet));
+    const Vernissage::Session::AxisDescriptor specAxis = session->getAxisDescriptor(pBricklet, session->getTriggerAxisName(pBricklet));
+    const Vernissage::Session::AxisDescriptor xAxis = session->getAxisDescriptor(pBricklet, specAxis.triggerAxisName);
+    const Vernissage::Session::AxisDescriptor yAxis = session->getAxisDescriptor(pBricklet, xAxis.triggerAxisName);
+    const Vernissage::Session::AxisTableSets sets = session->getAxisTableSets(pBricklet, session->getTriggerAxisName(pBricklet));
 
     const Vernissage::Session::TableSet xSet = sets.find(specAxis.triggerAxisName)->second;
     const Vernissage::Session::TableSet ySet = sets.find(xAxis.triggerAxisName)->second;
@@ -1045,38 +1046,40 @@ namespace
 int createWaves(DataFolderHandle dfHandle, const char* waveBaseName, int brickletID, bool resampleData,
                 int pixelSize, std::string& fullPathOfCreatedWave)
 {
+  BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
+  ASSERT_RETURN_ONE(bricklet);
+
+  const int dimension = bricklet->getMetaDataValue<int>("dimension");
+
   if (GlobalData::Instance().isDebuggingEnabled())
   {
-    BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-    ASSERT_RETURN_ONE(bricklet);
-
     void* pBricklet = bricklet->getBrickletPointer();
     ASSERT_RETURN_ONE(pBricklet);
 
     DEBUGPRINT("### BrickletID %d ###", brickletID);
-    DEBUGPRINT("dimension %d", bricklet->getMetaDataValue<int>("dimension"));
+    DEBUGPRINT("dimension %d", dimension);
 
-    std::vector<Vernissage::Session::ViewTypeCode> viewTypeCodes = bricklet->getViewTypeCodes();
-    std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCodes;
+    typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
 
-    for (itViewTypeCodes = viewTypeCodes.begin(); itViewTypeCodes != viewTypeCodes.end(); itViewTypeCodes++)
+    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    ASSERT_RETURN_ONE(session);
+
+    const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(pBricklet);
+    for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
     {
-      DEBUGPRINT("viewType %s", viewTypeCodeToString(*itViewTypeCodes).c_str());
+      DEBUGPRINT("viewType %s", viewTypeCodeToString(*it).c_str());
     }
 
     DEBUGPRINT("Axis order is from triggerAxis to rootAxis");
 
-    std::vector<std::string> allAxes = bricklet->getAxes<std::string>();
+    typedef std::vector<std::string> StringVector;
+    const StringVector allAxes = bricklet->getAxes<std::string>();
 
-    for (std::vector<std::string>::const_iterator itAllAxes = allAxes.begin(); itAllAxes != allAxes.end(); itAllAxes++)
+    for (StringVector::const_iterator it = allAxes.begin(); it != allAxes.end(); it++)
     {
-      DEBUGPRINT("Axis %s", itAllAxes->c_str());
+      DEBUGPRINT("Axis %s", it->c_str());
     }
   }
-
-  BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-  ASSERT_RETURN_ONE(bricklet);
-  const int dimension = bricklet->getMetaDataValue<int>("dimension");
 
   switch (dimension)
   {
@@ -1105,19 +1108,19 @@ int createWaves(DataFolderHandle dfHandle, const char* waveBaseName, int brickle
 */
 int createRawDataWave(DataFolderHandle dfHandle, const char* waveName, int brickletID, std::string& fullPathOfCreatedWaves)
 {
-  const int* pBuffer;
-  int* dataPtr = NULL;
-  int count = 0, ret;
+  int ret;
   CountInt dimensionSizes[MAX_DIMENSIONS + 1];
   MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-  BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
+  BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
   ASSERT_RETURN_ONE(bricklet);
 
   WaveClass wave(bricklet->getExtrema());
-  wave.setNameAndTraceDir(std::string(waveName), NO_TRACE);
+  wave.setNameAndTraceDir(waveName, NO_TRACE);
 
-  bricklet ->getBrickletContentsBuffer(&pBuffer, count);
+  const int* pBuffer;
+  int count;
+  bricklet->getBrickletContentsBuffer(&pBuffer, count);
 
   if (count == 0 || pBuffer == NULL)
   {
@@ -1145,7 +1148,7 @@ int createRawDataWave(DataFolderHandle dfHandle, const char* waveName, int brick
   wave.setWaveHandle(waveHandle);
   waveHandle = NULL;
 
-  dataPtr = getWaveDataPtr<int>(wave.getWaveHandle());
+  int* dataPtr = getWaveDataPtr<int>(wave.getWaveHandle());
 
   ASSERT_RETURN_ONE(dataPtr);
   ASSERT_RETURN_ONE(pBuffer);
@@ -1156,4 +1159,3 @@ int createRawDataWave(DataFolderHandle dfHandle, const char* waveName, int brick
   appendToWaveList(dfHandle, wave.getWaveHandle(), fullPathOfCreatedWaves);
   return ret;
 }
-

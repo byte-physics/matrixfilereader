@@ -14,6 +14,7 @@
 #include "constants.hpp"
 #include "ForwardDecl.hpp"
 #include "dllhandler.hpp"
+#include "utils_generic.hpp"
 
 class GlobalData
 {
@@ -38,8 +39,32 @@ public:
   template<typename T>
   T getFileName() const;
 
+  template<>
+  std::string getFileName<std::string>() const
+  {
+    return toString(m_resultFileName);
+  }
+
+  template<>
+  std::wstring getFileName<std::wstring>() const
+  {
+    return m_resultFileName;
+  }
+
   template<typename T>
   T getDirPath() const;
+
+  template<>
+  std::string getDirPath<std::string>() const
+  {
+    return toString(m_resultDirPath);
+  }
+
+  template<>
+  std::wstring getDirPath<std::wstring>() const
+  {
+    return m_resultDirPath;
+  }
 
   bool resultFileOpen() const;
 
@@ -48,8 +73,8 @@ public:
 
   BrickletClass* getBrickletClassObject(int brickletID) const;
 
-  std::vector<int> convertBrickletPtr(const std::vector<void*>&);
-  int convertBrickletPtr(void*);
+  std::vector<int> convertBrickletPtr(const std::vector<void*>&) const;
+  int convertBrickletPtr(void*) const;
 
   std::vector<void*> getBrickletSeries(void* rawBrickletPtr);
 

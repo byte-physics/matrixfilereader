@@ -29,7 +29,7 @@ public:
   void getBrickletContentsBuffer(const int** pBuffer, int& count);
 
   typedef std::pair<std::string,std::string> StringPair;
-  const std::vector<StringPair>& getBrickletMetaData();
+  const std::vector<StringPair>& getMetaData();
   const std::vector<StringPair>& getDeploymentParameter();
 
   template<typename T>
@@ -47,10 +47,7 @@ public:
       return std::string();
     }
 
-    if (m_metaData.empty())
-    {
-      loadMetaData();
-    }
+    getMetaData();
 
     for (unsigned int i = 0; i < m_metaData.size(); i++)
     {
@@ -71,7 +68,6 @@ public:
   template<>
   const std::vector<std::wstring>& getAxes();
 
-  const std::vector<Vernissage::Session::ViewTypeCode>& getViewTypeCodes()const;
   void* getBrickletPointer()const;
   const ExtremaData& getExtrema()const;
 
@@ -96,5 +92,4 @@ private:
   // special meta data
   std::vector<std::wstring> m_allAxesWString;
   std::vector<std::string>  m_allAxesString;
-  std::vector<Vernissage::Session::ViewTypeCode> m_viewTypeCodes;
 };

@@ -26,8 +26,11 @@ namespace  {
       value = doubleToBool(objValue.nv.realValue);
       DEBUGPRINT("debug=%d", value);
     }
-    else // variable does not exist or is of wrong type
+    else
+    {
+      // variable does not exist or is of wrong type
       DEBUGPRINT("debug=%d (default)", value);
+    }
 
     return value;
   }
@@ -132,30 +135,6 @@ bool GlobalData::resultFileOpen() const
   return (!m_resultFileName.empty());
 }
 
-template<>
-std::string GlobalData::getDirPath<std::string>() const
-{
-  return toString(m_resultDirPath);
-}
-
-template<>
-std::wstring GlobalData::getDirPath<std::wstring>() const
-{
-  return m_resultDirPath;
-}
-
-template<>
-std::string GlobalData::getFileName<std::string>() const
-{
-  return toString(m_resultFileName);
-}
-
-template<>
-std::wstring GlobalData::getFileName<std::wstring>() const
-{
-  return m_resultFileName;
-}
-
 /*
   returns an integer which tells if we should create single or double precision waves
   the integer can be readily used with MDMakeWave
@@ -199,6 +178,7 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet
     HISTPRINT("Out of memory in createBrickletClassObject\r");
     throw e;
   }
+  ASSERT_RETURN_VOID(bricklet);
   m_brickletIDBrickletClassMap[brickletID] = bricklet;
 
   DEBUGPRINT("setBrickletPointerMap brickletID=%d,pBricklet=%p", brickletID, pBricklet);
@@ -219,6 +199,7 @@ void GlobalData::setInternalError(int errorValue)
     HISTPRINT(errorMessage);
   }
 }
+
 /*
   Must be called by every operation which sets V_flag before returning
   In case some internal cache got filled by the operation, filledCache=true has to be passed
@@ -229,9 +210,7 @@ void GlobalData::finalize(bool filledCache /* = false */, int errorCode /* = SUC
 
   if (!isDataCacheEnabled() && filledCache)
   {
-    int totalBrickletCount = m_VernissageSession->getBrickletCount();
-
-    for (int i = 1; i <= totalBrickletCount; i++)
+    for (int i = 1; i <= m_VernissageSession->getBrickletCount(); i++)
     {
       BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(i);
       ASSERT_RETURN_VOID(bricklet);
@@ -396,7 +375,7 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */)
 /*
   Converts a vector of vernissage APIs raw bricklet pointers to a vector of brickletIDs
 */
-std::vector<int> GlobalData::convertBrickletPtr(const std::vector<void*>& rawBrickletPtrs)
+std::vector<int> GlobalData::convertBrickletPtr(const std::vector<void*>& rawBrickletPtrs) const
 {
   std::vector<int> brickletIDs;
   brickletIDs.reserve(rawBrickletPtrs.size());
@@ -404,8 +383,7 @@ std::vector<int> GlobalData::convertBrickletPtr(const std::vector<void*>& rawBri
   typedef std::vector<void*>::const_iterator ItType;
   for (ItType it = rawBrickletPtrs.begin(); it != rawBrickletPtrs.end(); it++)
   {
-    const int brickletID = convertBrickletPtr(*it);
-    brickletIDs.push_back(brickletID);
+    brickletIDs.push_back(convertBrickletPtr(*it));
   }
 
   return brickletIDs;
@@ -414,7 +392,7 @@ std::vector<int> GlobalData::convertBrickletPtr(const std::vector<void*>& rawBri
 /*
   Returns a brickletID for the vernissage APIs raw bricklet pointer
 */
-int GlobalData::convertBrickletPtr(void* rawBrickletPtr)
+int GlobalData::convertBrickletPtr(void* rawBrickletPtr) const
 {
   for (IntBrickletClassPtrMap::const_iterator it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++)
   {
@@ -434,7 +412,6 @@ int GlobalData::convertBrickletPtr(void* rawBrickletPtr)
 */
 std::vector<void*> GlobalData::getBrickletSeries(void* rawBrickletPtr)
 {
-  void* p = NULL;
   std::vector<void*> brickeltSeries;
 
   if (rawBrickletPtr == NULL)
@@ -443,7 +420,7 @@ std::vector<void*> GlobalData::getBrickletSeries(void* rawBrickletPtr)
   }
 
   // get all predecessors
-  p =  rawBrickletPtr;
+  void* p =  rawBrickletPtr;
 
   while ((p = m_VernissageSession->getPredecessorBricklet(p)) != NULL)
   {

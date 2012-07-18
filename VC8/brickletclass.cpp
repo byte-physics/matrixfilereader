@@ -15,6 +15,7 @@ BrickletClass::BrickletClass(void* const pBricklet, int brickletID)
   :
   m_brickletPtr(pBricklet),
   m_rawBufferContents(NULL),
+  m_rawBufferContentsSize(0),
   m_brickletID(brickletID),
   m_vernissageSession(GlobalData::Instance().getVernissageSession())
 {
@@ -51,9 +52,9 @@ void BrickletClass::clearCache()
 */
 void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
 {
+  count = 0;
   ASSERT_RETURN_VOID(pBuffer);
   ASSERT_RETURN_VOID(m_vernissageSession);
-  count = 0;
 
   // we are not called the first time
   if (m_rawBufferContents != NULL)
@@ -130,9 +131,9 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
 }
 
 /*
-  Wrapper function which returns a vector of the meta data keys values
+  Wrapper function which returns a vector of the meta data keys (.first) and values (.second)
 */
-const std::vector<BrickletClass::StringPair>& BrickletClass::getBrickletMetaData()
+const std::vector<BrickletClass::StringPair>& BrickletClass::getMetaData()
 {
   if (m_metaData.empty())
   {
@@ -162,13 +163,13 @@ void BrickletClass::loadMetaData()
   metaData.push_back(std::make_pair("creationTimeStamp", toString(mktime(&ctime))));
 
   // viewTypeCodes
-  m_viewTypeCodes = m_vernissageSession->getViewTypes(m_brickletPtr);
-  std::vector<Vernissage::Session::ViewTypeCode>::const_iterator itViewTypeCode;
+  typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
+  const ViewTypeCodeVector viewTypeCodes = m_vernissageSession->getViewTypes(m_brickletPtr);
 
   std::string viewTypeCodesAsOneString;
-  for (itViewTypeCode = m_viewTypeCodes.begin(); itViewTypeCode != m_viewTypeCodes.end(); itViewTypeCode++)
+  for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
   {
-    viewTypeCodesAsOneString.append(viewTypeCodeToString(*itViewTypeCode) + listSepChar);
+    viewTypeCodesAsOneString.append(viewTypeCodeToString(*it) + listSepChar);
   }
 
   metaData.push_back(std::make_pair("viewTypeCodes",viewTypeCodesAsOneString));
@@ -472,11 +473,6 @@ void BrickletClass::setBrickletPointer( void* const pBricklet )
   m_brickletPtr = pBricklet;
 }
 
-const std::vector<Vernissage::Session::ViewTypeCode>& BrickletClass::getViewTypeCodes() const
-{
-  return m_viewTypeCodes;
-}
-
 void* BrickletClass::getBrickletPointer() const
 {
   return m_brickletPtr;
@@ -521,7 +517,7 @@ void BrickletClass::loadDeploymentParameters()
     for (MapType::const_iterator itParam = elementInstanceParamsMap.begin(); itParam != elementInstanceParamsMap.end(); itParam++)
     {
       const std::wstring parameter = itParam->first;
-      const std::string key = toString(*itInstance) + "." + toString(parameter) + ".deployment";
+      const std::string key = toString(*itInstance) + "." + toString(parameter);
       const std::wstring deployment = m_vernissageSession->getExperimentElementDeploymentParameter(m_brickletPtr,*itInstance,parameter);
       deployParams.push_back(std::make_pair(key,toString(deployment)));
     }

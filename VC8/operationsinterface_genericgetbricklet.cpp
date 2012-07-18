@@ -326,7 +326,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
       break;
 
     case META_DATA:
-      ret = createAndFillTextWave(bricklet->getBrickletMetaData(), brickletDataFolderHndl, waveName, brickletID, fullPathOfCreatedWaves);
+      ret = createAndFillTextWave(bricklet->getMetaData(), brickletDataFolderHndl, waveName, brickletID, fullPathOfCreatedWaves);
       break;
 
     case DEPLOY_DATA:

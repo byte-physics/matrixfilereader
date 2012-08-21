@@ -44,7 +44,6 @@ void BrickletClass::clearCache()
 
   // resize to zero elements
   std::vector<StringPair>().swap(m_metaData);
-  std::vector<StringPair>().swap(m_deployParams);
 }
 
 /*
@@ -483,45 +482,3 @@ const ExtremaData& BrickletClass::getExtrema() const
   return m_extrema;
 }
 
-/*
-  Wrapper function which returns a vector with the deployment parameters and their values
-*/
-const std::vector<BrickletClass::StringPair>& BrickletClass::getDeploymentParameter()
-{
-  if (m_deployParams.empty())
-  {
-    try
-    {
-      loadDeploymentParameters();
-    }
-    catch (CMemoryException* e)
-    {
-      e->Delete();
-      HISTPRINT("Out of memory in getBrickletMetaDataValues()");
-    }
-  }
-  return m_deployParams;
-}
-
-
-void BrickletClass::loadDeploymentParameters()
-{
-  std::vector<StringPair> deployParams;
-  deployParams.reserve(METADATA_RESERVE_SIZE);
-
-  const std::vector<std::wstring> elementInstanceNames = m_vernissageSession->getExperimentElementInstanceNames(m_brickletPtr, L"");
-  for (std::vector<std::wstring>::const_iterator itInstance = elementInstanceNames.begin(); itInstance != elementInstanceNames.end(); itInstance++)
-  {
-    typedef std::map<std::wstring, Vernissage::Session::Parameter> MapType;
-    const MapType elementInstanceParamsMap = m_vernissageSession->getExperimentElementParameters(m_brickletPtr, *itInstance);
-    for (MapType::const_iterator itParam = elementInstanceParamsMap.begin(); itParam != elementInstanceParamsMap.end(); itParam++)
-    {
-      const std::wstring parameter = itParam->first;
-      const std::string key = toString(*itInstance) + "." + toString(parameter);
-      const std::wstring deployment = m_vernissageSession->getExperimentElementDeploymentParameter(m_brickletPtr,*itInstance,parameter);
-      deployParams.push_back(std::make_pair(key,toString(deployment)));
-    }
-  }
-
-  m_deployParams.swap(deployParams);
-}

@@ -12,19 +12,6 @@
 #include "globaldata.hpp"
 #include "preferences.hpp"
 
-static int RegisterGetBrickletDeployData()
-{
-  const char* cmdTemplate;
-  const char* runtimeNumVarList;
-  const char* runtimeStrVarList;
-
-  // NOTE: If you change this template, you must change the MFR_GetBrickletDeployRuntimeParams structure as well.
-  cmdTemplate = "MFR_GetBrickletDeployData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName /DEST=dataFolderRef:dfref";
-  runtimeNumVarList = V_flag;
-  runtimeStrVarList = S_waveNames;
-  return RegisterOperation(cmdTemplate, runtimeNumVarList, runtimeStrVarList, sizeof(GetBrickletDeployDataRuntimeParams), (void*)ExecuteGetBrickletDeployData, 0);
-}
-
 static int RegisterGetResultFileMetaData()
 {
   const char* cmdTemplate;
@@ -301,12 +288,6 @@ HOST_IMPORT int XOPMain(IORecHandle ioRecHandle)
   }
 
   if (errorCode = RegisterGetBrickletMetaData())
-  {
-    SetXOPResult(errorCode);
-    return EXIT_FAILURE;
-  }
-
-  if (errorCode = RegisterGetBrickletDeployData())
   {
     SetXOPResult(errorCode);
     return EXIT_FAILURE;

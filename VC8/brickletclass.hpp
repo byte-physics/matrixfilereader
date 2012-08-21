@@ -30,7 +30,6 @@ public:
 
   typedef std::pair<std::string,std::string> StringPair;
   const std::vector<StringPair>& getMetaData();
-  const std::vector<StringPair>& getDeploymentParameter();
 
   template<typename T>
   T getMetaDataValue(const std::string& key)
@@ -73,7 +72,6 @@ public:
 
 private:
   void loadMetaData();
-  void loadDeploymentParameters();
   void generateAllAxesVector();
 
   void* m_brickletPtr;
@@ -87,7 +85,7 @@ private:
   ExtremaData m_extrema;
 
   // meta data
-  std::vector<StringPair> m_metaData, m_deployParams;
+  std::vector<StringPair> m_metaData;
 
   // special meta data
   std::vector<std::wstring> m_allAxesWString;

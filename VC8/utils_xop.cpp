@@ -195,8 +195,9 @@ std::string getRelativePath(DataFolderHandle df, waveHndl wv)
 
   std::string relativePath = std::string(wavePath,strlen(basePath),std::string::npos);
 
-  char waveName[MAX_OBJ_NAME + 1];
+  char waveName[MAX_OBJ_NAME + 2 + 1];
   WaveName(wv, waveName);
+  PossiblyQuoteName(waveName);
   // append the wavename
   return relativeFolderPrefix + relativePath + waveName;
 }

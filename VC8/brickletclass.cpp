@@ -11,7 +11,7 @@
 #include "extremadata.hpp"
 #include "utils_generic.hpp"
 
-BrickletClass::BrickletClass(void* const pBricklet, int brickletID)
+BrickletClass::BrickletClass(int brickletID, void* const pBricklet)
   :
   m_brickletPtr(pBricklet),
   m_rawBufferContents(NULL),
@@ -481,4 +481,3 @@ const ExtremaData& BrickletClass::getExtrema() const
 {
   return m_extrema;
 }
-

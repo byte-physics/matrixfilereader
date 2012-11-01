@@ -170,7 +170,7 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet
 
   try
   {
-    bricklet = new BrickletClass(pBricklet, brickletID);
+    bricklet = new BrickletClass(brickletID, pBricklet);
   }
   catch (CMemoryException* e)
   {

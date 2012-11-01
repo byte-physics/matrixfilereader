@@ -19,7 +19,7 @@
 class BrickletClass
 {
 public:
-  BrickletClass(void* const pBricklet, int brickletID);
+  BrickletClass(int brickletID, void* const pBricklet);
   ~BrickletClass();
 
 public:
@@ -76,7 +76,7 @@ private:
 
   void* m_brickletPtr;
   Vernissage::Session* m_vernissageSession;
-  int m_brickletID;
+  const int m_brickletID;
 
   // storage for the raw data
   int* m_rawBufferContents;

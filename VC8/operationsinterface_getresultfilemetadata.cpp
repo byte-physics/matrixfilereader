@@ -75,7 +75,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   }
 
   ret = CheckName(NULL, WAVE_OBJECT, waveName.c_str());
-  if (ret == NAME_TOO_LONG)
+  if (ret == NAME_TOO_LONG || ret == BAD_CHAR_IN_WAVE_NAME)
   {
     GlobalData::Instance().setError(WRONG_PARAMETER, "waveName");
     return 0;

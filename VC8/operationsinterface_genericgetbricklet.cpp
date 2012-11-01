@@ -276,6 +276,13 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
       return 0;
     }
 
+    ret = CheckName(NULL, WAVE_OBJECT, waveName);
+    if (ret == NAME_TOO_LONG || ret == BAD_CHAR_IN_WAVE_NAME)
+    {
+      GlobalData::Instance().setError(WRONG_PARAMETER, "waveName");
+      return 0;
+    }
+
     // datafolder handling
     DataFolderHandle brickletDataFolderHndl = NULL;
     if (GlobalData::Instance().isDatafolderEnabled())

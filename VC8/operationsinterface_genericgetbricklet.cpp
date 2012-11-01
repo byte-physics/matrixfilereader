@@ -23,6 +23,22 @@ namespace  {
     META_DATA      = 4
   };
 
+  /*
+    Constructs a valid wave name given a buffer of length MAX_OBJ_NAME + 1, a baseName and a brickletID
+    Returns 0 on success
+  */
+  int formatWaveName( char* const buf, const std::string& baseName, int brickletID ) 
+  {
+    const int size = MAX_OBJ_NAME + 1;
+    const int len = _snprintf(buf, size, brickletWaveFormat, baseName.c_str(), brickletID);
+    buf[size - 1] = '\0';
+    if ( len == size // no space for trailing \0
+         || len < 0  // formatted string too long
+       )
+      return NAME_TOO_LONG;
+
+    return 0;
+  }
 } // anonymous namespace 
 
 extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p)
@@ -107,23 +123,6 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p)
   params.dfref                = p->dfref;
 
   return GenericGetBricklet(&params, RAW_DATA);
-}
-
-/*
-  Constructs a valid wave name given a buffer of length MAX_OBJ_NAME + 1, a baseName and a brickletID
-  Returns 0 on success
-*/
-int formatWaveName( char* const buf, const std::string& baseName, int brickletID ) 
-{
-  const int size = MAX_OBJ_NAME + 1;
-  const int len = _snprintf(buf, size, brickletWaveFormat, baseName.c_str(), brickletID);
-  buf[size - 1] = '\0';
-  if ( len == size // no space for trailing \0
-       || len < 0  // formatted string too long
-      )
-     return NAME_TOO_LONG;
-
-  return 0;
 }
 
 int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)

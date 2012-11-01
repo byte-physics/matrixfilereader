@@ -32,6 +32,7 @@ public:
   int getTraceDir() const;
   bool isEmpty() const;
   const ExtremaData& getExtrema() const;;
+  int GetPixelSize() const;
 
   void fillWave(int index, int rawValue, double scaledValue);
 

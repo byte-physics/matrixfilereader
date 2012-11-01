@@ -201,3 +201,8 @@ waveHndl WaveClass::getWaveHandle() const
 {
   return m_waveHandle;
 }
+
+int WaveClass::GetPixelSize() const
+{
+  return pixelSize;
+}

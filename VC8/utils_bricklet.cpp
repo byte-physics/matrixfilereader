@@ -160,7 +160,7 @@ void setDataWaveNote(int brickletID, WaveClass& waveData)
   waveNote.append("rawMax="                + toString(waveData.getExtrema().getRawMax())   + "\r");
   waveNote.append("physicalValueOfRawMin=" + toString(waveData.getExtrema().getPhysValRawMin()) + "\r");
   waveNote.append("physicalValueOfRawMax=" + toString(waveData.getExtrema().getPhysValRawMax()) + "\r");
-  waveNote.append("pixelSize="             + toString(waveData.pixelSize) + "\r");
+  waveNote.append("pixelSize="             + toString(waveData.GetPixelSize()) + "\r");
 
   setWaveNoteAsString(waveNote, waveData.getWaveHandle());
 }

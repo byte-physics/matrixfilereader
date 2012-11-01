@@ -174,10 +174,10 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet
   }
   catch (CMemoryException* e)
   {
-    e->Delete();
     HISTPRINT("Out of memory in createBrickletClassObject\r");
     throw e;
   }
+
   ASSERT_RETURN_VOID(bricklet);
   m_brickletIDBrickletClassMap[brickletID] = bricklet;
 

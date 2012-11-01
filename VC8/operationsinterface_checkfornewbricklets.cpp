@@ -17,12 +17,6 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
   BEGIN_OUTER_CATCH
   GlobalData::Instance().initialize(p->calledFromMacro, p->calledFromFunction);
 
-  void* pContext  = NULL, *pBricklet = NULL;
-  BrickletClass* bricklet = NULL;
-  std::wstring fileName, dirPath;
-  bool loadSuccess;
-  int i, ret;
-
   // save defaults
   SetOperationNumVar(V_startBrickletID, -1.0);
   SetOperationNumVar(V_endBrickletID, -1.0);
@@ -33,17 +27,17 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
     return 0;
   }
 
-  Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(pSession);
+  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+  ASSERT_RETURN_ZERO(session);
 
-  const int oldNumberOfBricklets = pSession->getBrickletCount();
+  const int oldNumberOfBricklets = session->getBrickletCount();
 
-  fileName = GlobalData::Instance().getFileName<std::wstring>();
-  dirPath = GlobalData::Instance().getDirPath<std::wstring>();
+  std::wstring fileName = GlobalData::Instance().getFileName<std::wstring>();
+  std::wstring dirPath = GlobalData::Instance().getDirPath<std::wstring>();
 
   // true -> result set will be added to the database
   // false -> replaces the current results sets in the internal databse
-  loadSuccess = pSession->loadResultSet(dirPath, fileName, false);
+  const bool loadSuccess = session->loadResultSet(dirPath, fileName, false);
 
   if (!loadSuccess)
   {
@@ -53,24 +47,25 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
   }
 
   // starting from here we have to
-  // - update the pBricklet pointers in the BrickletClass objects
+  // - update the vernissageBricklet pointers in the BrickletClass objects
   // - compare old to new totalNumberOfBricklets
-  const int numberOfBricklets = pSession->getBrickletCount();
+  const int numberOfBricklets = session->getBrickletCount();
 
-  for (i = 1; i <= numberOfBricklets; i++)
+  void *pContext = NULL;
+  for (int i = 1; i <= numberOfBricklets; i++)
   {
-    pBricklet = pSession->getNextBricklet(&pContext);
-    ASSERT_RETURN_ZERO(pBricklet);
+    void* vernissageBricklet = session->getNextBricklet(&pContext);
+    ASSERT_RETURN_ZERO(vernissageBricklet);
 
-    bricklet = GlobalData::Instance().getBrickletClassObject(i);
+    BrickletClass *bricklet = GlobalData::Instance().getBrickletClassObject(i);
 
     if (bricklet == NULL) // this is a new bricklet
     {
-      GlobalData::Instance().createBrickletClassObject(i, pBricklet);
+      GlobalData::Instance().createBrickletClassObject(i, vernissageBricklet);
     }
-    else   // the bricklet is old and we only have to update *pBricklet
+    else   // the bricklet is old and we only have to update *vernissageBricklet
     {
-      bricklet->setBrickletPointer(pBricklet);
+      bricklet->setBrickletPointer(vernissageBricklet);
     }
   }
 
@@ -88,7 +83,7 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
     return 0;
   }
 
-  ret = SetOperationNumVar(V_startBrickletID, oldNumberOfBricklets + 1);
+  int ret = SetOperationNumVar(V_startBrickletID, oldNumberOfBricklets + 1);
 
   if (ret != 0)
   {

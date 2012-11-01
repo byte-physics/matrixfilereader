@@ -51,11 +51,11 @@ namespace
     BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
     ASSERT_RETURN_ONE(bricklet);
 
-    void* pBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(pBricklet);
+    void* vernissageBricklet = bricklet->getBrickletPointer();
+    ASSERT_RETURN_ONE(vernissageBricklet);
 
-    Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
-    ASSERT_RETURN_ONE(pSession);
+    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    ASSERT_RETURN_ONE(session);
 
     // pointer to raw data
     int rawBrickletSize = 0;
@@ -68,8 +68,8 @@ namespace
       return UNKNOWN_ERROR;
     }
 
-    const std::wstring triggerAxisName = pSession->getTriggerAxisName(pBricklet);
-    const Vernissage::Session::AxisDescriptor triggerAxis = pSession->getAxisDescriptor(pBricklet, triggerAxisName);
+    const std::wstring triggerAxisName = session->getTriggerAxisName(vernissageBricklet);
+    const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
     int numPointsTriggerAxis = triggerAxis.clocks;
 
     if (triggerAxis.mirrored)
@@ -133,11 +133,11 @@ namespace
     BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
     ASSERT_RETURN_ONE(bricklet);
 
-    void* pBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(pBricklet);
+    void* vernissageBricklet = bricklet->getBrickletPointer();
+    ASSERT_RETURN_ONE(vernissageBricklet);
 
-    Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
-    ASSERT_RETURN_ONE(pSession);
+    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    ASSERT_RETURN_ONE(session);
 
     // pointer to raw data
     int rawBrickletSize = 0;
@@ -150,7 +150,7 @@ namespace
       return UNKNOWN_ERROR;
     }
 
-    const Vernissage::Session::AxisDescriptor triggerAxis = pSession->getAxisDescriptor(pBricklet, pSession->getTriggerAxisName(pBricklet));
+    const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
 
     // Determine the length of one "line" of data
     int numPointsTriggerAxis = triggerAxis.clocks;
@@ -164,7 +164,7 @@ namespace
     }
 
     // There must be another axis, because the Bricklet has two dimensions:
-    const Vernissage::Session::AxisDescriptor rootAxis = pSession->getAxisDescriptor(pBricklet, triggerAxis.triggerAxisName);
+    const Vernissage::Session::AxisDescriptor rootAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxis.triggerAxisName);
 
     // Determine the length of one "line" of data
     int numPointsRootAxis = rootAxis.clocks;
@@ -531,8 +531,8 @@ namespace
     BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
     ASSERT_RETURN_ONE(bricklet);
 
-    void* const pBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(pBricklet);
+    void* const vernissageBricklet = bricklet->getBrickletPointer();
+    ASSERT_RETURN_ONE(vernissageBricklet);
 
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
     ASSERT_RETURN_ONE(session);
@@ -553,7 +553,7 @@ namespace
     // check for correct view type codes
     int found = 0;
     typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
-    const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(pBricklet);
+    const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(vernissageBricklet);
 
     for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
     {
@@ -573,10 +573,10 @@ namespace
       DEBUGPRINT("The 3D data is not of the type vtc_2Dof3D and vtc_Spectroscopy.");
     }
 
-    const Vernissage::Session::AxisDescriptor specAxis = session->getAxisDescriptor(pBricklet, session->getTriggerAxisName(pBricklet));
-    const Vernissage::Session::AxisDescriptor xAxis = session->getAxisDescriptor(pBricklet, specAxis.triggerAxisName);
-    const Vernissage::Session::AxisDescriptor yAxis = session->getAxisDescriptor(pBricklet, xAxis.triggerAxisName);
-    const Vernissage::Session::AxisTableSets sets = session->getAxisTableSets(pBricklet, session->getTriggerAxisName(pBricklet));
+    const Vernissage::Session::AxisDescriptor specAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
+    const Vernissage::Session::AxisDescriptor xAxis = session->getAxisDescriptor(vernissageBricklet, specAxis.triggerAxisName);
+    const Vernissage::Session::AxisDescriptor yAxis = session->getAxisDescriptor(vernissageBricklet, xAxis.triggerAxisName);
+    const Vernissage::Session::AxisTableSets sets = session->getAxisTableSets(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
 
     const Vernissage::Session::TableSet xSet = sets.find(specAxis.triggerAxisName)->second;
     const Vernissage::Session::TableSet ySet = sets.find(xAxis.triggerAxisName)->second;
@@ -1053,8 +1053,8 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
 
   if (GlobalData::Instance().isDebuggingEnabled())
   {
-    void* pBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(pBricklet);
+    void* vernissageBricklet = bricklet->getBrickletPointer();
+    ASSERT_RETURN_ONE(vernissageBricklet);
 
     DEBUGPRINT("### BrickletID %d ###", brickletID);
     DEBUGPRINT("dimension %d", dimension);
@@ -1064,7 +1064,7 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
     ASSERT_RETURN_ONE(session);
 
-    const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(pBricklet);
+    const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(vernissageBricklet);
     for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
     {
       DEBUGPRINT("viewType %s", viewTypeCodeToString(*it).c_str());

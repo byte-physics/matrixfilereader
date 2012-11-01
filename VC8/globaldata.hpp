@@ -24,7 +24,7 @@ public:
   void setResultFile(const std::wstring& dirPath, const std::wstring& fileName);
   void closeSession();
   void closeResultFile();
-  void createBrickletClassObject(int brickletID, void* const pBricklet);
+  void createBrickletClassObject(int brickletID, void* const vernissageBricklet);
   void setError(int errorCode, const std::string& msgArgument = std::string());
   void setInternalError(int errorCode);
 

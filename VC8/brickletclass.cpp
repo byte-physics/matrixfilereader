@@ -11,16 +11,16 @@
 #include "extremadata.hpp"
 #include "utils_generic.hpp"
 
-BrickletClass::BrickletClass(int brickletID, void* const pBricklet)
+BrickletClass::BrickletClass(int brickletID, void* const vernissageBricklet)
   :
-  m_brickletPtr(pBricklet),
+  m_brickletPtr(vernissageBricklet),
   m_rawBufferContents(NULL),
   m_rawBufferContentsSize(0),
   m_brickletID(brickletID),
   m_vernissageSession(GlobalData::Instance().getVernissageSession())
 {
   ASSERT_RETURN_VOID(m_vernissageSession);
-  ASSERT_RETURN_VOID(pBricklet);
+  ASSERT_RETURN_VOID(vernissageBricklet);
 }
 
 BrickletClass::~BrickletClass()
@@ -464,12 +464,12 @@ const std::vector<std::string>& BrickletClass::getAxes<std::string>()
 }
 
 /*
-  resetting *pBricklet is only needed after the same result file is loaded again to check for new bricklets
+  Resetting *vernissageBricklet is only needed after the same result file is loaded again to check for new bricklets
 */
-void BrickletClass::setBrickletPointer( void* const pBricklet )
+void BrickletClass::setBrickletPointer( void* const vernissageBricklet )
 {
-  ASSERT_RETURN_VOID(pBricklet);
-  m_brickletPtr = pBricklet;
+  ASSERT_RETURN_VOID(vernissageBricklet);
+  m_brickletPtr = vernissageBricklet;
 }
 
 void* BrickletClass::getBrickletPointer() const

@@ -161,16 +161,16 @@ BrickletClass* GlobalData::getBrickletClassObject(int brickletID) const
 }
 
 /*
-  for each bricklet we have to call this function and make the connection between the pBricklet pointer
+  for each bricklet we have to call this function and make the connection between the vernissageBricklet pointer
   from the vernissage DLL and our brickletClass objects
 */
-void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet)
+void GlobalData::createBrickletClassObject(int brickletID, void* const vernissageBricklet)
 {
   BrickletClass* bricklet = NULL;
 
   try
   {
-    bricklet = new BrickletClass(brickletID, pBricklet);
+    bricklet = new BrickletClass(brickletID, vernissageBricklet);
   }
   catch (CMemoryException* e)
   {
@@ -181,7 +181,7 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const pBricklet
   ASSERT_RETURN_VOID(bricklet);
   m_brickletIDBrickletClassMap[brickletID] = bricklet;
 
-  DEBUGPRINT("setBrickletPointerMap brickletID=%d,pBricklet=%p", brickletID, pBricklet);
+  DEBUGPRINT("setBrickletPointerMap brickletID=%d,vernissageBricklet=%p", brickletID, vernissageBricklet);
 }
 
 /*
@@ -406,7 +406,7 @@ int GlobalData::convertBrickletPtr(void* rawBrickletPtr) const
     }
   }
 
-  HISTPRINT(outputBuffer, "BUG: Could not find a corresponding brickletID for the raw pointer %p", rawBrickletPtr);
+  HISTPRINT("BUG: Could not find a corresponding brickletID for the raw pointer %p", rawBrickletPtr);
   return INVALID_BRICKLETID;
 }
 

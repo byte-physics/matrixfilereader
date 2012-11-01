@@ -13,8 +13,8 @@
 DLLHandler::DLLHandler()
   :
   m_foundationModule(NULL),
-  m_pGetSessionFunc(NULL),
-  m_pReleaseSessionFunc(NULL),
+  m_getSessionFunc(NULL),
+  m_releaseSessionFunc(NULL),
   m_vernissageVersion("0.00")
 {}
 
@@ -23,16 +23,16 @@ DLLHandler::~DLLHandler()
 
 void DLLHandler::closeSession()
 {
-  if (m_pReleaseSessionFunc != NULL)
+  if (m_releaseSessionFunc != NULL)
   {
-    (*m_pReleaseSessionFunc)();
+    (*m_releaseSessionFunc)();
   }
 
   FreeLibrary(m_foundationModule);
   m_foundationModule = NULL;
   m_vernissageVersion = "0.00";
-  m_pReleaseSessionFunc = NULL;
-  m_pGetSessionFunc = NULL;
+  m_releaseSessionFunc = NULL;
+  m_getSessionFunc = NULL;
 }
 
 /*
@@ -123,7 +123,7 @@ In case something goes wrong, NULL is returned
 */
 Vernissage::Session* DLLHandler::createSessionObject()
 {
-  Vernissage::Session* pSession = NULL;
+  Vernissage::Session* session = NULL;
   std::vector<std::string> dllNames;
 
   dllNames.push_back("Ace.dll");
@@ -151,7 +151,7 @@ Vernissage::Session* DLLHandler::createSessionObject()
     else
     {
       HISTPRINT("Something went wrong (windows error code %d) loading the DLL %s", GetLastError(), dllName.c_str());
-      return pSession;
+      return session;
     }
   }
 
@@ -159,14 +159,14 @@ Vernissage::Session* DLLHandler::createSessionObject()
   m_foundationModule    = module;
   ASSERT_RETURN_ZERO(m_foundationModule);
 
-  m_pGetSessionFunc    = (GetSessionFunc)    GetProcAddress(m_foundationModule, "getSession");
-  m_pReleaseSessionFunc  = (ReleaseSessionFunc)  GetProcAddress(m_foundationModule, "releaseSession");
+  m_getSessionFunc     = (GetSessionFunc)     GetProcAddress(m_foundationModule, "getSession");
+  m_releaseSessionFunc = (ReleaseSessionFunc) GetProcAddress(m_foundationModule, "releaseSession");
 
-  ASSERT_RETURN_ZERO(m_pGetSessionFunc);
-  ASSERT_RETURN_ZERO(m_pReleaseSessionFunc);
+  ASSERT_RETURN_ZERO(m_getSessionFunc);
+  ASSERT_RETURN_ZERO(m_releaseSessionFunc);
 
-  pSession = (*m_pGetSessionFunc)();
-  return pSession;
+  session = (*m_getSessionFunc)();
+  return session;
 }
 
 const std::string& DLLHandler::getVernissageVersion() const

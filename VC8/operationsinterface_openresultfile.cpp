@@ -125,8 +125,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   strncpy(GlobalData::Instance().openDlgInitialDir, dirPath, MAX_PATH_LEN + 1);
   GlobalData::Instance().openDlgInitialDir[MAX_PATH_LEN] = '\0';
 
-  Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(pSession);
+  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+  ASSERT_RETURN_ZERO(session);
 
   // now we convert to wide strings
   const std::wstring  dirPathWString = CharPtrToWString(dirPath);
@@ -134,7 +134,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
 
   // true -> result set will be added to the database
   // false -> replaces the current results sets in the internal databse
-  const bool loadSuccess = pSession->loadResultSet(dirPathWString, fileNameWString, false);
+  const bool loadSuccess = session->loadResultSet(dirPathWString, fileNameWString, false);
 
   if (!loadSuccess)
   {
@@ -145,19 +145,19 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   //starting from here the result file is valid
   GlobalData::Instance().setResultFile(dirPathWString, fileNameWString);
 
-  const int totalNumBricklets = pSession->getBrickletCount();
+  const int totalNumBricklets = session->getBrickletCount();
   DEBUGPRINT("totalNumBricklets=%d", totalNumBricklets);
 
   // brickletIDs are 1-based
   void* pContext = NULL;
   for (int i = 1; i <= totalNumBricklets; i++)
   {
-    void* pBricklet = pSession->getNextBricklet(&pContext);
-    ASSERT_RETURN_ZERO(pBricklet);
+    void* vernissageBricklet = session->getNextBricklet(&pContext);
+    ASSERT_RETURN_ZERO(vernissageBricklet);
 
     try
     {
-      GlobalData::Instance().createBrickletClassObject(i, pBricklet);
+      GlobalData::Instance().createBrickletClassObject(i, vernissageBricklet);
     }
     catch (CMemoryException* e)
     {

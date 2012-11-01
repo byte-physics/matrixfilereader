@@ -27,8 +27,8 @@ private:
   std::string getVernissagePath();
 
 private:
-  GetSessionFunc m_pGetSessionFunc;
-  ReleaseSessionFunc  m_pReleaseSessionFunc;
+  GetSessionFunc m_getSessionFunc;
+  ReleaseSessionFunc  m_releaseSessionFunc;
   HMODULE m_foundationModule;
   std::string m_vernissageVersion;
 };

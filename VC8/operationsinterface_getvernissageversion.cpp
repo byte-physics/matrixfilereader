@@ -16,8 +16,8 @@ extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr 
   BEGIN_OUTER_CATCH
   SetOperationNumVar(V_DLLversion, 0);
 
-  Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(pSession);
+  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+  ASSERT_RETURN_ZERO(session);
 
   SetOperationNumVar(V_DLLversion, stringToAnyType<double>(GlobalData::Instance().getVernissageVersion()));
   END_OUTER_CATCH

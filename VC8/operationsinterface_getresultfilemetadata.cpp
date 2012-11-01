@@ -54,10 +54,10 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     return 0;
   }
 
-  Vernissage::Session* pSession = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(pSession);
+  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+  ASSERT_RETURN_ZERO(session);
 
-  const int numberOfBricklets = pSession->getBrickletCount();
+  const int numberOfBricklets = session->getBrickletCount();
 
   // check waveName parameter
   std::string waveName = resultMetaDefault;
@@ -90,12 +90,12 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   {
     const BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(numberOfBricklets);
     ASSERT_RETURN_ZERO(bricklet);
-    void* pBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ZERO(pBricklet);
+    void* vernissageBricklet = bricklet->getBrickletPointer();
+    ASSERT_RETURN_ZERO(vernissageBricklet);
 
     // use the timestamp of the last bricklet as dateOfLastChange
-    tm ctime = pSession->getCreationTimestamp(pBricklet);
-    const Vernissage::Session::BrickletMetaData brickletMetaData = pSession->getMetaData(pBricklet);
+    tm ctime = session->getCreationTimestamp(vernissageBricklet);
+    const Vernissage::Session::BrickletMetaData brickletMetaData = session->getMetaData(vernissageBricklet);
 
     char buf[ARRAY_SIZE];
     sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d", ctime.tm_mon + 1, ctime.tm_mday, ctime.tm_year + 1900, ctime.tm_hour, ctime.tm_min, ctime.tm_sec);

@@ -19,11 +19,11 @@
 class BrickletClass
 {
 public:
-  BrickletClass(int brickletID, void* const pBricklet);
+  BrickletClass(int brickletID, void* const vernissageBricklet);
   ~BrickletClass();
 
 public:
-  void setBrickletPointer(void* const pBricklet);
+  void setBrickletPointer(void* const vernissageBricklet);
 
   void clearCache();
   void getBrickletContentsBuffer(const int** pBuffer, int& count);

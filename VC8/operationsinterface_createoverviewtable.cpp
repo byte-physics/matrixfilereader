@@ -32,7 +32,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
   // and also read the variable settings from this folder
   if (p->DESTFlagEncountered)
   {
-    if (p->dfref == NULL)
+    if (!dataFolderExists(p->dfref))
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "dfref");
       return 0;
@@ -107,6 +107,13 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
     waveName = overViewTableDefault;
   }
 
+  ret = CheckName(NULL, WAVE_OBJECT, waveName.c_str());
+  if (ret == NAME_TOO_LONG)
+  {
+    GlobalData::Instance().setError(WRONG_PARAMETER, "waveName");
+    return 0;
+  }
+
   splitString(keyList, listSepChar, keys);
 
   if (keys.empty())
@@ -160,9 +167,10 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
   setOtherWaveNote(waveHandle);
 
-  SetOperationStrVar(S_waveNames, getFullWavePath(destDataFolderHndl, waveHandle).c_str());
-  const bool filledCache = true;
-  GlobalData::Instance().finalize(filledCache);
+  std::string waveList;
+  appendToWaveList(destDataFolderHndl,waveHandle,waveList);
+  SetOperationStrVar(S_waveNames, waveList.c_str());
+  GlobalData::Instance().finalizeWithFilledCache();
   END_OUTER_CATCH
   return 0;
 }

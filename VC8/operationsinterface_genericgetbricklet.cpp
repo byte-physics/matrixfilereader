@@ -109,6 +109,23 @@ extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p)
   return GenericGetBricklet(&params, RAW_DATA);
 }
 
+/*
+  Constructs a valid wave name given a buffer of length MAX_OBJ_NAME + 1, a baseName and a brickletID
+  Returns 0 on success
+*/
+int formatWaveName( char* const buf, const std::string& baseName, int brickletID ) 
+{
+  const int size = MAX_OBJ_NAME + 1;
+  const int len = _snprintf(buf, size, brickletWaveFormat, baseName.c_str(), brickletID);
+  buf[size - 1] = '\0';
+  if ( len == size // no space for trailing \0
+       || len < 0  // formatted string too long
+      )
+     return NAME_TOO_LONG;
+
+  return 0;
+}
+
 int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 {
   BEGIN_OUTER_CATCH
@@ -117,7 +134,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
   GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro, p->calledFromFunction);
   SetOperationStrVar(S_waveNames, "");
 
-  std::string fullPathOfCreatedWaves;
+  std::string waveNameList;
   int ret = -1;
 
   // check of DEST flag which tells us that we should place all output in the supplied datafolder
@@ -125,7 +142,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
   DataFolderHandle destDataFolderHndl = NULL;
   if (p->DESTFlagEncountered)
   {
-    if (p->dfref == NULL)
+    if (!dataFolderExists(p->dfref))
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "dfref");
       return 0;
@@ -252,19 +269,13 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
     BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
     ASSERT_RETURN_ZERO(bricklet);
 
-    // check only the length of the wave "baseName"
-    // if we don't do it here we can not know an upper limit for char waveName[]
-    // if it is too long we abort
-    ret = CheckName(NULL, WAVE_OBJECT, baseName.c_str());
-
-    if (ret == NAME_TOO_LONG)
-    {
-      GlobalData::Instance().setInternalError(ret);
-      return ret;
-    }
-
     char waveName[MAX_OBJ_NAME + 1];
-    sprintf(waveName, brickletWaveFormat, baseName.c_str(), brickletID);
+    ret = formatWaveName(waveName, baseName, brickletID);
+    if (ret != 0)
+    {
+      GlobalData::Instance().setError(WRONG_PARAMETER, "baseName");
+      return 0;
+    }
 
     // datafolder handling
     DataFolderHandle brickletDataFolderHndl = NULL;
@@ -291,15 +302,15 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
     switch (typeOfData)
     {
     case RAW_DATA:
-      ret = createRawDataWave(brickletDataFolderHndl, waveName, brickletID, fullPathOfCreatedWaves);
+      ret = createRawDataWave(destDataFolderHndl, brickletDataFolderHndl, waveName, brickletID, waveNameList);
       break;
 
     case CONVERTED_DATA:
-      ret = createWaves(brickletDataFolderHndl, waveName, brickletID, resampleData, pixelSize, fullPathOfCreatedWaves);
+      ret = createWaves(destDataFolderHndl, brickletDataFolderHndl, waveName, brickletID, resampleData, pixelSize, waveNameList);
       break;
 
     case META_DATA:
-      ret = createAndFillTextWave(bricklet->getMetaData(), brickletDataFolderHndl, waveName, brickletID, fullPathOfCreatedWaves);
+      ret = createAndFillTextWave(destDataFolderHndl, bricklet->getMetaData(), brickletDataFolderHndl, waveName, brickletID, waveNameList);
       break;
 
     default:
@@ -336,10 +347,8 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
     }
   }
 
-  SetOperationStrVar(S_waveNames, fullPathOfCreatedWaves.c_str());
-
-  const bool filledCache = true;
-  GlobalData::Instance().finalize(filledCache, ret);
+  SetOperationStrVar(S_waveNames, waveNameList.c_str());
+  GlobalData::Instance().finalizeWithFilledCache();
   END_OUTER_CATCH
   return 0;
 }

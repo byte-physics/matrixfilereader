@@ -34,7 +34,8 @@ public:
   void initializeWithoutReadSettings(int calledFromMacro, int calledFromFunction);
   void initialize(int calledFromMacro, int calledFromFunction);
 
-  void finalize(bool filledCache = false, int errorCode = SUCCESS);
+  void finalize();
+  void finalizeWithFilledCache();
 
   template<typename T>
   T getFileName() const;

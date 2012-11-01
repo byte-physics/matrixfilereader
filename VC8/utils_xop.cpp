@@ -154,33 +154,50 @@ void waveClearNaN32(float* data, CountInt length)
   }
 }
 
-/*
-  Append the full path of wv to waveList
-*/
 void appendToWaveList(DataFolderHandle df, waveHndl wv, std::string& waveList)
 {
-  waveList.append(getFullWavePath(df, wv));
+  waveList.append(getRelativePath(df,wv));
   waveList.append(listSepChar);
 }
 
 /*
-  return the full path of the wave
+  Returns the path of wv with respect to df
+  Assumes that wv lies below df
 */
-std::string getFullWavePath(DataFolderHandle df, waveHndl wv)
+std::string getRelativePath(DataFolderHandle df, waveHndl wv)
 {
-  // flags=3 returns the full path to the datafolder and including quotes if needed
-  char dataFolderPath[MAXCMDLEN + 1];
-  const int ret = GetDataFolderNameOrPath(df, 3, dataFolderPath);
-
+  // flags=3 returns the full path to the datafolder, if needed with quotes
+  const int FULLPATH_WITH_QUOTES = 3;
+  char basePath[MAXCMDLEN + 1];
+  int ret = GetDataFolderNameOrPath(df, FULLPATH_WITH_QUOTES, basePath);
   if (ret != 0)
   {
-    HISTPRINT("BUG: Could not query the datafolder for its name");
+    HISTPRINT("BUG: Could not query the datafolder handle for its name");
     return std::string();
   }
 
+  DataFolderHandle waveDataFolder;
+  ret = GetWavesDataFolder(wv, &waveDataFolder);
+  if (ret != 0)
+  {
+    HISTPRINT("BUG: Could not query the wave for its datafolder path");
+    return std::string();
+  }
+
+  char wavePath[MAXCMDLEN + 1];
+  ret = GetDataFolderNameOrPath(waveDataFolder, FULLPATH_WITH_QUOTES, wavePath);
+  if (ret != 0)
+  {
+    HISTPRINT("BUG: Could not query the wave's datafolder path");
+    return std::string();
+  }
+
+  std::string relativePath = std::string(wavePath,strlen(basePath),std::string::npos);
+
   char waveName[MAX_OBJ_NAME + 1];
   WaveName(wv, waveName);
-  return std::string(dataFolderPath) + waveName;
+  // append the wavename
+  return ":" + relativePath + waveName;
 }
 
 /*
@@ -206,4 +223,39 @@ void convertHandleToString(Handle strHandle, std::string& str)
     e->Delete();
     HISTPRINT("Out of memory in convertHandleToString()");
   }
+}
+
+/*
+  Checks if the datafolder behind the handle exists
+*/
+bool dataFolderExists(DataFolderHandle df)
+{
+  if (df == NULL)
+  {
+    return false;
+  }
+
+  int dfrefID;
+  int ret;
+
+  ret = GetDataFolderIDNumber(df, &dfrefID);
+  if(ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return false;
+  }
+
+  DataFolderHandle newDFHandle;
+  ret = GetDataFolderByIDNumber(dfrefID,&newDFHandle);
+  if(ret == CANT_FIND_FOLDER || newDFHandle == NULL)
+  {
+    return false;
+  }
+  else if(ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return false;
+  }
+
+  return true;
 }

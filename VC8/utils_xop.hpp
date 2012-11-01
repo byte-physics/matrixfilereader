@@ -81,7 +81,8 @@ int stringVectorToTextWave(const std::vector<std::string>& data, waveHndl waveHa
 void waveClearNaN64(double* wavePtr, CountInt length);
 void waveClearNaN32(float* wavePtr, CountInt length);
 
-std::string getFullWavePath(DataFolderHandle df, waveHndl wv);
 void appendToWaveList(DataFolderHandle df, waveHndl wv, std::string& waveList);
 
 void convertHandleToString(Handle strHandle, std::string& str);
+bool dataFolderExists(DataFolderHandle df);
+std::string getRelativePath(DataFolderHandle df, waveHndl wv);

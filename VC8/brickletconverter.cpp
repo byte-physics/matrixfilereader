@@ -43,7 +43,7 @@ namespace
     DEBUGPRINT("raw->scaled transformation: slope=%g,yIntercept=%g", slope, yIntercept);
   }
 
-  int createWaves1D(DataFolderHandle dfHandle, const char* waveBaseName, int brickletID, std::string& fullPathOfCreatedWave)
+  int createWaves1D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, std::string& waveNameList)
   {
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
@@ -83,7 +83,7 @@ namespace
     wave1D.setNameAndTraceDir(waveBaseName, NO_TRACE);
 
     waveHndl waveHandle;
-    int ret = MDMakeWave(&waveHandle, wave1D.getWaveName(), dfHandle, dimensionSizes,
+    int ret = MDMakeWave(&waveHandle, wave1D.getWaveName(), waveFolderHandle, dimensionSizes,
                          GlobalData::Instance().getIgorWaveType(), GlobalData::Instance().isOverwriteEnabled<int>());
 
     if (ret == NAME_WAV_CONFLICT)
@@ -121,11 +121,11 @@ namespace
     wave1D.setWaveUnits(ROWS, triggerAxis.physicalUnit);
     wave1D.setWaveUnits(DATA, bricklet->getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
-    appendToWaveList(dfHandle, wave1D.getWaveHandle(), fullPathOfCreatedWave);
+    appendToWaveList(baseFolderHandle, wave1D.getWaveHandle(), waveNameList);
     return SUCCESS;
   }
 
-  int createWaves2D(DataFolderHandle dfHandle, const char* waveBaseName, int brickletID, bool resampleData, int pixelSize, std::string& fullPathOfCreatedWave)
+  int createWaves2D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, bool resampleData, int pixelSize, std::string& waveNameList)
   {
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
@@ -232,7 +232,7 @@ namespace
       }
 
       waveHndl waveHandle;
-      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), dfHandle, dimensionSizes,
+      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), waveFolderHandle, dimensionSizes,
                            GlobalData::Instance().getIgorWaveType(), GlobalData::Instance().isOverwriteEnabled<int>());
 
       if (ret == NAME_WAV_CONFLICT)
@@ -442,7 +442,7 @@ namespace
 
         char dataFolderPath[MAXCMDLEN + 1];
         // flag=3 results in the full path being returned including a trailing colon
-        int ret = GetDataFolderNameOrPath(dfHandle, 3, dataFolderPath);
+        int ret = GetDataFolderNameOrPath(waveFolderHandle, 3, dataFolderPath);
 
         if (ret != 0)
         {
@@ -473,14 +473,14 @@ namespace
         }
 
         // rename wave from M_PixelatedImage to waveNameVector[i] both sitting in dfHandle
-        ret = RenameDataFolderObject(dfHandle, WAVE_OBJECT, "M_PixelatedImage", wave[i].getWaveName());
+        ret = RenameDataFolderObject(waveFolderHandle, WAVE_OBJECT, "M_PixelatedImage", wave[i].getWaveName());
 
         if (ret != 0)
         {
           return ret;
         }
 
-        wave[i].setWaveHandle(FetchWaveFromDataFolder(dfHandle, wave[i].getWaveName()));
+        wave[i].setWaveHandle(FetchWaveFromDataFolder(waveFolderHandle, wave[i].getWaveName()));
         ASSERT_RETURN_ONE(wave[i].getWaveHandle());
         // get wave dimensions; needed for setScale below
         int numDimensions;
@@ -517,13 +517,13 @@ namespace
       wave[i].setWaveUnits(COLUMNS, rootAxis.physicalUnit);
       wave[i].setWaveUnits(DATA, bricklet->getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
-      appendToWaveList(dfHandle, wave[i].getWaveHandle(), fullPathOfCreatedWave);
+      appendToWaveList(baseFolderHandle, wave[i].getWaveHandle(), waveNameList);
     }
 
     return SUCCESS;
   }
 
-  int createWaves3D(DataFolderHandle dfHandle, const char* waveBaseName, int brickletID, std::string& fullPathOfCreatedWave)
+  int createWaves3D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, std::string& waveNameList)
   {
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
@@ -867,7 +867,7 @@ namespace
       }
 
       waveHndl waveHandle;
-      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), dfHandle, dimensionSizes, GlobalData::Instance().getIgorWaveType(), GlobalData::Instance().isOverwriteEnabled<int>());
+      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), waveFolderHandle, dimensionSizes, GlobalData::Instance().getIgorWaveType(), GlobalData::Instance().isOverwriteEnabled<int>());
 
       if (ret == NAME_WAV_CONFLICT)
       {
@@ -1032,7 +1032,7 @@ namespace
       wave[i].setWaveUnits(LAYERS, specAxis.physicalUnit);
       wave[i].setWaveUnits(DATA, bricklet->getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
-      appendToWaveList(dfHandle, wave[i].getWaveHandle(), fullPathOfCreatedWave);
+      appendToWaveList(baseFolderHandle, wave[i].getWaveHandle(), waveNameList);
     }
 
     return SUCCESS;
@@ -1043,8 +1043,8 @@ namespace
 /*
   Creates the real data waves, supports 1D-3D data
 */
-int createWaves(DataFolderHandle dfHandle, const char* waveBaseName, int brickletID, bool resampleData,
-                int pixelSize, std::string& fullPathOfCreatedWave)
+int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, bool resampleData,
+                int pixelSize, std::string& waveNameList)
 {
   BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
   ASSERT_RETURN_ONE(bricklet);
@@ -1084,15 +1084,15 @@ int createWaves(DataFolderHandle dfHandle, const char* waveBaseName, int brickle
   switch (dimension)
   {
   case 1:
-    return createWaves1D(dfHandle, waveBaseName, brickletID, fullPathOfCreatedWave);
+    return createWaves1D(baseFolderHandle, waveFolderHandle, waveBaseName, brickletID, waveNameList);
     break;
 
   case 2:
-    return createWaves2D(dfHandle, waveBaseName, brickletID, resampleData, pixelSize, fullPathOfCreatedWave);
+    return createWaves2D(baseFolderHandle, waveFolderHandle, waveBaseName, brickletID, resampleData, pixelSize, waveNameList);
     break;
 
   case 3:
-    return createWaves3D(dfHandle, waveBaseName, brickletID, fullPathOfCreatedWave);
+    return createWaves3D(baseFolderHandle, waveFolderHandle, waveBaseName, brickletID, waveNameList);
     break;
 
   default:
@@ -1106,7 +1106,7 @@ int createWaves(DataFolderHandle dfHandle, const char* waveBaseName, int brickle
 /*
   create the raw data wave which just holds the raw data as 1D array
 */
-int createRawDataWave(DataFolderHandle dfHandle, const char* waveName, int brickletID, std::string& fullPathOfCreatedWaves)
+int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHandle, const char* waveName, int brickletID, std::string& waveNameList)
 {
   int ret;
   CountInt dimensionSizes[MAX_DIMENSIONS + 1];
@@ -1156,6 +1156,6 @@ int createRawDataWave(DataFolderHandle dfHandle, const char* waveName, int brick
 
   setDataWaveNote(brickletID,  wave);
 
-  appendToWaveList(dfHandle, wave.getWaveHandle(), fullPathOfCreatedWaves);
+  appendToWaveList(baseFolderHandle, wave.getWaveHandle(), waveNameList);
   return ret;
 }

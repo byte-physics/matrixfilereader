@@ -26,14 +26,13 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   DataFolderHandle destDataFolderHndl = NULL;
   if (p->DESTFlagEncountered)
   {
-    if (p->dfref == NULL)
+    if(!dataFolderExists(p->dfref))
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "dfref");
       return 0;
     }
 
     destDataFolderHndl = p->dfref;
-    // Here we check again for the config variables, this time in the destDataFolderHndl
   }
   else // no DEST flag given, so we take the current data folder as destination folder
   {
@@ -46,6 +45,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     }
   }
 
+  // Here we check again for the config variables, this time in the destDataFolderHndl
   GlobalData::Instance().readSettings(destDataFolderHndl);
 
   if (!GlobalData::Instance().resultFileOpen())
@@ -72,6 +72,13 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     {
       convertHandleToString(p->waveName, waveName);
     }
+  }
+
+  ret = CheckName(NULL, WAVE_OBJECT, waveName.c_str());
+  if (ret == NAME_TOO_LONG)
+  {
+    GlobalData::Instance().setError(WRONG_PARAMETER, "waveName");
+    return 0;
   }
 
   std::vector<std::pair<std::string,std::string> > data;
@@ -111,8 +118,8 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   }
 
   // brickletID=0 because we are handling resultfile metadata
-  std::string fullPathOfCreatedWaves;
-  ret = createAndFillTextWave(data, destDataFolderHndl, waveName.c_str(), 0, fullPathOfCreatedWaves);
+  std::string waveNameList;
+  ret = createAndFillTextWave(destDataFolderHndl, data, destDataFolderHndl, waveName.c_str(), 0, waveNameList);
 
   if (ret == WAVE_EXIST)
   {
@@ -125,9 +132,8 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     return 0;
   }
 
-  SetOperationStrVar(S_waveNames, fullPathOfCreatedWaves.c_str());
-  const bool filledCache = true;
-  GlobalData::Instance().finalize(filledCache);
+  SetOperationStrVar(S_waveNames, waveNameList.c_str());
+  GlobalData::Instance().finalizeWithFilledCache();
   END_OUTER_CATCH
   return 0;
 }

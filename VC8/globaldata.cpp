@@ -200,15 +200,11 @@ void GlobalData::setInternalError(int errorValue)
   }
 }
 
-/*
-  Must be called by every operation which sets V_flag before returning
-  In case some internal cache got filled by the operation, filledCache=true has to be passed
-*/
-void GlobalData::finalize(bool filledCache /* = false */, int errorCode /* = SUCCESS */)
+void GlobalData::finalizeWithFilledCache()
 {
-  this->setError(errorCode);
+  finalize();
 
-  if (!isDataCacheEnabled() && filledCache)
+  if (!isDataCacheEnabled())
   {
     for (int i = 1; i <= m_VernissageSession->getBrickletCount(); i++)
     {
@@ -217,6 +213,14 @@ void GlobalData::finalize(bool filledCache /* = false */, int errorCode /* = SUC
       bricklet->clearCache();
     }
   }
+}
+
+/*
+  Must be called by every operation which sets V_flag before returning
+*/
+void GlobalData::finalize()
+{
+  this->setError(SUCCESS);
 }
 
 /*

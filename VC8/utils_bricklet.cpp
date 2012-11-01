@@ -14,7 +14,7 @@
 /*
   Create a two column text wave from two string vectors
 */
-int createAndFillTextWave(const std::vector<std::pair<std::string,std::string> >& data, DataFolderHandle dataFolderHandle, const char* waveName, int brickletID, std::string& fullPathOfCreatedWaves)
+int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<std::pair<std::string,std::string> >& data, DataFolderHandle dataFolderHandle, const char* waveName, int brickletID, std::string& waveNameList)
 {
   // create 2D textwave with firstColumn.size() rows and 2 columns
   if (data.empty())
@@ -74,7 +74,7 @@ int createAndFillTextWave(const std::vector<std::pair<std::string,std::string> >
     return ret;
   }
   setOtherWaveNote(waveHandle, brickletID);
-  appendToWaveList(dataFolderHandle, waveHandle, fullPathOfCreatedWaves);
+  appendToWaveList(baseFolderHandle, waveHandle, waveNameList);
 
   return 0;
 }
@@ -152,7 +152,7 @@ std::string brickletTypeToString(unsigned int idx)
 /*
   Set the appropriate wave note for data waves
 */
-void setDataWaveNote(int brickletID, WaveClass& waveData)
+void setDataWaveNote( int brickletID, const WaveClass& waveData )
 {
   std::string  waveNote = getStandardWaveNote(brickletID, waveData.getTraceDir());
 

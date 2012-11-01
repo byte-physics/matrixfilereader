@@ -60,7 +60,6 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
 
   HISTPRINT(str.c_str());
 
-  // set errorCode to SUCCESS
   GlobalData::Instance().finalize();
   END_OUTER_CATCH
   return 0;

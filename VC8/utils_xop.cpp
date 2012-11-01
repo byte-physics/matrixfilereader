@@ -93,8 +93,8 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 
   ret = SetTextWaveData(waveHandle, mode, textHandle);
 
-  //DEBUGPRINT("SetTextWaveData returned %d",ret);
-  //  DisposeHandle(textHandle);
+  // DEBUGPRINT("SetTextWaveData returned %d",ret);
+  // DisposeHandle(textHandle);
 
   return ret;
 }

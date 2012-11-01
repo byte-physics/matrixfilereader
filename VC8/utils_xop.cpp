@@ -9,6 +9,7 @@
 #include "globaldata.hpp"
 #include "waveclass.hpp"
 #include "utils_generic.hpp"
+#include "constants.hpp"
 
 /*
   Write stringVector to the textwave waveHandle, using memcpy this is quite fast
@@ -197,7 +198,7 @@ std::string getRelativePath(DataFolderHandle df, waveHndl wv)
   char waveName[MAX_OBJ_NAME + 1];
   WaveName(wv, waveName);
   // append the wavename
-  return ":" + relativePath + waveName;
+  return relativeFolderPrefix + relativePath + waveName;
 }
 
 /*

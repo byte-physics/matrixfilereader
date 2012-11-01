@@ -137,3 +137,4 @@ const char dlgPrompt[]          = "Looking for a MATRIX result file";
 const int maximum_pixelSize     = 10;
 
 const char listSepChar[]        = ";";
+const char relativeFolderPrefix[] = ":";

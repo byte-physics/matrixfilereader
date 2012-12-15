@@ -131,10 +131,15 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 
   // due to our special handling of the /DEST flag we read the settings later
   GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro, p->calledFromFunction);
-  SetOperationStrVar(S_waveNames, "");
+  int ret = SetOperationStrVar(S_waveNames, "");
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   std::string waveNameList;
-  int ret = -1;
 
   // check of DEST flag which tells us that we should place all output in the supplied datafolder
   // and also read the variable settings from this folder
@@ -353,7 +358,14 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
     }
   }
 
-  SetOperationStrVar(S_waveNames, waveNameList.c_str());
+  ret = SetOperationStrVar(S_waveNames, waveNameList.c_str());
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
   GlobalData::Instance().finalizeWithFilledCache();
   END_OUTER_CATCH
   return 0;

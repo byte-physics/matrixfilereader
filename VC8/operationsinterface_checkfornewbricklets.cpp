@@ -18,8 +18,21 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
   GlobalData::Instance().initialize(p->calledFromMacro, p->calledFromFunction);
 
   // save defaults
-  SetOperationNumVar(V_startBrickletID, -1.0);
-  SetOperationNumVar(V_endBrickletID, -1.0);
+  int ret = SetOperationNumVar(V_startBrickletID, -1.0);
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
+  ret = SetOperationNumVar(V_endBrickletID, -1.0);
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   if (!GlobalData::Instance().resultFileOpen())
   {
@@ -83,7 +96,7 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
     return 0;
   }
 
-  int ret = SetOperationNumVar(V_startBrickletID, oldNumberOfBricklets + 1);
+  ret = SetOperationNumVar(V_startBrickletID, oldNumberOfBricklets + 1);
 
   if (ret != 0)
   {

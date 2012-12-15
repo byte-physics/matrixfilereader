@@ -17,9 +17,14 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 {
   BEGIN_OUTER_CATCH
   GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro, p->calledFromFunction);
-  SetOperationStrVar(S_waveNames, "");
+  int ret = SetOperationStrVar(S_waveNames, "");
 
-  int ret = -1;
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
   std::string keyList, waveName;
   waveHndl waveHandle;
   DataFolderHandle destDataFolderHndl = NULL;
@@ -169,7 +174,15 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
   std::string waveList;
   appendToWaveList(destDataFolderHndl,waveHandle,waveList);
-  SetOperationStrVar(S_waveNames, waveList.c_str());
+
+  ret = SetOperationStrVar(S_waveNames, waveList.c_str());
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
   GlobalData::Instance().finalizeWithFilledCache();
   END_OUTER_CATCH
   return 0;

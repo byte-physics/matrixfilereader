@@ -12,9 +12,24 @@
 
 extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
 {
+  BEGIN_OUTER_CATCH
   GlobalData::Instance().initialize(p->calledFromMacro, p->calledFromFunction);
-  SetOperationStrVar(S_fileName, "");
-  SetOperationStrVar(S_dirPath, "");
+
+  int ret = SetOperationStrVar(S_fileName, "");
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
+  ret = SetOperationStrVar(S_dirPath, "");
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   if (!GlobalData::Instance().resultFileOpen())
   {
@@ -22,9 +37,23 @@ extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
     return 0;
   }
 
-  SetOperationStrVar(S_fileName, GlobalData::Instance().getFileName<std::string>().c_str());
-  SetOperationStrVar(S_dirPath, GlobalData::Instance().getDirPath<std::string>().c_str());
+  ret = SetOperationStrVar(S_fileName, GlobalData::Instance().getFileName<std::string>().c_str());
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
+  ret = SetOperationStrVar(S_dirPath, GlobalData::Instance().getDirPath<std::string>().c_str());
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   GlobalData::Instance().finalize();
+  END_OUTER_CATCH
   return 0;
 }

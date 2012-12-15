@@ -18,8 +18,13 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   BEGIN_OUTER_CATCH
   GlobalData::Instance().initializeWithoutReadSettings(p->calledFromMacro, p->calledFromFunction);
 
-  SetOperationStrVar(S_waveNames, "");
-  int ret;
+  int ret = SetOperationStrVar(S_waveNames, "");
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   // check of DEST flag which tells us that we should place all output in the supplied datafolder
   // and also read the variable settings from this folder
@@ -132,7 +137,14 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     return 0;
   }
 
-  SetOperationStrVar(S_waveNames, waveNameList.c_str());
+  ret = SetOperationStrVar(S_waveNames, waveNameList.c_str());
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
   GlobalData::Instance().finalizeWithFilledCache();
   END_OUTER_CATCH
   return 0;

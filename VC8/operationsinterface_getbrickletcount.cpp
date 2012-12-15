@@ -25,9 +25,15 @@ extern "C" int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p)
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
   ASSERT_RETURN_ZERO(session);
 
-  SetOperationNumVar(V_count, session->getBrickletCount());
+  int ret = SetOperationNumVar(V_count, session->getBrickletCount());
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
   GlobalData::Instance().finalize();
   END_OUTER_CATCH
   return 0;
 }
-

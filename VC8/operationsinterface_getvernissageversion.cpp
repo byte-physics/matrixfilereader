@@ -14,12 +14,25 @@
 extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p)
 {
   BEGIN_OUTER_CATCH
-  SetOperationNumVar(V_DLLversion, 0);
+  int ret = SetOperationNumVar(V_DLLversion, 0);
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
   ASSERT_RETURN_ZERO(session);
 
-  SetOperationNumVar(V_DLLversion, stringToAnyType<double>(GlobalData::Instance().getVernissageVersion()));
+  ret = SetOperationNumVar(V_DLLversion, stringToAnyType<double>(GlobalData::Instance().getVernissageVersion()));
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
   END_OUTER_CATCH
   return 0;
 }

@@ -13,6 +13,15 @@
 
 extern "C" int ExecuteGetVersion(GetVersionRuntimeParamsPtr p)
 {
-  SetOperationNumVar(V_XOPversion, stringToAnyType<double>(MatrixFileReader_XOP_VERSION_STR));
+  BEGIN_OUTER_CATCH
+  int ret = SetOperationNumVar(V_XOPversion, stringToAnyType<double>(MatrixFileReader_XOP_VERSION_STR));
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
+
+  END_OUTER_CATCH
   return 0;
 }

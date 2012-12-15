@@ -14,7 +14,13 @@
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
 {
   BEGIN_OUTER_CATCH
-  SetOperationStrVar(S_value, "");
+  int ret = SetOperationStrVar(S_value, "");
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   std::string str;
 
@@ -56,7 +62,13 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   str.append("Bug description:\r");
   str.append("####\r");
 
-  SetOperationStrVar(S_value, str.c_str());
+  ret = SetOperationStrVar(S_value, str.c_str());
+
+  if (ret != 0)
+  {
+    GlobalData::Instance().setInternalError(ret);
+    return 0;
+  }
 
   HISTPRINT(str.c_str());
 

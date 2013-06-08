@@ -36,6 +36,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p);
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p);
 extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p);
+extern "C" int ExecuteGetBrickletDeployData(GetBrickletDeployDataRuntimeParamsPtr p);
 extern "C" int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p);
 extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p);
 extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p);

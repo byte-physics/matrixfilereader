@@ -10,6 +10,39 @@
   ParseOperationTemplate Igor function, see Operation-Template-Generator.pxp)
 */
 
+// Operation template: MFR_GetBrickletDeployData /R=(number:startBrickletID[,number:endBrickletID]) /N=string:baseName /DEST=dataFolderRef:dfref
+
+// Runtime param structure for MFR_GetBrickletDeploy operation.
+#pragma pack(2)	// All structures passed to Igor are two-byte aligned.
+struct GetBrickletDeployDataRuntimeParams {
+  // Flag parameters.
+
+  // Parameters for /R flag group.
+  int RFlagEncountered;
+  double startBrickletID;
+  double endBrickletID;					// Optional parameter.
+  int RFlagParamsSet[2];
+
+  // Parameters for /N flag group.
+  int NFlagEncountered;
+  Handle baseName;
+  int NFlagParamsSet[1];
+
+  // Parameters for /DEST flag group.
+  int DESTFlagEncountered;
+  DataFolderHandle dfref;
+  int DESTFlagParamsSet[1];
+
+  // Main parameters.
+
+  // These are postamble fields that Igor sets.
+  int calledFromFunction;					// 1 if called from a user function, 0 otherwise.
+  int calledFromMacro;					// 1 if called from a macro, 0 otherwise.
+};
+typedef struct GetBrickletDeployDataRuntimeParams GetBrickletDeployDataRuntimeParams;
+typedef struct GetBrickletDeployDataRuntimeParams* GetBrickletDeployDataRuntimeParamsPtr;
+#pragma pack()	// Reset structure alignment to default.
+
 // Operation template: MFR_GetXOPErrorMessage [number:errorCode]
 
 // Runtime param structure for MFR_GetXOPErrorMessage operation.

@@ -16,18 +16,13 @@
 
 namespace  {
 
-  enum TYPE
-  {
-    RAW_DATA       = 1,
-    CONVERTED_DATA = 2,
-    META_DATA      = 4
-  };
+  enum TYPE { RAW_DATA = 1, CONVERTED_DATA = 2, META_DATA = 4, DEPLOY_DATA = 8 };
 
   /*
     Constructs a valid wave name given a buffer of length MAX_OBJ_NAME + 1, a baseName and a brickletID
     Returns 0 on success
   */
-  int formatWaveName( char* const buf, const std::string& baseName, int brickletID ) 
+  int formatWaveName( char* const buf, const std::string& baseName, int brickletID )
   {
     const int size = MAX_OBJ_NAME + 1;
     const int len = _snprintf(buf, size, brickletWaveFormat, baseName.c_str(), brickletID);
@@ -39,7 +34,7 @@ namespace  {
 
     return 0;
   }
-} // anonymous namespace 
+} // anonymous namespace
 
 extern "C" int ExecuteGetBrickletData(GetBrickletDataRuntimeParamsPtr p)
 {
@@ -95,6 +90,34 @@ int ExecuteGetBrickletMetaData(GetBrickletMetaDataRuntimeParamsPtr p)
   params.dfref                = p->dfref;
 
   return GenericGetBricklet(&params, META_DATA);
+}
+
+extern "C" int ExecuteGetBrickletDeployData(GetBrickletDeployDataRuntimeParamsPtr p)
+{
+  GenericGetBrickletParams params;
+
+  params.calledFromFunction   = p->calledFromFunction;
+  params.calledFromMacro      = p->calledFromMacro;
+
+  params.NFlagEncountered     = p->NFlagEncountered;
+  params.NFlagParamsSet[0]    = p->NFlagParamsSet[0];
+  params.baseName             = p->baseName;
+
+  params.RFlagEncountered     = p->RFlagEncountered;
+  params.RFlagParamsSet[0]    = p->RFlagParamsSet[0];
+  params.RFlagParamsSet[1]    = p->RFlagParamsSet[1];
+  params.startBrickletID      = p->startBrickletID;
+  params.endBrickletID        = p->endBrickletID;
+
+  params.SFlagEncountered     = 0;
+  params.SFlagParamsSet[0]    = 0;
+  params.pixelSize            = 0.0;
+
+  params.DESTFlagEncountered  = p->DESTFlagEncountered;
+  params.DESTFlagParamsSet[0] = p->DESTFlagParamsSet[0];
+  params.dfref                = p->dfref;
+
+  return GenericGetBricklet(&params, DEPLOY_DATA);
 }
 
 extern "C" int ExecuteGetBrickletRawData(GetBrickletRawDataRuntimeParamsPtr p)
@@ -245,6 +268,10 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
       baseName = brickletMetaDefault;
       break;
 
+    case DEPLOY_DATA:
+      baseName = brickletDeployDefault;
+      break;
+
     default:
       HISTPRINT("BUG: Error in GenericGetBricklet");
       return 0;
@@ -322,6 +349,10 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 
     case META_DATA:
       ret = createAndFillTextWave(destDataFolderHndl, bricklet->getMetaData(), brickletDataFolderHndl, waveName, brickletID, waveNameList);
+      break;
+
+    case DEPLOY_DATA:
+      ret = createAndFillTextWave(destDataFolderHndl, bricklet->getDeploymentParameter(), brickletDataFolderHndl, waveName, brickletID, waveNameList);
       break;
 
     default:

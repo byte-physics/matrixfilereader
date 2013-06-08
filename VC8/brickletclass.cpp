@@ -14,7 +14,10 @@
 namespace  {
 
   typedef std::map<std::wstring, Vernissage::Session::Parameter> ParameterMap;
+  typedef ParameterMap::const_iterator ParameterMapIt;
   typedef std::vector<BrickletClass::StringPair> StringPairVector;
+  typedef std::vector<std::wstring> WstringVector;
+  typedef WstringVector::const_iterator WstringVectorIt;
 
   template<typename T>
   inline void AddMetaData(StringPairVector& metaData, std::string key, T value )
@@ -65,6 +68,7 @@ void BrickletClass::clearCache()
 
   // resize to zero elements
   std::vector<StringPair>().swap(m_metaData);
+  std::vector<StringPair>().swap(m_deployParams);
   std::vector<std::string>().swap(m_allAxesString);
   std::vector<std::wstring>().swap(m_allAxesWString);
 }
@@ -180,8 +184,6 @@ void BrickletClass::loadMetaData()
 {
   typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
   typedef ViewTypeCodeVector::const_iterator ViewTypeCodeVectorIt;
-  typedef std::vector<std::wstring> WstringVector;
-  typedef WstringVector::const_iterator WstringVectorIt;
 
   StringPairVector metaData;
   metaData.reserve(METADATA_RESERVE_SIZE);
@@ -418,6 +420,54 @@ void BrickletClass::loadMetaData()
   // ensure that we only use as much memory as we have to
   m_metaData.swap(metaData);
 }
+
+/*
+Wrapper function which returns a vector with the deployment parameters and their values
+*/
+const std::vector<BrickletClass::StringPair>& BrickletClass::getDeploymentParameter()
+{
+  if (m_deployParams.empty())
+  {
+    try
+    {
+      loadDeploymentParameters();
+    }
+    catch (CMemoryException* e)
+    {
+      e->Delete();
+      HISTPRINT("Out of memory in getBrickletMetaDataValues()");
+    }
+  }
+  return m_deployParams;
+}
+
+/*
+  Reads all deployment parameters into our own structures
+*/
+void BrickletClass::loadDeploymentParameters()
+{
+  StringPairVector deployParams;
+  deployParams.reserve(METADATA_RESERVE_SIZE);
+
+  Vernissage::Session* session = getVernissageSession();
+  ASSERT_RETURN_VOID(session);
+
+  const WstringVector elementInstanceNames = session->getExperimentElementInstanceNames(m_brickletPtr, L"");
+  for (WstringVectorIt itInstance = elementInstanceNames.begin(); itInstance != elementInstanceNames.end(); itInstance++)
+  {
+    typedef std::map<std::wstring,std::wstring> ParamMap;
+    typedef ParamMap::const_iterator ParamMapIt;
+    const ParamMap paramMap = session->getExperimentElementDeploymentParameters(m_brickletPtr, *itInstance);
+    for (ParamMapIt it = paramMap.begin(); it != paramMap.end(); it++)
+    {
+      const std::string key = toString(*itInstance) + "." + toString(it->first);
+      AddMetaData(deployParams,key,it->second);
+    }
+  }
+
+  m_deployParams.swap(deployParams);
+}
+
 
 // see Vernissage Manual page 20/21
 // the idea here is to first get the root and triggerAxis for the Bricklet

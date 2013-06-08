@@ -13,13 +13,14 @@
 const int ARRAY_SIZE = 1024;
 
 // format string for wavenames in igor
-// The total number of bricklets is limited to 10^5 - 1 
+// The total number of bricklets is limited to 10^5 - 1
 const char brickletWaveFormat[]    = "%s_%05d";
 const char dataFolderFormat[]      = "X_%05d";
 
 // default wave and datafolder names
 const char brickletDataDefault[]   = "data";
 const char brickletMetaDefault[]   = "metaData";
+const char brickletDeployDefault[] = "deployData";
 const char resultMetaDefault[]     = "resultFileMetaData";
 const char overViewTableDefault[]  = "overViewTable";
 const char brickletRawDefault[]    = "rawData";

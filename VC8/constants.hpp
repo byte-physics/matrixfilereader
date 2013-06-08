@@ -24,15 +24,6 @@ const char resultMetaDefault[]     = "resultFileMetaData";
 const char overViewTableDefault[]  = "overViewTable";
 const char brickletRawDefault[]    = "rawData";
 
-// value types from element instance parameters
-// from the vernissage header file
-const char VT_SPECIAL_STRING[]    = "vt_Special";
-const char VT_INTEGER_STRING[]    = "vt_Integer";
-const char VT_DOUBLE_STRING[]     = "vt_Double";
-const char VT_BOOLEAN_STRING[]    = "vt_Boolean";
-const char VT_ENUM_STRING[]       = "vt_Enum";
-const char VT_STRING_STRING[]     = "vt_String";
-
 // bricklet types as string
 // from the vernissage header file
 const char BTC_UNKNOWN[]          = "btc_Unknown";

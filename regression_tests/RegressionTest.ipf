@@ -213,6 +213,24 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
     if( cmpstr(refWave[0][0],"resultDirPath") == 0 ) // resultfile metadata
       newWave[0][1] = refWave[0][1]
     endif
+
+    // Starting with Vernissage T2.2-2 the values spatialInfo.physicalX and
+    // spatialInfo.physicalY are not written anymore if spatialInfo.originatorKnown is false
+    // Therefore we delete these entries from the refWave
+    FindValue/TEXT="spatialInfo.physicalX.No1"/TXOP=4 refWave
+    variable pos1 = V_value
+
+    FindValue/TEXT="spatialInfo.originatorKnown"/TXOP=4 refWave
+    variable pos2 = V_value
+
+    if( pos2 > 0 && pos1 > 0 && cmpstr(refWave[pos2][1],"false") == 0 && cmpstr(refWave[pos1][1],"0") == 0)
+	    FindValue/TEXT="spatialInfo.physicalX.No1"/TXOP=4 refWave
+	    DeletePoints V_value, 1, refWave
+
+	    FindValue/TEXT="spatialInfo.physicalY.No1"/TXOP=4 refWave
+	    DeletePoints V_value, 1, refWave
+    endif
+
   endif
 
   // remove variable parts of the wave's note
@@ -343,8 +361,8 @@ Function diff(wvName)
   variable i, j
 
   if(WaveType(root:newFolder:$wvName) == 0) // text waves
-    wave/T newWaveT = root:newFolder:$wvName
-    wave/T refWaveT = root:refFolder:$wvName
+    wave/T newWaveT = :newFolder:$wvName
+    wave/T refWaveT = :refFolder:$wvName
 
     for(i=0; i < DimSize(newWaveT,0); i+=1)
       if ( cmpstr(newWaveT[i][0],refWaveT[i][0]) != 0 )
@@ -378,7 +396,8 @@ Function regressionTest()
   string refDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:igor-xop:regression_tests:referenceData_0.19"
   string rawDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:TestData-Matrix-V3.0"
 
-  string PATH = "r:newVersion_0.21"
+  string PATH = "r:newVersion_0.22"
+  DeleteFolder/Z=1 PATH
   variable ret
   ret = createDataSet(PATH, rawDataPath)
 
@@ -388,3 +407,4 @@ Function regressionTest()
 
   compareDiscFolders(refDataPath, PATH)
 End
+

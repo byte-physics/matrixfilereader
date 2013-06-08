@@ -137,6 +137,7 @@ std::string brickletTypeToString(unsigned int idx)
   names.push_back(BTC_RAWPATHSPEC);
   names.push_back(BTC_ESPSNAPSHOTSEQ);
   names.push_back(BTC_ESPIMAGEMAP);
+  names.push_back(BTC_INTERFEROMETERCUR);
 
   if (idx < 0 || idx >= names.size())
   {

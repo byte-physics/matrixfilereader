@@ -11,6 +11,22 @@
 #include "extremadata.hpp"
 #include "utils_generic.hpp"
 
+namespace  {
+
+  typedef std::map<std::wstring, Vernissage::Session::Parameter> ParameterMap;
+
+  void AddParameterMap( std::vector<BrickletClass::StringPair>& metaData, const std::string& parentName, const ParameterMap& paramMap )
+  {
+    for (ParameterMap::const_iterator it = paramMap.begin(); it != paramMap.end(); it++)
+    {
+      const std::string key = parentName + std::string(".") + toString(it->first);
+      metaData.push_back(std::make_pair(key + std::string(".value"),toString(it->second.value)));
+      metaData.push_back(std::make_pair(key + std::string(".unit"),toString(it->second.unit)));
+    }
+  }
+
+} // anonymous namespace
+
 BrickletClass::BrickletClass(int brickletID, void* const vernissageBricklet)
   :
   m_brickletPtr(vernissageBricklet),
@@ -264,18 +280,10 @@ void BrickletClass::loadMetaData()
   }
 
   const std::vector<std::wstring> elementInstanceNames = m_vernissageSession->getExperimentElementInstanceNames(m_brickletPtr, L"");
-  for (std::vector<std::wstring>::const_iterator itInstance = elementInstanceNames.begin(); itInstance != elementInstanceNames.end(); itInstance++)
+  for (std::vector<std::wstring>::const_iterator it = elementInstanceNames.begin(); it != elementInstanceNames.end(); it++)
   {
-    typedef std::map<std::wstring, Vernissage::Session::Parameter> MapType;
-
-    const MapType elementInstanceParamsMap = m_vernissageSession->getExperimentElementParameters(m_brickletPtr, *itInstance);
-
-    for (MapType::const_iterator itParam = elementInstanceParamsMap.begin(); itParam != elementInstanceParamsMap.end(); itParam++)
-    {
-      const std::string key = toString(*itInstance) + std::string(".") + toString(itParam->first) ;
-      metaData.push_back(std::make_pair(key + std::string(".value"),toString(itParam->second.value)));
-      metaData.push_back(std::make_pair(key + std::string(".unit"),toString(itParam->second.unit)));
-    }
+   const ParameterMap elementInstanceParamsMap = m_vernissageSession->getExperimentElementParameters(m_brickletPtr, *it);
+   AddParameterMap(metaData,toString(*it),elementInstanceParamsMap);
   }
 
   // BEGIN Vernissage::Session::SpatialInfo
@@ -337,8 +345,7 @@ void BrickletClass::loadMetaData()
   metaData.push_back(std::make_pair("allAxes",allAxesAsOneString));
 
   // BEGIN Vernissage::Session::axisDescriptor
-  std::vector<std::wstring>::const_iterator itAllAxes;
-  for (itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++)
+  for (std::vector<std::wstring>::const_iterator itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++)
   {
     const std::wstring axisNameWString = *itAllAxes;
     const std::string axisNameString  = toString(*itAllAxes);
@@ -387,6 +394,11 @@ void BrickletClass::loadMetaData()
       metaData.push_back(std::make_pair(axisNameString + ".AxisTableSet.count",toString(index)));
     }
     // END Vernissage::Session:AxisTableSet
+
+    // BEGIN Vernissage::AxisParameters introduced with Vernissage 2.2
+    const ParameterMap axisParams = m_vernissageSession->getAxisParameters(m_brickletPtr, axisNameWString);
+    AddParameterMap(metaData,axisNameString,axisParams);
+    // END Vernissage::AxisParameters
   }
 
   DEBUGPRINT("Loaded %d keys/values as brickletMetaData for bricklet %d", metaData.size(), m_brickletID);

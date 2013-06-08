@@ -53,7 +53,7 @@ std::string DLLHandler::getVernissagePath()
   char subKeyName[255];
   DWORD subKeyLength = (DWORD) sizeof(subKeyName) / sizeof(WCHAR);
   int subKeyIndex = 0;
-  std::string regBaseKeyName = "SOFTWARE\\Omicron NanoTechnology\\Vernissage";
+  std::string regBaseKeyName = "SOFTWARE\\Omicron NanoScience\\Vernissage";
 
   result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regBaseKeyName.c_str(), 0, KEY_READ, &hregBaseKey);
 

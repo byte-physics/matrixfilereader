@@ -79,75 +79,101 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<s
   return 0;
 }
 
+class IndexToString
+{
+public:
+  virtual ~IndexToString() {};
+
+  virtual std::string operator()(unsigned int index) const
+  {
+    const std::vector<std::string>& data = getData();
+
+    if (index < 0 || index >= data.size())
+    {
+      DEBUGPRINT("BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d", index, data.size() - 1);
+      return std::string();
+    }
+    else
+    {
+      return data.at(index);
+    }
+  }
+
+private:
+  virtual const std::vector<std::string>& getData() const = 0;
+};
+
+class ViewTypeConverter : public IndexToString
+{
+public:
+  ViewTypeConverter()
+  {
+    m_data.push_back(VTC_OTHER);
+    m_data.push_back(VTC_SIMPLE2D);
+    m_data.push_back(VTC_SIMPLE1D);
+    m_data.push_back(VTC_FWDBWD2D);
+    m_data.push_back(VTC_2DOF3D);
+    m_data.push_back(VTC_SPECTROSCOPY);
+    m_data.push_back(VTC_FORCECURVE);
+    m_data.push_back(VTC_1DPROFILE);
+    m_data.push_back(VTC_INTERFEROMETER);
+    m_data.push_back(VTC_CONTINUOUSCURVE);
+    m_data.push_back(VTC_PHASEAMPLITUDECUR);
+    m_data.push_back(VTC_CURVESET);
+    m_data.push_back(VTC_PARAMETERISEDCUR);
+    m_data.push_back(VTC_DISCRETEENERGYMAP);
+    m_data.push_back(VTC_ESPIMAGEMAP);
+  }
+
+private:
+  std::vector<std::string> m_data;
+  const std::vector<std::string>& getData() const { return m_data; }
+};
+
 /*
   Convert a vernissage viewtype code to a string
 */
 std::string viewTypeCodeToString(unsigned int idx)
 {
-  std::vector<std::string> names;
-  names.reserve(20);
-
-  names.push_back(VTC_OTHER);
-  names.push_back(VTC_SIMPLE2D);
-  names.push_back(VTC_SIMPLE1D);
-  names.push_back(VTC_FWDBWD2D);
-  names.push_back(VTC_2DOF3D);
-  names.push_back(VTC_SPECTROSCOPY);
-  names.push_back(VTC_FORCECURVE);
-  names.push_back(VTC_1DPROFILE);
-  names.push_back(VTC_INTERFEROMETER);
-  names.push_back(VTC_CONTINUOUSCURVE);
-  names.push_back(VTC_PHASEAMPLITUDECUR);
-  names.push_back(VTC_CURVESET);
-  names.push_back(VTC_PARAMETERISEDCUR);
-  names.push_back(VTC_DISCRETEENERGYMAP);
-  names.push_back(VTC_ESPIMAGEMAP);
-
-  if (idx < 0 || idx >= names.size())
-  {
-    DEBUGPRINT("BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d", idx, names.size() - 1);
-    return std::string();
-  }
-  else
-  {
-    return names.at(idx);
-  }
+  const static ViewTypeConverter conv;
+  return conv(idx);
 }
+
+class BrickletTypeConverter : public IndexToString
+{
+public:
+  BrickletTypeConverter()
+  {
+    m_data.push_back(BTC_UNKNOWN);
+    m_data.push_back(BTC_SPMSPECTROSCOPY);
+    m_data.push_back(BTC_ATOMMANIPULATION);
+    m_data.push_back(BTC_1DCURVE);
+    m_data.push_back(BTC_SPMIMAGE);
+    m_data.push_back(BTC_PATHSPECTROSCOPY);
+    m_data.push_back(BTC_ESPREGION);
+    m_data.push_back(BTC_VOLUMECITS);
+    m_data.push_back(BTC_DISCRETEENERGYMAP);
+    m_data.push_back(BTC_FORCECURVE);
+    m_data.push_back(BTC_PHASEAMPLITUDECUR);
+    m_data.push_back(BTC_SIGNALOVERTIME);
+    m_data.push_back(BTC_RAWPATHSPEC);
+    m_data.push_back(BTC_ESPSNAPSHOTSEQ);
+    m_data.push_back(BTC_ESPIMAGEMAP);
+    m_data.push_back(BTC_INTERFEROMETERCUR);
+  }
+
+private:
+  std::vector<std::string> m_data;
+  const std::vector<std::string>& getData() const { return m_data; }
+};
 
 /*
   Convert the bricklet type enumeration value into a human readable string
 */
 std::string brickletTypeToString(unsigned int idx)
 {
-  std::vector<std::string> names;
-  names.reserve(20);
-
-  names.push_back(BTC_UNKNOWN);
-  names.push_back(BTC_SPMSPECTROSCOPY);
-  names.push_back(BTC_ATOMMANIPULATION);
-  names.push_back(BTC_1DCURVE);
-  names.push_back(BTC_SPMIMAGE);
-  names.push_back(BTC_PATHSPECTROSCOPY);
-  names.push_back(BTC_ESPREGION);
-  names.push_back(BTC_VOLUMECITS);
-  names.push_back(BTC_DISCRETEENERGYMAP);
-  names.push_back(BTC_FORCECURVE);
-  names.push_back(BTC_PHASEAMPLITUDECUR);
-  names.push_back(BTC_SIGNALOVERTIME);
-  names.push_back(BTC_RAWPATHSPEC);
-  names.push_back(BTC_ESPSNAPSHOTSEQ);
-  names.push_back(BTC_ESPIMAGEMAP);
-  names.push_back(BTC_INTERFEROMETERCUR);
-
-  if (idx < 0 || idx >= names.size())
-  {
-    DEBUGPRINT("BUG: brickletTypeToString got %d as parameter, but it should be between 0 and %d", idx, names.size() - 1);
-    return std::string();
-  }
-  else
-  {
-    return names.at(idx);
-  }
+  const static BrickletTypeConverter conv;
+  return conv(idx);
 }
 
 /*
@@ -235,4 +261,12 @@ bool isValidBrickletID(int brickletID)
 bool isValidTraceDir(int traceDir)
 {
   return (traceDir >= TRACE_UP && traceDir <= RE_TRACE_DOWN);
+}
+
+/*
+  Convenience helper
+*/
+Vernissage::Session* getVernissageSession()
+{
+  return GlobalData::Instance().getVernissageSession();
 }

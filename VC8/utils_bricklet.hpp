@@ -21,3 +21,6 @@ bool isValidTraceDir(int traceDir);
 
 int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<std::pair<std::string,std::string> >& data,
                           DataFolderHandle dataFolderHandle, const char* waveName, int brickletID, std::string& waveNameList);
+
+class Vernissage::Session;
+Vernissage::Session* getVernissageSession();

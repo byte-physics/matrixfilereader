@@ -14,14 +14,21 @@
 namespace  {
 
   typedef std::map<std::wstring, Vernissage::Session::Parameter> ParameterMap;
+  typedef std::vector<BrickletClass::StringPair> StringPairVector;
 
-  void AddParameterMap( std::vector<BrickletClass::StringPair>& metaData, const std::string& parentName, const ParameterMap& paramMap )
+  template<typename T>
+  inline void AddMetaData(StringPairVector& metaData, std::string key, T value )
+  {
+    metaData.push_back(std::make_pair(key, toString(value)));
+  }
+
+  void AddParameterMap( StringPairVector& metaData, const std::string& parentName, const ParameterMap& paramMap )
   {
     for (ParameterMap::const_iterator it = paramMap.begin(); it != paramMap.end(); it++)
     {
       const std::string key = parentName + std::string(".") + toString(it->first);
-      metaData.push_back(std::make_pair(key + std::string(".value"),toString(it->second.value)));
-      metaData.push_back(std::make_pair(key + std::string(".unit"),toString(it->second.unit)));
+      AddMetaData(metaData,key + std::string(".value"),it->second.value);
+      AddMetaData(metaData,key + std::string(".unit"),it->second.unit);
     }
   }
 
@@ -32,10 +39,8 @@ BrickletClass::BrickletClass(int brickletID, void* const vernissageBricklet)
   m_brickletPtr(vernissageBricklet),
   m_rawBufferContents(NULL),
   m_rawBufferContentsSize(0),
-  m_brickletID(brickletID),
-  m_vernissageSession(GlobalData::Instance().getVernissageSession())
+  m_brickletID(brickletID)
 {
-  ASSERT_RETURN_VOID(m_vernissageSession);
   ASSERT_RETURN_VOID(vernissageBricklet);
 }
 
@@ -60,6 +65,8 @@ void BrickletClass::clearCache()
 
   // resize to zero elements
   std::vector<StringPair>().swap(m_metaData);
+  std::vector<std::string>().swap(m_allAxesString);
+  std::vector<std::wstring>().swap(m_allAxesWString);
 }
 
 /*
@@ -69,7 +76,8 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
 {
   count = 0;
   ASSERT_RETURN_VOID(pBuffer);
-  ASSERT_RETURN_VOID(m_vernissageSession);
+  Vernissage::Session* session = getVernissageSession();
+  ASSERT_RETURN_VOID(session);
 
   // we are not called the first time
   if (m_rawBufferContents != NULL)
@@ -87,7 +95,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
   {
     try
     {
-      m_vernissageSession->loadBrickletContents(m_brickletPtr, pBuffer, count);
+      session->loadBrickletContents(m_brickletPtr, pBuffer, count);
     }
     catch (...)
     {
@@ -101,7 +109,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
     if (*pBuffer == NULL || count == 0)
     {
       HISTPRINT("Out of memory in getBrickletContentsBuffer() with bricklet %d", m_brickletID);
-      m_vernissageSession->unloadBrickletContents(m_brickletPtr);
+      session->unloadBrickletContents(m_brickletPtr);
       *pBuffer = NULL;
       count = 0;
       return;
@@ -111,11 +119,11 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
 
     // these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
     // implicitly which is quite expensive
-    const int rawMin = m_vernissageSession->getRawMin(m_brickletPtr);
-    m_extrema.setMinimum(rawMin, m_vernissageSession->toPhysical(rawMin, m_brickletPtr));
+    const int rawMin = session->getRawMin(m_brickletPtr);
+    m_extrema.setMinimum(rawMin, session->toPhysical(rawMin, m_brickletPtr));
 
-    const int rawMax = m_vernissageSession->getRawMax(m_brickletPtr);
-    m_extrema.setMaximum(rawMax, m_vernissageSession->toPhysical(rawMax, m_brickletPtr));
+    const int rawMax = session->getRawMax(m_brickletPtr);
+    m_extrema.setMaximum(rawMax, session->toPhysical(rawMax, m_brickletPtr));
 
     DEBUGPRINT("rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
                m_extrema.getRawMin(), m_extrema.getRawMax(), m_extrema.getPhysValRawMin(), m_extrema.getPhysValRawMax());
@@ -133,7 +141,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
       HISTPRINT("Out of memory in getBrickletContentsBuffer()");
       *pBuffer = NULL;
       count = 0;
-      m_vernissageSession->unloadBrickletContents(m_brickletPtr);
+      session->unloadBrickletContents(m_brickletPtr);
       return;
     }
 
@@ -141,7 +149,7 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
     *pBuffer = m_rawBufferContents;
 
     // release memory from vernissage DLL
-    m_vernissageSession->unloadBrickletContents(m_brickletPtr);
+    session->unloadBrickletContents(m_brickletPtr);
   }
 }
 
@@ -170,101 +178,108 @@ const std::vector<BrickletClass::StringPair>& BrickletClass::getMetaData()
 */
 void BrickletClass::loadMetaData()
 {
-  std::vector<StringPair> metaData;
+  typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
+  typedef ViewTypeCodeVector::const_iterator ViewTypeCodeVectorIt;
+  typedef std::vector<std::wstring> WstringVector;
+  typedef WstringVector::const_iterator WstringVectorIt;
+
+  StringPairVector metaData;
   metaData.reserve(METADATA_RESERVE_SIZE);
 
+  Vernissage::Session* session = getVernissageSession();
+  ASSERT_RETURN_VOID(session);
+
   // timestamp of creation
-  tm ctime = m_vernissageSession->getCreationTimestamp(m_brickletPtr);
-  metaData.push_back(std::make_pair("creationTimeStamp", toString(mktime(&ctime))));
+  tm ctime = session->getCreationTimestamp(m_brickletPtr);
+  AddMetaData(metaData,"creationTimeStamp", mktime(&ctime));
 
   // viewTypeCodes
-  typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
-  const ViewTypeCodeVector viewTypeCodes = m_vernissageSession->getViewTypes(m_brickletPtr);
+  const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(m_brickletPtr);
 
   std::string viewTypeCodesAsOneString;
-  for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
+  for (ViewTypeCodeVectorIt it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
   {
     viewTypeCodesAsOneString.append(viewTypeCodeToString(*it) + listSepChar);
   }
 
-  metaData.push_back(std::make_pair("viewTypeCodes",viewTypeCodesAsOneString));
-  metaData.push_back(std::make_pair(BRICKLET_ID_KEY,toString(m_brickletID)));
+  AddMetaData(metaData,"viewTypeCodes",viewTypeCodesAsOneString);
+  AddMetaData(metaData,BRICKLET_ID_KEY,m_brickletID);
 
   // resultfile
-  metaData.push_back(std::make_pair(RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName<std::string>()));
-  metaData.push_back(std::make_pair(RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath<std::string>()));
+  AddMetaData(metaData,RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName<std::string>());
+  AddMetaData(metaData,RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath<std::string>());
 
   // introduced with Vernissage 2.0
-  metaData.push_back(std::make_pair("sampleName",toString(m_vernissageSession->getSampleName(m_brickletPtr))));
+  AddMetaData(metaData,"sampleName",session->getSampleName(m_brickletPtr));
 
   // dito
-  metaData.push_back(std::make_pair("dataSetName",toString(m_vernissageSession->getDataSetName(m_brickletPtr))));
+  AddMetaData(metaData,"dataSetName",session->getDataSetName(m_brickletPtr));
 
   // dito
   // datacomment is a vector, each entry is from one call to writeDataComment
-  std::vector<std::wstring> dataComments = m_vernissageSession->getDataComments(m_brickletPtr);
+  const WstringVector dataComments = session->getDataComments(m_brickletPtr);
 
   // we also write out the number of data comments for convenient access
-  metaData.push_back(std::make_pair("dataComment.count",toString(dataComments.size())));
+  AddMetaData(metaData,"dataComment.count",dataComments.size());
 
   for (unsigned int i = 0; i < dataComments.size(); i++)
   {
     const std::string key = "dataCommentNo" + toString(i + 1);
     const std::string value = toString(dataComments[i]);
-    metaData.push_back(std::make_pair(key,value));
+    AddMetaData(metaData,key,value);
   }
 
   // introduced with vernissage 2.1
-  metaData.push_back(std::make_pair("visualMateNode",toString(m_vernissageSession->getVisualMateNode(m_brickletPtr))));
-  metaData.push_back(std::make_pair("channelGroupName",toString(m_vernissageSession->getChannelGroupName(m_brickletPtr))));
+  AddMetaData(metaData,"visualMateNode",session->getVisualMateNode(m_brickletPtr));
+  AddMetaData(metaData,"channelGroupName",session->getChannelGroupName(m_brickletPtr));
 
   // introduced with vernissage 2.0 (but forgotten until release 2.1)
-  metaData.push_back(std::make_pair("brickletType",brickletTypeToString(m_vernissageSession->getType(m_brickletPtr))));
+  AddMetaData(metaData,"brickletType",brickletTypeToString(session->getType(m_brickletPtr)));
 
-  // BEGIN m_VernissageSession->getBrickletMetaData
-  const Vernissage::Session::BrickletMetaData brickletMetaData = m_vernissageSession->getMetaData(m_brickletPtr);
-  metaData.push_back(std::make_pair("brickletMetaData.fileCreatorName",toString(brickletMetaData.fileCreatorName)));
-  metaData.push_back(std::make_pair("brickletMetaData.fileCreatorVersion",toString(brickletMetaData.fileCreatorVersion)));
-  metaData.push_back(std::make_pair("brickletMetaData.accountName",toString(brickletMetaData.accountName)));
-  metaData.push_back(std::make_pair("brickletMetaData.userName",toString(brickletMetaData.userName)));
-  // END m_VernissageSession->getBrickletMetaData
+  // BEGIN session->getBrickletMetaData
+  const Vernissage::Session::BrickletMetaData brickletMetaData = session->getMetaData(m_brickletPtr);
+  AddMetaData(metaData,"brickletMetaData.fileCreatorName",brickletMetaData.fileCreatorName);
+  AddMetaData(metaData,"brickletMetaData.fileCreatorVersion",brickletMetaData.fileCreatorVersion);
+  AddMetaData(metaData,"brickletMetaData.accountName",brickletMetaData.accountName);
+  AddMetaData(metaData,"brickletMetaData.userName",brickletMetaData.userName);
+  // END session->getBrickletMetaData
 
-  metaData.push_back(std::make_pair("sequenceID",toString(m_vernissageSession->getSequenceId(m_brickletPtr))));
-  metaData.push_back(std::make_pair("creationComment",toString(m_vernissageSession->getCreationComment(m_brickletPtr))));
-  metaData.push_back(std::make_pair("dimension",toString(m_vernissageSession->getDimensionCount(m_brickletPtr))));
-  metaData.push_back(std::make_pair("rootAxis",toString(m_vernissageSession->getRootAxisName(m_brickletPtr))));
+  AddMetaData(metaData,"sequenceID",session->getSequenceId(m_brickletPtr));
+  AddMetaData(metaData,"creationComment",session->getCreationComment(m_brickletPtr));
+  AddMetaData(metaData,"dimension",session->getDimensionCount(m_brickletPtr));
+  AddMetaData(metaData,"rootAxis",session->getRootAxisName(m_brickletPtr));
 
   // new in vernissage 2.1
-  metaData.push_back(std::make_pair("rootAxisQualified",toString(m_vernissageSession->getRootAxisQualifiedName(m_brickletPtr))));
-  metaData.push_back(std::make_pair("triggerAxis",toString(m_vernissageSession->getTriggerAxisName(m_brickletPtr))));
-  metaData.push_back(std::make_pair("triggerAxisQualified",toString(m_vernissageSession->getTriggerAxisQualifiedName(m_brickletPtr))));
+  AddMetaData(metaData,"rootAxisQualified",session->getRootAxisQualifiedName(m_brickletPtr));
+  AddMetaData(metaData,"triggerAxis",session->getTriggerAxisName(m_brickletPtr));
+  AddMetaData(metaData,"triggerAxisQualified",session->getTriggerAxisQualifiedName(m_brickletPtr));
 
-  metaData.push_back(std::make_pair("channelName",toString(m_vernissageSession->getChannelName(m_brickletPtr))));
-  metaData.push_back(std::make_pair("channelInstanceName",toString(m_vernissageSession->getChannelInstanceName(m_brickletPtr))));
+  AddMetaData(metaData,"channelName",session->getChannelName(m_brickletPtr));
+  AddMetaData(metaData,"channelInstanceName",session->getChannelInstanceName(m_brickletPtr));
 
-  metaData.push_back(std::make_pair(CHANNEL_UNIT_KEY,toString(m_vernissageSession->getChannelUnit(m_brickletPtr))));
-  metaData.push_back(std::make_pair("runCycleCount",toString(m_vernissageSession->getRunCycleCount(m_brickletPtr))));
+  AddMetaData(metaData,CHANNEL_UNIT_KEY,session->getChannelUnit(m_brickletPtr));
+  AddMetaData(metaData,"runCycleCount",session->getRunCycleCount(m_brickletPtr));
 
-  metaData.push_back(std::make_pair("scanCycleCount",toString(m_vernissageSession->getScanCycleCount(m_brickletPtr))));
+  AddMetaData(metaData,"scanCycleCount",session->getScanCycleCount(m_brickletPtr));
 
   // new in vernissage 2.1
   {
-    const std::vector<void*> dependentBrickletsVoidVector = m_vernissageSession->getDependingBricklets(m_brickletPtr);
+    const std::vector<void*> dependentBrickletsVoidVector = session->getDependingBricklets(m_brickletPtr);
     const std::vector<int> dependentBrickletsIntVector    = GlobalData::Instance().convertBrickletPtr(dependentBrickletsVoidVector);
     std::string dependentBricklets;
     joinString(dependentBrickletsIntVector, listSepChar, dependentBricklets);
 
-    metaData.push_back(std::make_pair("dependentBricklets",dependentBricklets));
+    AddMetaData(metaData,"dependentBricklets",dependentBricklets);
   }
 
   // new in vernissage 2.1
   {
-    const std::vector<void*> referencedBrickletsVoidVector = m_vernissageSession->getReferencedBricklets(m_brickletPtr);
+    const std::vector<void*> referencedBrickletsVoidVector = session->getReferencedBricklets(m_brickletPtr);
     const std::vector<int> referencedBrickletsIntVector    = GlobalData::Instance().convertBrickletPtr(referencedBrickletsVoidVector);
     std::string referencedBricklets;
     joinString(referencedBrickletsIntVector, listSepChar, referencedBricklets);
 
-    metaData.push_back(std::make_pair("referencedBricklets",referencedBricklets));
+    AddMetaData(metaData,"referencedBricklets",referencedBricklets);
   }
 
   // new in vernissage 2.1
@@ -276,127 +291,124 @@ void BrickletClass::loadMetaData()
     std::string brickletSeries;
     joinString(brickletSeriesIntVector, listSepChar, brickletSeries);
 
-    metaData.push_back(std::make_pair("brickletSeries",brickletSeries));
+    AddMetaData(metaData,"brickletSeries",brickletSeries);
   }
 
-  const std::vector<std::wstring> elementInstanceNames = m_vernissageSession->getExperimentElementInstanceNames(m_brickletPtr, L"");
+  const std::vector<std::wstring> elementInstanceNames = session->getExperimentElementInstanceNames(m_brickletPtr, L"");
   for (std::vector<std::wstring>::const_iterator it = elementInstanceNames.begin(); it != elementInstanceNames.end(); it++)
   {
-   const ParameterMap elementInstanceParamsMap = m_vernissageSession->getExperimentElementParameters(m_brickletPtr, *it);
+   const ParameterMap elementInstanceParamsMap = session->getExperimentElementParameters(m_brickletPtr, *it);
    AddParameterMap(metaData,toString(*it),elementInstanceParamsMap);
   }
 
   // BEGIN Vernissage::Session::SpatialInfo
-  const Vernissage::Session::SpatialInfo spatialInfo = m_vernissageSession->getSpatialInfo(m_brickletPtr);
+  const Vernissage::Session::SpatialInfo spatialInfo = session->getSpatialInfo(m_brickletPtr);
   for (std::vector<double>::const_iterator it = spatialInfo.physicalX.begin(); it != spatialInfo.physicalX.end(); it++)
   {
-    char buf[ARRAY_SIZE];
-    int index = it - spatialInfo.physicalX.begin() + 1 ; // one-based Index
-    sprintf(buf, "spatialInfo.physicalX.No%d", index);
-    metaData.push_back(std::make_pair(buf,toString(*it)));
+    const int index = it - spatialInfo.physicalX.begin() + 1 ; // 1-based index
+    const std::string key = "spatialInfo.physicalX.No" + toString(index);
+    AddMetaData(metaData,key,*it);
   }
   for (std::vector<double>::const_iterator it = spatialInfo.physicalY.begin(); it != spatialInfo.physicalY.end(); it++)
   {
-    char buf[ARRAY_SIZE];
-    int index = it - spatialInfo.physicalY.begin() + 1 ; // one-based Index
-    sprintf(buf, "spatialInfo.physicalY.No%d", index);
-    metaData.push_back(std::make_pair(buf,toString(*it)));
+    const int index = it - spatialInfo.physicalY.begin() + 1 ; // 1-based index
+    const std::string key = "spatialInfo.physicalY.No" + toString(index);
+    AddMetaData(metaData,key,*it);
   }
 
   if (spatialInfo.originatorKnown)
   {
-    metaData.push_back(std::make_pair("spatialInfo.originatorKnown","true"));
-    metaData.push_back(std::make_pair("spatialInfo.channelName",toString(spatialInfo.channelName)));
-    metaData.push_back(std::make_pair("spatialInfo.sequenceId",toString(spatialInfo.sequenceId)));
-    metaData.push_back(std::make_pair("spatialInfo.runCycleCount",toString(spatialInfo.runCycleCount)));
-    metaData.push_back(std::make_pair("spatialInfo.scanCycleCount",toString(spatialInfo.scanCycleCount)));
-    metaData.push_back(std::make_pair("spatialInfo.viewName",toString(spatialInfo.viewName)));
-    metaData.push_back(std::make_pair("spatialInfo.viewSelectionId",toString(spatialInfo.viewSelectionId)));
-    metaData.push_back(std::make_pair("spatialInfo.viewSelectionIndex",toString(spatialInfo.viewSelectionIndex)));
+    AddMetaData(metaData,"spatialInfo.originatorKnown","true");
+    AddMetaData(metaData,"spatialInfo.channelName",spatialInfo.channelName);
+    AddMetaData(metaData,"spatialInfo.sequenceId",spatialInfo.sequenceId);
+    AddMetaData(metaData,"spatialInfo.runCycleCount",spatialInfo.runCycleCount);
+    AddMetaData(metaData,"spatialInfo.scanCycleCount",spatialInfo.scanCycleCount);
+    AddMetaData(metaData,"spatialInfo.viewName",spatialInfo.viewName);
+    AddMetaData(metaData,"spatialInfo.viewSelectionId",spatialInfo.viewSelectionId);
+    AddMetaData(metaData,"spatialInfo.viewSelectionIndex",spatialInfo.viewSelectionIndex);
   }
   else
   {
-    metaData.push_back(std::make_pair("spatialInfo.originatorKnown","false"));
-    metaData.push_back(std::make_pair("spatialInfo.channelName",""));
-    metaData.push_back(std::make_pair("spatialInfo.sequenceId",""));
-    metaData.push_back(std::make_pair("spatialInfo.runCycleCount",""));
-    metaData.push_back(std::make_pair("spatialInfo.scanCycleCount",""));
-    metaData.push_back(std::make_pair("spatialInfo.viewName",""));
-    metaData.push_back(std::make_pair("spatialInfo.viewSelectionId",""));
-    metaData.push_back(std::make_pair("spatialInfo.viewSelectionIndex",""));
+    AddMetaData(metaData,"spatialInfo.originatorKnown","false");
+    AddMetaData(metaData,"spatialInfo.channelName","");
+    AddMetaData(metaData,"spatialInfo.sequenceId","");
+    AddMetaData(metaData,"spatialInfo.runCycleCount","");
+    AddMetaData(metaData,"spatialInfo.scanCycleCount","");
+    AddMetaData(metaData,"spatialInfo.viewName","");
+    AddMetaData(metaData,"spatialInfo.viewSelectionId","");
+    AddMetaData(metaData,"spatialInfo.viewSelectionIndex","");
   }
   //END Vernissage::Session::SpatialInfo
 
   // BEGIN Vernissage::Session::ExperimentInfo
-  const Vernissage::Session::ExperimentInfo experimentInfo = m_vernissageSession->getExperimentInfo(m_brickletPtr);
-  metaData.push_back(std::make_pair("experimentInfo.Name",toString(experimentInfo.experimentName)));
-  metaData.push_back(std::make_pair("experimentInfo.Version",toString(experimentInfo.experimentVersion)));
-  metaData.push_back(std::make_pair("experimentInfo.Description",toString(experimentInfo.experimentDescription)));
-  metaData.push_back(std::make_pair("experimentInfo.FileSpec",toString(experimentInfo.experimentFileSpec)));
-  metaData.push_back(std::make_pair("experimentInfo.projectName",toString(experimentInfo.projectName)));
-  metaData.push_back(std::make_pair("experimentInfo.projectVersion",toString(experimentInfo.projectVersion)));
-  metaData.push_back(std::make_pair("experimentInfo.projectFileSpec",toString(experimentInfo.projectFileSpec)));
+  const Vernissage::Session::ExperimentInfo experimentInfo = session->getExperimentInfo(m_brickletPtr);
+  AddMetaData(metaData,"experimentInfo.Name",experimentInfo.experimentName);
+  AddMetaData(metaData,"experimentInfo.Version",experimentInfo.experimentVersion);
+  AddMetaData(metaData,"experimentInfo.Description",experimentInfo.experimentDescription);
+  AddMetaData(metaData,"experimentInfo.FileSpec",experimentInfo.experimentFileSpec);
+  AddMetaData(metaData,"experimentInfo.projectName",experimentInfo.projectName);
+  AddMetaData(metaData,"experimentInfo.projectVersion",experimentInfo.projectVersion);
+  AddMetaData(metaData,"experimentInfo.projectFileSpec",experimentInfo.projectFileSpec);
   // END Vernissage::Session::ExperimentInfo
 
   // create m_allAxes* internally
   getAxes<std::string>();
   std::string allAxesAsOneString;
   joinString(m_allAxesString, listSepChar, allAxesAsOneString);
-  metaData.push_back(std::make_pair("allAxes",allAxesAsOneString));
+  AddMetaData(metaData,"allAxes",allAxesAsOneString);
 
   // BEGIN Vernissage::Session::axisDescriptor
-  for (std::vector<std::wstring>::const_iterator itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++)
+  for (WstringVectorIt itAllAxes = m_allAxesWString.begin(); itAllAxes != m_allAxesWString.end(); itAllAxes++)
   {
     const std::wstring axisNameWString = *itAllAxes;
     const std::string axisNameString  = toString(*itAllAxes);
 
-    const Vernissage::Session::AxisDescriptor axisDescriptor = m_vernissageSession->getAxisDescriptor(m_brickletPtr, axisNameWString);
-    metaData.push_back(std::make_pair(axisNameString + ".clocks",toString(axisDescriptor.clocks)));
-    metaData.push_back(std::make_pair(axisNameString + ".mirrored",(axisDescriptor.mirrored ? "true" : "false")));
-    metaData.push_back(std::make_pair(axisNameString + ".physicalUnit",toString(axisDescriptor.physicalUnit)));
-    metaData.push_back(std::make_pair(axisNameString + ".physicalIncrement",toString(axisDescriptor.physicalIncrement)));
-    metaData.push_back(std::make_pair(axisNameString + ".physicalStart",toString(axisDescriptor.physicalStart)));
-    metaData.push_back(std::make_pair(axisNameString + ".rawIncrement",toString(axisDescriptor.rawIncrement)));
-    metaData.push_back(std::make_pair(axisNameString + ".rawStart",toString(axisDescriptor.rawStart)));
-    metaData.push_back(std::make_pair(axisNameString + ".triggerAxisName",toString(axisDescriptor.triggerAxisName)));
+    const Vernissage::Session::AxisDescriptor axisDescriptor = session->getAxisDescriptor(m_brickletPtr, axisNameWString);
+    AddMetaData(metaData,axisNameString + ".clocks",axisDescriptor.clocks);
+    AddMetaData(metaData,axisNameString + ".mirrored",(axisDescriptor.mirrored ? "true" : "false"));
+    AddMetaData(metaData,axisNameString + ".physicalUnit",axisDescriptor.physicalUnit);
+    AddMetaData(metaData,axisNameString + ".physicalIncrement",axisDescriptor.physicalIncrement);
+    AddMetaData(metaData,axisNameString + ".physicalStart",axisDescriptor.physicalStart);
+    AddMetaData(metaData,axisNameString + ".rawIncrement",axisDescriptor.rawIncrement);
+    AddMetaData(metaData,axisNameString + ".rawStart",axisDescriptor.rawStart);
+    AddMetaData(metaData,axisNameString + ".triggerAxisName",axisDescriptor.triggerAxisName);
     // END Vernissage::Session::axisDescriptor
 
     // BEGIN Vernissage::Session:AxisTableSet
-    const Vernissage::Session::AxisTableSets axisTableSetsMap = m_vernissageSession->getAxisTableSets(m_brickletPtr, axisNameWString);
+    const Vernissage::Session::AxisTableSets axisTableSetsMap = session->getAxisTableSets(m_brickletPtr, axisNameWString);
 
     // if it is empty, we got the standard table set which is [start=1,step=1,stop=clocks]
     if (axisTableSetsMap.empty())
     {
-      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSet.count","1"));
-      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.axis",""));
-      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.start","1"));
-      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.step","1"));
-      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSetNo1.stop",toString(axisDescriptor.clocks)));
+      AddMetaData(metaData,axisNameString + ".AxisTableSet.count","1");
+      AddMetaData(metaData,axisNameString + ".AxisTableSetNo1.axis","");
+      AddMetaData(metaData,axisNameString + ".AxisTableSetNo1.start","1");
+      AddMetaData(metaData,axisNameString + ".AxisTableSetNo1.step","1");
+      AddMetaData(metaData,axisNameString + ".AxisTableSetNo1.stop",axisDescriptor.clocks);
     }
     else
     {
-      Vernissage::Session::AxisTableSets::const_iterator itAxisTabelSetsMap;
-      Vernissage::Session::TableSet::const_iterator itAxisTableSetsMapStruct;
-
       unsigned int index = 0;
-      for (itAxisTabelSetsMap = axisTableSetsMap.begin(); itAxisTabelSetsMap != axisTableSetsMap.end(); itAxisTabelSetsMap++)
+      typedef Vernissage::Session::AxisTableSets::const_iterator AxisTableSetsIt;
+      for (AxisTableSetsIt itMap = axisTableSetsMap.begin(); itMap != axisTableSetsMap.end(); itMap++)
       {
-        for (itAxisTableSetsMapStruct = itAxisTabelSetsMap->second.begin(); itAxisTableSetsMapStruct != itAxisTabelSetsMap->second.end(); itAxisTableSetsMapStruct++)
+        typedef Vernissage::Session::TableSet::const_iterator TableSetIt;
+        for (TableSetIt it = itMap->second.begin(); it != itMap->second.end(); it++)
         {
           index++; // 1-based index
           const std::string baseName = axisNameString + ".AxisTableSetNo" + toString(index) + ".axis";
-          metaData.push_back(std::make_pair(baseName,toString(itAxisTabelSetsMap->first)));
-          metaData.push_back(std::make_pair(baseName + ".start",toString(itAxisTableSetsMapStruct->start)));
-          metaData.push_back(std::make_pair(baseName + ".step",toString(itAxisTableSetsMapStruct->step)));
-          metaData.push_back(std::make_pair(baseName + ".stop",toString(itAxisTableSetsMapStruct->stop)));
+          AddMetaData(metaData,baseName,itMap->first);
+          AddMetaData(metaData,baseName + ".start",it->start);
+          AddMetaData(metaData,baseName + ".step",it->step);
+          AddMetaData(metaData,baseName + ".stop",it->stop);
         }
       }
-      metaData.push_back(std::make_pair(axisNameString + ".AxisTableSet.count",toString(index)));
+      AddMetaData(metaData,axisNameString + ".AxisTableSet.count",index);
     }
     // END Vernissage::Session:AxisTableSet
 
     // BEGIN Vernissage::AxisParameters introduced with Vernissage 2.2
-    const ParameterMap axisParams = m_vernissageSession->getAxisParameters(m_brickletPtr, axisNameWString);
+    const ParameterMap axisParams = session->getAxisParameters(m_brickletPtr, axisNameWString);
     AddParameterMap(metaData,axisNameString,axisParams);
     // END Vernissage::AxisParameters
   }
@@ -422,8 +434,11 @@ void BrickletClass::generateAllAxesVector()
   unsigned int numRuns = 0;
   const unsigned int maxRuns = 100;
 
-  const std::wstring rootAxis = m_vernissageSession->getRootAxisName(m_brickletPtr);
-  const std::wstring triggerAxis = m_vernissageSession->getTriggerAxisName(m_brickletPtr);
+  Vernissage::Session* session = getVernissageSession();
+  ASSERT_RETURN_VOID(session);
+
+  const std::wstring rootAxis = session->getRootAxisName(m_brickletPtr);
+  const std::wstring triggerAxis = session->getTriggerAxisName(m_brickletPtr);
 
   std::wstring axisName = triggerAxis;
   allAxesWString.push_back(triggerAxis);
@@ -431,7 +446,7 @@ void BrickletClass::generateAllAxesVector()
 
   while (axisName != rootAxis)
   {
-    axisName = m_vernissageSession->getAxisDescriptor(m_brickletPtr, axisName).triggerAxisName;
+    axisName = session->getAxisDescriptor(m_brickletPtr, axisName).triggerAxisName;
     allAxesWString.push_back(axisName);
     allAxesString.push_back(toString(axisName));
     numRuns++;

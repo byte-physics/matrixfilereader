@@ -75,7 +75,6 @@ private:
   void generateAllAxesVector();
 
   void* m_brickletPtr;
-  Vernissage::Session* m_vernissageSession;
   const int m_brickletID;
 
   // storage for the raw data

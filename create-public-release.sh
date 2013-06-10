@@ -2,8 +2,8 @@
 
 set -e
 
-lastVersion=0.20
-newVersion=0.21
+lastVersion=0.21
+newVersion=0.22
 
 filesToWatch="VC8 *.txt matrixfilereader-basic-gui.pxp Operation-Template-Generator.pxp *.ihf"
 

@@ -52,6 +52,7 @@ Function createData(resultFileFull)
 
     MFR_GetBrickletMetaData/R=(i)
     MFR_GetBrickletRawData/R=(i)
+    MFR_GetBrickletDeployData/R=(i)
 
     SaveData/Q/L=1/D=1/O/T=$folder/P=savePath ":"
     Killwaves/Z/A
@@ -393,7 +394,7 @@ End
 
 Function regressionTest()
 
-  string refDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:igor-xop:regression_tests:referenceData_0.19"
+  string refDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:igor-xop:regression_tests:referenceData_0.22"
   string rawDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:TestData-Matrix-V3.0"
 
   string PATH = "r:newVersion_0.22"

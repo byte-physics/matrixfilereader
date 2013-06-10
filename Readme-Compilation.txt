@@ -3,13 +3,13 @@ This is a step-by-step manual to compile the MatrixFileReader XOP.
 Requirements:
 - Visual Studio 2005 Professional, the Express Version does not work. (It is not advised to try a different version. If you have to switch, you need a different Vernissage SDK also)
 - Windows XP SP2/Windows Vista/Windows 7
-- Vernissage 2.1 and the corresponding SDK
+- Vernissage 2.2 and the corresponding SDK
 - XOP Toolkit 6
 - Igor 6.2.0 or later
 
 Various Hints:
 - Always compile the "Release" version. The "Debug" version can not be used with the Vernissage DLLs.
-- Include and library paths are set in header.h
+- Include and library paths are set in stdafx.h
 - If you want to add new operations checkout Operation-Template-Generator.pxp which uses ParseOperationTemplate
 
 Compilation:

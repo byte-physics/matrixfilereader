@@ -88,7 +88,7 @@ public:
   {
     const std::vector<std::string>& data = getData();
 
-    if (index < 0 || index >= data.size())
+    if (index >= data.size())
     {
       DEBUGPRINT("BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d", index, data.size() - 1);
       return std::string();

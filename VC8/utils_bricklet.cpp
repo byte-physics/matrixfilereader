@@ -123,6 +123,7 @@ public:
     m_data.push_back(VTC_PARAMETERISEDCUR);
     m_data.push_back(VTC_DISCRETEENERGYMAP);
     m_data.push_back(VTC_ESPIMAGEMAP);
+    m_data.push_back(VTC_DOWNWARD2D);
   }
 
 private:
@@ -160,6 +161,7 @@ public:
     m_data.push_back(BTC_ESPSNAPSHOTSEQ);
     m_data.push_back(BTC_ESPIMAGEMAP);
     m_data.push_back(BTC_INTERFEROMETERCUR);
+    m_data.push_back(BTC_ESPIMAGE);
   }
 
 private:

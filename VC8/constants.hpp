@@ -43,6 +43,7 @@ const char BTC_RAWPATHSPEC[]      = "btc_RawPathSpectroscopy";
 const char BTC_ESPSNAPSHOTSEQ[]   = "btc_ESpSnapshotSequence";
 const char BTC_ESPIMAGEMAP[]      = "btc_ESpImageMap";
 const char BTC_INTERFEROMETERCUR[]= "btc_InterferometerCurve";
+const char BTC_ESPIMAGE[]         = "btc_ESpImage";
 
 // viewtype codes as strings
 // from the vernissage header file
@@ -61,6 +62,7 @@ const char VTC_CURVESET[]         = "vtc_CurveSet";
 const char VTC_PARAMETERISEDCUR[] = "vtc_ParameterisedCurveSet";
 const char VTC_DISCRETEENERGYMAP[]= "vtc_DiscreteEnergyMap";
 const char VTC_ESPIMAGEMAP[]      = "vtc_ESpImageMap";
+const char VTC_DOWNWARD2D[]       = "vtc_Downward2D";
 
 // wave name suffixes
 const char TRACE_UP_STRING[]      = "_Up";

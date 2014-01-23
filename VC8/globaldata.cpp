@@ -24,12 +24,12 @@ namespace  {
     if (ret == 0 && objType == VAR_OBJECT)
     {
       value = doubleToBool(objValue.nv.realValue);
-      DEBUGPRINT("debug=%d", value);
+      DEBUGPRINT("%s=%d", option_name, value);
     }
     else
     {
       // variable does not exist or is of wrong type
-      DEBUGPRINT("debug=%d (default)", value);
+      DEBUGPRINT("%s=%d (default)", option_name, value);
     }
 
     return value;
@@ -366,7 +366,7 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */)
 
     if (ret == 0)
     {
-      DEBUGPRINT("V_MatrixFileReader* variables in the folder %s:", dataFolderPath);
+      DEBUGPRINT("Variables in the folder %s:", dataFolderPath);
     }
   }
 

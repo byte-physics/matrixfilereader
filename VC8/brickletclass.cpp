@@ -86,14 +86,11 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
   // we are not called the first time
   if (m_rawBufferContents != NULL)
   {
-    DEBUGPRINT("GlobalData::getBrickletContentsBuffer Using cached values");
-
-    DEBUGPRINT("before: pBuffer=%d,count=%d", *pBuffer, count);
-
+    DEBUGPRINT("BrickletClass::getBrickletContentsBuffer Using cached values");
     *pBuffer = m_rawBufferContents;
     count    = m_rawBufferContentsSize;
 
-    DEBUGPRINT("after: pBuffer=%d,count=%d", *pBuffer, count);
+    DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents, m_rawBufferContentsSize);
   }
   else  // we are called the first time
   {
@@ -118,8 +115,6 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
       count = 0;
       return;
     }
-
-    DEBUGPRINT("pBuffer=%d,count=%d", *pBuffer, count);
 
     // these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
     // implicitly which is quite expensive
@@ -151,6 +146,8 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
 
     memcpy(m_rawBufferContents, *pBuffer, sizeof(int)*m_rawBufferContentsSize);
     *pBuffer = m_rawBufferContents;
+
+    DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents, m_rawBufferContentsSize);
 
     // release memory from vernissage DLL
     session->unloadBrickletContents(m_brickletPtr);

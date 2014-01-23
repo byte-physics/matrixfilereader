@@ -128,11 +128,10 @@ void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
                m_extrema.getRawMin(), m_extrema.getRawMax(), m_extrema.getPhysValRawMin(), m_extrema.getPhysValRawMax());
 
     // copy the raw data to our own cache
-    m_rawBufferContentsSize = count;
-
     try
     {
-      m_rawBufferContents = new int[m_rawBufferContentsSize];
+      m_rawBufferContents = new int[count];
+      m_rawBufferContentsSize = count;
     }
     catch (CMemoryException* e)
     {

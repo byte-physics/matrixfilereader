@@ -74,7 +74,8 @@ namespace
 
     if (triggerAxis.mirrored)
     {
-      numPointsTriggerAxis /= 2;
+      HISTPRINT("BUG!!!!!!!!! Detected Trace/Retrace SPS curve which is currently not properly supported.");
+      // numPointsTriggerAxis /= 2;
     }
 
     dimensionSizes[ROWS] = numPointsTriggerAxis;

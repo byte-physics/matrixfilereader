@@ -85,7 +85,7 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
   // should not happen
   if (numberOfBricklets < oldNumberOfBricklets)
   {
-    HISTPRINT("Error in udating the result file. Please close and reopen it.");
+    HISTPRINT("Error in updating the result file. Please close and reopen it.");
     return 0;
   }
 

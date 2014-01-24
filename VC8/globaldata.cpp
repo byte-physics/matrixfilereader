@@ -181,7 +181,7 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const vernissag
   ASSERT_RETURN_VOID(bricklet);
   m_brickletIDBrickletClassMap[brickletID] = bricklet;
 
-  DEBUGPRINT("setBrickletPointerMap brickletID=%d,vernissageBricklet=%p", brickletID, vernissageBricklet);
+  DEBUGPRINT("createBrickletClassObject brickletID=%d,vernissageBricklet=%p", brickletID, vernissageBricklet);
 }
 
 /*

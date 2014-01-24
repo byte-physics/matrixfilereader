@@ -19,7 +19,7 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<s
   // create 2D textwave with firstColumn.size() rows and 2 columns
   if (data.empty())
   {
-    HISTPRINT("BUG: list size may not be zero: data size %d", data.size());
+    HISTPRINT("BUG: list size may not be zero");
     return UNKNOWN_ERROR;
   }
 

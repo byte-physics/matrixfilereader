@@ -6,6 +6,7 @@
 class GlobalData;
 class ExtremaData;
 class BrickletClass;
+typedef BrickletClass* BrickletClassPtr;
 class DLLHandler;
 class WaveClass;
 

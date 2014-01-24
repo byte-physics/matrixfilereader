@@ -18,8 +18,6 @@
 
 class GlobalData
 {
-  typedef  std::map<int, BrickletClass*, std::less<int>>    IntBrickletClassPtrMap;
-
 public:
   void setResultFile(const std::wstring& dirPath, const std::wstring& fileName);
   void closeSession();
@@ -122,5 +120,5 @@ private:
   bool m_errorToHistory;
   int m_lastError;
   std::string m_lastErrorArgument;
-  IntBrickletClassPtrMap m_brickletIDBrickletClassMap;
+  std::map<int, BrickletClassPtr> m_bricklets;
 };

@@ -13,6 +13,10 @@
 
 namespace  {
 
+  typedef std::map<int, BrickletClassPtr> BrickletClassPtrMap;
+  typedef BrickletClassPtrMap::iterator BrickletMapIt;
+  typedef BrickletClassPtrMap::const_iterator BrickletMapCIt;
+
   bool getSettingOrDefault( DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
   {
     int objType;
@@ -88,14 +92,14 @@ Vernissage::Session* GlobalData::getVernissageSession()
 void GlobalData::closeResultFile()
 {
   //delete BrickletClass objects
-  for (IntBrickletClassPtrMap::iterator it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++)
+  for (BrickletMapIt it = m_bricklets.begin(); it != m_bricklets.end(); it++)
   {
     delete it->second;
     it->second = NULL;
   }
 
   // empty bricklet map
-  m_brickletIDBrickletClassMap.clear();
+  m_bricklets.clear();
 
   // remove opened result set from internal database
   if (m_VernissageSession)
@@ -110,7 +114,7 @@ void GlobalData::closeResultFile()
 
 /*
   closes the session and unloads the DLL
-  will only be called when we receivce the CLEANUP signal
+  will only be called when we receive the CLEANUP signal
 */
 void GlobalData::closeSession()
 {
@@ -150,9 +154,9 @@ int GlobalData::getIgorWaveType() const
 */
 BrickletClass* GlobalData::getBrickletClassObject(int brickletID) const
 {
-  IntBrickletClassPtrMap::const_iterator it = m_brickletIDBrickletClassMap.find(brickletID);
+  BrickletMapCIt it = m_bricklets.find(brickletID);
 
-  if (it != m_brickletIDBrickletClassMap.end()) // we found the element
+  if (it != m_bricklets.end()) // we found the element
   {
     return it->second;
   }
@@ -179,7 +183,7 @@ void GlobalData::createBrickletClassObject(int brickletID, void* const vernissag
   }
 
   ASSERT_RETURN_VOID(bricklet);
-  m_brickletIDBrickletClassMap[brickletID] = bricklet;
+  m_bricklets[brickletID] = bricklet;
 
   DEBUGPRINT("createBrickletClassObject brickletID=%d,vernissageBricklet=%p", brickletID, vernissageBricklet);
 }
@@ -206,11 +210,9 @@ void GlobalData::finalizeWithFilledCache()
 
   if (!isDataCacheEnabled())
   {
-    for (int i = 1; i <= m_VernissageSession->getBrickletCount(); i++)
+    for (BrickletMapIt it = m_bricklets.begin(); it != m_bricklets.end(); it++)
     {
-      BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(i);
-      ASSERT_RETURN_VOID(bricklet);
-      bricklet->clearCache();
+      it->second->clearCache();
     }
   }
 }
@@ -398,7 +400,7 @@ std::vector<int> GlobalData::convertBrickletPtr(const std::vector<void*>& rawBri
 */
 int GlobalData::convertBrickletPtr(void* rawBrickletPtr) const
 {
-  for (IntBrickletClassPtrMap::const_iterator it = m_brickletIDBrickletClassMap.begin(); it != m_brickletIDBrickletClassMap.end(); it++)
+  for (BrickletMapCIt it = m_bricklets.begin(); it != m_bricklets.end(); it++)
   {
     if (it->second->getBrickletPointer() == rawBrickletPtr)
     {

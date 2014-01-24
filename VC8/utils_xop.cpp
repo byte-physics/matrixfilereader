@@ -95,7 +95,7 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
   ret = SetTextWaveData(waveHandle, mode, textHandle);
 
   // DEBUGPRINT("SetTextWaveData returned %d",ret);
-  // DisposeHandle(textHandle);
+  DisposeHandle(textHandle);
 
   return ret;
 }
@@ -127,6 +127,7 @@ void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle)
 
   ASSERT_RETURN_VOID(waveHandle);
   SetWaveNote(waveHandle, noteHandle);
+  // SetWaveNote takes care of diposing the handle
 }
 
 /*

@@ -72,6 +72,9 @@ namespace
     const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
     int numPointsTriggerAxis = triggerAxis.clocks;
 
+    // FIXME in zwei waves schreiben falls die Achse gespiegelt ist
+    // wie nennen?
+    // Andere neue Messmodi die das gleiche problem haben?
     if (triggerAxis.mirrored)
     {
       HISTPRINT("BUG!!!!!!!!! Detected Trace/Retrace SPS curve which is currently not properly supported.");
@@ -116,6 +119,7 @@ namespace
       wave1D.fillWave(i, rawValue, rawValue * slope + yIntercept);
     }
 
+    // FIXME muss auch aufgebohrt werden für die hinwärts/rückwärts scans aka ramp reversal
     setDataWaveNote(brickletID, wave1D);
 
     wave1D.setWaveScaling(ROWS, &triggerAxis.physicalIncrement, &triggerAxis.physicalStart);

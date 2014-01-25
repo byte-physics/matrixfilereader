@@ -11,6 +11,15 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
+namespace  {
+
+  DWORDLONG convertBytesToGiB( DWORDLONG bytes )
+  {
+    return bytes /(1024 * 1024 * 1024);
+  }
+
+} // anonymous namespace
+
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
 {
   BEGIN_OUTER_CATCH
@@ -23,15 +32,13 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   }
 
   std::string str;
+  str.append("####\r");
 
   // get windows version
   // see http://msdn.microsoft.com/en-us/library/ms724451%28VS.85%29.aspx
   OSVERSIONINFO osvi;
-
   ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
   osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-  str.append("####\r");
 
   BOOL retValue = GetVersionEx(&osvi);
 
@@ -45,17 +52,27 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
     str.append("Windows version: unknown\r");
   }
 
-#if defined(_MSC_VER)
-  str.append("Visual Studio version: " + toString(_MSC_VER) + "\r");
-#elif defined(__GNUC__)
-  str.append("GCC version: " __VERSION__ "\r");
-#else
-  str.append("Unknown compiler version\r");
-#endif
+  MEMORYSTATUSEX statex;
+  ZeroMemory(&statex, sizeof(MEMORYSTATUSEX));
+  statex.dwLength = sizeof(MEMORYSTATUSEX);
+  retValue = GlobalMemoryStatusEx(&statex);
 
+  if (retValue != 0)
+  {
+    str.append("Free Memory: " + toString(convertBytesToGiB(statex.ullAvailPhys)) + " GiB\r");
+    str.append("Total Memory: " + toString(convertBytesToGiB(statex.ullTotalPhys)) + " GiB\r");
+  }
+  else
+  {
+    str.append("Free Memory: unknown\r");
+    str.append("Total Memory: unknown\r");
+  }
+
+  str.append("Visual Studio version: " + toString(_MSC_VER) + "\r");
   str.append("Igor Pro Version: " + toString(igorVersion) + "\r");
   str.append("Vernissage version: " + GlobalData::Instance().getVernissageVersion() + "\r");
-  str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
+  str.append("XOP version: " MatrixFileReader_XOP_VERSION_STR);
+  str.append("\r");
   str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
   str.append("\r");
   str.append("Your Name:\r");

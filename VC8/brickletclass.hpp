@@ -26,7 +26,8 @@ public:
   void setBrickletPointer(void* const vernissageBricklet);
 
   void clearCache();
-  void getBrickletContentsBuffer(const int** pBuffer, int& count);
+  int* getRawData();
+  int  getRawDataSize();
 
   typedef std::pair<std::string,std::string> StringPair;
   const std::vector<StringPair>& getMetaData();

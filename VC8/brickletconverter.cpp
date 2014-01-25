@@ -52,16 +52,13 @@ namespace
     void* vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
-    // pointer to raw data
-    int rawBrickletSize = 0;
-    const int* rawBrickletDataPtr;
-    bricklet.getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
-
-    if (rawBrickletSize == 0 || &rawBrickletDataPtr == NULL)
+    const int* rawBrickletDataPtr = bricklet.getRawData();
+    if (rawBrickletDataPtr == NULL)
     {
       HISTPRINT("Could not load bricklet contents.");
       return UNKNOWN_ERROR;
     }
+    const int rawBrickletSize = bricklet.getRawDataSize();
 
     const std::wstring triggerAxisName = session->getTriggerAxisName(vernissageBricklet);
     const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
@@ -134,16 +131,13 @@ namespace
     void* vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
-    // pointer to raw data
-    int rawBrickletSize = 0;
-    const int* rawBrickletDataPtr;
-    bricklet.getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
-
-    if (rawBrickletSize == 0 || &rawBrickletDataPtr == NULL)
+    const int* rawBrickletDataPtr = bricklet.getRawData();
+    if (rawBrickletDataPtr == NULL)
     {
       HISTPRINT("Could not load bricklet contents.");
       return UNKNOWN_ERROR;
     }
+    const int rawBrickletSize = bricklet.getRawDataSize();
 
     const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
 
@@ -525,16 +519,13 @@ namespace
     void* const vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
-    // pointer to raw data
-    int rawBrickletSize;
-    const int* rawBrickletDataPtr;
-    bricklet.getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
-
-    if (rawBrickletSize == 0 || &rawBrickletDataPtr == NULL)
+    const int* rawBrickletDataPtr = bricklet.getRawData();
+    if (rawBrickletDataPtr == NULL)
     {
       HISTPRINT("Could not load bricklet contents.");
       return UNKNOWN_ERROR;
     }
+    const int rawBrickletSize = bricklet.getRawDataSize();
 
     // V triggerAxis -> V is triggered by X , X is triggered by Y and Y is the root axis
 
@@ -1099,18 +1090,16 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
   WaveClass wave(bricklet.getExtrema());
   wave.setNameAndTraceDir(waveName, NO_TRACE);
 
-  const int* pBuffer;
-  int count;
-  bricklet.getBrickletContentsBuffer(&pBuffer, count);
-
-  if (count == 0 || pBuffer == NULL)
+  const int* rawBrickletDataPtr = bricklet.getRawData();
+  if (rawBrickletDataPtr == NULL)
   {
     HISTPRINT("Could not load bricklet contents.");
-    return 0;
+    return UNKNOWN_ERROR;
   }
+  const int rawBrickletSize = bricklet.getRawDataSize();
 
   // create 1D wave with count points
-  dimensionSizes[ROWS] = count;
+  dimensionSizes[ROWS] = rawBrickletSize;
 
   waveHndl waveHandle;
   ret = MDMakeWave(&waveHandle, wave.getWaveName(), dfHandle, dimensionSizes, NT_I32, GlobalData::Instance().isOverwriteEnabled<int>());
@@ -1130,7 +1119,7 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
 
   int* dataPtr = getWaveDataPtr<int>(wave.getWaveHandle());
 
-  memcpy(dataPtr, pBuffer, count * sizeof(int));
+  memcpy(dataPtr, rawBrickletDataPtr, sizeof(int) * rawBrickletSize);
 
   setDataWaveNote(brickletID,  wave);
 

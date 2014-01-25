@@ -92,81 +92,70 @@ void BrickletClass::clearCache()
 /*
   Load the raw data of the bricklet into our own cache
 */
-void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
+int* BrickletClass::getRawData()
 {
-  count = 0;
-  THROW_IF_NULL(pBuffer);
-
-  Vernissage::Session* session = getVernissageSession();
-
   // we are not called the first time
   if (m_rawBufferContents != NULL)
   {
     DEBUGPRINT("BrickletClass::getBrickletContentsBuffer Using cached values");
-    *pBuffer = m_rawBufferContents;
-    count    = m_rawBufferContentsSize;
-
     DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents, m_rawBufferContentsSize);
+    return m_rawBufferContents;
   }
-  else  // we are called the first time
+
+  int count = 0;
+  const int *pBuffer;
+  Vernissage::Session* session = getVernissageSession();
+
+  try
   {
-    try
-    {
-      session->loadBrickletContents(m_brickletPtr, pBuffer, count);
-    }
-    catch (...)
-    {
-      HISTPRINT("Could not load the bricklet contents, probably out of memory in getBrickletContentsBuffer() with bricklet %d", m_brickletID);
-      *pBuffer = NULL;
-      count = 0;
-      return;
-    }
-
-    // loadBrickletContents either throws an exception or returns pBuffer == 0 || count == 0 in the error case
-    if (*pBuffer == NULL || count == 0)
-    {
-      HISTPRINT("Out of memory in getBrickletContentsBuffer() with bricklet %d", m_brickletID);
-      session->unloadBrickletContents(m_brickletPtr);
-      *pBuffer = NULL;
-      count = 0;
-      return;
-    }
-
-    // these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
-    // implicitly which is quite expensive
-    const int rawMin = session->getRawMin(m_brickletPtr);
-    m_extrema.setMinimum(rawMin, session->toPhysical(rawMin, m_brickletPtr));
-
-    const int rawMax = session->getRawMax(m_brickletPtr);
-    m_extrema.setMaximum(rawMax, session->toPhysical(rawMax, m_brickletPtr));
-
-    DEBUGPRINT("rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
-               m_extrema.getRawMin(), m_extrema.getRawMax(), m_extrema.getPhysValRawMin(), m_extrema.getPhysValRawMax());
-
-    // copy the raw data to our own cache
-    try
-    {
-      m_rawBufferContents = new int[count];
-      m_rawBufferContentsSize = count;
-    }
-    catch (CMemoryException* e)
-    {
-      e->Delete();
-      HISTPRINT("Out of memory in getBrickletContentsBuffer()");
-      *pBuffer = NULL;
-      count = 0;
-      session->unloadBrickletContents(m_brickletPtr);
-      return;
-    }
-
-    memcpy(m_rawBufferContents, *pBuffer, sizeof(int)*m_rawBufferContentsSize);
-    *pBuffer = m_rawBufferContents;
-
-    DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents, m_rawBufferContentsSize);
-
-    // release memory from vernissage DLL
-    session->unloadBrickletContents(m_brickletPtr);
+    session->loadBrickletContents(m_brickletPtr, &pBuffer, count);
   }
+  catch (...)
+  {
+    HISTPRINT("Could not load the bricklet contents, probably out of memory in getBrickletContentsBuffer() with bricklet %d", m_brickletID);
+    return NULL;
+  }
+
+  // loadBrickletContents either throws an exception or returns pBuffer == 0 || count == 0 in the error case
+  if (pBuffer == NULL || count <= 0)
+  {
+    HISTPRINT("Out of memory in getBrickletContentsBuffer() with bricklet %d", m_brickletID);
+    session->unloadBrickletContents(m_brickletPtr);
+    return NULL;
+  }
+
+  // these two lines have to be surrounded by loadbrickletContents/unloadBrickletContents, otherwise loadbrickletContents will be called
+  // implicitly which is quite expensive
+  const int rawMin = session->getRawMin(m_brickletPtr);
+  m_extrema.setMinimum(rawMin, session->toPhysical(rawMin, m_brickletPtr));
+
+  const int rawMax = session->getRawMax(m_brickletPtr);
+  m_extrema.setMaximum(rawMax, session->toPhysical(rawMax, m_brickletPtr));
+
+  DEBUGPRINT("rawMin=%d,rawMax=%d,scaledMin=%g,scaledMax=%g",
+             m_extrema.getRawMin(), m_extrema.getRawMax(), m_extrema.getPhysValRawMin(), m_extrema.getPhysValRawMax());
+
+  // copy the raw data to our own cache
+  try
+  {
+    m_rawBufferContents = new int[count];
+  }
+  catch (CMemoryException* e)
+  {
+    e->Delete();
+    HISTPRINT("Out of memory in getBrickletContentsBuffer()");
+    session->unloadBrickletContents(m_brickletPtr);
+    return NULL;
+  }
+
+  memcpy(m_rawBufferContents, pBuffer, sizeof(int)*count);
+  m_rawBufferContentsSize = count;
+
+  DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents, m_rawBufferContentsSize);
+
+  // release memory from vernissage DLL
+  session->unloadBrickletContents(m_brickletPtr);
+  return m_rawBufferContents;
 }
 
 /*
@@ -566,4 +555,10 @@ void* BrickletClass::getBrickletPointer() const
 const ExtremaData& BrickletClass::getExtrema() const
 {
   return m_extrema;
+}
+
+int BrickletClass::getRawDataSize()
+{
+  THROW_IF_NULL(m_rawBufferContents);
+  return m_rawBufferContentsSize;
 }

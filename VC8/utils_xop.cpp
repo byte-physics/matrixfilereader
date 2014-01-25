@@ -17,6 +17,7 @@
 int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHndl waveHandle)
 {
   ASSERT_RETURN_ONE(stringVector.size());
+  ASSERT_RETURN_ONE(waveHandle);
 
   std::vector<long int> stringSizes;
 

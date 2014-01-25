@@ -43,8 +43,6 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<s
     return UNKNOWN_ERROR;
   }
 
-  ASSERT_RETURN_ONE(waveHandle);
-
   // copy the strings of both columns into a new vector
   // so that they are then 1D
   // first: first, then: second

@@ -82,6 +82,7 @@ Vernissage::Session* GlobalData::getVernissageSession()
   else
   {
     m_VernissageSession = m_DLLHandler.createSessionObject();
+    THROW_IF_NULL(m_VernissageSession);
     return m_VernissageSession;
   }
 }
@@ -152,7 +153,7 @@ int GlobalData::getIgorWaveType() const
   m_brickletIDBrickletClassMap maps a brickletID to a brickletClass pointer
   returns NULL if the bricklet with brickletID can not be found
 */
-BrickletClass* GlobalData::getBrickletClassObject(int brickletID) const
+BrickletClass* GlobalData::getBrickletPtr(int brickletID) const
 {
   BrickletMapCIt it = m_bricklets.find(brickletID);
 
@@ -162,6 +163,17 @@ BrickletClass* GlobalData::getBrickletClassObject(int brickletID) const
   }
 
   return NULL;
+}
+
+BrickletClass& GlobalData::getBricklet(int brickletID) const
+{
+  BrickletClass* bricklet = getBrickletPtr(brickletID);
+
+  if(bricklet == NULL)
+  {
+    throw std::runtime_error("The requested bricklet " + toString(brickletID) + " does not exist");
+  }
+  return *bricklet;
 }
 
 /*

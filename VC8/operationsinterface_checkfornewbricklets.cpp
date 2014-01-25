@@ -41,8 +41,6 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
   }
 
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(session);
-
   const int oldNumberOfBricklets = session->getBrickletCount();
 
   std::wstring fileName = GlobalData::Instance().getFileName<std::wstring>();
@@ -70,7 +68,7 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
     void* vernissageBricklet = session->getNextBricklet(&pContext);
     ASSERT_RETURN_ZERO(vernissageBricklet);
 
-    BrickletClass *bricklet = GlobalData::Instance().getBrickletClassObject(i);
+    BrickletClass *bricklet = GlobalData::Instance().getBrickletPtr(i);
 
     if (bricklet == NULL) // this is a new bricklet
     {

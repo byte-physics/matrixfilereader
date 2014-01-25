@@ -40,41 +40,27 @@ WaveClass::~WaveClass(){}
 */
 void WaveClass::setWaveHandle(const waveHndl& waveHandle)
 {
-  if (WaveType(waveHandle) & NT_FP64)
-  {
-    m_doublePtr = getWaveDataPtr<double>(waveHandle);
-    m_floatPtr = NULL;
+  THROW_IF_NULL(waveHandle);
 
-    if (m_doublePtr == NULL)
-    {
-      HISTPRINT("BUG: setWaveHandle(...) m_doublePtr is NULL, this should not happen...");
-    }
-    else
-    {
-      moreData = true;
-      m_waveHandle = waveHandle;
-    }
+  const int waveType = WaveType(waveHandle);
+  if ( waveType & NT_FP64)
+  {
+    m_doublePtr  = getWaveDataPtr<double>(waveHandle);
+    m_floatPtr   = NULL;
+    moreData     = true;
+    m_waveHandle = waveHandle;
   }
-  else if (WaveType(waveHandle) & NT_FP32)
+  else if (waveType & NT_FP32)
   {
-    m_doublePtr = NULL;
-    m_floatPtr = getWaveDataPtr<float>(waveHandle);
-
-    if (m_floatPtr == NULL)
-    {
-      HISTPRINT("BUG: setWaveHandle(...) m_floatPtr is NULL, this should not happen...");
-    }
-    else
-    {
-      moreData = true;
-      m_waveHandle = waveHandle;
-    }
+    m_doublePtr  = NULL;
+    m_floatPtr   = getWaveDataPtr<float>(waveHandle);
+    moreData     = true;
+    m_waveHandle = waveHandle;
   }
-  else if (WaveType(waveHandle) & NT_I32)
+  else if (waveType & NT_I32)
   {
-    m_doublePtr = NULL;
-    m_floatPtr = NULL;
-
+    m_doublePtr  = NULL;
+    m_floatPtr   = NULL;
     m_waveHandle = waveHandle;
   }
   else

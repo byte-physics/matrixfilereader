@@ -126,7 +126,6 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   GlobalData::Instance().openDlgInitialDir[MAX_PATH_LEN] = '\0';
 
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(session);
 
   // now we convert to wide strings
   const std::wstring  dirPathWString = ansiToUnicode(dirPath);

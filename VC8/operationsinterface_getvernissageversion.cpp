@@ -22,9 +22,6 @@ extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr 
     return 0;
   }
 
-  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(session);
-
   ret = SetOperationNumVar(V_DLLversion, stringToAnyType<double>(GlobalData::Instance().getVernissageVersion()));
 
   if (ret != 0)

@@ -198,8 +198,6 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
   }
 
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(session);
-
   const int numberOfBricklets = session->getBrickletCount();
 
   if (numberOfBricklets == 0)
@@ -297,8 +295,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 
   for (int brickletID = startBrickletID; brickletID <= endBrickletID; brickletID++)
   {
-    BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-    ASSERT_RETURN_ZERO(bricklet);
+    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
 
     char waveName[MAX_OBJ_NAME + 1];
     ret = formatWaveName(waveName, baseName, brickletID);
@@ -348,11 +345,11 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
       break;
 
     case META_DATA:
-      ret = createAndFillTextWave(destDataFolderHndl, bricklet->getMetaData(), brickletDataFolderHndl, waveName, brickletID, waveNameList);
+      ret = createAndFillTextWave(destDataFolderHndl, bricklet.getMetaData(), brickletDataFolderHndl, waveName, brickletID, waveNameList);
       break;
 
     case DEPLOY_DATA:
-      ret = createAndFillTextWave(destDataFolderHndl, bricklet->getDeploymentParameter(), brickletDataFolderHndl, waveName, brickletID, waveNameList);
+      ret = createAndFillTextWave(destDataFolderHndl, bricklet.getDeploymentParameter(), brickletDataFolderHndl, waveName, brickletID, waveNameList);
       break;
 
     default:
@@ -363,7 +360,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 
     if (!GlobalData::Instance().isDataCacheEnabled())
     {
-      bricklet->clearCache();
+      bricklet.clearCache();
     }
 
     if (ret == WAVE_EXIST)

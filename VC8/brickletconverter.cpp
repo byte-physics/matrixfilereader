@@ -17,13 +17,13 @@
 namespace
 {
   // Create data for the raw->scaled transformation
-  void CalculateTransformationParameter(BrickletClass* const bricklet, double& slope, double& yIntercept)
+  void CalculateTransformationParameter(const BrickletClass& bricklet, double& slope, double& yIntercept)
   {
     // the min and max values here are for the complete bricklet data and not only for one wave
-    const int xOne = bricklet->getExtrema().getRawMin();
-    const int xTwo = bricklet->getExtrema().getRawMax();
-    const double yOne = bricklet->getExtrema().getPhysValRawMin();
-    const double yTwo = bricklet->getExtrema().getPhysValRawMax();
+    const int xOne = bricklet.getExtrema().getRawMin();
+    const int xTwo = bricklet.getExtrema().getRawMax();
+    const double yOne = bricklet.getExtrema().getPhysValRawMin();
+    const double yTwo = bricklet.getExtrema().getPhysValRawMax();
 
     // usually xOne is not equal to xTwo
     if (xOne != xTwo)
@@ -48,19 +48,14 @@ namespace
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-    BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-    ASSERT_RETURN_ONE(bricklet);
-
-    void* vernissageBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(vernissageBricklet);
-
+    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+    void* vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-    ASSERT_RETURN_ONE(session);
 
     // pointer to raw data
     int rawBrickletSize = 0;
     const int* rawBrickletDataPtr;
-    bricklet->getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
+    bricklet.getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
 
     if (rawBrickletSize == 0 || &rawBrickletDataPtr == NULL)
     {
@@ -124,7 +119,7 @@ namespace
 
     wave1D.setWaveScaling(ROWS, &triggerAxis.physicalIncrement, &triggerAxis.physicalStart);
     wave1D.setWaveUnits(ROWS, triggerAxis.physicalUnit);
-    wave1D.setWaveUnits(DATA, bricklet->getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
+    wave1D.setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
     appendToWaveList(baseFolderHandle, wave1D.getWaveHandle(), waveNameList);
     return SUCCESS;
@@ -135,19 +130,14 @@ namespace
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-    BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-    ASSERT_RETURN_ONE(bricklet);
-
-    void* vernissageBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(vernissageBricklet);
-
+    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+    void* vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-    ASSERT_RETURN_ONE(session);
 
     // pointer to raw data
     int rawBrickletSize = 0;
     const int* rawBrickletDataPtr;
-    bricklet->getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
+    bricklet.getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
 
     if (rawBrickletSize == 0 || &rawBrickletDataPtr == NULL)
     {
@@ -251,7 +241,6 @@ namespace
         return UNKNOWN_ERROR;
       }
 
-      ASSERT_RETURN_ONE(waveHandle);
       wave[i].setWaveHandle(waveHandle);
       wave[i].clearWave();
     }
@@ -486,7 +475,6 @@ namespace
         }
 
         wave[i].setWaveHandle(FetchWaveFromDataFolder(waveFolderHandle, wave[i].getWaveName()));
-        ASSERT_RETURN_ONE(wave[i].getWaveHandle());
         // get wave dimensions; needed for setScale below
         int numDimensions;
         ret = MDGetWaveDimensions(wave[i].getWaveHandle(), &numDimensions, interpolatedDimSizes);
@@ -520,7 +508,7 @@ namespace
 
       wave[i].setWaveUnits(ROWS, triggerAxis.physicalUnit);
       wave[i].setWaveUnits(COLUMNS, rootAxis.physicalUnit);
-      wave[i].setWaveUnits(DATA, bricklet->getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
+      wave[i].setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
       appendToWaveList(baseFolderHandle, wave[i].getWaveHandle(), waveNameList);
     }
@@ -533,19 +521,14 @@ namespace
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-    BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-    ASSERT_RETURN_ONE(bricklet);
-
-    void* const vernissageBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(vernissageBricklet);
-
+    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+    void* const vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-    ASSERT_RETURN_ONE(session);
 
     // pointer to raw data
     int rawBrickletSize;
     const int* rawBrickletDataPtr;
-    bricklet->getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
+    bricklet.getBrickletContentsBuffer(&rawBrickletDataPtr , rawBrickletSize);
 
     if (rawBrickletSize == 0 || &rawBrickletDataPtr == NULL)
     {
@@ -885,7 +868,6 @@ namespace
         return UNKNOWN_ERROR;
       }
 
-      ASSERT_RETURN_ONE(waveHandle);
       wave[i].setWaveHandle(waveHandle);
       wave[i].clearWave();
     }
@@ -1035,7 +1017,7 @@ namespace
       wave[i].setWaveUnits(ROWS, xAxis.physicalUnit);
       wave[i].setWaveUnits(COLUMNS, yAxis.physicalUnit);
       wave[i].setWaveUnits(LAYERS, specAxis.physicalUnit);
-      wave[i].setWaveUnits(DATA, bricklet->getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
+      wave[i].setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
       appendToWaveList(baseFolderHandle, wave[i].getWaveHandle(), waveNameList);
     }
@@ -1051,15 +1033,12 @@ namespace
 int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, bool resampleData,
                 int pixelSize, std::string& waveNameList)
 {
-  BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-  ASSERT_RETURN_ONE(bricklet);
-
-  const int dimension = bricklet->getMetaDataValue<int>("dimension");
+  BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+  const int dimension = bricklet.getMetaDataValue<int>("dimension");
 
   if (GlobalData::Instance().isDebuggingEnabled())
   {
-    void* vernissageBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ONE(vernissageBricklet);
+    void* vernissageBricklet = bricklet.getBrickletPointer();
 
     DEBUGPRINT("### BrickletID %d ###", brickletID);
     DEBUGPRINT("dimension %d", dimension);
@@ -1067,8 +1046,6 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
     typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
 
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-    ASSERT_RETURN_ONE(session);
-
     const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(vernissageBricklet);
     for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
     {
@@ -1078,7 +1055,7 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
     DEBUGPRINT("Axis order is from triggerAxis to rootAxis");
 
     typedef std::vector<std::string> StringVector;
-    const StringVector allAxes = bricklet->getAxes<std::string>();
+    const StringVector allAxes = bricklet.getAxes<std::string>();
 
     for (StringVector::const_iterator it = allAxes.begin(); it != allAxes.end(); it++)
     {
@@ -1117,15 +1094,14 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
   CountInt dimensionSizes[MAX_DIMENSIONS + 1];
   MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-  BrickletClass* const bricklet = GlobalData::Instance().getBrickletClassObject(brickletID);
-  ASSERT_RETURN_ONE(bricklet);
+  BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
 
-  WaveClass wave(bricklet->getExtrema());
+  WaveClass wave(bricklet.getExtrema());
   wave.setNameAndTraceDir(waveName, NO_TRACE);
 
   const int* pBuffer;
   int count;
-  bricklet->getBrickletContentsBuffer(&pBuffer, count);
+  bricklet.getBrickletContentsBuffer(&pBuffer, count);
 
   if (count == 0 || pBuffer == NULL)
   {
@@ -1149,14 +1125,11 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
     return ret;
   }
 
-  ASSERT_RETURN_ONE(waveHandle);
   wave.setWaveHandle(waveHandle);
   waveHandle = NULL;
 
   int* dataPtr = getWaveDataPtr<int>(wave.getWaveHandle());
 
-  ASSERT_RETURN_ONE(dataPtr);
-  ASSERT_RETURN_ONE(pBuffer);
   memcpy(dataPtr, pBuffer, count * sizeof(int));
 
   setDataWaveNote(brickletID,  wave);

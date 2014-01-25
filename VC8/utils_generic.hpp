@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#define THROW_IF_NULL(A) {if(A == NULL){ throw std::runtime_error("THROW_IF_NULL: Pointer " #A " is NULL.\r"); } }
 #define MYASSERT(A,B) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL.\r"); return B; } }
 #define ASSERT_RETURN_ZERO(A) { MYASSERT(A,0)}
 #define ASSERT_RETURN_MINUSONE(A) { MYASSERT(A,-1)}

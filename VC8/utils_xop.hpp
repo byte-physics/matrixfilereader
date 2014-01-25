@@ -57,10 +57,7 @@
 template <class T>
 T* getWaveDataPtr(waveHndl waveH)
 {
-  if (waveH == NULL)
-  {
-    return NULL;
-  }
+  THROW_IF_NULL(waveH);
 
   BCInt dataOffset;
   const int accessMode = kMDWaveAccessMode0;
@@ -68,9 +65,9 @@ T* getWaveDataPtr(waveHndl waveH)
 
   if (ret != 0)
   {
-    // throw here someting if you want to have it more C++-ish
-    return NULL;
+    throw std::runtime_error("MDAccessNumericWaveData returned error: " + toString(ret));
   }
+
   return reinterpret_cast<T*>(reinterpret_cast<char*>(*waveH) + dataOffset);
 }
 

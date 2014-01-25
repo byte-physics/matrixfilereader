@@ -70,7 +70,8 @@ public:
   std::string getLastErrorMessage() const;
   std::string getErrorMessage(int errorCode) const;
 
-  BrickletClass* getBrickletClassObject(int brickletID) const;
+  BrickletClass* getBrickletPtr(int brickletID) const;
+  BrickletClass& getBricklet(int brickletID) const;
 
   std::vector<int> convertBrickletPtr(const std::vector<void*>&) const;
   int convertBrickletPtr(void*) const;
@@ -112,7 +113,6 @@ private:
   ~GlobalData(); // hide dtor
   GlobalData(const GlobalData&); // hide copy ctor
   GlobalData& operator=(const GlobalData&); // hide assignment operator
-
   bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
   std::wstring m_resultFileName, m_resultDirPath;
   Vernissage::Session* m_VernissageSession;

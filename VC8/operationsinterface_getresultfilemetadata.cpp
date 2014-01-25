@@ -60,8 +60,6 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   }
 
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-  ASSERT_RETURN_ZERO(session);
-
   const int numberOfBricklets = session->getBrickletCount();
 
   // check waveName parameter
@@ -93,10 +91,8 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 
   if (numberOfBricklets > 0)
   {
-    const BrickletClass* bricklet = GlobalData::Instance().getBrickletClassObject(numberOfBricklets);
-    ASSERT_RETURN_ZERO(bricklet);
-    void* vernissageBricklet = bricklet->getBrickletPointer();
-    ASSERT_RETURN_ZERO(vernissageBricklet);
+    BrickletClass& bricklet = GlobalData::Instance().getBricklet(numberOfBricklets);
+    void* vernissageBricklet = bricklet.getBrickletPointer();
 
     // use the timestamp of the last bricklet as dateOfLastChange
     tm ctime = session->getCreationTimestamp(vernissageBricklet);

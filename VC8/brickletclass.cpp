@@ -60,7 +60,7 @@ BrickletClass::BrickletClass(int brickletID, void* const vernissageBricklet)
   m_rawBufferContentsSize(0),
   m_brickletID(brickletID)
 {
-  ASSERT_RETURN_VOID(vernissageBricklet);
+  THROW_IF_NULL(vernissageBricklet);
 }
 
 BrickletClass::~BrickletClass()
@@ -95,9 +95,9 @@ void BrickletClass::clearCache()
 void BrickletClass::getBrickletContentsBuffer(const int** pBuffer, int& count)
 {
   count = 0;
-  ASSERT_RETURN_VOID(pBuffer);
+  THROW_IF_NULL(pBuffer);
+
   Vernissage::Session* session = getVernissageSession();
-  ASSERT_RETURN_VOID(session);
 
   // we are not called the first time
   if (m_rawBufferContents != NULL)
@@ -201,7 +201,6 @@ void BrickletClass::loadMetaData()
   m_metaData.reserve(METADATA_RESERVE_SIZE);
 
   Vernissage::Session* session = getVernissageSession();
-  ASSERT_RETURN_VOID(session);
 
   // timestamp of creation
   tm ctime = session->getCreationTimestamp(m_brickletPtr);
@@ -460,7 +459,6 @@ void BrickletClass::loadDeploymentParameters()
   m_deployParams.reserve(METADATA_RESERVE_SIZE);
 
   Vernissage::Session* session = getVernissageSession();
-  ASSERT_RETURN_VOID(session);
 
   const WstringVector elementInstanceNames = session->getExperimentElementInstanceNames(m_brickletPtr, L"");
   for (WstringVectorIt itInstance = elementInstanceNames.begin(); itInstance != elementInstanceNames.end(); itInstance++)
@@ -495,8 +493,6 @@ void BrickletClass::generateAllAxesVector()
   const unsigned int maxRuns = 100;
 
   Vernissage::Session* session = getVernissageSession();
-  ASSERT_RETURN_VOID(session);
-
   const std::wstring rootAxis = session->getRootAxisName(m_brickletPtr);
   const std::wstring triggerAxis = session->getTriggerAxisName(m_brickletPtr);
 
@@ -555,10 +551,13 @@ const std::vector<std::string>& BrickletClass::getAxes<std::string>()
 */
 void BrickletClass::setBrickletPointer( void* const vernissageBricklet )
 {
-  ASSERT_RETURN_VOID(vernissageBricklet);
+  THROW_IF_NULL(vernissageBricklet);
   m_brickletPtr = vernissageBricklet;
 }
 
+/*
+  Does never return NULL
+*/
 void* BrickletClass::getBrickletPointer() const
 {
   return m_brickletPtr;

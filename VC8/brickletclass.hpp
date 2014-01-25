@@ -72,6 +72,9 @@ public:
   const ExtremaData& getExtrema()const;
 
 private:
+  BrickletClass(const BrickletClass&);
+  BrickletClass& operator=(const BrickletClass&);
+
   void loadMetaData();
   void loadDeploymentParameters();
   void generateAllAxesVector();

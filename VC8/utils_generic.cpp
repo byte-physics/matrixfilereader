@@ -8,27 +8,14 @@
 #include "utils_generic.hpp"
 #include "globaldata.hpp"
 
-/*
-  Convert a string to a wstring
-*/
-std::wstring StringToWString(const std::string& s)
+std::wstring ansiToUnicode(const std::string& s)
 {
-  std::wstring temp(s.length(), L' ');
-  std::copy(s.begin(), s.end(), temp.begin());
-  return temp;
+  return GlobalData::Instance().getVernissageSession()->ansiToUnicode(s);
 }
 
-/*
-  Convert a char ptr to a string
-*/
-std::wstring CharPtrToWString(char* cStr)
+std::string unicodeToAnsi(const std::wstring& s)
 {
-  if (cStr == NULL)
-  {
-    return std::wstring();
-  }
-  std::string str(cStr);
-  return StringToWString(str);
+  return GlobalData::Instance().getVernissageSession()->unicodeToAnsi(s);
 }
 
 /*
@@ -127,12 +114,4 @@ void RemoveAllBackslashesAtTheEnd(char* str)
 bool doubleToBool(double value)
 {
   return (value < DBL_EPSILON ? false : true);
-}
-
-template<>
-std::string toString<>( const std::wstring& s )
-{
-  std::string temp(s.length(), ' ');
-  std::copy(s.begin(), s.end(), temp.begin());
-  return temp;
 }

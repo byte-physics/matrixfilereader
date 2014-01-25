@@ -129,8 +129,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   ASSERT_RETURN_ZERO(session);
 
   // now we convert to wide strings
-  const std::wstring  dirPathWString = CharPtrToWString(dirPath);
-  const std::wstring  fileNameWString = CharPtrToWString(fileName);
+  const std::wstring  dirPathWString = ansiToUnicode(dirPath);
+  const std::wstring  fileNameWString = ansiToUnicode(fileName);
 
   // true -> result set will be added to the database
   // false -> replaces the current results sets in the internal databse

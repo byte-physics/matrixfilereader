@@ -31,6 +31,9 @@
 //#define DEBUGCODE \
 //  HISTPRINT("line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);\
 
+std::wstring ansiToUnicode(const std::string& s);
+std::string unicodeToAnsi(const std::wstring& s);
+
 template <class T>
 T stringToAnyType(std::string str)
 {
@@ -39,9 +42,6 @@ T stringToAnyType(std::string str)
   ss >> t;
   return t;
 }
-
-std::wstring StringToWString(const std::string& s);
-std::wstring CharPtrToWString(char* cStr);
 
 /*
   Converts any type to a std::string
@@ -59,13 +59,16 @@ std::string toString(const T& t)
   Specialization
 */
 template<>
-std::string toString<std::wstring>(const std::wstring& s);
+inline std::string toString<std::wstring>(const std::wstring& s)
+{
+  return unicodeToAnsi(s);
+}
 
 /*
   Specialization (which does nothing)
 */
 template<>
-inline std::string toString<>( const std::string& s )
+inline std::string toString<std::string>( const std::string& s )
 {
   return s;
 }

@@ -65,7 +65,7 @@ BrickletClass::BrickletClass(int brickletID, void* const vernissageBricklet)
 
 BrickletClass::~BrickletClass()
 {
-  this->clearCache();
+  clearCache();
 }
 
 /*

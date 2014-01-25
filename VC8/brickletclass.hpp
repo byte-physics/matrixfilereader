@@ -36,7 +36,7 @@ public:
   template<typename T>
   T getMetaDataValue(const std::string& key)
   {
-    return stringToAnyType<T>(this->getMetaDataValue<std::string>(key));
+    return stringToAnyType<T>(getMetaDataValue<std::string>(key));
   }
 
   template<>

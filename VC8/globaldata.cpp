@@ -59,7 +59,7 @@ GlobalData::~GlobalData()
 // store name and path of the open result file
 void GlobalData::setResultFile(const std::wstring& dirPath, const std::wstring& fileName)
 {
-  if (this->resultFileOpen())
+  if (resultFileOpen())
   {
     HISTPRINT("BUG: there is already a result file open, please close that first");
     return;
@@ -119,7 +119,7 @@ void GlobalData::closeResultFile()
 */
 void GlobalData::closeSession()
 {
-  this->closeResultFile();
+  closeResultFile();
   m_DLLHandler.closeSession();
   m_VernissageSession = NULL;
 }
@@ -129,7 +129,7 @@ const std::string& GlobalData::getVernissageVersion()
 {
   if (m_VernissageSession == NULL)
   {
-    this->getVernissageSession();
+    getVernissageSession();
   }
 
   return m_DLLHandler.getVernissageVersion();
@@ -234,7 +234,7 @@ void GlobalData::finalizeWithFilledCache()
 */
 void GlobalData::finalize()
 {
-  this->setError(SUCCESS);
+  setError(SUCCESS);
 }
 
 /*
@@ -248,7 +248,7 @@ void GlobalData::initializeWithoutReadSettings(int calledFromMacro, int calledFr
   // set it temporary to false, otherwise the setError in the next line causes the error message to be printed
   m_errorToHistory = false;
 
-  this->setError(UNKNOWN_ERROR);
+  setError(UNKNOWN_ERROR);
   m_errorToHistory = (calledFromMacro == 0 && calledFromFunction == 0);
 }
 
@@ -258,8 +258,8 @@ void GlobalData::initializeWithoutReadSettings(int calledFromMacro, int calledFr
 */
 void GlobalData::initialize(int calledFromMacro, const int calledFromFunction)
 {
-  this->readSettings();
-  this->initializeWithoutReadSettings(calledFromMacro, calledFromFunction);
+  readSettings();
+  initializeWithoutReadSettings(calledFromMacro, calledFromFunction);
 }
 
 /*

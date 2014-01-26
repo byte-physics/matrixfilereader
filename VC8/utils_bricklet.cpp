@@ -7,7 +7,7 @@
 #include "stdafx.h"
 
 #include "utils_bricklet.hpp"
-#include "waveclass.hpp"
+#include "wave.hpp"
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 

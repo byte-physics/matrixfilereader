@@ -337,7 +337,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\waveclass.cpp"
+				RelativePath=".\wave.cpp"
 				>
 				<FileConfiguration
 					Name="Release (static build)|Win32"
@@ -426,7 +426,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\waveclass.hpp"
+				RelativePath=".\wave.hpp"
 				>
 			</File>
 			<File

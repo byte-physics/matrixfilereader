@@ -7,7 +7,7 @@
 #include "stdafx.h"
 
 #include "globaldata.hpp"
-#include "waveclass.hpp"
+#include "wave.hpp"
 #include "utils_generic.hpp"
 #include "constants.hpp"
 

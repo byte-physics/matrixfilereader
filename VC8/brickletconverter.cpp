@@ -9,7 +9,7 @@
 #include "brickletconverter.hpp"
 #include "utils_bricklet.hpp"
 #include "globaldata.hpp"
-#include "waveclass.hpp"
+#include "wave.hpp"
 #include "bricklet.hpp"
 #include "extremadata.hpp"
 #include "utils_generic.hpp"

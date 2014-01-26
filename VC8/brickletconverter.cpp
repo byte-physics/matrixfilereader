@@ -75,7 +75,7 @@ namespace
 
     dimensionSizes[ROWS] = numPointsTriggerAxis;
 
-    WaveClass wave1D;
+    Wave wave1D;
     wave1D.setNameAndTraceDir(waveBaseName, NO_TRACE);
 
     waveHndl waveHandle;
@@ -174,11 +174,11 @@ namespace
     dimensionSizes[COLUMNS] = numPointsRootAxis;
     const int waveSize = dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
-    WaveClass wave[MAX_NUM_TRACES];
-    WaveClass* traceUpData = &wave[TRACE_UP];
-    WaveClass* reTraceUpData = &wave[RE_TRACE_UP];
-    WaveClass* traceDownData = &wave[TRACE_DOWN];
-    WaveClass* reTraceDownData = &wave[RE_TRACE_DOWN];
+    Wave wave[MAX_NUM_TRACES];
+    Wave* traceUpData = &wave[TRACE_UP];
+    Wave* reTraceUpData = &wave[RE_TRACE_UP];
+    Wave* traceDownData = &wave[TRACE_DOWN];
+    Wave* reTraceDownData = &wave[RE_TRACE_DOWN];
 
     int triggerAxisBlockSize;
 
@@ -778,11 +778,11 @@ namespace
     DEBUGPRINT("dimensions of the cube: rows=%d,cols=%d,layers=%d",
                dimensionSizes[ROWS], dimensionSizes[COLUMNS], dimensionSizes[LAYERS]);
 
-    WaveClass wave[MAX_NUM_TRACES];
-    WaveClass* traceUpData = &wave[TRACE_UP];
-    WaveClass* reTraceUpData = &wave[RE_TRACE_UP];
-    WaveClass* traceDownData = &wave[TRACE_DOWN];
-    WaveClass* reTraceDownData = &wave[RE_TRACE_DOWN];
+    Wave wave[MAX_NUM_TRACES];
+    Wave* traceUpData = &wave[TRACE_UP];
+    Wave* reTraceUpData = &wave[RE_TRACE_UP];
+    Wave* traceDownData = &wave[TRACE_DOWN];
+    Wave* reTraceDownData = &wave[RE_TRACE_DOWN];
 
     // 4 cubes, TraceUp, TraceDown, ReTraceUp, ReTraceDown
     if (numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableBWD != 0 &&
@@ -1087,7 +1087,7 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
 
   Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
 
-  WaveClass wave(bricklet.getExtrema());
+  Wave wave(bricklet.getExtrema());
   wave.setNameAndTraceDir(waveName, NO_TRACE);
 
   const int* rawBrickletDataPtr = bricklet.getRawData();

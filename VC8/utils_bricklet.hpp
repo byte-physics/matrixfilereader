@@ -11,7 +11,7 @@
 std::string viewTypeCodeToString(unsigned int idx);
 std::string brickletTypeToString(unsigned int idx);
 
-void setDataWaveNote(int brickletID, const WaveClass& waveData);
+void setDataWaveNote(int brickletID, const Wave& waveData);
 void setOtherWaveNote(waveHndl waveHandle, int brickletID  = -1, int traceDir  = -1);
 std::string getStandardWaveNote(int brickletID = -1, int traceDir = -1);
 

@@ -9,7 +9,7 @@ class ExtremaData;
 class Bricklet;
 typedef boost::shared_ptr<Bricklet> BrickletPtr;
 class DLLHandler;
-class WaveClass;
+class Wave;
 
 // Forward Declare Vernissage classes also
 namespace Vernissage

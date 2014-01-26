@@ -179,7 +179,7 @@ std::string brickletTypeToString(unsigned int idx)
 /*
   Set the appropriate wave note for data waves
 */
-void setDataWaveNote( int brickletID, const WaveClass& waveData )
+void setDataWaveNote( int brickletID, const Wave& waveData )
 {
   std::string  waveNote = getStandardWaveNote(brickletID, waveData.getTraceDir());
 

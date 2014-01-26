@@ -12,12 +12,12 @@
 /*
   Internal representation of a igor wave
 */
-class WaveClass
+class Wave
 {
 public:
-  WaveClass();
-  WaveClass(const ExtremaData& extremaData);
-  ~WaveClass();
+  Wave();
+  Wave(const ExtremaData& extremaData);
+  ~Wave();
 
   void clearWave();
   void setWaveHandle(const waveHndl& waveHandle);
@@ -56,7 +56,7 @@ private:
   It will _not_ be checked if index is out-of-range
   Here we also determine the extrema values
 */
-inline void WaveClass::fillWave(int index, int rawValue, double scaledValue)
+inline void Wave::fillWave(int index, int rawValue, double scaledValue)
 {
   if (m_floatPtr)
   {

@@ -10,12 +10,12 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
-WaveClass::WaveClass()
+Wave::Wave()
 {
   Init();
 }
 
-WaveClass::WaveClass( const ExtremaData& extremaData )
+Wave::Wave( const ExtremaData& extremaData )
   :
   m_extrema(extremaData)
 {
@@ -23,7 +23,7 @@ WaveClass::WaveClass( const ExtremaData& extremaData )
 }
 
 // Common initialization routine for all ctors
-void WaveClass::Init()
+void Wave::Init()
 {
   m_traceDir = NO_TRACE;
   moreData = false;
@@ -33,12 +33,12 @@ void WaveClass::Init()
   m_pixelSize = default_pixelsize;
 }
 
-WaveClass::~WaveClass(){}
+Wave::~Wave(){}
 
 /*
   Make a connection between the waveHandle and this class
 */
-void WaveClass::setWaveHandle(const waveHndl& waveHandle)
+void Wave::setWaveHandle(const waveHndl& waveHandle)
 {
   THROW_IF_NULL(waveHandle);
 
@@ -72,7 +72,7 @@ void WaveClass::setWaveHandle(const waveHndl& waveHandle)
 /*
   Set the name and trace direction of the wave, adds then the appropriate suffix to the wave name
 */
-void WaveClass::setNameAndTraceDir(const std::string& basename, int traceDir)
+void Wave::setNameAndTraceDir(const std::string& basename, int traceDir)
 {
   m_traceDir = traceDir;
 
@@ -107,7 +107,7 @@ void WaveClass::setNameAndTraceDir(const std::string& basename, int traceDir)
 /*
   Output debug info
 */
-void WaveClass::printDebugInfo()
+void Wave::printDebugInfo()
 {
   DEBUGPRINT("%s: waveHandle=%p, float=%p, double=%p, moreData=%s",
              m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr, moreData ? "true" : "false");
@@ -116,7 +116,7 @@ void WaveClass::printDebugInfo()
 /*
   Sets the complete wave to NaN
 */
-void WaveClass::clearWave()
+void Wave::clearWave()
 {
   if (m_doublePtr)
   {
@@ -131,7 +131,7 @@ void WaveClass::clearWave()
 /*
   convenience wrapper
 */
-void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr)
+void Wave::setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr)
 {
   ASSERT_RETURN_VOID(m_waveHandle);
 
@@ -146,7 +146,7 @@ void WaveClass::setWaveScaling(int dimension, const double* sfAPtr, const double
 /*
   convenience wrapper
 */
-void WaveClass::setWaveUnits(int dimension, const std::string& units)
+void Wave::setWaveUnits(int dimension, const std::string& units)
 {
   ASSERT_RETURN_VOID(m_waveHandle);
 
@@ -158,42 +158,42 @@ void WaveClass::setWaveUnits(int dimension, const std::string& units)
   }
 }
 
-void WaveClass::setWaveUnits(int dimension, const std::wstring& units)
+void Wave::setWaveUnits(int dimension, const std::wstring& units)
 {
   setWaveUnits(dimension, unicodeToAnsi(units));
 }
 
-const ExtremaData& WaveClass::getExtrema() const
+const ExtremaData& Wave::getExtrema() const
 {
   return m_extrema;
 }
 
-bool WaveClass::isEmpty() const
+bool Wave::isEmpty() const
 {
   return m_wavename.empty();
 }
 
-int WaveClass::getTraceDir() const
+int Wave::getTraceDir() const
 {
   return m_traceDir;
 }
 
-const char* WaveClass::getWaveName() const
+const char* Wave::getWaveName() const
 {
   return m_wavename.c_str();
 }
 
-waveHndl WaveClass::getWaveHandle() const
+waveHndl Wave::getWaveHandle() const
 {
   return m_waveHandle;
 }
 
-int WaveClass::GetPixelSize() const
+int Wave::GetPixelSize() const
 {
   return m_pixelSize;
 }
 
-void WaveClass::SetPixelSize(int pixelSize)
+void Wave::SetPixelSize(int pixelSize)
 {
   m_pixelSize = pixelSize;
 }

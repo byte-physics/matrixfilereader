@@ -2,11 +2,12 @@
   Forward Declarations of all XOP classes
 */
 #pragma once
+#include <boost/smart_ptr.hpp>
 
 class GlobalData;
 class ExtremaData;
-class BrickletClass;
-typedef BrickletClass* BrickletClassPtr;
+class Bricklet;
+typedef boost::shared_ptr<Bricklet> BrickletPtr;
 class DLLHandler;
 class WaveClass;
 

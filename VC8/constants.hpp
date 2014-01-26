@@ -82,8 +82,8 @@ const int MAX_NUM_TRACES          = 4;
 
 const char PROJECTURL[]           = "http://www.igorexchange.com/project/matrixFileReader";
 
-// number of keys to reserve space for in the metadata std::vector
-const int  METADATA_RESERVE_SIZE  = 1024;
+// number of entries to reserver in some vectors
+const int  RESERVE_SIZE           = 1024;
 
 // useful for MDSetWaveUnits, defined in accordance to ROWS, COLUMNS, etc.
 const int DATA = -1;

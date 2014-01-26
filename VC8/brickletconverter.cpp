@@ -10,14 +10,14 @@
 #include "utils_bricklet.hpp"
 #include "globaldata.hpp"
 #include "waveclass.hpp"
-#include "brickletclass.hpp"
+#include "bricklet.hpp"
 #include "extremadata.hpp"
 #include "utils_generic.hpp"
 
 namespace
 {
   // Create data for the raw->scaled transformation
-  void CalculateTransformationParameter(const BrickletClass& bricklet, double& slope, double& yIntercept)
+  void CalculateTransformationParameter(const Bricklet& bricklet, double& slope, double& yIntercept)
   {
     // the min and max values here are for the complete bricklet data and not only for one wave
     const int xOne = bricklet.getExtrema().getRawMin();
@@ -48,7 +48,7 @@ namespace
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+    Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
     void* vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
@@ -80,7 +80,7 @@ namespace
 
     waveHndl waveHandle;
     int ret = MDMakeWave(&waveHandle, wave1D.getWaveName(), waveFolderHandle, dimensionSizes,
-                         GlobalData::Instance().getIgorWaveType(), GlobalData::Instance().isOverwriteEnabled<int>());
+                         getIgorWaveType(), isOverwriteEnabled());
 
     if (ret == NAME_WAV_CONFLICT)
     {
@@ -127,7 +127,7 @@ namespace
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+    Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
     void* vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
@@ -222,7 +222,7 @@ namespace
 
       waveHndl waveHandle;
       int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), waveFolderHandle, dimensionSizes,
-                           GlobalData::Instance().getIgorWaveType(), GlobalData::Instance().isOverwriteEnabled<int>());
+                           getIgorWaveType(), isOverwriteEnabled());
 
       if (ret == NAME_WAV_CONFLICT)
       {
@@ -515,7 +515,7 @@ namespace
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+    Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
     void* const vernissageBricklet = bricklet.getBrickletPointer();
     Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
@@ -846,7 +846,7 @@ namespace
       }
 
       waveHndl waveHandle;
-      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), waveFolderHandle, dimensionSizes, GlobalData::Instance().getIgorWaveType(), GlobalData::Instance().isOverwriteEnabled<int>());
+      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), waveFolderHandle, dimensionSizes, getIgorWaveType(), isOverwriteEnabled());
 
       if (ret == NAME_WAV_CONFLICT)
       {
@@ -1024,7 +1024,7 @@ namespace
 int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, bool resampleData,
                 int pixelSize, std::string& waveNameList)
 {
-  BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+  Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
   const int dimension = bricklet.getMetaDataValue<int>("dimension");
 
   if (GlobalData::Instance().isDebuggingEnabled())
@@ -1085,7 +1085,7 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
   CountInt dimensionSizes[MAX_DIMENSIONS + 1];
   MemClear(dimensionSizes, sizeof(dimensionSizes));
 
-  BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+  Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
 
   WaveClass wave(bricklet.getExtrema());
   wave.setNameAndTraceDir(waveName, NO_TRACE);
@@ -1102,7 +1102,7 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
   dimensionSizes[ROWS] = rawBrickletSize;
 
   waveHndl waveHandle;
-  ret = MDMakeWave(&waveHandle, wave.getWaveName(), dfHandle, dimensionSizes, NT_I32, GlobalData::Instance().isOverwriteEnabled<int>());
+  ret = MDMakeWave(&waveHandle, wave.getWaveName(), dfHandle, dimensionSizes, NT_I32, isOverwriteEnabled());
 
   if (ret == NAME_WAV_CONFLICT)
   {

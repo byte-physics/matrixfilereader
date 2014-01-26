@@ -11,7 +11,7 @@
 #include "utils_bricklet.hpp"
 #include "brickletconverter.hpp"
 #include "globaldata.hpp"
-#include "brickletclass.hpp"
+#include "bricklet.hpp"
 #include "utils_generic.hpp"
 
 namespace  {
@@ -295,7 +295,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
 
   for (int brickletID = startBrickletID; brickletID <= endBrickletID; brickletID++)
   {
-    BrickletClass& bricklet = GlobalData::Instance().getBricklet(brickletID);
+    Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
 
     char waveName[MAX_OBJ_NAME + 1];
     ret = formatWaveName(waveName, baseName, brickletID);

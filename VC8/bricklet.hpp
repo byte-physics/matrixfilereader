@@ -16,11 +16,11 @@
 /*
   Internal representation of a bricklet
 */
-class BrickletClass
+class Bricklet
 {
 public:
-  BrickletClass(int brickletID, void* const vernissageBricklet);
-  ~BrickletClass();
+  Bricklet(int brickletID, void* const vernissageBricklet);
+  ~Bricklet();
 
 public:
   void setBrickletPointer(void* const vernissageBricklet);
@@ -40,7 +40,7 @@ public:
   }
 
   template<>
-  std::string BrickletClass::getMetaDataValue( const std::string& key )
+  std::string Bricklet::getMetaDataValue( const std::string& key )
   {
     if (key.empty())
     {
@@ -73,8 +73,8 @@ public:
   const ExtremaData& getExtrema()const;
 
 private:
-  BrickletClass(const BrickletClass&);
-  BrickletClass& operator=(const BrickletClass&);
+  Bricklet(const Bricklet&);
+  Bricklet& operator=(const Bricklet&);
 
   void loadMetaData();
   void loadDeploymentParameters();
@@ -84,7 +84,8 @@ private:
   const int m_brickletID;
 
   // storage for the raw data
-  int* m_rawBufferContents;
+  typedef boost::scoped_array<int> ScopedIntArray;
+  ScopedIntArray m_rawBufferContents;
   int m_rawBufferContentsSize;
 
   ExtremaData m_extrema;

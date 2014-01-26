@@ -30,7 +30,7 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<s
   dimensionSizes[COLUMNS] = 2;
 
   waveHndl waveHandle;
-  int ret = MDMakeWave(&waveHandle, waveName, dataFolderHandle, dimensionSizes, TEXT_WAVE_TYPE, GlobalData::Instance().isOverwriteEnabled<int>());
+  int ret = MDMakeWave(&waveHandle, waveName, dataFolderHandle, dimensionSizes, TEXT_WAVE_TYPE, isOverwriteEnabled());
 
   if (ret == NAME_WAV_CONFLICT)
   {
@@ -269,4 +269,53 @@ bool isValidTraceDir(int traceDir)
 Vernissage::Session* getVernissageSession()
 {
   return GlobalData::Instance().getVernissageSession();
+}
+
+int isOverwriteEnabled()
+{
+  return static_cast<int>(GlobalData::Instance().isOverwriteEnabled());
+}
+
+/*
+  Returns an integer which tells if we should create single or double precision waves
+  the integer can be readily used with MDMakeWave
+*/
+int getIgorWaveType()
+{
+  return (GlobalData::Instance().isDoubleWaveEnabled() ? NT_FP64 : NT_FP32);
+}
+
+/*
+  Returns a vector of all bricklets which are part of the series of rawBrickletPtr (also included).
+  The returned vector is not sorted.
+*/
+std::vector<void*> getBrickletSeries( void* rawBrickletPtr )
+{
+  std::vector<void*> brickeltSeries;
+
+  if (rawBrickletPtr == NULL)
+  {
+    return brickeltSeries;
+  }
+
+  // get all predecessors
+  void* p =  rawBrickletPtr;
+
+  while ((p = getVernissageSession()->getPredecessorBricklet(p)) != NULL)
+  {
+    brickeltSeries.push_back(p);
+  }
+
+  // add the bricklet itself
+  brickeltSeries.push_back(rawBrickletPtr);
+
+  // get all successors
+  p =  rawBrickletPtr;
+
+  while ((p = getVernissageSession()->getSuccessorBricklet(p)) != NULL)
+  {
+    brickeltSeries.push_back(p);
+  }
+
+  return brickeltSeries;
 }

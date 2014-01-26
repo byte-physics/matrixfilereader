@@ -152,11 +152,10 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   for (int i = 1; i <= totalNumBricklets; i++)
   {
     void* vernissageBricklet = session->getNextBricklet(&pContext);
-    ASSERT_RETURN_ZERO(vernissageBricklet);
 
     try
     {
-      GlobalData::Instance().createBrickletClassObject(i, vernissageBricklet);
+      GlobalData::Instance().createBricklet(i, vernissageBricklet);
     }
     catch (CMemoryException* e)
     {

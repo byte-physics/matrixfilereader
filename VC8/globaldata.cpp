@@ -8,14 +8,15 @@
 
 #include "globaldata.hpp"
 #include "dllhandler.hpp"
-#include "brickletclass.hpp"
+#include "bricklet.hpp"
 #include "utils_generic.hpp"
+#include "utils_bricklet.hpp"
 
 namespace  {
 
-  typedef std::map<int, BrickletClassPtr> BrickletClassPtrMap;
-  typedef BrickletClassPtrMap::iterator BrickletMapIt;
-  typedef BrickletClassPtrMap::const_iterator BrickletMapCIt;
+  typedef RawBrickletToIDMap::const_iterator MapCIt;
+  typedef BrickletPtrVector::iterator BrickletVectorIt;
+  typedef BrickletPtrVector::const_iterator BrickletVectorCIt;
 
   bool getSettingOrDefault( DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
   {
@@ -51,7 +52,9 @@ GlobalData::GlobalData()
   m_datafolder(datafolder_default),
   m_datacache(cache_default),
   m_errorToHistory(false)
-{}
+{
+  m_bricklets.reserve(RESERVE_SIZE);
+}
 
 GlobalData::~GlobalData()
 {}
@@ -92,15 +95,8 @@ Vernissage::Session* GlobalData::getVernissageSession()
 */
 void GlobalData::closeResultFile()
 {
-  //delete BrickletClass objects
-  for (BrickletMapIt it = m_bricklets.begin(); it != m_bricklets.end(); it++)
-  {
-    delete it->second;
-    it->second = NULL;
-  }
-
-  // empty bricklet map
   m_bricklets.clear();
+  m_rawToBrickletID.clear();
 
   // remove opened result set from internal database
   if (m_VernissageSession)
@@ -124,7 +120,9 @@ void GlobalData::closeSession()
   m_VernissageSession = NULL;
 }
 
-// return a version string identifying the vernissage DLL version
+/*
+  Returns a version string identifying the vernissage DLL version
+*/
 const std::string& GlobalData::getVernissageVersion()
 {
   if (m_VernissageSession == NULL)
@@ -140,64 +138,82 @@ bool GlobalData::resultFileOpen() const
   return (!m_resultFileName.empty());
 }
 
-/*
-  returns an integer which tells if we should create single or double precision waves
-  the integer can be readily used with MDMakeWave
-*/
-int GlobalData::getIgorWaveType() const
+Bricklet& GlobalData::getBricklet(int brickletID)
 {
-  return (m_doubleWave ? NT_FP64 : NT_FP32);
-}
-
-/*
-  m_brickletIDBrickletClassMap maps a brickletID to a brickletClass pointer
-  returns NULL if the bricklet with brickletID can not be found
-*/
-BrickletClass* GlobalData::getBrickletPtr(int brickletID) const
-{
-  BrickletMapCIt it = m_bricklets.find(brickletID);
-
-  if (it != m_bricklets.end()) // we found the element
-  {
-    return it->second;
-  }
-
-  return NULL;
-}
-
-BrickletClass& GlobalData::getBricklet(int brickletID) const
-{
-  BrickletClass* bricklet = getBrickletPtr(brickletID);
-
-  if(bricklet == NULL)
+  if( !isValidBrickletID(brickletID)
+      || brickletID >= boost::numeric_cast<int>(m_bricklets.size())
+      || !m_bricklets[brickletID]
+    )
   {
     throw std::runtime_error("The requested bricklet " + toString(brickletID) + " does not exist");
   }
-  return *bricklet;
+
+  return *m_bricklets[brickletID];
 }
 
 /*
-  for each bricklet we have to call this function and make the connection between the vernissageBricklet pointer
-  from the vernissage DLL and our brickletClass objects
+  For each bricklet we have to call this function and make the connection between the vernissageBricklet pointer
+  from the vernissage DLL and our Bricklet objects
 */
-void GlobalData::createBrickletClassObject(int brickletID, void* const vernissageBricklet)
+void GlobalData::createBricklet(int brickletID, void* const vernissageBricklet)
 {
-  BrickletClass* bricklet = NULL;
+  THROW_IF_NULL(vernissageBricklet);
 
   try
   {
-    bricklet = new BrickletClass(brickletID, vernissageBricklet);
+    const int numBricklets = boost::numeric_cast<int>(m_bricklets.size());
+    const int totalNumBricklets = getVernissageSession()->getBrickletCount();
+
+    if (brickletID >= numBricklets)
+    {
+      if( totalNumBricklets < numBricklets )
+      {
+        throw std::runtime_error("BUG: Number of bricklets must not shrink.");
+      }
+
+      DEBUGPRINT("createBricklet: Increasing size of m_bricklets");
+
+      // we reserve more than we currently need
+      // m_bricklets[0] is always unused, so we need to create a bye one larger vector
+      m_bricklets.reserve(totalNumBricklets*2);
+      m_bricklets.resize(totalNumBricklets+1);
+    }
+
+    if(m_bricklets[brickletID])
+    {
+      throw std::runtime_error("Trying to overwrite brickletID " + toString((brickletID)));
+    }
+
+    m_bricklets[brickletID] = boost::make_shared<Bricklet>(brickletID, vernissageBricklet);
+    m_rawToBrickletID[vernissageBricklet] = brickletID;
+
+    DEBUGPRINT("createBricklet brickletID=%d,vernissageBricklet=%p", brickletID, vernissageBricklet);
   }
   catch (CMemoryException* e)
   {
     HISTPRINT("Out of memory in createBrickletClassObject\r");
     throw e;
   }
+}
 
-  ASSERT_RETURN_VOID(bricklet);
-  m_bricklets[brickletID] = bricklet;
+/*
+  Update the vernissage bricklet pointer for Bricklet brickletID to vernissageBricklet
+*/
+void GlobalData::updateBricklet(int brickletID, void* const vernissageBricklet)
+{
+  Bricklet& bricklet = getBricklet(brickletID);
+  void* const oldVernissageBricklet = bricklet.getBrickletPointer();
 
-  DEBUGPRINT("createBrickletClassObject brickletID=%d,vernissageBricklet=%p", brickletID, vernissageBricklet);
+  if( oldVernissageBricklet == vernissageBricklet)
+  {
+    return;
+  }
+
+  DEBUGPRINT("Updating vernissage bricklet pointer from %p to %p", oldVernissageBricklet, vernissageBricklet);
+
+  m_rawToBrickletID.erase(oldVernissageBricklet);
+  m_rawToBrickletID[vernissageBricklet] = brickletID;
+  bricklet.setBrickletPointer(vernissageBricklet);
 }
 
 /*
@@ -222,9 +238,9 @@ void GlobalData::finalizeWithFilledCache()
 
   if (!isDataCacheEnabled())
   {
-    for (BrickletMapIt it = m_bricklets.begin(); it != m_bricklets.end(); it++)
+    for (BrickletVectorIt it = m_bricklets.begin() + 1; it != m_bricklets.end(); it++)
     {
-      it->second->clearCache();
+      (*it)->clearCache();
     }
   }
 }
@@ -254,7 +270,7 @@ void GlobalData::initializeWithoutReadSettings(int calledFromMacro, int calledFr
 
 /*
   Must be called by every operation which sets V_flag and does depend on the V_MatrixFileReader*
-  variables defined in constans.h
+  variables defined in constants.h
 */
 void GlobalData::initialize(int calledFromMacro, const int calledFromFunction)
 {
@@ -391,72 +407,18 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */)
 }
 
 /*
-  Converts a vector of vernissage APIs raw bricklet pointers to a vector of brickletIDs
-*/
-std::vector<int> GlobalData::convertBrickletPtr(const std::vector<void*>& rawBrickletPtrs) const
-{
-  std::vector<int> brickletIDs;
-  brickletIDs.reserve(rawBrickletPtrs.size());
-
-  typedef std::vector<void*>::const_iterator ItType;
-  for (ItType it = rawBrickletPtrs.begin(); it != rawBrickletPtrs.end(); it++)
-  {
-    brickletIDs.push_back(convertBrickletPtr(*it));
-  }
-
-  return brickletIDs;
-}
-
-/*
   Returns a brickletID for the vernissage APIs raw bricklet pointer
 */
 int GlobalData::convertBrickletPtr(void* rawBrickletPtr) const
 {
-  for (BrickletMapCIt it = m_bricklets.begin(); it != m_bricklets.end(); it++)
+  MapCIt it = m_rawToBrickletID.find(rawBrickletPtr);
+  if( it != m_rawToBrickletID.end())
   {
-    if (it->second->getBrickletPointer() == rawBrickletPtr)
-    {
-      return it->first;
-    }
+    return it->second;
   }
 
   HISTPRINT("BUG: Could not find a corresponding brickletID for the raw pointer %p", rawBrickletPtr);
   return INVALID_BRICKLETID;
-}
-
-/*
-  Returns a vector of all bricklets which are part of the series of rawBrickletPtr (also included).
-  The returned vector is not sorted.
-*/
-std::vector<void*> GlobalData::getBrickletSeries(void* rawBrickletPtr)
-{
-  std::vector<void*> brickeltSeries;
-
-  if (rawBrickletPtr == NULL)
-  {
-    return brickeltSeries;
-  }
-
-  // get all predecessors
-  void* p =  rawBrickletPtr;
-
-  while ((p = m_VernissageSession->getPredecessorBricklet(p)) != NULL)
-  {
-    brickeltSeries.push_back(p);
-  }
-
-  // add the bricklet itself
-  brickeltSeries.push_back(rawBrickletPtr);
-
-  // get all successors
-  p =  rawBrickletPtr;
-
-  while ((p = m_VernissageSession->getSuccessorBricklet(p)) != NULL)
-  {
-    brickeltSeries.push_back(p);
-  }
-
-  return brickeltSeries;
 }
 
 bool GlobalData::isDataCacheEnabled() const
@@ -477,4 +439,9 @@ bool GlobalData::isDebuggingEnabled() const
 bool GlobalData::isDoubleWaveEnabled() const
 {
   return m_doubleWave;
+}
+
+bool GlobalData::isOverwriteEnabled() const
+{
+  return m_overwrite;
 }

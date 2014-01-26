@@ -10,7 +10,7 @@
 #include "operationsinterface.hpp"
 #include "globaldata.hpp"
 #include "utils_bricklet.hpp"
-#include "brickletclass.hpp"
+#include "bricklet.hpp"
 #include "utils_generic.hpp"
 
 extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
@@ -128,7 +128,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
   dimensionSizes[ROWS] = numberOfBricklets;
   dimensionSizes[COLUMNS] = keys.size();
 
-  ret = MDMakeWave(&waveHandle, waveName.c_str(), destDataFolderHndl, dimensionSizes, TEXT_WAVE_TYPE, GlobalData::Instance().isOverwriteEnabled<int>());
+  ret = MDMakeWave(&waveHandle, waveName.c_str(), destDataFolderHndl, dimensionSizes, TEXT_WAVE_TYPE, isOverwriteEnabled());
 
   if (ret == NAME_WAV_CONFLICT)
   {
@@ -152,7 +152,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
     for (int i = 1; i <= numberOfBricklets; i++)
     {
-      BrickletClass& bricklet = GlobalData::Instance().getBricklet(i);
+      Bricklet& bricklet = GlobalData::Instance().getBricklet(i);
       const std::string value = bricklet.getMetaDataValue<std::string>(key);
       textWaveContents.push_back(value);
       DEBUGPRINT("   value=%s", value.c_str());

@@ -10,7 +10,7 @@
 #include "operationsinterface.hpp"
 #include "utils_bricklet.hpp"
 #include "globaldata.hpp"
-#include "brickletclass.hpp"
+#include "bricklet.hpp"
 #include "utils_generic.hpp"
 
 extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPtr p)
@@ -91,7 +91,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
 
   if (numberOfBricklets > 0)
   {
-    BrickletClass& bricklet = GlobalData::Instance().getBricklet(numberOfBricklets);
+    Bricklet& bricklet = GlobalData::Instance().getBricklet(numberOfBricklets);
     void* vernissageBricklet = bricklet.getBrickletPointer();
 
     // use the timestamp of the last bricklet as dateOfLastChange

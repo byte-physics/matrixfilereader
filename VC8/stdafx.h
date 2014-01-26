@@ -22,17 +22,14 @@
 #undef max
 #undef min
 
-#pragma  warning(push)
-#pragma  warning(disable: 4244) // conversion from 'const wchar_t' to 'char', possible loss of data
 #include <string>
-#pragma  warning(pop)
-
 #include <algorithm>
 #include <sstream>
 #include <vector>
 #include <map>
-
 #include <limits>
+#include <boost/smart_ptr.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "XOPStandardHeaders.h"
 

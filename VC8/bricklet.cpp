@@ -5,7 +5,7 @@
 */
 #include "stdafx.h"
 
-#include "brickletclass.hpp"
+#include "bricklet.hpp"
 #include "globaldata.hpp"
 #include "utils_bricklet.hpp"
 #include "extremadata.hpp"
@@ -15,7 +15,7 @@ namespace  {
 
   typedef std::map<std::wstring, Vernissage::Session::Parameter> ParameterMap;
   typedef ParameterMap::const_iterator ParameterMapIt;
-  typedef std::vector<BrickletClass::StringPair> StringPairVector;
+  typedef std::vector<Bricklet::StringPair> StringPairVector;
   typedef std::vector<std::wstring> WstringVector;
   typedef WstringVector::const_iterator WstringVectorIt;
 
@@ -51,34 +51,47 @@ namespace  {
     }
   }
 
+  int convertBrickletPtr(void* rawBrickletPtr)
+  {
+    return GlobalData::Instance().convertBrickletPtr(rawBrickletPtr);
+  }
+
+  std::vector<int> convertRawBrickletVector(std::vector<void*> rawVec)
+  {
+    std::vector<int> idVec(rawVec.size());
+    std::transform(rawVec.begin(),rawVec.end(),idVec.begin(),convertBrickletPtr);
+    return idVec;
+  }
+
 } // anonymous namespace
 
-BrickletClass::BrickletClass(int brickletID, void* const vernissageBricklet)
+Bricklet::Bricklet(int brickletID, void* const vernissageBricklet)
   :
   m_brickletPtr(vernissageBricklet),
-  m_rawBufferContents(NULL),
   m_rawBufferContentsSize(0),
   m_brickletID(brickletID)
 {
+  if (!isValidBrickletID(brickletID))
+  {
+    throw std::runtime_error("Invalid brickletID: " + toString(brickletID));
+  }
+
   THROW_IF_NULL(vernissageBricklet);
 }
 
-BrickletClass::~BrickletClass()
-{
-  clearCache();
-}
+Bricklet::~Bricklet()
+{}
 
 /*
   delete our internally cached data, is called at destruction time and if we want keep memory
   consumption low
 */
-void BrickletClass::clearCache()
+void Bricklet::clearCache()
 {
-  if (m_rawBufferContents != NULL)
+  if (m_rawBufferContents)
   {
     DEBUGPRINT("Deleting raw data from bricklet %d", m_brickletID);
-    delete[] m_rawBufferContents;
-    m_rawBufferContents = NULL;
+    m_rawBufferContents.reset();
     m_rawBufferContentsSize = 0;
   }
 
@@ -92,14 +105,14 @@ void BrickletClass::clearCache()
 /*
   Load the raw data of the bricklet into our own cache
 */
-int* BrickletClass::getRawData()
+int* Bricklet::getRawData()
 {
   // we are not called the first time
-  if (m_rawBufferContents != NULL)
+  if (m_rawBufferContents)
   {
     DEBUGPRINT("BrickletClass::getBrickletContentsBuffer Using cached values");
-    DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents, m_rawBufferContentsSize);
-    return m_rawBufferContents;
+    DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents.get(), m_rawBufferContentsSize);
+    return m_rawBufferContents.get();
   }
 
   int count = 0;
@@ -138,7 +151,7 @@ int* BrickletClass::getRawData()
   // copy the raw data to our own cache
   try
   {
-    m_rawBufferContents = new int[count];
+    m_rawBufferContents.reset(new int[count]);
   }
   catch (CMemoryException* e)
   {
@@ -148,20 +161,20 @@ int* BrickletClass::getRawData()
     return NULL;
   }
 
-  memcpy(m_rawBufferContents, pBuffer, sizeof(int)*count);
+  memcpy(m_rawBufferContents.get(), pBuffer, sizeof(int)*count);
   m_rawBufferContentsSize = count;
 
-  DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents, m_rawBufferContentsSize);
+  DEBUGPRINT("m_rawBufferContents=%p,size=%d", m_rawBufferContents.get(), m_rawBufferContentsSize);
 
   // release memory from vernissage DLL
   session->unloadBrickletContents(m_brickletPtr);
-  return m_rawBufferContents;
+  return m_rawBufferContents.get();
 }
 
 /*
   Wrapper function which returns a vector of the meta data keys (.first) and values (.second)
 */
-const std::vector<BrickletClass::StringPair>& BrickletClass::getMetaData()
+const std::vector<Bricklet::StringPair>& Bricklet::getMetaData()
 {
   if (m_metaData.empty())
   {
@@ -172,7 +185,8 @@ const std::vector<BrickletClass::StringPair>& BrickletClass::getMetaData()
     catch (CMemoryException* e)
     {
       e->Delete();
-      HISTPRINT("Out of memory in getBrickletMetaDataValues()");
+      HISTPRINT("Out of memory in getMetaData()");
+      m_metaData.clear();
     }
   }
   return m_metaData;
@@ -181,13 +195,13 @@ const std::vector<BrickletClass::StringPair>& BrickletClass::getMetaData()
 /*
   Reads all meta data into our own structures
 */
-void BrickletClass::loadMetaData()
+void Bricklet::loadMetaData()
 {
   typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
   typedef ViewTypeCodeVector::const_iterator ViewTypeCodeVectorIt;
 
   m_metaData.clear();
-  m_metaData.reserve(METADATA_RESERVE_SIZE);
+  m_metaData.reserve(RESERVE_SIZE);
 
   Vernissage::Session* session = getVernissageSession();
 
@@ -266,32 +280,30 @@ void BrickletClass::loadMetaData()
 
   // new in vernissage 2.1
   {
-    const std::vector<void*> dependentBrickletsVoidVector = session->getDependingBricklets(m_brickletPtr);
-    const std::vector<int> dependentBrickletsIntVector    = GlobalData::Instance().convertBrickletPtr(dependentBrickletsVoidVector);
+    const std::vector<int> idVec = convertRawBrickletVector(session->getDependingBricklets(m_brickletPtr));
     std::string dependentBricklets;
-    joinString(dependentBrickletsIntVector, listSepChar, dependentBricklets);
+    joinString(idVec, listSepChar, dependentBricklets);
 
     AddMetaData(m_metaData,"dependentBricklets",dependentBricklets);
   }
 
   // new in vernissage 2.1
   {
-    const std::vector<void*> referencedBrickletsVoidVector = session->getReferencedBricklets(m_brickletPtr);
-    const std::vector<int> referencedBrickletsIntVector    = GlobalData::Instance().convertBrickletPtr(referencedBrickletsVoidVector);
+    const std::vector<int> idVec = convertRawBrickletVector(session->getReferencedBricklets(m_brickletPtr));
     std::string referencedBricklets;
-    joinString(referencedBrickletsIntVector, listSepChar, referencedBricklets);
+    joinString(idVec, listSepChar, referencedBricklets);
 
     AddMetaData(m_metaData,"referencedBricklets",referencedBricklets);
   }
 
   // new in vernissage 2.1
   {
-    const std::vector<void*> brickletSeriesVoidVector = GlobalData::Instance().getBrickletSeries(m_brickletPtr);
-    std::vector<int> brickletSeriesIntVector    = GlobalData::Instance().convertBrickletPtr(brickletSeriesVoidVector);
+    std::vector<int> idVec = convertRawBrickletVector(getBrickletSeries(m_brickletPtr));
+
     // we want to have a sorted list of bricklets
-    std::sort(brickletSeriesIntVector.begin(), brickletSeriesIntVector.end());
+    std::sort(idVec.begin(), idVec.end());
     std::string brickletSeries;
-    joinString(brickletSeriesIntVector, listSepChar, brickletSeries);
+    joinString(idVec, listSepChar, brickletSeries);
 
     AddMetaData(m_metaData,"brickletSeries",brickletSeries);
   }
@@ -422,7 +434,7 @@ void BrickletClass::loadMetaData()
 /*
 Wrapper function which returns a vector with the deployment parameters and their values
 */
-const std::vector<BrickletClass::StringPair>& BrickletClass::getDeploymentParameter()
+const std::vector<Bricklet::StringPair>& Bricklet::getDeploymentParameter()
 {
   if (m_deployParams.empty())
   {
@@ -433,7 +445,8 @@ const std::vector<BrickletClass::StringPair>& BrickletClass::getDeploymentParame
     catch (CMemoryException* e)
     {
       e->Delete();
-      HISTPRINT("Out of memory in getBrickletMetaDataValues()");
+      HISTPRINT("Out of memory in getDeploymentParameter()");
+      m_deployParams.clear();
     }
   }
   return m_deployParams;
@@ -442,10 +455,10 @@ const std::vector<BrickletClass::StringPair>& BrickletClass::getDeploymentParame
 /*
   Reads all deployment parameters into our own structures
 */
-void BrickletClass::loadDeploymentParameters()
+void Bricklet::loadDeploymentParameters()
 {
   m_deployParams.clear();
-  m_deployParams.reserve(METADATA_RESERVE_SIZE);
+  m_deployParams.reserve(RESERVE_SIZE);
 
   Vernissage::Session* session = getVernissageSession();
 
@@ -473,7 +486,7 @@ void BrickletClass::loadDeploymentParameters()
 // In more than 99% of the cases this routine will return one to three axes
 // The value of maxRuns is strictly speaking wrong becaUse the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
 // The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName"
-void BrickletClass::generateAllAxesVector()
+void Bricklet::generateAllAxesVector()
 {
   std::vector<std::wstring> allAxesWString;
   std::vector<std::string> allAxesString;
@@ -511,7 +524,7 @@ void BrickletClass::generateAllAxesVector()
   Returns a vector with the axis hierarchy (std::wstring)
 */
 template<>
-const std::vector<std::wstring>& BrickletClass::getAxes<std::wstring>()
+const std::vector<std::wstring>& Bricklet::getAxes<std::wstring>()
 {
   if (m_allAxesString.empty() || m_allAxesWString.empty())
   {
@@ -525,7 +538,7 @@ const std::vector<std::wstring>& BrickletClass::getAxes<std::wstring>()
   Returns a vector with the axis hierarchy (std::string)
 */
 template<>
-const std::vector<std::string>& BrickletClass::getAxes<std::string>()
+const std::vector<std::string>& Bricklet::getAxes<std::string>()
 {
   if (m_allAxesString.empty() || m_allAxesWString.empty())
   {
@@ -538,7 +551,7 @@ const std::vector<std::string>& BrickletClass::getAxes<std::string>()
 /*
   Resetting *vernissageBricklet is only needed after the same result file is loaded again to check for new bricklets
 */
-void BrickletClass::setBrickletPointer( void* const vernissageBricklet )
+void Bricklet::setBrickletPointer( void* const vernissageBricklet )
 {
   THROW_IF_NULL(vernissageBricklet);
   m_brickletPtr = vernissageBricklet;
@@ -547,17 +560,17 @@ void BrickletClass::setBrickletPointer( void* const vernissageBricklet )
 /*
   Does never return NULL
 */
-void* BrickletClass::getBrickletPointer() const
+void* Bricklet::getBrickletPointer() const
 {
   return m_brickletPtr;
 }
 
-const ExtremaData& BrickletClass::getExtrema() const
+const ExtremaData& Bricklet::getExtrema() const
 {
   return m_extrema;
 }
 
-int BrickletClass::getRawDataSize()
+int Bricklet::getRawDataSize()
 {
   THROW_IF_NULL(m_rawBufferContents);
   return m_rawBufferContentsSize;

@@ -9,7 +9,7 @@
 #include "operationstructs.hpp"
 #include "operationsinterface.hpp"
 #include "globaldata.hpp"
-#include "brickletclass.hpp"
+#include "bricklet.hpp"
 #include "utils_generic.hpp"
 
 extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr p)
@@ -62,29 +62,27 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
   // - compare old to new totalNumberOfBricklets
   const int numberOfBricklets = session->getBrickletCount();
 
+  // should not happen
+  if (numberOfBricklets < oldNumberOfBricklets)
+  {
+    HISTPRINT("Error in updating the result file. Please close and reopen it.");
+    return 0;
+  }
+
   void *pContext = NULL;
   for (int i = 1; i <= numberOfBricklets; i++)
   {
     void* vernissageBricklet = session->getNextBricklet(&pContext);
     ASSERT_RETURN_ZERO(vernissageBricklet);
 
-    BrickletClass *bricklet = GlobalData::Instance().getBrickletPtr(i);
-
-    if (bricklet == NULL) // this is a new bricklet
+    if (i > oldNumberOfBricklets) // this is a new bricklet
     {
-      GlobalData::Instance().createBrickletClassObject(i, vernissageBricklet);
+      GlobalData::Instance().createBricklet(i, vernissageBricklet);
     }
     else   // the bricklet is old and we only have to update *vernissageBricklet
     {
-      bricklet->setBrickletPointer(vernissageBricklet);
+      GlobalData::Instance().updateBricklet(i,vernissageBricklet);
     }
-  }
-
-  // should not happen
-  if (numberOfBricklets < oldNumberOfBricklets)
-  {
-    HISTPRINT("Error in updating the result file. Please close and reopen it.");
-    return 0;
   }
 
   // from here on we know that numberOfBricklets >= oldNumberOfBricklets

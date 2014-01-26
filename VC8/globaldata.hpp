@@ -10,11 +10,16 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
 #include "errorcodes.hpp"
 #include "constants.hpp"
 #include "ForwardDecl.hpp"
 #include "dllhandler.hpp"
 #include "utils_generic.hpp"
+
+typedef std::vector<BrickletPtr> BrickletPtrVector;
+typedef std::map<void*,int> RawBrickletToIDMap;
 
 class GlobalData
 {
@@ -22,7 +27,10 @@ public:
   void setResultFile(const std::wstring& dirPath, const std::wstring& fileName);
   void closeSession();
   void closeResultFile();
-  void createBrickletClassObject(int brickletID, void* const vernissageBricklet);
+
+  void createBricklet(int brickletID, void* const vernissageBricklet);
+  void updateBricklet(int brickletID, void* const vernissageBricklet);
+
   void setError(int errorCode, const std::string& msgArgument = std::string());
   void setInternalError(int errorCode);
 
@@ -70,15 +78,8 @@ public:
   std::string getLastErrorMessage() const;
   std::string getErrorMessage(int errorCode) const;
 
-  BrickletClass* getBrickletPtr(int brickletID) const;
-  BrickletClass& getBricklet(int brickletID) const;
-
-  std::vector<int> convertBrickletPtr(const std::vector<void*>&) const;
-  int convertBrickletPtr(void*) const;
-
-  std::vector<void*> getBrickletSeries(void* rawBrickletPtr);
-
-  int getIgorWaveType() const;
+  Bricklet& getBricklet(int brickletID);
+  int convertBrickletPtr(void* rawBrickletPtr) const;
 
   ///@name Settings handling
   ///@{
@@ -86,12 +87,7 @@ public:
   bool isDoubleWaveEnabled() const;
   bool isDatafolderEnabled() const;
   bool isDataCacheEnabled() const;
-
-  template<typename T>
-  T isOverwriteEnabled() const
-  {
-    return static_cast<T>(m_overwrite);
-  }
+  bool isOverwriteEnabled() const;
 
   void readSettings(DataFolderHandle dataFolderHndl = NULL);
   ///@}
@@ -120,5 +116,6 @@ private:
   bool m_errorToHistory;
   int m_lastError;
   std::string m_lastErrorArgument;
-  std::map<int, BrickletClassPtr> m_bricklets;
+  BrickletPtrVector m_bricklets;
+  RawBrickletToIDMap m_rawToBrickletID;
 };

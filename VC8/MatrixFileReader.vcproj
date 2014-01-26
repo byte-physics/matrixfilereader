@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport"
+				AdditionalIncludeDirectories="&quot;H:\projekte\physical-value\libs\boost_1_55_0&quot;;XOP_Toolkit_6/IgorXOPs6/XOPSupport"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="false"
 				RuntimeLibrary="2"
@@ -221,7 +221,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\brickletclass.cpp"
+				RelativePath=".\bricklet.cpp"
 				>
 				<FileConfiguration
 					Name="Release (static build)|Win32"
@@ -366,7 +366,7 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\brickletclass.hpp"
+				RelativePath=".\bricklet.hpp"
 				>
 			</File>
 			<File

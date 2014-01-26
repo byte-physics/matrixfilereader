@@ -128,6 +128,7 @@ const char S_errorMessage[]     = "S_errorMessage";
 const char filterStr[]          = "Matrix result files (*.mtrx)\0*.mtrx\0All Files (*.*)\0*.*\0\0";
 const char dlgPrompt[]          = "Looking for a MATRIX result file";
 
+const int default_pixelsize     = 1;
 //maximum allowed pixelSize, although this is already ridiculously high
 const int maximum_pixelSize     = 10;
 

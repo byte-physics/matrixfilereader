@@ -30,7 +30,7 @@ void WaveClass::Init()
   m_doublePtr = NULL;
   m_floatPtr = NULL;
   m_waveHandle = NULL;
-  pixelSize = 1;
+  m_pixelSize = default_pixelsize;
 }
 
 WaveClass::~WaveClass(){}
@@ -190,5 +190,10 @@ waveHndl WaveClass::getWaveHandle() const
 
 int WaveClass::GetPixelSize() const
 {
-  return pixelSize;
+  return m_pixelSize;
+}
+
+void WaveClass::SetPixelSize(int pixelSize)
+{
+  m_pixelSize = pixelSize;
 }

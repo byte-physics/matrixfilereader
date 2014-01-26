@@ -33,13 +33,12 @@ public:
   bool isEmpty() const;
   const ExtremaData& getExtrema() const;;
   int GetPixelSize() const;
+  void SetPixelSize(int pixelSize);
 
   void fillWave(int index, int rawValue, double scaledValue);
 
 public:
   bool moreData;
-  int pixelSize;
-
 private:
   void Init();
 
@@ -49,6 +48,7 @@ private:
   waveHndl m_waveHandle;
   float* m_floatPtr;
   double* m_doublePtr;
+  int m_pixelSize;
 };
 
 /*

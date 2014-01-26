@@ -424,7 +424,7 @@ namespace
 
       if (resampleData)
       {
-        wave[i].pixelSize = pixelSize;
+        wave[i].SetPixelSize(pixelSize);
 
         DEBUGPRINT("Resampling wave %s with pixelSize=%d", wave[i].getWaveName(), pixelSize);
 

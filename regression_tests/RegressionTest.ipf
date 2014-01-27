@@ -152,13 +152,31 @@ Function CompareRange(refFolderOnDisc, newFolderOnDisc, refFileList, ignoreTextW
 
     SetDataFolder cdf
     NewDataFolder/S/O refFolder
+
     string path = refFolderOnDisc + fileName
+    GetFileFolderInfo/Q/Z path
+    if(V_flag != 0)
+    	print "Could not find the file " + path
+    	abortNow()
+    endif
     LoadWave/Q/C path
     Wave/Z refWave = $StringFromList(0,S_waveNames)
 
     SetDataFolder cdf
     NewDataFolder/S/O newFolder
+
+	// Names of SPS curves have changed in c50506
+    GetFileFolderInfo/Q/Z newFolderOnDisc + fileName
+    if(V_flag != 0)
+    	fileName = ReplaceString(".ibw",filename,"_1.ibw")
+    endif
+
     path = newFolderOnDisc + fileName
+    GetFileFolderInfo/Q/Z path
+    if(V_flag != 0)
+    	print "Could not find the file " + path
+    	abortNow()
+    endif
     LoadWave/Q/C path
     Wave/Z newWave = $StringFromList(0,S_waveNames)
 
@@ -246,6 +264,10 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
 
   refWaveNote = RemoveByKey("resultDirPath",refWaveNote,"=","\r")
   newWaveNote = RemoveByKey("resultDirPath",newWaveNote,"=","\r")
+
+  // suffix was introduced in c50506
+  refWaveNote = RemoveByKey("suffix",refWaveNote,"=","\r")
+  newWaveNote = RemoveByKey("suffix",newWaveNote,"=","\r")
 
   Note/K refWave, refWaveNote
   Note/K newWave, newWaveNote

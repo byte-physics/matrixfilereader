@@ -40,14 +40,19 @@ namespace  {
   {
     StringPairVector(vec.begin(),vec.end()).swap(vec);
 
+    std::size_t size = 0;
+    std::size_t capacity = 0;
+
     if(GlobalData::Instance().isDebuggingEnabled())
     {
       for (StringPairVector::iterator it = vec.begin(); it != vec.end(); it++)
       {
-        //For std::strings shrink to fit does not do anything in VC8, therefore we just report the current size and capacity of the key here.
-        DEBUGPRINT("idx=%d, first.size=%d, first.capacity=%d",it - vec.begin(), it->first.size(), it->first.capacity());
+        //For std::strings shrink to fit does not do anything in VC8
+        size     += it->first.size() + it->second.size();
+        capacity += it->first.capacity() + it->second.capacity();
       }
-      DEBUGPRINT("size=%d, capacity=%d",vec.size(), vec.capacity());
+      DEBUGPRINT("vector:  size=%d, capacity=%d",vec.size(), vec.capacity());
+      DEBUGPRINT("strings: size=%d, capacity=%d",size, capacity);
     }
   }
 

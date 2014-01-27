@@ -108,6 +108,11 @@ namespace
     const std::wstring triggerAxisName = session->getTriggerAxisName(vernissageBricklet);
     const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
     int numPointsTriggerAxis = triggerAxis.clocks;
+    // axis length and data length differ in case this is an aborted I(t) scan or similar
+    int dataSize             = rawBrickletSize;
+
+    DEBUGPRINT("rawBrickletSize=%d, numPointsTriggerAxis=%d, triggerAxis.mirrored=%s",
+               rawBrickletSize, numPointsTriggerAxis, triggerAxis.mirrored ? "true" : "false");
 
     std::vector<Wave> waves(MAX_NUM_WAVES);
     Wave& wave1 = waves[0];
@@ -115,16 +120,19 @@ namespace
 
     if (triggerAxis.mirrored)
     {
+      if (numPointsTriggerAxis != rawBrickletSize)
+      {
+        HISTPRINT("BUG: Axis length differs from data length. Keep fingers crossed!");
+      }
       wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
       wave2.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_2);
       numPointsTriggerAxis /= 2;
+      dataSize = numPointsTriggerAxis;
     }
     else
     {
-      wave1.setProperties(waveBaseName, NO_TRACE,suffix_ramp_reversal_1);
+      wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
     }
-
-    const int firstBlockOffset = numPointsTriggerAxis;
 
     dimensionSizes[ROWS] = numPointsTriggerAxis;
 
@@ -137,7 +145,7 @@ namespace
     double slope, yIntercept;
     CalculateTransformationParameter(bricklet, slope, yIntercept);
 
-    for (int i = 0; i < numPointsTriggerAxis ; i++)
+    for (int i = 0; i < dataSize; i++)
     {
       const int rawValue = rawBrickletDataPtr[i];
       wave1.fillWave(i, rawValue, rawValue * slope + yIntercept);
@@ -145,6 +153,8 @@ namespace
 
     if (triggerAxis.mirrored)
     {
+      const int firstBlockOffset = numPointsTriggerAxis;
+
       for (int i = 0; i < numPointsTriggerAxis; i++)
       {
         const int rawValue = rawBrickletDataPtr[firstBlockOffset + i];

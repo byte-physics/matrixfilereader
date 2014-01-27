@@ -80,7 +80,7 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<s
 class IndexToString
 {
 public:
-  virtual ~IndexToString() {};
+  virtual ~IndexToString(){}
 
   virtual std::string operator()(unsigned int index) const
   {

@@ -78,7 +78,7 @@ const int TRACE_DOWN              = 2;
 const int RE_TRACE_DOWN           = 3;
 
 // number of different trace types, TRACE_UP to RE_TRACE_DOWN
-const int MAX_NUM_TRACES          = 4;
+const int MAX_NUM_WAVES          = 4;
 
 const char PROJECTURL[]           = "http://www.igorexchange.com/project/matrixFileReader";
 
@@ -134,3 +134,6 @@ const int maximum_pixelSize     = 10;
 
 const char listSepChar[]        = ";";
 const char relativeFolderPrefix[] = ":";
+
+const char suffix_ramp_reversal_1[]    = "_1";
+const char suffix_ramp_reversal_2[]    = "_2";

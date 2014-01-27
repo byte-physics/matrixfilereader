@@ -16,6 +16,9 @@
 
 namespace
 {
+  typedef std::vector<Wave> WaveVec;
+  typedef std::vector<Wave>::iterator WaveIt;
+
   // Create data for the raw->scaled transformation
   void CalculateTransformationParameter(const Bricklet& bricklet, double& slope, double& yIntercept)
   {
@@ -43,6 +46,48 @@ namespace
     DEBUGPRINT("raw->scaled transformation: slope=%g,yIntercept=%g", slope, yIntercept);
   }
 
+  int createEmptyWaves( WaveVec& waves, DataFolderHandle waveFolderHandle, CountInt* dimensionSizes )
+  {
+    for (WaveIt it = waves.begin(); it != waves.end(); it++)
+    {
+      // skip empty entries
+      if (it->isEmpty())
+      {
+        continue;
+      }
+
+      waveHndl waveHandle;
+      int ret = MDMakeWave(&waveHandle, it->getWaveName(), waveFolderHandle, dimensionSizes,
+        getIgorWaveType(), isOverwriteEnabled());
+
+      if (ret == NAME_WAV_CONFLICT)
+      {
+        DEBUGPRINT("Wave %s already exists.", it->getWaveName());
+        return WAVE_EXIST;
+      }
+      else if (ret != 0)
+      {
+        HISTPRINT("Error %d in creating wave %s.", ret, it->getWaveName());
+        return UNKNOWN_ERROR;
+      }
+
+      it->setWaveHandle(waveHandle);
+      it->clearWave();
+    }
+
+    for (WaveIt it = waves.begin(); GlobalData::Instance().isDebuggingEnabled() && it != waves.end(); it++)
+    {
+      if (it->isEmpty())
+      {
+        continue;
+      }
+
+      it->printDebugInfo();
+    }
+
+    return 0;
+  }
+
   int createWaves1D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, std::string& waveNameList)
   {
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
@@ -64,61 +109,65 @@ namespace
     const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
     int numPointsTriggerAxis = triggerAxis.clocks;
 
-    // FIXME in zwei waves schreiben falls die Achse gespiegelt ist
-    // wie nennen?
-    // Andere neue Messmodi die das gleiche problem haben?
+    std::vector<Wave> waves(MAX_NUM_WAVES);
+    Wave& wave1 = waves[0];
+    Wave& wave2 = waves[1];
+
     if (triggerAxis.mirrored)
     {
-      HISTPRINT("BUG!!!!!!!!! Detected Trace/Retrace SPS curve which is currently not properly supported.");
-      // numPointsTriggerAxis /= 2;
+      wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
+      wave2.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_2);
+      numPointsTriggerAxis /= 2;
     }
+    else
+    {
+      wave1.setProperties(waveBaseName, NO_TRACE,suffix_ramp_reversal_1);
+    }
+
+    const int firstBlockOffset = numPointsTriggerAxis;
 
     dimensionSizes[ROWS] = numPointsTriggerAxis;
 
-    Wave wave1D;
-    wave1D.setNameAndTraceDir(waveBaseName, NO_TRACE);
-
-    waveHndl waveHandle;
-    int ret = MDMakeWave(&waveHandle, wave1D.getWaveName(), waveFolderHandle, dimensionSizes,
-                         getIgorWaveType(), isOverwriteEnabled());
-
-    if (ret == NAME_WAV_CONFLICT)
+    int ret = createEmptyWaves(waves,waveFolderHandle, dimensionSizes);
+    if( ret != 0)
     {
-      DEBUGPRINT("Wave %s already exists.", wave1D.getWaveName());
-      return WAVE_EXIST;
-    }
-    else if (ret != 0)
-    {
-      HISTPRINT("Error %d in creating wave %s.", ret, wave1D.getWaveName());
-      return UNKNOWN_ERROR;
-    }
-
-    wave1D.setWaveHandle(waveHandle);
-    wave1D.clearWave();
-    waveHandle = NULL;
-
-    if (GlobalData::Instance().isDebuggingEnabled())
-    {
-      wave1D.printDebugInfo();
+      return ret;
     }
 
     double slope, yIntercept;
     CalculateTransformationParameter(bricklet, slope, yIntercept);
 
-    for (int i = 0; i < rawBrickletSize ; i++)
+    for (int i = 0; i < numPointsTriggerAxis ; i++)
     {
       const int rawValue = rawBrickletDataPtr[i];
-      wave1D.fillWave(i, rawValue, rawValue * slope + yIntercept);
+      wave1.fillWave(i, rawValue, rawValue * slope + yIntercept);
     }
 
-    // FIXME muss auch aufgebohrt werden für die hinwärts/rückwärts scans aka ramp reversal
-    setDataWaveNote(brickletID, wave1D);
+    if (triggerAxis.mirrored)
+    {
+      for (int i = 0; i < numPointsTriggerAxis; i++)
+      {
+        const int rawValue = rawBrickletDataPtr[firstBlockOffset + i];
+        wave2.fillWave(firstBlockOffset - i - 1, rawValue, rawValue * slope + yIntercept);
+      }
+    }
 
-    wave1D.setWaveScaling(ROWS, &triggerAxis.physicalIncrement, &triggerAxis.physicalStart);
-    wave1D.setWaveUnits(ROWS, triggerAxis.physicalUnit);
-    wave1D.setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
+    for (WaveIt it = waves.begin(); it != waves.end(); it++)
+    {
+      // skip empty entries
+      if (it->isEmpty())
+      {
+        continue;
+      }
 
-    appendToWaveList(baseFolderHandle, wave1D.getWaveHandle(), waveNameList);
+      setDataWaveNote(brickletID, *it);
+      it->setWaveScaling(ROWS, &triggerAxis.physicalIncrement, &triggerAxis.physicalStart);
+      it->setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
+      it->setWaveUnits(ROWS, triggerAxis.physicalUnit);
+
+      appendToWaveList(baseFolderHandle, it->getWaveHandle(), waveNameList);
+    }
+
     return SUCCESS;
   }
 
@@ -167,18 +216,17 @@ namespace
     }
 
     DEBUGPRINT("numPointsRootAxis=%d", numPointsRootAxis);
-
     DEBUGPRINT("numPointsTriggerAxis=%d", numPointsTriggerAxis);
 
     dimensionSizes[ROWS] = numPointsTriggerAxis;
     dimensionSizes[COLUMNS] = numPointsRootAxis;
     const int waveSize = dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
-    Wave wave[MAX_NUM_TRACES];
-    Wave* traceUpData = &wave[TRACE_UP];
-    Wave* reTraceUpData = &wave[RE_TRACE_UP];
-    Wave* traceDownData = &wave[TRACE_DOWN];
-    Wave* reTraceDownData = &wave[RE_TRACE_DOWN];
+    WaveVec waves(MAX_NUM_WAVES);
+    Wave& traceUpData     = waves[TRACE_UP];
+    Wave& reTraceUpData   = waves[RE_TRACE_UP];
+    Wave& traceDownData   = waves[TRACE_DOWN];
+    Wave& reTraceDownData = waves[RE_TRACE_DOWN];
 
     int triggerAxisBlockSize;
 
@@ -189,62 +237,36 @@ namespace
     if (triggerAxis.mirrored && rootAxis.mirrored)
     {
       triggerAxisBlockSize = 2 * numPointsTriggerAxis;
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
-      wave[RE_TRACE_UP].setNameAndTraceDir(waveBaseName, RE_TRACE_UP);
-      wave[TRACE_DOWN].setNameAndTraceDir(waveBaseName, TRACE_DOWN);
-      wave[RE_TRACE_DOWN].setNameAndTraceDir(waveBaseName, RE_TRACE_DOWN);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
+      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
+      waves[TRACE_DOWN].setProperties(waveBaseName, TRACE_DOWN);
+      waves[RE_TRACE_DOWN].setProperties(waveBaseName, RE_TRACE_DOWN);
     }
     else if (triggerAxis.mirrored)
     {
       triggerAxisBlockSize = 2 * numPointsTriggerAxis;
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
-      wave[RE_TRACE_UP].setNameAndTraceDir(waveBaseName, RE_TRACE_UP);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
+      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
     }
     else if (rootAxis.mirrored)
     {
       triggerAxisBlockSize = numPointsTriggerAxis;
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
-      wave[TRACE_DOWN].setNameAndTraceDir(waveBaseName, TRACE_DOWN);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
+      waves[TRACE_DOWN].setProperties(waveBaseName, TRACE_DOWN);
     }
     else
     {
       triggerAxisBlockSize = numPointsTriggerAxis;
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
     }
 
-    for (int i = 0; i < MAX_NUM_TRACES; i++)
+    int ret = createEmptyWaves(waves,waveFolderHandle,dimensionSizes);
+    if(ret != 0)
     {
-      // skip empty entries
-      if (wave[i].isEmpty())
-      {
-        continue;
-      }
-
-      waveHndl waveHandle;
-      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), waveFolderHandle, dimensionSizes,
-                           getIgorWaveType(), isOverwriteEnabled());
-
-      if (ret == NAME_WAV_CONFLICT)
-      {
-        DEBUGPRINT("Wave %s already exists.", wave[i].getWaveName());
-        return WAVE_EXIST;
-      }
-      else if (ret != 0)
-      {
-        HISTPRINT("Error %d in creating wave %s.", ret, wave[i].getWaveName());
-        return UNKNOWN_ERROR;
-      }
-
-      wave[i].setWaveHandle(waveHandle);
-      wave[i].clearWave();
+      return ret;
     }
 
     const int firstBlockOffset = numPointsRootAxis * triggerAxisBlockSize;
-
-    for (int i = 0; GlobalData::Instance().isDebuggingEnabled() && i < MAX_NUM_TRACES; i++)
-    {
-      wave[i].printDebugInfo();
-    }
 
     double slope, yIntercept;
     CalculateTransformationParameter(bricklet, slope, yIntercept);
@@ -302,7 +324,7 @@ namespace
       for (int j = 0; j < numPointsTriggerAxis; j++)
       {
         // traceUp
-        if (traceUpData->moreData)
+        if (traceUpData.moreData)
         {
           rawIndex  = i * triggerAxisBlockSize + j;
           dataIndex = i * numPointsTriggerAxis + j;
@@ -316,19 +338,19 @@ namespace
             rawValue  = rawBrickletDataPtr[rawIndex];
             scaledValue = rawValue * slope + yIntercept;
 
-            traceUpData->fillWave(dataIndex, rawValue, scaledValue);
+            traceUpData.fillWave(dataIndex, rawValue, scaledValue);
           }
           else
           {
             DEBUGPRINT("Index out of range in traceUp");
             DEBUGPRINT("traceUpDataIndex=%d,waveSize=%d", dataIndex, waveSize);
             DEBUGPRINT("traceUpRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-            traceUpData->moreData = false;
+            traceUpData.moreData = false;
           }
         }
 
         // traceDown
-        if (traceDownData->moreData)
+        if (traceDownData.moreData)
         {
           rawIndex = firstBlockOffset + i * triggerAxisBlockSize + j;
           // compared to the traceUpData->dbl the index i is shifted
@@ -344,19 +366,19 @@ namespace
             rawValue  = rawBrickletDataPtr[rawIndex];
             scaledValue = rawValue * slope + yIntercept;
 
-            traceDownData->fillWave(dataIndex, rawValue, scaledValue);
+            traceDownData.fillWave(dataIndex, rawValue, scaledValue);
           }
           else
           {
             DEBUGPRINT("Index out of range in traceDown");
             DEBUGPRINT("traceDownDataIndex=%d,waveSize=%d", dataIndex, waveSize);
             DEBUGPRINT("traceDownRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-            traceDownData->moreData = false;
+            traceDownData.moreData = false;
           }
         }
 
         // reTraceUp
-        if (reTraceUpData->moreData)
+        if (reTraceUpData.moreData)
         {
 
           // here we shift the j index, because the data is now acquired from high column number to low column number
@@ -372,19 +394,19 @@ namespace
             rawValue  = rawBrickletDataPtr[rawIndex];
             scaledValue  = rawValue * slope + yIntercept;
 
-            reTraceUpData->fillWave(dataIndex, rawValue, scaledValue);
+            reTraceUpData.fillWave(dataIndex, rawValue, scaledValue);
           }
           else
           {
             DEBUGPRINT("Index out of range in reTraceUp");
             DEBUGPRINT("reTraceUpDataIndex=%d,waveSize=%d", dataIndex, waveSize);
             DEBUGPRINT("reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-            reTraceUpData->moreData = false;
+            reTraceUpData.moreData = false;
           }
         }
 
         // reTraceDown
-        if (reTraceDownData->moreData)
+        if (reTraceDownData.moreData)
         {
 
           rawIndex  = firstBlockOffset + i * triggerAxisBlockSize + triggerAxisBlockSize - (j + 1);
@@ -399,22 +421,22 @@ namespace
 
             rawValue = rawBrickletDataPtr[rawIndex];
             scaledValue = rawValue * slope + yIntercept;
-            reTraceDownData->fillWave(dataIndex, rawValue, scaledValue);
+            reTraceDownData.fillWave(dataIndex, rawValue, scaledValue);
           }
           else
           {
             DEBUGPRINT("Index out of range in reTraceDown");
             DEBUGPRINT("reTraceDownDataIndex=%d,waveSize=%d", dataIndex, waveSize);
             DEBUGPRINT("reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-            reTraceDownData->moreData = false;
+            reTraceDownData.moreData = false;
           }
         }
       }
     }
 
-    for (int i = 0; i < MAX_NUM_TRACES; i++)
+    for (WaveIt it = waves.begin(); it != waves.end(); it++)
     {
-      if (wave[i].isEmpty())
+      if (it->isEmpty())
       {
         continue;
       }
@@ -424,9 +446,9 @@ namespace
 
       if (resampleData)
       {
-        wave[i].SetPixelSize(pixelSize);
+        it->SetPixelSize(pixelSize);
 
-        DEBUGPRINT("Resampling wave %s with pixelSize=%d", wave[i].getWaveName(), pixelSize);
+        DEBUGPRINT("Resampling wave %s with pixelSize=%d", it->getWaveName(), pixelSize);
 
         char dataFolderPath[MAXCMDLEN + 1];
         // flag=3 results in the full path being returned including a trailing colon
@@ -442,7 +464,7 @@ namespace
         sprintf(cmd, "ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s",
                 pixelSize, pixelSize, dataFolderPath, dataFolderPath);
         // quote waveName properly, it might be a liberal name
-        CatPossiblyQuotedName(cmd, wave[i].getWaveName());
+        CatPossiblyQuotedName(cmd, it->getWaveName());
 
         ret = XOPSilentCommand(cmd);
 
@@ -453,7 +475,7 @@ namespace
         }
 
         // kill the un-interpolated wave and invalidate waveHandeVector[i]
-        ret = KillWave(wave[i].getWaveHandle());
+        ret = KillWave(it->getWaveHandle());
 
         if (ret != 0)
         {
@@ -461,17 +483,17 @@ namespace
         }
 
         // rename wave from M_PixelatedImage to waveNameVector[i] both sitting in dfHandle
-        ret = RenameDataFolderObject(waveFolderHandle, WAVE_OBJECT, "M_PixelatedImage", wave[i].getWaveName());
+        ret = RenameDataFolderObject(waveFolderHandle, WAVE_OBJECT, "M_PixelatedImage", it->getWaveName());
 
         if (ret != 0)
         {
           return ret;
         }
 
-        wave[i].setWaveHandle(FetchWaveFromDataFolder(waveFolderHandle, wave[i].getWaveName()));
+        it->setWaveHandle(FetchWaveFromDataFolder(waveFolderHandle, it->getWaveName()));
         // get wave dimensions; needed for setScale below
         int numDimensions;
-        ret = MDGetWaveDimensions(wave[i].getWaveHandle(), &numDimensions, interpolatedDimSizes);
+        ret = MDGetWaveDimensions(it->getWaveHandle(), &numDimensions, interpolatedDimSizes);
 
         if (ret != 0)
         {
@@ -480,7 +502,7 @@ namespace
       }
 
       // set wave note and add info about resampling to the wave note
-      setDataWaveNote(brickletID, wave[i]);
+      setDataWaveNote(brickletID, *it);
 
       double xAxisDelta, yAxisDelta;
 
@@ -497,19 +519,20 @@ namespace
       }
 
       const double zeroSetScaleOffset = 0.0;
-      wave[i].setWaveScaling(ROWS, &xAxisDelta, &zeroSetScaleOffset);
-      wave[i].setWaveScaling(COLUMNS, &yAxisDelta, &zeroSetScaleOffset);
+      it->setWaveScaling(ROWS, &xAxisDelta, &zeroSetScaleOffset);
+      it->setWaveScaling(COLUMNS, &yAxisDelta, &zeroSetScaleOffset);
 
-      wave[i].setWaveUnits(ROWS, triggerAxis.physicalUnit);
-      wave[i].setWaveUnits(COLUMNS, rootAxis.physicalUnit);
-      wave[i].setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
+      it->setWaveUnits(ROWS, triggerAxis.physicalUnit);
+      it->setWaveUnits(COLUMNS, rootAxis.physicalUnit);
+      it->setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
-      appendToWaveList(baseFolderHandle, wave[i].getWaveHandle(), waveNameList);
+      appendToWaveList(baseFolderHandle, it->getWaveHandle(), waveNameList);
     }
 
     return SUCCESS;
   }
 
+  // FIXME does not support ramp reversal
   int createWaves3D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, std::string& waveNameList)
   {
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
@@ -778,48 +801,48 @@ namespace
     DEBUGPRINT("dimensions of the cube: rows=%d,cols=%d,layers=%d",
                dimensionSizes[ROWS], dimensionSizes[COLUMNS], dimensionSizes[LAYERS]);
 
-    Wave wave[MAX_NUM_TRACES];
-    Wave* traceUpData = &wave[TRACE_UP];
-    Wave* reTraceUpData = &wave[RE_TRACE_UP];
-    Wave* traceDownData = &wave[TRACE_DOWN];
-    Wave* reTraceDownData = &wave[RE_TRACE_DOWN];
+    WaveVec waves(MAX_NUM_WAVES);
+    Wave& traceUpData =  waves[TRACE_UP];
+    Wave& reTraceUpData = waves[RE_TRACE_UP];
+    Wave& traceDownData = waves[TRACE_DOWN];
+    Wave& reTraceDownData = waves[RE_TRACE_DOWN];
 
     // 4 cubes, TraceUp, TraceDown, ReTraceUp, ReTraceDown
     if (numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableBWD != 0 &&
         numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableUp != 0)
     {
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
-      wave[RE_TRACE_UP].setNameAndTraceDir(waveBaseName, RE_TRACE_UP);
-      wave[TRACE_DOWN].setNameAndTraceDir(waveBaseName, TRACE_DOWN);
-      wave[RE_TRACE_DOWN].setNameAndTraceDir(waveBaseName, RE_TRACE_DOWN);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
+      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
+      waves[TRACE_DOWN].setProperties(waveBaseName, TRACE_DOWN);
+      waves[RE_TRACE_DOWN].setProperties(waveBaseName, RE_TRACE_DOWN);
     }
     // 2 cubes, TraceUp, TraceDown
     else if (numPointsXAxisWithTableBWD == 0 && numPointsYAxisWithTableDown != 0)
     {
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
-      wave[TRACE_DOWN].setNameAndTraceDir(waveBaseName, TRACE_DOWN);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
+      waves[TRACE_DOWN].setProperties(waveBaseName, TRACE_DOWN);
     }
     // 2 cubes, TraceUp, ReTraceUp
     else if (numPointsXAxisWithTableBWD != 0 && numPointsYAxisWithTableDown == 0)
     {
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
-      wave[RE_TRACE_UP].setNameAndTraceDir(waveBaseName, RE_TRACE_UP);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
+      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
     }
     // 2 cubes, ReTraceUp, ReTraceDown
     else if (numPointsXAxisWithTableFWD == 0 && numPointsYAxisWithTableDown != 0)
     {
-      wave[RE_TRACE_UP].setNameAndTraceDir(waveBaseName, RE_TRACE_UP);
-      wave[RE_TRACE_DOWN].setNameAndTraceDir(waveBaseName, RE_TRACE_DOWN);
+      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
+      waves[RE_TRACE_DOWN].setProperties(waveBaseName, RE_TRACE_DOWN);
     }
     // 1 cube, TraceUp
     else if (numPointsXAxisWithTableBWD == 0 && numPointsYAxisWithTableDown == 0)
     {
-      wave[TRACE_UP].setNameAndTraceDir(waveBaseName, TRACE_UP);
+      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
     }
     // 1 cube, ReTraceUp
     else if (numPointsXAxisWithTableFWD == 0 && numPointsYAxisWithTableDown == 0)
     {
-      wave[RE_TRACE_UP].setNameAndTraceDir(waveBaseName, RE_TRACE_UP);
+      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
     }
     // not possible
     else
@@ -837,35 +860,10 @@ namespace
 
     DEBUGPRINT("xAxisBlockSize=%d,firstBlockOffset=%d", xAxisBlockSize, firstBlockOffset);
 
-    for (int i = 0; i < MAX_NUM_TRACES; i++)
+    int ret = createEmptyWaves(waves,waveFolderHandle,dimensionSizes);
+    if(ret != 0)
     {
-      // skip empty entries
-      if (wave[i].isEmpty())
-      {
-        continue;
-      }
-
-      waveHndl waveHandle;
-      int ret = MDMakeWave(&waveHandle, wave[i].getWaveName(), waveFolderHandle, dimensionSizes, getIgorWaveType(), isOverwriteEnabled());
-
-      if (ret == NAME_WAV_CONFLICT)
-      {
-        DEBUGPRINT("Wave %s already exists.", wave[i].getWaveName());
-        return WAVE_EXIST;
-      }
-      else if (ret != 0)
-      {
-        HISTPRINT("Error %d in creating wave %s.", ret, wave[i].getWaveName());
-        return UNKNOWN_ERROR;
-      }
-
-      wave[i].setWaveHandle(waveHandle);
-      wave[i].clearWave();
-    }
-
-    for (int i = 0; GlobalData::Instance().isDebuggingEnabled() && i < MAX_NUM_TRACES; i++)
-    {
-      wave[i].printDebugInfo();
+      return ret;
     }
 
     double slope, yIntercept;
@@ -885,7 +883,7 @@ namespace
         for (int k = 0; k < dimensionSizes[LAYERS]; k++)
         {
           // traceUp
-          if (traceUpData->moreData)
+          if (traceUpData.moreData)
           {
             rawIndex  = i * xAxisBlockSize + j * dimensionSizes[LAYERS] + k;
             dataIndex = i * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
@@ -899,18 +897,18 @@ namespace
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              traceUpData->fillWave(dataIndex, rawValue, scaledValue);
+              traceUpData.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
               DEBUGPRINT("Index out of range in traceUp");
               DEBUGPRINT("traceUpDataIndex=%d,waveSize=%d", dataIndex, waveSize);
               DEBUGPRINT("traceUpRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              traceUpData->moreData = false;
+              traceUpData.moreData = false;
             }
           }// if traceUpDataPtr
 
-          if (traceDownData->moreData)
+          if (traceDownData.moreData)
           {
 
             rawIndex  = firstBlockOffset + i * xAxisBlockSize + j * dimensionSizes[LAYERS] + k;
@@ -925,18 +923,18 @@ namespace
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              traceDownData->fillWave(dataIndex, rawValue, scaledValue);
+              traceDownData.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
               DEBUGPRINT("Index out of range in traceDown");
               DEBUGPRINT("traceDownDataIndex=%d,waveSize=%d", dataIndex, waveSize);
               DEBUGPRINT("traceDownRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              traceDownData->moreData = false;
+              traceDownData.moreData = false;
             }
           }// if traceDownDataPtr
 
-          if (reTraceUpData->moreData)
+          if (reTraceUpData.moreData)
           {
 
             rawIndex  = i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
@@ -951,18 +949,18 @@ namespace
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              reTraceUpData->fillWave(dataIndex, rawValue, scaledValue);
+              reTraceUpData.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
               DEBUGPRINT("Index out of range in reTraceUp");
               DEBUGPRINT("reTraceUpDataIndex=%d,waveSize=%d", dataIndex, waveSize);
               DEBUGPRINT("reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              reTraceUpData->moreData = false;
+              reTraceUpData.moreData = false;
             }
           }// if reTraceUpDataPtr
 
-          if (reTraceDownData->moreData)
+          if (reTraceDownData.moreData)
           {
 
             rawIndex  = firstBlockOffset + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
@@ -978,39 +976,39 @@ namespace
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              reTraceDownData->fillWave(dataIndex, rawValue, scaledValue);
+              reTraceDownData.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
               DEBUGPRINT("Index out of range in reTraceDown");
               DEBUGPRINT("reTraceDownDataIndex=%d,waveSize=%d", dataIndex, waveSize);
               DEBUGPRINT("reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              reTraceDownData->moreData = false;
+              reTraceDownData.moreData = false;
             }
           }// if reTraceDownDataPtr
         } // for LAYERS
       } // for ROWS
     } // for COLUMNS
 
-    for (int i = 0; i < MAX_NUM_TRACES; i++)
+    for (WaveIt it = waves.begin(); it != waves.end(); it++)
     {
-      if (wave[i].isEmpty())
+      if (it->isEmpty())
       {
         continue;
       }
 
-      setDataWaveNote(brickletID, wave[i]);
+      setDataWaveNote(brickletID, *it);
 
-      wave[i].setWaveScaling(ROWS, &xAxisDelta, &xAxisOffset);
-      wave[i].setWaveScaling(COLUMNS, &yAxisDelta, &yAxisOffset);
-      wave[i].setWaveScaling(LAYERS, &specAxis.physicalIncrement, &specAxis.physicalStart);
+      it->setWaveScaling(ROWS, &xAxisDelta, &xAxisOffset);
+      it->setWaveScaling(COLUMNS, &yAxisDelta, &yAxisOffset);
+      it->setWaveScaling(LAYERS, &specAxis.physicalIncrement, &specAxis.physicalStart);
 
-      wave[i].setWaveUnits(ROWS, xAxis.physicalUnit);
-      wave[i].setWaveUnits(COLUMNS, yAxis.physicalUnit);
-      wave[i].setWaveUnits(LAYERS, specAxis.physicalUnit);
-      wave[i].setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
+      it->setWaveUnits(ROWS, xAxis.physicalUnit);
+      it->setWaveUnits(COLUMNS, yAxis.physicalUnit);
+      it->setWaveUnits(LAYERS, specAxis.physicalUnit);
+      it->setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
 
-      appendToWaveList(baseFolderHandle, wave[i].getWaveHandle(), waveNameList);
+      appendToWaveList(baseFolderHandle, it->getWaveHandle(), waveNameList);
     }
 
     return SUCCESS;
@@ -1042,6 +1040,9 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
     {
       DEBUGPRINT("viewType %s", viewTypeCodeToString(*it).c_str());
     }
+    const int brickletType = session->getType(bricklet.getBrickletPointer());
+    const std::string brickletTypeString = brickletTypeToString(brickletType);
+    DEBUGPRINT("brickletType %s",brickletTypeString.c_str());
 
     DEBUGPRINT("Axis order is from triggerAxis to rootAxis");
 
@@ -1088,7 +1089,7 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
   Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
 
   Wave wave(bricklet.getExtrema());
-  wave.setNameAndTraceDir(waveName, NO_TRACE);
+  wave.setProperties(waveName, NO_TRACE);
 
   const int* rawBrickletDataPtr = bricklet.getRawData();
   if (rawBrickletDataPtr == NULL)

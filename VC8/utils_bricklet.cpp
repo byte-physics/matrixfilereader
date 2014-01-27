@@ -181,7 +181,7 @@ std::string brickletTypeToString(unsigned int idx)
 */
 void setDataWaveNote( int brickletID, const Wave& waveData )
 {
-  std::string  waveNote = getStandardWaveNote(brickletID, waveData.getTraceDir());
+  std::string  waveNote = getStandardWaveNote(brickletID, waveData.getTraceDir(),waveData.getSuffix());
 
   waveNote.append("rawMin="                + toString(waveData.getExtrema().getRawMin())    + "\r");
   waveNote.append("rawMax="                + toString(waveData.getExtrema().getRawMax())   + "\r");
@@ -195,15 +195,15 @@ void setDataWaveNote( int brickletID, const Wave& waveData )
 /*
   Set the appropriate wave note for the other waves (bricklet metadata, resultfile meta data, overviewtable)
 */
-void setOtherWaveNote(waveHndl waveHandle, int brickletID /*= -1*/, int traceDir  /*= -1*/)
+void setOtherWaveNote(waveHndl waveHandle, int brickletID /*= -1*/, int traceDir  /*= -1*/, std::string suffix /* = std::string() */ )
 {
-  setWaveNoteAsString(getStandardWaveNote(brickletID, traceDir), waveHandle);
+  setWaveNoteAsString(getStandardWaveNote(brickletID, traceDir, suffix), waveHandle);
 }
 
 /*
   Return a string containing the standard wave note part
 */
-std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 */)
+std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 */, std::string suffix /* = std::string() */ )
 {
   std::string waveNote;
   waveNote.append(RESULT_FILE_NAME_KEY + "=" + GlobalData::Instance().getFileName<std::string>() + "\r");
@@ -220,12 +220,14 @@ std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 
 
   if (isValidTraceDir(traceDir))
   {
-    waveNote.append(TRACEDIR_ID_KEY + "=" + toString(traceDir) + "\r");
+    waveNote.append(TRACEDIR_KEY + "=" + toString(traceDir) + "\r");
   }
   else
   {
-    waveNote.append(TRACEDIR_ID_KEY + "=\r");
+    waveNote.append(TRACEDIR_KEY + "=\r");
   }
+
+  waveNote.append(SUFFIX_KEY + "=" + suffix + "\r");
 
   waveNote.append("xopVersion=" + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
   waveNote.append("vernissageVersion=" + GlobalData::Instance().getVernissageVersion() + "\r");

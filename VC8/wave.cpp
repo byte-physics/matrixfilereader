@@ -72,14 +72,12 @@ void Wave::setWaveHandle(const waveHndl& waveHandle)
 /*
   Set the name and trace direction of the wave, adds then the appropriate suffix to the wave name
 */
-void Wave::setNameAndTraceDir(const std::string& basename, int traceDir)
+void Wave::setProperties(const std::string& basename, int traceDir, std::string suffix)
 {
-  m_traceDir = traceDir;
-
-  switch (m_traceDir)
+  switch (traceDir)
   {
   case NO_TRACE:
-    m_wavename = basename;
+    m_wavename = basename + suffix;
     break;
 
   case TRACE_UP:
@@ -99,9 +97,12 @@ void Wave::setNameAndTraceDir(const std::string& basename, int traceDir)
     break;
 
   default:
-    HISTPRINT("BUG: setNameAndTraceDir() tracedir is out of range");
-    break;
+    HISTPRINT("BUG: Wave::setProperties traceDir is out of range");
+    return;
   }
+
+  m_traceDir = traceDir;
+  m_suffix = suffix;
 }
 
 /*
@@ -109,8 +110,10 @@ void Wave::setNameAndTraceDir(const std::string& basename, int traceDir)
 */
 void Wave::printDebugInfo()
 {
-  DEBUGPRINT("%s: waveHandle=%p, float=%p, double=%p, moreData=%s",
-             m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr, moreData ? "true" : "false");
+  DEBUGPRINT("%s: waveHandle=%p, float=%p, double=%p, moreData=%s, traceDir=%d, specialSuffix=%s",
+             m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle,
+             m_floatPtr, m_doublePtr, moreData ? "true" : "false",
+             m_traceDir, m_suffix.c_str());
 }
 
 /*
@@ -196,4 +199,9 @@ int Wave::GetPixelSize() const
 void Wave::SetPixelSize(int pixelSize)
 {
   m_pixelSize = pixelSize;
+}
+
+std::string Wave::getSuffix() const
+{
+  return m_suffix;
 }

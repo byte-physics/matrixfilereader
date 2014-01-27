@@ -21,7 +21,7 @@ public:
 
   void clearWave();
   void setWaveHandle(const waveHndl& waveHandle);
-  void setNameAndTraceDir(const std::string& basename, int traceDir);
+  void setProperties(const std::string& basename, int traceDir, std::string suffix = std::string());
   void printDebugInfo();
   void setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr);
   void setWaveUnits(int dimension, const std::wstring& units);
@@ -34,6 +34,7 @@ public:
   const ExtremaData& getExtrema() const;;
   int GetPixelSize() const;
   void SetPixelSize(int pixelSize);
+  std::string getSuffix() const;
 
   void fillWave(int index, int rawValue, double scaledValue);
 
@@ -41,7 +42,6 @@ public:
   bool moreData;
 private:
   void Init();
-
   ExtremaData m_extrema;
   std::string m_wavename;
   int m_traceDir;
@@ -49,6 +49,7 @@ private:
   float* m_floatPtr;
   double* m_doublePtr;
   int m_pixelSize;
+  std::string m_suffix;
 };
 
 /*

@@ -37,6 +37,12 @@ Function createData(resultFileFull)
 
   MFR_GetResultFileMetaData
   MFR_CreateOverviewTable
+  
+  GetFileFolderInfo/Q/Z/P=savePath
+  if(V_flag != 0)
+  	PathInfo savePath
+  	print "Destination folder %s does not exist", S_path
+  endif
 
   SaveData/L=1/D=1/O/T=$folder/P=savePath ":"
   Killwaves/Z/A
@@ -224,13 +230,11 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
       return 0
     endif
 
-    // we have to set the resultDirPath to the correct one as the current run might from a different path
-    if( cmpstr(refWave[4][0],"resultDirPath") == 0 ) // bricklet metadata
-      newWave[4][1] = refWave[4][1]
-    endif
-
-    if( cmpstr(refWave[0][0],"resultDirPath") == 0 ) // resultfile metadata
-      newWave[0][1] = refWave[0][1]
+    // we have to set the resultDirPath to the correct path, the new one might be different
+    FindValue/TEXT="resultDirPath"/TXOP=4 refWave
+    variable idx = V_value
+    if(idx != -1)
+      newWave[idx][1] = refWave[idx][1]
     endif
 
     // Starting with Vernissage T2.2-2 the values spatialInfo.physicalX and
@@ -416,14 +420,13 @@ End
 
 Function regressionTest()
 
-  string refDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:igor-xop:regression_tests:referenceData_0.22"
-  string rawDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:TestData-Matrix-V3.0"
+  string refDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:igor-xop:regression_tests:referenceData_0.23"
+  string rawDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:TestData-Matrix-V3.0-3.1"
 
   string PATH = "r:newVersion_0.22"
   DeleteFolder/Z=1 PATH
   variable ret
   ret = createDataSet(PATH, rawDataPath)
-
   if(ret == 1)
       return ret
   endif

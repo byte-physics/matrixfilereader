@@ -105,6 +105,7 @@ namespace
     }
     const int rawBrickletSize = bricklet.getRawDataSize();
 
+    const int brickletType = session->getType(vernissageBricklet);
     const std::wstring triggerAxisName = session->getTriggerAxisName(vernissageBricklet);
     const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
     int numPointsTriggerAxis = triggerAxis.clocks;
@@ -124,6 +125,11 @@ namespace
       {
         HISTPRINT("BUG: Axis length differs from data length. Keep fingers crossed!");
       }
+      if (brickletType != Vernissage::Session::btc_SPMSpectroscopy)
+      {
+        HISTPRINT("BUG: Unexpected mirrored trigger axis with non btc_SPMSpectroscopy dataset.");
+      }
+
       wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
       wave2.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_2);
       numPointsTriggerAxis /= 2;
@@ -131,7 +137,15 @@ namespace
     }
     else
     {
-      wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
+      // at the moment the special suffix makes only sense with 1D SPS data
+      if (brickletType == Vernissage::Session::btc_SPMSpectroscopy)
+      {
+        wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
+      }
+      else
+      {
+        wave1.setProperties(waveBaseName, NO_TRACE);
+      }
     }
 
     dimensionSizes[ROWS] = numPointsTriggerAxis;

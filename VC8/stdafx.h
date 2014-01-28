@@ -28,8 +28,14 @@
 #include <vector>
 #include <map>
 #include <limits>
+
 #include <boost/smart_ptr.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+
+#define BOOST_THREAD_VERSION 3
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 #include "XOPStandardHeaders.h"
 

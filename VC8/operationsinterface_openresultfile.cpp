@@ -125,6 +125,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   strncpy(GlobalData::Instance().openDlgInitialDir, dirPath, MAX_PATH_LEN + 1);
   GlobalData::Instance().openDlgInitialDir[MAX_PATH_LEN] = '\0';
 
+  // first call to getVernissageSession() will result in the DLL loading
+  // which must happen in the main thread
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
   // now we convert to wide strings
@@ -133,9 +135,20 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
 
   // true -> result set will be added to the database
   // false -> replaces the current results sets in the internal databse
-  const bool loadSuccess = session->loadResultSet(dirPathWString, fileNameWString, false);
+  const bool accumulative = false;
 
-  if (!loadSuccess)
+  // loading the result set is done in its own thread in order to not block the GUI
+  boost::packaged_task<bool> task(boost::bind(&Vernissage::Session::loadResultSet, session, boost::cref(dirPathWString), boost::cref(fileNameWString), accumulative));
+  boost::future<bool> loadResult = task.get_future();
+  boost::thread thread(boost::move(task));
+
+  while(!thread.try_join_for(boost::chrono::milliseconds(100)))
+  {
+    // we don't allow the user to abort here
+    SpinProcess();
+  }
+
+  if (!loadResult.get())
   {
     HISTPRINT("Could not load the result file");
     return 0;

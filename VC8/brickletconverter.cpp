@@ -20,8 +20,10 @@ namespace
   typedef std::vector<Wave>::iterator WaveIt;
 
   // Create data for the raw->scaled transformation
-  void CalculateTransformationParameter(const Bricklet& bricklet, double& slope, double& yIntercept)
+  typedef std::pair<double,double> TransData;
+  TransData CalculateTransformationParameter(const Bricklet& bricklet)
   {
+    double slope, yIntercept;
     // the min and max values here are for the complete bricklet data and not only for one wave
     const int x1    = bricklet.getExtrema().getRawMin();
     const int x2    = bricklet.getExtrema().getRawMax();
@@ -41,9 +43,10 @@ namespace
       slope      = 0.0;
       yIntercept = y1;
     }
-
     DEBUGPRINT("raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%.15g,yTwo=%.15g", x1, x2, y1, y2);
     DEBUGPRINT("raw->scaled transformation: slope=%.15g,yIntercept=%.15g", slope, yIntercept);
+
+    return std::make_pair(slope, yIntercept);
   }
 
   int createEmptyWaves( WaveVec& waves, DataFolderHandle waveFolderHandle, CountInt* dimensionSizes )
@@ -156,8 +159,9 @@ namespace
       return ret;
     }
 
-    double slope, yIntercept;
-    CalculateTransformationParameter(bricklet, slope, yIntercept);
+    const TransData transData = CalculateTransformationParameter(bricklet);
+    const double slope      = transData.first;
+    const double yIntercept = transData.second;
 
     for (int i = 0; i < dataSize; i++)
     {
@@ -292,8 +296,9 @@ namespace
 
     const int firstBlockOffset = numPointsRootAxis * triggerAxisBlockSize;
 
-    double slope, yIntercept;
-    CalculateTransformationParameter(bricklet, slope, yIntercept);
+    const TransData transData = CalculateTransformationParameter(bricklet);
+    const double slope      = transData.first;
+    const double yIntercept = transData.second;
 
     // See also Vernissage manual page 22f
     // triggerAxisBlockSize: number of points in the raw data array which were acquired at the same root axis position
@@ -890,8 +895,9 @@ namespace
       return ret;
     }
 
-    double slope, yIntercept;
-    CalculateTransformationParameter(bricklet, slope, yIntercept);
+    const TransData transData = CalculateTransformationParameter(bricklet);
+    const double slope      = transData.first;
+    const double yIntercept = transData.second;
 
     int rawIndex, dataIndex;
     int rawValue;

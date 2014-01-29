@@ -284,6 +284,8 @@ void Bricklet::loadMetaData()
   AddMetaData(m_metaData,"scanCycleCount",session->getScanCycleCount(m_brickletPtr));
 
   // new in vernissage 2.1
+  // FIXME vernissage takes ages for the getDependingBricklets and friends calls
+  // *and* internally locks the accesses so that we can't access it concurrently
   {
     const std::vector<int> idVec = convertRawBrickletVector(session->getDependingBricklets(m_brickletPtr));
     std::string dependentBricklets;

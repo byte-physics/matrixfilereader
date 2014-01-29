@@ -31,7 +31,6 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
   CountInt dimensionSizes[MAX_DIMENSIONS + 1];
   MemClear(dimensionSizes, sizeof(dimensionSizes));
-  std::vector<std::string> keys, textWaveContents;
 
   // check of DEST flag which tells us that we should place all output in the supplied datafolder
   // and also read the variable settings from this folder
@@ -117,6 +116,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
     return 0;
   }
 
+  std::vector<std::string> keys;
   splitString(keyList, listSepChar, keys);
 
   if (keys.empty())
@@ -144,22 +144,31 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
   ASSERT_RETURN_ZERO(waveHandle);
 
+  std::vector<std::string> content;
+  content.reserve(keys.size()*numberOfBricklets);
+
   for (unsigned int j = 0; j < keys.size(); j++)
   {
-    const std::string key = keys.at(j);
-    MDSetDimensionLabel(waveHandle, COLUMNS, j, key.c_str());
-    DEBUGPRINT("key=%s", key.c_str());
+    const std::string key = keys[j];
+    //DEBUGPRINT("key=%s", key.c_str());
+    int ret = MDSetDimensionLabel(waveHandle, COLUMNS, j, key.c_str());
+    if (ret != 0)
+    {
+      DEBUGPRINT("MDSetDimensionLabel returned %d",ret);
+      return ret;
+    }
 
     for (int i = 1; i <= numberOfBricklets; i++)
     {
       Bricklet& bricklet = GlobalData::Instance().getBricklet(i);
       const std::string value = bricklet.getMetaDataValue<std::string>(key);
-      textWaveContents.push_back(value);
-      DEBUGPRINT("   value=%s", value.c_str());
+      content.push_back(value);
+      //DEBUGPRINT("   value=%s", value.c_str());
     }
   }
 
-  ret = stringVectorToTextWave(textWaveContents, waveHandle);
+  // needs data in column-major format
+  ret = stringVectorToTextWave(content, waveHandle);
 
   if (ret != 0)
   {

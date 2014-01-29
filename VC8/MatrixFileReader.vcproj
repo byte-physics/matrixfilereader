@@ -26,6 +26,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
+				CommandLine="genversion.pl"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

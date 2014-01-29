@@ -10,6 +10,7 @@
 #include "operationsinterface.hpp"
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
+#include "gitversion.hpp"
 
 namespace  {
 
@@ -71,7 +72,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   str.append("Visual Studio version: " + toString(_MSC_VER) + "\r");
   str.append("Igor Pro Version: " + toString(igorVersion) + "\r");
   str.append("Vernissage version: " + GlobalData::Instance().getVernissageVersion() + "\r");
-  str.append("XOP version: " MatrixFileReader_XOP_VERSION_STR);
+  str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + " (Build " + std::string(GIT_VERSION) + ")");
   str.append("\r");
   str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
   str.append("\r");

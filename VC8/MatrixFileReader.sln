@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6AE16886-D517-483C-9FFF-41B95746EB2A}"
 	ProjectSection(SolutionItems) = preProject
 		copyfiles.bat = copyfiles.bat
+		genVersion.pl = genVersion.pl
 		VernissageSDK_T2.2_4\src\Incl\Vernissage.h = VernissageSDK_T2.2_4\src\Incl\Vernissage.h
 	EndProjectSection
 EndProject

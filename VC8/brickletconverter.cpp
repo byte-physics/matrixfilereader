@@ -23,27 +23,27 @@ namespace
   void CalculateTransformationParameter(const Bricklet& bricklet, double& slope, double& yIntercept)
   {
     // the min and max values here are for the complete bricklet data and not only for one wave
-    const int xOne = bricklet.getExtrema().getRawMin();
-    const int xTwo = bricklet.getExtrema().getRawMax();
-    const double yOne = bricklet.getExtrema().getPhysValRawMin();
-    const double yTwo = bricklet.getExtrema().getPhysValRawMax();
+    const int x1    = bricklet.getExtrema().getRawMin();
+    const int x2    = bricklet.getExtrema().getRawMax();
+    const double y1 = bricklet.getExtrema().getPhysValRawMin();
+    const double y2 = bricklet.getExtrema().getPhysValRawMax();
 
     // usually xOne is not equal to xTwo
-    if (xOne != xTwo)
+    if (x1 != x2)
     {
-      slope = (yOne - yTwo) / (xOne * 1.0 - xTwo * 1.0);
-      yIntercept = yOne - slope * xOne;
+      slope = (y1 - y2) / (x1 * 1.0 - x2 * 1.0);
+      yIntercept = y1 - slope * x1;
     }
     else
     {
       // but if it is we have to do something different
       // xOne == xTwo means that the minimum is equal to the maximum, so the data is everywhere yOne == yTwo aka constant
-      slope = 0.0;
-      yIntercept = yOne;
+      slope      = 0.0;
+      yIntercept = y1;
     }
 
-    DEBUGPRINT("raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%g,yTwo=%g", xOne, xTwo, yOne, yTwo);
-    DEBUGPRINT("raw->scaled transformation: slope=%g,yIntercept=%g", slope, yIntercept);
+    DEBUGPRINT("raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%.15g,yTwo=%.15g", x1, x2, y1, y2);
+    DEBUGPRINT("raw->scaled transformation: slope=%.15g,yIntercept=%.15g", slope, yIntercept);
   }
 
   int createEmptyWaves( WaveVec& waves, DataFolderHandle waveFolderHandle, CountInt* dimensionSizes )

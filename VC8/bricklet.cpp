@@ -227,8 +227,8 @@ void Bricklet::loadMetaData()
   AddMetaData(m_metaData,BRICKLET_ID_KEY,m_brickletID);
 
   // resultfile
-  AddMetaData(m_metaData,RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName<std::string>());
-  AddMetaData(m_metaData,RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath<std::string>());
+  AddMetaData(m_metaData,RESULT_FILE_NAME_KEY,unicodeToAnsi(GlobalData::Instance().getFileName()));
+  AddMetaData(m_metaData,RESULT_DIR_PATH_KEY,unicodeToAnsi(GlobalData::Instance().getDirPath()));
 
   // introduced with Vernissage 2.0
   AddMetaData(m_metaData,"sampleName",session->getSampleName(m_brickletPtr));

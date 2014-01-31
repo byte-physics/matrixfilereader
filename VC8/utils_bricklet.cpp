@@ -206,8 +206,8 @@ void setOtherWaveNote(waveHndl waveHandle, int brickletID /*= -1*/, int traceDir
 std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 */, std::string suffix /* = std::string() */ )
 {
   std::string waveNote;
-  waveNote.append(RESULT_FILE_NAME_KEY + "=" + GlobalData::Instance().getFileName<std::string>() + "\r");
-  waveNote.append(RESULT_DIR_PATH_KEY + "=" + GlobalData::Instance().getDirPath<std::string>() + "\r");
+  waveNote.append(RESULT_FILE_NAME_KEY + "=" + unicodeToAnsi(GlobalData::Instance().getFileName()) + "\r");
+  waveNote.append(RESULT_DIR_PATH_KEY + "=" + unicodeToAnsi(GlobalData::Instance().getDirPath()) + "\r");
 
   if (isValidBrickletID(brickletID))
   {

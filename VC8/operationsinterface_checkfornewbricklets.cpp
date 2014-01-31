@@ -43,8 +43,8 @@ extern "C" int ExecuteCheckForNewBricklets(CheckForNewBrickletsRuntimeParamsPtr 
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
   const int oldNumberOfBricklets = session->getBrickletCount();
 
-  std::wstring fileName = GlobalData::Instance().getFileName<std::wstring>();
-  std::wstring dirPath = GlobalData::Instance().getDirPath<std::wstring>();
+  std::wstring fileName = GlobalData::Instance().getFileName();
+  std::wstring dirPath = GlobalData::Instance().getDirPath();
 
   // true -> result set will be added to the database
   // false -> replaces the current results sets in the internal databse

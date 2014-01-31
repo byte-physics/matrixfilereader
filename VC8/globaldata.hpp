@@ -43,35 +43,8 @@ public:
   void finalize();
   void finalizeWithFilledCache();
 
-  template<typename T>
-  T getFileName() const;
-
-  template<>
-  std::string getFileName<std::string>() const
-  {
-    return toString(m_resultFileName);
-  }
-
-  template<>
-  std::wstring getFileName<std::wstring>() const
-  {
-    return m_resultFileName;
-  }
-
-  template<typename T>
-  T getDirPath() const;
-
-  template<>
-  std::string getDirPath<std::string>() const
-  {
-    return toString(m_resultDirPath);
-  }
-
-  template<>
-  std::wstring getDirPath<std::wstring>() const
-  {
-    return m_resultDirPath;
-  }
+  const std::wstring& getFileName() const;
+  const std::wstring& getDirPath() const;
 
   bool resultFileOpen() const;
 

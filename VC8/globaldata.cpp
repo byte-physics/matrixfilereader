@@ -40,7 +40,7 @@ namespace  {
     return value;
   }
 
-} // anonymous namespace 
+} // anonymous namespace
 
 GlobalData::GlobalData()
   :
@@ -70,6 +70,16 @@ void GlobalData::setResultFile(const std::wstring& dirPath, const std::wstring& 
 
   m_resultDirPath = dirPath;
   m_resultFileName = fileName;
+}
+
+const std::wstring& GlobalData::getFileName() const
+{
+  return m_resultFileName;
+}
+
+const std::wstring& GlobalData::getDirPath() const
+{
+  return m_resultDirPath;
 }
 
 /*

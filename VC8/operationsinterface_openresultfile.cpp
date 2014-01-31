@@ -24,7 +24,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
 
   if (GlobalData::Instance().resultFileOpen())
   {
-    GlobalData::Instance().setError(ALREADY_FILE_OPEN, GlobalData::Instance().getFileName<std::string>());
+    GlobalData::Instance().setError(ALREADY_FILE_OPEN, unicodeToAnsi(GlobalData::Instance().getFileName()));
     return 0;
   }
 

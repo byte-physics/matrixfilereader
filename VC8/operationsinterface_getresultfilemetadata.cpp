@@ -85,8 +85,8 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   }
 
   std::vector<std::pair<std::string,std::string> > data;
-  data.push_back(std::make_pair(RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath<std::string>()));
-  data.push_back(std::make_pair(RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName<std::string>()));
+  data.push_back(std::make_pair(RESULT_DIR_PATH_KEY,unicodeToAnsi(GlobalData::Instance().getDirPath())));
+  data.push_back(std::make_pair(RESULT_FILE_NAME_KEY,unicodeToAnsi(GlobalData::Instance().getFileName())));
   data.push_back(std::make_pair("totalNumberOfBricklets",toString(numberOfBricklets)));
 
   if (numberOfBricklets > 0)

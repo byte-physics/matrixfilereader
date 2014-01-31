@@ -40,7 +40,7 @@ public:
   }
 
   template<>
-  std::string Bricklet::getMetaDataValue( const std::string& key )
+  std::string getMetaDataValue( const std::string& key )
   {
     if (key.empty())
     {

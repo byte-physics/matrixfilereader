@@ -387,7 +387,7 @@ Function diff(wvName)
 
   variable i, j
 
-  if(WaveType(root:newFolder:$wvName) == 0) // text waves
+  if(WaveType(:newFolder:$wvName) == 0) // text waves
     wave/T newWaveT = :newFolder:$wvName
     wave/T refWaveT = :refFolder:$wvName
 
@@ -403,15 +403,22 @@ Function diff(wvName)
       endif
     endfor
   else // numeric waves
+
     // todo check for matching dimensions
-    wave newWave = root:newFolder:$wvName
-    wave refWave = root:refFolder:$wvName
+    wave newWave = :newFolder:$wvName
+    wave refWave = :refFolder:$wvName
+
+    Make/D/O/N=(DimSize(newWave,0),DimSize(newWave,1)) diffWave
+    diffWave = newWave - refWave
 
     for(i=0; i < DimSize(newWave,0); i+=1)
       for(j=0; j < DimSize(newWave,1); j+=1)
-        if(newWave[i][j] != refWave[i][j])
+        variable new = newWave[i][j]
+        variable ref = refWave[i][j]
+        if( new != ref  && numtype(ref) != 2 && numtype(new) != 2)
           printf "mismatched value: row %d, col %d\r", i, j
           printf "    new _%.15g_ vs old _%.15g_\r", newWave[i][j], refWave[i][j]
+          return NaN
         endif
       endfor
     endfor

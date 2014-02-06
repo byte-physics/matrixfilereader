@@ -71,8 +71,6 @@ T* getWaveDataPtr(waveHndl waveH)
   return reinterpret_cast<T*>(reinterpret_cast<char*>(*waveH) + dataOffset);
 }
 
-void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle);
-
 int stringVectorToTextWave(const std::vector<std::string>& data, waveHndl waveHandle);
 
 void waveClearNaN64(double* wavePtr, CountInt length);

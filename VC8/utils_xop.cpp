@@ -102,36 +102,6 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 }
 
 /*
-  Write the string waveNote as wave note into waveHandle
-*/
-void setWaveNoteAsString(const std::string& waveNote, waveHndl waveHandle)
-{
-  if (waveNote.empty())
-  {
-    HISTPRINT("BUG: got empty waveNote in setWaveNoteAsString.");
-    return;
-  }
-
-  Handle noteHandle = NewHandle(waveNote.size()) ;
-
-  if (noteHandle == NULL)
-  {
-    return;
-  }
-
-  int ret = PutCStringInHandle(waveNote.c_str(), noteHandle);
-  if (ret != 0)
-  {
-    HISTPRINT("internal error %d, aborting", ret);
-    return;
-  }
-
-  ASSERT_RETURN_VOID(waveHandle);
-  SetWaveNote(waveHandle, noteHandle);
-  // SetWaveNote takes care of diposing the handle
-}
-
-/*
   Sets the complete wave data to which data points to NaN (double precision version)
 */
 void waveClearNaN64(double* data, CountInt length)

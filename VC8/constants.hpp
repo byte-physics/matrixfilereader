@@ -135,5 +135,6 @@ const int maximum_pixelSize     = 10;
 const char listSepChar[]        = ";";
 const char relativeFolderPrefix[] = ":";
 
+const char SUFFIX_NAME[]              = "suffix";
 const char suffix_ramp_reversal_1[]    = "_1";
 const char suffix_ramp_reversal_2[]    = "_2";

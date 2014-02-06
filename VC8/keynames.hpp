@@ -7,12 +7,11 @@
 #include <string>
 
 /*
-  Common names for the data and meta data waves
+  Common names of the meta data keys
 */
-const std::string RESULT_FILE_NAME_KEY  = "resultFileName";
-const std::string RESULT_DIR_PATH_KEY   = "resultDirPath";
-const std::string BRICKLET_ID_KEY       = "brickletID";
-const std::string TRACEDIR_KEY          = "traceDirection";
-const std::string SUFFIX_KEY            = "suffix";
-const std::string CHANNEL_UNIT_KEY      = "channelUnit";
-const std::string DIMENSION_KEY         = "dimension";
+const char RESULT_FILE_NAME_KEY[]  = "resultFileName";
+const char RESULT_DIR_PATH_KEY[]   = "resultDirPath";
+const char BRICKLET_ID_KEY[]       = "brickletID";
+const char TRACEDIR_KEY[]          = "traceDirection";
+const char CHANNEL_UNIT_KEY[]      = "channelUnit";
+const char DIMENSION_KEY[]         = "dimension";

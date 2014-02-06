@@ -11,6 +11,154 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
+namespace {
+
+  /*
+    Write the string waveNote as wave note into waveHandle
+  */
+  void setWaveNote(const std::string& waveNote, waveHndl waveHandle)
+  {
+    if (waveNote.empty())
+    {
+      HISTPRINT("BUG: got empty waveNote in setWaveNote.");
+      return;
+    }
+
+    Handle noteHandle = NewHandle(waveNote.size()) ;
+
+    if (noteHandle == NULL)
+    {
+      return;
+    }
+
+    int ret = PutCStringInHandle(waveNote.c_str(), noteHandle);
+    if (ret != 0)
+    {
+      HISTPRINT("internal error %d, aborting", ret);
+      return;
+    }
+
+    ASSERT_RETURN_VOID(waveHandle);
+    SetWaveNote(waveHandle, noteHandle);
+    // SetWaveNote takes care of diposing the handle
+  }
+
+  /*
+    Return a string containing the standard wave note part
+  */
+  void setStandardWaveNote(std::stringstream& sstr, int brickletID /* = -1 */, int traceDir /* = -1 */, std::string suffix /* = std::string() */ )
+  {
+    sstr.precision(DBL_DIG);
+
+    sstr << RESULT_FILE_NAME_KEY << '=' << unicodeToAnsi(GlobalData::Instance().getFileName()) << CR_CHAR;
+    sstr << RESULT_DIR_PATH_KEY  << '=' << unicodeToAnsi(GlobalData::Instance().getDirPath())  << CR_CHAR;
+
+    if (isValidBrickletID(brickletID))
+    {
+      sstr << BRICKLET_ID_KEY << '=' << brickletID << CR_CHAR;
+    }
+    else
+    {
+      sstr << BRICKLET_ID_KEY << '=' << CR_CHAR;
+    }
+
+    if (isValidTraceDir(traceDir))
+    {
+      sstr << TRACEDIR_KEY << '=' << traceDir << CR_CHAR;
+    }
+    else
+    {
+      sstr << TRACEDIR_KEY << '=' << CR_CHAR;
+    }
+
+    sstr << SUFFIX_NAME          << '=' << suffix                                 << CR_CHAR;
+    sstr << "xopVersion="        << MatrixFileReader_XOP_VERSION_STR              << CR_CHAR;
+    sstr << "vernissageVersion=" << GlobalData::Instance().getVernissageVersion() << CR_CHAR;
+  }
+
+  class IndexToString
+  {
+  public:
+    virtual ~IndexToString(){}
+
+    virtual std::string operator()(unsigned int index) const
+    {
+      const std::vector<std::string>& data = getData();
+
+      if (index >= data.size())
+      {
+        DEBUGPRINT("BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d", index, data.size() - 1);
+        return std::string();
+      }
+      else
+      {
+        return data.at(index);
+      }
+    }
+
+  private:
+    virtual const std::vector<std::string>& getData() const = 0;
+  };
+
+  class ViewTypeConverter : public IndexToString
+  {
+  public:
+    ViewTypeConverter()
+    {
+      m_data.push_back(VTC_OTHER);
+      m_data.push_back(VTC_SIMPLE2D);
+      m_data.push_back(VTC_SIMPLE1D);
+      m_data.push_back(VTC_FWDBWD2D);
+      m_data.push_back(VTC_2DOF3D);
+      m_data.push_back(VTC_SPECTROSCOPY);
+      m_data.push_back(VTC_FORCECURVE);
+      m_data.push_back(VTC_1DPROFILE);
+      m_data.push_back(VTC_INTERFEROMETER);
+      m_data.push_back(VTC_CONTINUOUSCURVE);
+      m_data.push_back(VTC_PHASEAMPLITUDECUR);
+      m_data.push_back(VTC_CURVESET);
+      m_data.push_back(VTC_PARAMETERISEDCUR);
+      m_data.push_back(VTC_DISCRETEENERGYMAP);
+      m_data.push_back(VTC_ESPIMAGEMAP);
+      m_data.push_back(VTC_DOWNWARD2D);
+    }
+
+  private:
+    std::vector<std::string> m_data;
+    const std::vector<std::string>& getData() const { return m_data; }
+  };
+
+  class BrickletTypeConverter : public IndexToString
+  {
+  public:
+    BrickletTypeConverter()
+    {
+      m_data.push_back(BTC_UNKNOWN);
+      m_data.push_back(BTC_SPMSPECTROSCOPY);
+      m_data.push_back(BTC_ATOMMANIPULATION);
+      m_data.push_back(BTC_1DCURVE);
+      m_data.push_back(BTC_SPMIMAGE);
+      m_data.push_back(BTC_PATHSPECTROSCOPY);
+      m_data.push_back(BTC_ESPREGION);
+      m_data.push_back(BTC_VOLUMECITS);
+      m_data.push_back(BTC_DISCRETEENERGYMAP);
+      m_data.push_back(BTC_FORCECURVE);
+      m_data.push_back(BTC_PHASEAMPLITUDECUR);
+      m_data.push_back(BTC_SIGNALOVERTIME);
+      m_data.push_back(BTC_RAWPATHSPEC);
+      m_data.push_back(BTC_ESPSNAPSHOTSEQ);
+      m_data.push_back(BTC_ESPIMAGEMAP);
+      m_data.push_back(BTC_INTERFEROMETERCUR);
+      m_data.push_back(BTC_ESPIMAGE);
+    }
+
+  private:
+    std::vector<std::string> m_data;
+    const std::vector<std::string>& getData() const { return m_data; }
+  };
+
+} // anonymous namespace
+
 /*
   Create a two column text wave from two string vectors
 */
@@ -77,58 +225,6 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<s
   return 0;
 }
 
-class IndexToString
-{
-public:
-  virtual ~IndexToString(){}
-
-  virtual std::string operator()(unsigned int index) const
-  {
-    const std::vector<std::string>& data = getData();
-
-    if (index >= data.size())
-    {
-      DEBUGPRINT("BUG: viewTypeCodeToString got %d as parameter, but it should be between 0 and %d", index, data.size() - 1);
-      return std::string();
-    }
-    else
-    {
-      return data.at(index);
-    }
-  }
-
-private:
-  virtual const std::vector<std::string>& getData() const = 0;
-};
-
-class ViewTypeConverter : public IndexToString
-{
-public:
-  ViewTypeConverter()
-  {
-    m_data.push_back(VTC_OTHER);
-    m_data.push_back(VTC_SIMPLE2D);
-    m_data.push_back(VTC_SIMPLE1D);
-    m_data.push_back(VTC_FWDBWD2D);
-    m_data.push_back(VTC_2DOF3D);
-    m_data.push_back(VTC_SPECTROSCOPY);
-    m_data.push_back(VTC_FORCECURVE);
-    m_data.push_back(VTC_1DPROFILE);
-    m_data.push_back(VTC_INTERFEROMETER);
-    m_data.push_back(VTC_CONTINUOUSCURVE);
-    m_data.push_back(VTC_PHASEAMPLITUDECUR);
-    m_data.push_back(VTC_CURVESET);
-    m_data.push_back(VTC_PARAMETERISEDCUR);
-    m_data.push_back(VTC_DISCRETEENERGYMAP);
-    m_data.push_back(VTC_ESPIMAGEMAP);
-    m_data.push_back(VTC_DOWNWARD2D);
-  }
-
-private:
-  std::vector<std::string> m_data;
-  const std::vector<std::string>& getData() const { return m_data; }
-};
-
 /*
   Convert a vernissage viewtype code to a string
 */
@@ -137,35 +233,6 @@ std::string viewTypeCodeToString(unsigned int idx)
   const static ViewTypeConverter conv;
   return conv(idx);
 }
-
-class BrickletTypeConverter : public IndexToString
-{
-public:
-  BrickletTypeConverter()
-  {
-    m_data.push_back(BTC_UNKNOWN);
-    m_data.push_back(BTC_SPMSPECTROSCOPY);
-    m_data.push_back(BTC_ATOMMANIPULATION);
-    m_data.push_back(BTC_1DCURVE);
-    m_data.push_back(BTC_SPMIMAGE);
-    m_data.push_back(BTC_PATHSPECTROSCOPY);
-    m_data.push_back(BTC_ESPREGION);
-    m_data.push_back(BTC_VOLUMECITS);
-    m_data.push_back(BTC_DISCRETEENERGYMAP);
-    m_data.push_back(BTC_FORCECURVE);
-    m_data.push_back(BTC_PHASEAMPLITUDECUR);
-    m_data.push_back(BTC_SIGNALOVERTIME);
-    m_data.push_back(BTC_RAWPATHSPEC);
-    m_data.push_back(BTC_ESPSNAPSHOTSEQ);
-    m_data.push_back(BTC_ESPIMAGEMAP);
-    m_data.push_back(BTC_INTERFEROMETERCUR);
-    m_data.push_back(BTC_ESPIMAGE);
-  }
-
-private:
-  std::vector<std::string> m_data;
-  const std::vector<std::string>& getData() const { return m_data; }
-};
 
 /*
   Convert the bricklet type enumeration value into a human readable string
@@ -181,15 +248,16 @@ std::string brickletTypeToString(unsigned int idx)
 */
 void setDataWaveNote( int brickletID, const Wave& waveData )
 {
-  std::string  waveNote = getStandardWaveNote(brickletID, waveData.getTraceDir(),waveData.getSuffix());
+  std::stringstream note;
+  setStandardWaveNote(note, brickletID, waveData.getTraceDir(), waveData.getSuffix());
 
-  waveNote.append("rawMin="                + toString(waveData.getExtrema().getRawMin())    + "\r");
-  waveNote.append("rawMax="                + toString(waveData.getExtrema().getRawMax())   + "\r");
-  waveNote.append("physicalValueOfRawMin=" + toString(waveData.getExtrema().getPhysValRawMin()) + "\r");
-  waveNote.append("physicalValueOfRawMax=" + toString(waveData.getExtrema().getPhysValRawMax()) + "\r");
-  waveNote.append("pixelSize="             + toString(waveData.GetPixelSize()) + "\r");
+  note << "rawMin="                << waveData.getExtrema().getRawMin()        << CR_CHAR;
+  note << "rawMax="                << waveData.getExtrema().getRawMax()        << CR_CHAR;
+  note << "physicalValueOfRawMin=" << waveData.getExtrema().getPhysValRawMin() << CR_CHAR;
+  note << "physicalValueOfRawMax=" << waveData.getExtrema().getPhysValRawMax() << CR_CHAR;
+  note << "pixelSize="             << waveData.GetPixelSize()                  << CR_CHAR;
 
-  setWaveNoteAsString(waveNote, waveData.getWaveHandle());
+  setWaveNote(note.str(), waveData.getWaveHandle());
 }
 
 /*
@@ -197,42 +265,9 @@ void setDataWaveNote( int brickletID, const Wave& waveData )
 */
 void setOtherWaveNote(waveHndl waveHandle, int brickletID /*= -1*/, int traceDir  /*= -1*/, std::string suffix /* = std::string() */ )
 {
-  setWaveNoteAsString(getStandardWaveNote(brickletID, traceDir, suffix), waveHandle);
-}
-
-/*
-  Return a string containing the standard wave note part
-*/
-std::string getStandardWaveNote(int brickletID /* = -1 */, int traceDir /* = -1 */, std::string suffix /* = std::string() */ )
-{
-  std::string waveNote;
-  waveNote.append(RESULT_FILE_NAME_KEY + "=" + unicodeToAnsi(GlobalData::Instance().getFileName()) + "\r");
-  waveNote.append(RESULT_DIR_PATH_KEY + "=" + unicodeToAnsi(GlobalData::Instance().getDirPath()) + "\r");
-
-  if (isValidBrickletID(brickletID))
-  {
-    waveNote.append(BRICKLET_ID_KEY + "=" + toString(brickletID) + "\r");
-  }
-  else
-  {
-    waveNote.append(BRICKLET_ID_KEY + "=\r");
-  }
-
-  if (isValidTraceDir(traceDir))
-  {
-    waveNote.append(TRACEDIR_KEY + "=" + toString(traceDir) + "\r");
-  }
-  else
-  {
-    waveNote.append(TRACEDIR_KEY + "=\r");
-  }
-
-  waveNote.append(SUFFIX_KEY + "=" + suffix + "\r");
-
-  waveNote.append("xopVersion=" + std::string(MatrixFileReader_XOP_VERSION_STR) + "\r");
-  waveNote.append("vernissageVersion=" + GlobalData::Instance().getVernissageVersion() + "\r");
-
-  return waveNote;
+  std::stringstream note;
+  setStandardWaveNote(note, brickletID, traceDir, suffix);
+  setWaveNote(note.str(), waveHandle);
 }
 
 /*

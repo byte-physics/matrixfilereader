@@ -15,3 +15,4 @@ const std::string BRICKLET_ID_KEY       = "brickletID";
 const std::string TRACEDIR_KEY          = "traceDirection";
 const std::string SUFFIX_KEY            = "suffix";
 const std::string CHANNEL_UNIT_KEY      = "channelUnit";
+const std::string DIMENSION_KEY         = "dimension";

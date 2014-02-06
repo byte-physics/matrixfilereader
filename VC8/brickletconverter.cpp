@@ -18,6 +18,16 @@ namespace
 {
   typedef std::vector<Wave> WaveVec;
   typedef std::vector<Wave>::iterator WaveIt;
+  typedef std::vector<std::string> StringVector;
+  typedef std::vector<std::string>::const_iterator StringVectorCIt;
+
+  // Vernissage typedef
+  typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
+  typedef ViewTypeCodeVector::const_iterator ViewTypeCodeVectorCIt;
+  typedef Vernissage::Session::TableSet TableSet;
+  typedef Vernissage::Session::AxisTableSets AxisTableSets;
+  typedef TableSet::const_iterator TableSetCIt;
+  typedef Vernissage::Session::AxisDescriptor AxisDescriptor;
 
   // Create data for the raw->scaled transformation
   typedef std::pair<double,double> TransData;
@@ -98,7 +108,7 @@ namespace
 
     Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
     void* vernissageBricklet = bricklet.getBrickletPointer();
-    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    Vernissage::Session* session = getVernissageSession();
 
     const int* rawBrickletDataPtr = bricklet.getRawData();
     if (rawBrickletDataPtr == NULL)
@@ -110,7 +120,7 @@ namespace
 
     const int brickletType = session->getType(vernissageBricklet);
     const std::wstring triggerAxisName = session->getTriggerAxisName(vernissageBricklet);
-    const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
+    const AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxisName);
     int numPointsTriggerAxis = triggerAxis.clocks;
     // axis length and data length differ in case this is an aborted I(t) scan or similar
     int dataSize             = rawBrickletSize;
@@ -206,7 +216,7 @@ namespace
 
     Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
     void* vernissageBricklet = bricklet.getBrickletPointer();
-    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    Vernissage::Session* session = getVernissageSession();
 
     const int* rawBrickletDataPtr = bricklet.getRawData();
     if (rawBrickletDataPtr == NULL)
@@ -216,7 +226,7 @@ namespace
     }
     const int rawBrickletSize = bricklet.getRawDataSize();
 
-    const Vernissage::Session::AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
+    const AxisDescriptor triggerAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
 
     // Determine the length of one "line" of data
     int numPointsTriggerAxis = triggerAxis.clocks;
@@ -230,7 +240,7 @@ namespace
     }
 
     // There must be another axis, because the Bricklet has two dimensions:
-    const Vernissage::Session::AxisDescriptor rootAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxis.triggerAxisName);
+    const AxisDescriptor rootAxis = session->getAxisDescriptor(vernissageBricklet, triggerAxis.triggerAxisName);
 
     // Determine the length of one "line" of data
     int numPointsRootAxis = rootAxis.clocks;
@@ -569,7 +579,7 @@ namespace
 
     Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
     void* const vernissageBricklet = bricklet.getBrickletPointer();
-    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    Vernissage::Session* session = getVernissageSession();
 
     const int* rawBrickletDataPtr = bricklet.getRawData();
     if (rawBrickletDataPtr == NULL)
@@ -583,10 +593,9 @@ namespace
 
     // check for correct view type codes
     int found = 0;
-    typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
     const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(vernissageBricklet);
 
-    for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
+    for (ViewTypeCodeVectorCIt it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
     {
       if (*it == Vernissage::Session::vtc_Spectroscopy)
       {
@@ -604,13 +613,13 @@ namespace
       DEBUGPRINT("The 3D data is not of the type vtc_2Dof3D and vtc_Spectroscopy.");
     }
 
-    const Vernissage::Session::AxisDescriptor specAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
-    const Vernissage::Session::AxisDescriptor xAxis = session->getAxisDescriptor(vernissageBricklet, specAxis.triggerAxisName);
-    const Vernissage::Session::AxisDescriptor yAxis = session->getAxisDescriptor(vernissageBricklet, xAxis.triggerAxisName);
-    const Vernissage::Session::AxisTableSets sets = session->getAxisTableSets(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
+    const AxisDescriptor specAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
+    const AxisDescriptor xAxis = session->getAxisDescriptor(vernissageBricklet, specAxis.triggerAxisName);
+    const AxisDescriptor yAxis = session->getAxisDescriptor(vernissageBricklet, xAxis.triggerAxisName);
+    const AxisTableSets sets = session->getAxisTableSets(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
 
-    const Vernissage::Session::TableSet xSet = sets.find(specAxis.triggerAxisName)->second;
-    const Vernissage::Session::TableSet ySet = sets.find(xAxis.triggerAxisName)->second;
+    const TableSet xSet = sets.find(specAxis.triggerAxisName)->second;
+    const TableSet ySet = sets.find(xAxis.triggerAxisName)->second;
 
     // V Axis
     int numPointsVAxis = specAxis.clocks;
@@ -641,7 +650,7 @@ namespace
     // For that we have to take into account the table sets
     // Then we also know how many 3D cubes we have, we can have 1,2 or 4. the same as in the 2D case
 
-    Vernissage::Session::TableSet::const_iterator yIt, xIt;
+    TableSetCIt yIt, xIt;
     int tablePosX, tablePosY;
 
     // BEGIN Borrowed from SCALA exporter plugin
@@ -795,14 +804,14 @@ namespace
       DEBUGPRINT("Number of axes we have table sets for: %d", sets.size());
       DEBUGPRINT("Tablesets: xAxis");
 
-      for (Vernissage::Session::TableSet::const_iterator  it = xSet.begin(); it != xSet.end(); it++)
+      for (TableSetCIt it = xSet.begin(); it != xSet.end(); it++)
       {
         DEBUGPRINT("start=%d, step=%d, stop=%d", it->start, it->step, it->stop);
       }
 
       DEBUGPRINT("Tablesets: yAxis");
 
-      for (Vernissage::Session::TableSet::const_iterator it = ySet.begin(); it != ySet.end(); it++)
+      for (TableSetCIt it = ySet.begin(); it != ySet.end(); it++)
       {
         DEBUGPRINT("start=%d, step=%d, stop=%d", it->start, it->step, it->stop);
       }
@@ -1054,7 +1063,7 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
                 int pixelSize, std::string& waveNameList)
 {
   Bricklet& bricklet = GlobalData::Instance().getBricklet(brickletID);
-  const int dimension = bricklet.getMetaDataValue<int>("dimension");
+  const int dimension = bricklet.getMetaDataValue<int>(DIMENSION_KEY);
 
   if (GlobalData::Instance().isDebuggingEnabled())
   {
@@ -1063,11 +1072,9 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
     DEBUGPRINT("### BrickletID %d ###", brickletID);
     DEBUGPRINT("dimension %d", dimension);
 
-    typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
-
-    Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+    Vernissage::Session* session = getVernissageSession();
     const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(vernissageBricklet);
-    for (ViewTypeCodeVector::const_iterator it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
+    for (ViewTypeCodeVectorCIt it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
     {
       DEBUGPRINT("viewType %s", viewTypeCodeToString(*it).c_str());
     }
@@ -1077,10 +1084,9 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
 
     DEBUGPRINT("Axis order is from triggerAxis to rootAxis");
 
-    typedef std::vector<std::string> StringVector;
     const StringVector allAxes = bricklet.getAxes<std::string>();
 
-    for (StringVector::const_iterator it = allAxes.begin(); it != allAxes.end(); it++)
+    for (StringVectorCIt it = allAxes.begin(); it != allAxes.end(); it++)
     {
       DEBUGPRINT("Axis %s", it->c_str());
     }
@@ -1113,7 +1119,6 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
 */
 int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHandle, const char* waveName, int brickletID, std::string& waveNameList)
 {
-  int ret;
   CountInt dimensionSizes[MAX_DIMENSIONS + 1];
   MemClear(dimensionSizes, sizeof(dimensionSizes));
 
@@ -1134,7 +1139,7 @@ int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dfHand
   dimensionSizes[ROWS] = rawBrickletSize;
 
   waveHndl waveHandle;
-  ret = MDMakeWave(&waveHandle, wave.getWaveName(), dfHandle, dimensionSizes, NT_I32, isOverwriteEnabled());
+  int ret = MDMakeWave(&waveHandle, wave.getWaveName(), dfHandle, dimensionSizes, NT_I32, isOverwriteEnabled());
 
   if (ret == NAME_WAV_CONFLICT)
   {

@@ -626,8 +626,7 @@ namespace
 
     if (specAxis.mirrored)
     {
-      HISTPRINT("BUG: Ramp reversal is currently not supported, the spectroscopy curve is therefore not correct!.");
-//    numPointsVAxis /= 2;
+      numPointsVAxis /= 2;
     }
 
     // X Axis

@@ -394,12 +394,14 @@ Function diff(wvName)
     for(i=0; i < DimSize(newWaveT,0); i+=1)
       if ( cmpstr(newWaveT[i][0],refWaveT[i][0]) != 0 )
         printf "mismatched key: row %d\r", i
-        printf "    new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
+        printf "char:   new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
+        printf "num:   new _%d_ vs old _%d_\r", char2num(newWaveT[i][1]), char2num(refWaveT[i][1])
       endif
 
       if ( cmpstr(newWaveT[i][1],refWaveT[i][1]) != 0 )
         printf "mismatched value: row %d\r", i
-        printf "    new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
+        printf "char:   new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
+        printf "num:   new _%d_ vs old _%d_\r", char2num(newWaveT[i][1]), char2num(refWaveT[i][1])
       endif
     endfor
   else // numeric waves

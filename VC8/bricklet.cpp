@@ -434,6 +434,27 @@ void Bricklet::loadMetaData()
     // END Vernissage::AxisParameters
   }
 
+  // BEGIN Vernissage::CalibrationInfo introduced with Vernissage 2.2
+  {
+    typedef std::map<std::wstring,Vernissage::Session::CalibrationInfo> CalibMap;
+    typedef CalibMap::const_iterator CalibMapIt;
+    const std::map<std::wstring,Vernissage::Session::CalibrationInfo> calibMap = session->getCalibrationInformation(m_brickletPtr);
+
+    for (CalibMapIt it = calibMap.begin(); it != calibMap.end(); it++)
+    {
+      const std::string baseName            = "calibration." + toString(it->first);
+      const std::string dataSet             = toString(it->second.dataSet);
+      const std::string dataSetVariant      = toString(it->second.dataSetVariant);
+      const std::string parameterSet        = toString(it->second.parameterSet);
+      const std::string parameterSetVariant = toString(it->second.parameterSetVariant);
+      AddMetaData(m_metaData, baseName + ".dataSet", dataSet);
+      AddMetaData(m_metaData, baseName + ".dataSetVariant", dataSetVariant);
+      AddMetaData(m_metaData, baseName + ".parameterSetVariant", parameterSet);
+      AddMetaData(m_metaData, baseName + ".parameterSet", parameterSetVariant);
+    }
+  }
+  // END Vernissage::CalibrationInfo
+
   DEBUGPRINT("Loaded %d keys/values as brickletMetaData for bricklet %d", m_metaData.size(), m_brickletID);
   ShrinkToFit(m_metaData);
 }

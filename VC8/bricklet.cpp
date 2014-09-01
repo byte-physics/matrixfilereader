@@ -491,7 +491,7 @@ void Bricklet::loadDeploymentParameters()
 // Then we know the starting point of the axis hierachy (rootAxis) and the endpoint (triggerAxis)
 // In this way we can then traverse from the endpoint (triggerAxis) to the starting point (rootAxis) and record all axis names
 // In more than 99% of the cases this routine will return one to three axes
-// The value of maxRuns is strictly speaking wrong becaUse the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
+// The value of maxRuns is strictly speaking wrong because the Matrix Software supports an unlimited number of axes, but due to pragmativ and safe coding reasons this has ben set to 100.
 // The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName"
 void Bricklet::generateAllAxesVector()
 {

@@ -29,12 +29,11 @@ mkdir -p $pxpFolder
 mkdir -p $regressFolder
 
 cp License.txt $folder
-cp Readme-Compilation.txt $folder
-cp INSTALL-public.txt $folder/INSTALL.txt
+cp Readme.md $folder
 cp "matrixfilereader Help.ihf" $docFolder
 cp matrixfilereader-basic-gui.pxp $pxpFolder
 
-cp regression_tests/*.{bat,log,txt,ipf,pxp} $regressFolder
+cp regression_tests/*.{bat,log,ipf,pxp} $regressFolder
 
 cp VC8/*.{bat,cpp,h,hpp,rc} VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcproj $srcFolder
 

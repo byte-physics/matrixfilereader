@@ -254,6 +254,28 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
 	    DeletePoints V_value, 1, refWave
     endif
 
+	// old meta data reference waves don't have calibration data
+	// calibration data was added in 089069
+	FindValue/TEXT="calibration.Default.dataSet"/TXOP=4 newWave
+	if(V_Value > 0)
+	  DeletePoints V_Value, 1, newWave
+	endif
+
+	FindValue/TEXT="calibration.Default.dataSetVariant"/TXOP=4 newWave
+	if(V_Value > 0)
+	  DeletePoints V_Value, 1, newWave
+	endif
+
+	FindValue/TEXT="calibration.Default.parameterSetVariant"/TXOP=4 newWave
+	if(V_Value > 0)
+	  DeletePoints V_Value, 1, newWave
+	endif
+
+	FindValue/TEXT="calibration.Default.parameterSet"/TXOP=4 newWave
+	if(V_Value > 0)
+	  DeletePoints V_Value, 1, newWave
+	endif
+
   endif
 
   // remove variable parts of the wave's note

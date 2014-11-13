@@ -451,8 +451,8 @@ End
 
 Function regressionTest()
 
-  string refDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:igor-xop:regression_tests:referenceData_0.23"
-  string rawDataPath = "h:projekte:gitRepo:Coding:matrix-file-reader:TestData-Matrix-V3.0-3.1"
+  string refDataPath = "H:projekte:matrixfilereader-data:referenceData_0.23"
+  string rawDataPath = "H:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1"
 
   string PATH = "r:newVersion_0.22"
   DeleteFolder/Z=1 PATH

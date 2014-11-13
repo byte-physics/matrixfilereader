@@ -10,7 +10,7 @@ if errorlevel 1 goto BuildEventFailed
 copy "..\matrixfilereader Help.ihf" "c:\Dokumente und Einstellungen\thomas\Eigene Dateien\WaveMetrics\Igor Pro 6 User Files\Igor Help Files"
 if errorlevel 1 goto BuildEventFailed
 
-start H:\projekte\gitRepo\Coding\matrix-file-reader\igor-xop\matrixfilereader-basic-gui.pxp
+start H:\projekte\matrixfilereader\matrixfilereader-basic-gui.pxp
 if errorlevel 1 goto BuildEventFailed
 
 goto BuildEventOK

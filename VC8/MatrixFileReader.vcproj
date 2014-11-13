@@ -178,7 +178,7 @@
 				AdditionalDependencies="version.lib Igor.lib XOPSupport.lib"
 				OutputFile="Release (static build)\matrixfilereader.xop"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8;&quot;H:\projekte\spass-projekte\physical-value\libs\boost_1_55_0\libs&quot;"
+				AdditionalLibraryDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8;&quot;H:\projekte\spass-projekte\physical-value\libs\boost_1_55_0\stage\lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				DelayLoadDLLs=""
 				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"
@@ -633,10 +633,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\todo.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

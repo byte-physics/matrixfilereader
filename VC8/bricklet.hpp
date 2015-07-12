@@ -72,6 +72,8 @@ public:
   void* getBrickletPointer()const;
   const ExtremaData& getExtrema()const;
 
+  std::size_t getUsedMemory() const;
+
 private:
   Bricklet(const Bricklet&);
   Bricklet& operator=(const Bricklet&);

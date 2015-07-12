@@ -16,6 +16,7 @@ namespace  {
   typedef std::map<std::wstring, Vernissage::Session::Parameter> ParameterMap;
   typedef ParameterMap::const_iterator ParameterMapIt;
   typedef std::vector<Bricklet::StringPair> StringPairVector;
+  typedef StringPairVector::const_iterator StringPairVectorCIt;
   typedef std::vector<std::wstring> WstringVector;
   typedef WstringVector::const_iterator WstringVectorIt;
 
@@ -45,7 +46,7 @@ namespace  {
 
     if(GlobalData::Instance().isDebuggingEnabled())
     {
-      for (StringPairVector::iterator it = vec.begin(); it != vec.end(); it++)
+      for (StringPairVectorCIt it = vec.begin(); it != vec.end(); it++)
       {
         //For std::strings shrink to fit does not do anything in VC8
         size     += it->first.size() + it->second.size();
@@ -602,4 +603,29 @@ int Bricklet::getRawDataSize()
 {
   THROW_IF_NULL(m_rawBufferContents);
   return m_rawBufferContentsSize;
+}
+
+std::size_t Bricklet::getUsedMemory() const
+{
+  std::size_t usedMemMetaData = 0;
+  std::size_t usedMemRawData = m_rawBufferContentsSize * sizeof(int);
+
+  DEBUGPRINT("Memory usage of bricklet %d:", m_brickletID)
+  DEBUGPRINT("Raw data %d KiB:", usedMemRawData / 1024)
+
+  for (StringPairVectorCIt it = m_metaData.begin(); it != m_metaData.end(); it++)
+  {
+    usedMemMetaData += it->first.capacity();
+    usedMemMetaData += it->second.capacity();
+  }
+
+  for (StringPairVectorCIt it = m_deployParams.begin(); it != m_deployParams.end(); it++)
+  {
+    usedMemMetaData += it->first.capacity();
+    usedMemMetaData += it->second.capacity();
+  }
+
+  DEBUGPRINT("Meta data %d KiB:", usedMemMetaData / 1024)
+
+  return sizeof(*this) + usedMemRawData + usedMemMetaData;
 }

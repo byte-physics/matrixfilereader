@@ -24,6 +24,8 @@ namespace  {
 extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
 {
   BEGIN_OUTER_CATCH
+  GlobalData::Instance().readSettings();
+
   int ret = SetOperationStrVar(S_value, "");
 
   if (ret != 0)
@@ -68,6 +70,8 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
     str.append("Free Memory: unknown\r");
     str.append("Total Memory: unknown\r");
   }
+
+  str.append("Used Memory by this XOP: " + toString(GlobalData::Instance().getUsedMemory() / 1024 / 1024) + " MiB\r");
 
   str.append("Visual Studio version: " + toString(_MSC_VER) + "\r");
   str.append("Igor Pro Version: " + toString(igorVersion) + "\r");

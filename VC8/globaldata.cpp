@@ -455,3 +455,15 @@ bool GlobalData::isOverwriteEnabled() const
 {
   return m_overwrite;
 }
+
+std::size_t GlobalData::getUsedMemory() const
+{
+  std::size_t usedMemInBytes = sizeof(*this);
+
+  for(std::size_t i = 1; i  < m_bricklets.size(); i++)
+  {
+    usedMemInBytes += m_bricklets[i]->getUsedMemory();
+  }
+
+  return usedMemInBytes;
+}

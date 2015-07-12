@@ -72,6 +72,8 @@ public:
     return globData;
   }
 
+  std::size_t getUsedMemory() const;
+
   // Public member variables
   char outputBuffer[ARRAY_SIZE];
   int  openDlgFileIndex;

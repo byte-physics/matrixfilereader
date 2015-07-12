@@ -604,3 +604,28 @@ int Bricklet::getRawDataSize()
   THROW_IF_NULL(m_rawBufferContents);
   return m_rawBufferContentsSize;
 }
+
+std::size_t Bricklet::getUsedMemory() const
+{
+  std::size_t usedMemMetaData = 0;
+  std::size_t usedMemRawData = m_rawBufferContentsSize * sizeof(int);
+
+  DEBUGPRINT("Memory usage of bricklet %d:", m_brickletID)
+  DEBUGPRINT("Raw data %d KiB:", usedMemRawData / 1024)
+
+  for (StringPairVectorCIt it = m_metaData.begin(); it != m_metaData.end(); it++)
+  {
+    usedMemMetaData += it->first.capacity();
+    usedMemMetaData += it->second.capacity();
+  }
+
+  for (StringPairVectorCIt it = m_deployParams.begin(); it != m_deployParams.end(); it++)
+  {
+    usedMemMetaData += it->first.capacity();
+    usedMemMetaData += it->second.capacity();
+  }
+
+  DEBUGPRINT("Meta data %d KiB:", usedMemMetaData / 1024)
+
+  return sizeof(*this) + usedMemRawData + usedMemMetaData;
+}

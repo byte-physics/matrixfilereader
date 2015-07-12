@@ -16,6 +16,7 @@ namespace  {
   typedef std::map<std::wstring, Vernissage::Session::Parameter> ParameterMap;
   typedef ParameterMap::const_iterator ParameterMapIt;
   typedef std::vector<Bricklet::StringPair> StringPairVector;
+  typedef StringPairVector::const_iterator StringPairVectorCIt;
   typedef std::vector<std::wstring> WstringVector;
   typedef WstringVector::const_iterator WstringVectorIt;
 
@@ -45,7 +46,7 @@ namespace  {
 
     if(GlobalData::Instance().isDebuggingEnabled())
     {
-      for (StringPairVector::iterator it = vec.begin(); it != vec.end(); it++)
+      for (StringPairVectorCIt it = vec.begin(); it != vec.end(); it++)
       {
         //For std::strings shrink to fit does not do anything in VC8
         size     += it->first.size() + it->second.size();

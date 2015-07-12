@@ -82,7 +82,7 @@ const int MAX_NUM_WAVES          = 4;
 
 const char PROJECTURL[]           = "http://www.igorexchange.com/project/matrixFileReader";
 
-// number of entries to reserver in some vectors
+// number of entries to reserve in some vectors
 const int  RESERVE_SIZE           = 1024;
 
 // useful for MDSetWaveUnits, defined in accordance to ROWS, COLUMNS, etc.

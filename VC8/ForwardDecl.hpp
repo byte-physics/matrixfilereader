@@ -16,3 +16,8 @@ namespace Vernissage
 {
   class Session;
 } // namespace Vernissage
+
+typedef std::pair<std::string, std::string> StringPair;
+typedef std::vector<StringPair> StringPairVector;
+typedef StringPairVector::iterator StringPairVectorIt;
+typedef StringPairVector::const_iterator StringPairVectorCIt;

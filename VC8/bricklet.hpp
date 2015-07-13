@@ -29,7 +29,6 @@ public:
   int* getRawData();
   int  getRawDataSize();
 
-  typedef std::pair<std::string,std::string> StringPair;
   const std::vector<StringPair>& getMetaData();
   const std::vector<StringPair>& getDeploymentParameter();
 

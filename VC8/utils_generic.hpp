@@ -94,3 +94,9 @@ void joinString(const std::vector<T> &list, const char* sepChar, std::string& jo
 
 bool doubleToBool(double value);
 void RemoveAllBackslashesAtTheEnd(char* str);
+
+template<typename T>
+inline void AddEntry(StringPairVector& vec, std::string key, T value )
+{
+  vec.push_back(std::make_pair(key, toString(value)));
+}

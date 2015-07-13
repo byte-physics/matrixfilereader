@@ -162,7 +162,7 @@ namespace {
 /*
   Create a two column text wave from two string vectors
 */
-int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<std::pair<std::string,std::string> >& data, DataFolderHandle dataFolderHandle, const char* waveName, int brickletID, std::string& waveNameList)
+int createAndFillTextWave(DataFolderHandle baseFolderHandle, const StringPairVector& data, DataFolderHandle dataFolderHandle, const char* waveName, int brickletID, std::string& waveNameList)
 {
   // create 2D textwave with firstColumn.size() rows and 2 columns
   if (data.empty())

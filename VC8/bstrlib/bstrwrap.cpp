@@ -11,6 +11,7 @@
  * This file is the C++ wrapper for the bstring functions.
  */
 
+#include "stdafx.h"
 #if defined (_MSC_VER)
 # define _CRT_SECURE_NO_WARNINGS
 #endif

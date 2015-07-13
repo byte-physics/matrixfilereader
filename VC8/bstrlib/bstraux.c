@@ -12,6 +12,7 @@
  * is just an auxilliary module which includes miscellaneous or trivial 
  * functions.
  */
+#include "stdafx.h"
 
 #include <stdio.h>
 #include <stdlib.h>

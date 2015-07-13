@@ -7,7 +7,7 @@
 use strict;
 use warnings FATAL => qw( all );
 
-my $git = "c:\\Program Files (x86)\\Git\\bin\\git.exe";
+my $git = "c:\\Program Files\\Git\\bin\\git.exe";
 my $git_version=`"$git" rev-parse --short HEAD`;
 #my $git_version=`"$git" describe --match "MFR_public_release*" --dirty --always`;
 $git_version=~ s/\s+//g;

@@ -488,9 +488,6 @@ void Bricklet::loadDeploymentParameters()
 // The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName"
 void Bricklet::generateAllAxesVector()
 {
-  std::vector<std::wstring> allAxesWString;
-  std::vector<std::string> allAxesString;
-
   unsigned int numRuns = 0;
   const unsigned int maxRuns = 100;
 
@@ -499,14 +496,14 @@ void Bricklet::generateAllAxesVector()
   const std::wstring triggerAxis = session->getTriggerAxisName(m_brickletPtr);
 
   std::wstring axisName = triggerAxis;
-  allAxesWString.push_back(triggerAxis);
-  allAxesString.push_back(toString(triggerAxis));
+  m_allAxesWString.push_back(triggerAxis);
+  m_allAxesString.push_back(toString(triggerAxis));
 
   while (axisName != rootAxis)
   {
     axisName = session->getAxisDescriptor(m_brickletPtr, axisName).triggerAxisName;
-    allAxesWString.push_back(axisName);
-    allAxesString.push_back(toString(axisName));
+    m_allAxesWString.push_back(axisName);
+    m_allAxesString.push_back(toString(axisName));
     numRuns++;
 
     if (numRuns > maxRuns)
@@ -516,8 +513,8 @@ void Bricklet::generateAllAxesVector()
     }
   }
 
-  m_allAxesWString.swap(allAxesWString);
-  m_allAxesString.swap(allAxesString);
+  ShrinkToFit(m_allAxesWString);
+  ShrinkToFit(m_allAxesString);
 }
 
 /*

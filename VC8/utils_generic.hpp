@@ -95,6 +95,13 @@ void joinString(const std::vector<T> &list, const char* sepChar, std::string& jo
 bool doubleToBool(double value);
 void RemoveAllBackslashesAtTheEnd(char* str);
 
+// Shrink the memory usage of the passed vector
+template<class T, class U>
+void ShrinkToFit( std::vector<T, U>& vec )
+{
+  std::vector<T, U>(vec.begin(),vec.end()).swap(vec);
+}
+
 template<typename T>
 inline void AddEntry(StringPairVector& vec, std::string key, T value )
 {

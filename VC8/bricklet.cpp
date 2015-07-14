@@ -28,27 +28,6 @@ namespace  {
     }
   }
 
-  // Ensure that we only use as much memory as we have to
-  void ShrinkToFit( StringPairVector& vec )
-  {
-    StringPairVector(vec.begin(),vec.end()).swap(vec);
-
-    std::size_t size = 0;
-    std::size_t capacity = 0;
-
-    if(GlobalData::Instance().isDebuggingEnabled())
-    {
-      for (StringPairVectorCIt it = vec.begin(); it != vec.end(); it++)
-      {
-        //For std::strings shrink to fit does not do anything in VC8
-        size     += it->first.size() + it->second.size();
-        capacity += it->first.capacity() + it->second.capacity();
-      }
-      DEBUGPRINT("vector:  size=%d, capacity=%d",vec.size(), vec.capacity());
-      DEBUGPRINT("strings: size=%d, capacity=%d",size, capacity);
-    }
-  }
-
   int convertBrickletPtr(void* rawBrickletPtr)
   {
     return GlobalData::Instance().convertBrickletPtr(rawBrickletPtr);

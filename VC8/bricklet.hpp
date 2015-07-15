@@ -29,7 +29,6 @@ public:
   int* getRawData();
   int  getRawDataSize();
 
-  typedef std::pair<std::string,std::string> StringPair;
   const std::vector<StringPair>& getMetaData();
   const std::vector<StringPair>& getDeploymentParameter();
 
@@ -52,9 +51,9 @@ public:
 
     for (unsigned int i = 0; i < m_metaData.size(); i++)
     {
-      if (m_metaData[i].first == key)
+      if (m_metaData[i].first == key.c_str())
       {
-        return m_metaData[i].second;
+        return std::string(m_metaData[i].second);
       }
     }
     return std::string();

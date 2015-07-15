@@ -84,10 +84,10 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     return 0;
   }
 
-  std::vector<std::pair<std::string,std::string> > data;
-  data.push_back(std::make_pair(RESULT_DIR_PATH_KEY,unicodeToAnsi(GlobalData::Instance().getDirPath())));
-  data.push_back(std::make_pair(RESULT_FILE_NAME_KEY,unicodeToAnsi(GlobalData::Instance().getFileName())));
-  data.push_back(std::make_pair("totalNumberOfBricklets",toString(numberOfBricklets)));
+  StringPairVector data;
+  AddEntry(data,RESULT_DIR_PATH_KEY,unicodeToAnsi(GlobalData::Instance().getDirPath()));
+  AddEntry(data,RESULT_FILE_NAME_KEY,unicodeToAnsi(GlobalData::Instance().getFileName()));
+  AddEntry(data,"totalNumberOfBricklets",toString(numberOfBricklets));
 
   if (numberOfBricklets > 0)
   {
@@ -101,21 +101,21 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
     char buf[ARRAY_SIZE];
     sprintf(buf, "%02d/%02d/%04d %02d:%02d:%02d", ctime.tm_mon + 1, ctime.tm_mday, ctime.tm_year + 1900, ctime.tm_hour, ctime.tm_min, ctime.tm_sec);
 
-    data.push_back(std::make_pair("dateOfLastChange",buf));
-    data.push_back(std::make_pair("timeStampOfLastChange",toString<time_t>(mktime(&ctime))));
-    data.push_back(std::make_pair("BrickletMetaData.fileCreatorName",toString(brickletMetaData.fileCreatorName)));
-    data.push_back(std::make_pair("BrickletMetaData.fileCreatorVersion",toString(brickletMetaData.fileCreatorVersion)));
-    data.push_back(std::make_pair("BrickletMetaData.userName",toString(brickletMetaData.userName)));
-    data.push_back(std::make_pair("BrickletMetaData.accountName",toString(brickletMetaData.accountName)));
+    AddEntry(data, "dateOfLastChange"                   , std::string(buf));
+    AddEntry(data, "timeStampOfLastChange"              , mktime(&ctime));
+    AddEntry(data, "BrickletMetaData.fileCreatorName"   , brickletMetaData.fileCreatorName);
+    AddEntry(data, "BrickletMetaData.fileCreatorVersion", brickletMetaData.fileCreatorVersion);
+    AddEntry(data, "BrickletMetaData.userName"          , brickletMetaData.userName);
+    AddEntry(data, "BrickletMetaData.accountName"       , brickletMetaData.accountName);
   }
   else
   {
-    data.push_back(std::make_pair("dateOfLastChange",""));
-    data.push_back(std::make_pair("timeStampOfLastChange",""));
-    data.push_back(std::make_pair("BrickletMetaData.fileCreatorName",""));
-    data.push_back(std::make_pair("BrickletMetaData.fileCreatorVersion",""));
-    data.push_back(std::make_pair("BrickletMetaData.userName",""));
-    data.push_back(std::make_pair("BrickletMetaData.accountName",""));
+    AddEntry(data, "dateOfLastChange"                   , "");
+    AddEntry(data, "timeStampOfLastChange"              , "");
+    AddEntry(data, "BrickletMetaData.fileCreatorName"   , "");
+    AddEntry(data, "BrickletMetaData.fileCreatorVersion", "");
+    AddEntry(data, "BrickletMetaData.userName"          , "");
+    AddEntry(data, "BrickletMetaData.accountName"       , "");
   }
 
   // brickletID=0 because we are handling resultfile metadata

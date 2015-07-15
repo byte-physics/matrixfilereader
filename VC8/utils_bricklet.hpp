@@ -4,6 +4,7 @@
   see License.txt in the source folder for details.
 */
 #pragma once
+#include "ForwardDecl.hpp"
 
 /*
   Utility functions involving bricklets
@@ -21,9 +22,8 @@ bool isValidTraceDir(int traceDir);
 int isOverwriteEnabled();
 int getIgorWaveType();
 
-int createAndFillTextWave(DataFolderHandle baseFolderHandle, const std::vector<std::pair<std::string,std::string> >& data,
+int createAndFillTextWave(DataFolderHandle baseFolderHandle, const StringPairVector& data,
                           DataFolderHandle dataFolderHandle, const char* waveName, int brickletID, std::string& waveNameList);
 
-class Vernissage::Session;
 Vernissage::Session* getVernissageSession();
 std::vector<void*> getBrickletSeries(void* rawBrickletPtr);

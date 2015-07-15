@@ -466,6 +466,58 @@
 			</File>
 		</Filter>
 		<Filter
+			Name="bstrlib"
+			>
+			<File
+				RelativePath=".\bstrlib\bstraux.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\bstrlib\bstraux.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bstrlib\bstrlib.c"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\bstrlib\bstrlib.h"
+				>
+			</File>
+			<File
+				RelativePath=".\bstrlib\bstrwrap.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\bstrlib\bstrwrap.h"
+				>
+			</File>
+		</Filter>
+		<Filter
 			Name="Operations"
 			>
 			<File

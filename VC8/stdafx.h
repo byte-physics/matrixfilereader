@@ -9,6 +9,9 @@
 */
 #pragma once
 
+#define BSTRLIB_CAN_USE_STL
+#include "bstrlib/bstrwrap.h"
+
 // allow the system to be equal or newer than Windows Server 2003 with SP1 or Windows XP with SP2
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0502

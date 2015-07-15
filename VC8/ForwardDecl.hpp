@@ -17,7 +17,12 @@ namespace Vernissage
   class Session;
 } // namespace Vernissage
 
-typedef std::pair<std::string, std::string> StringPair;
+namespace Bstrlib
+{
+  struct CBString;
+}
+
+typedef std::pair<Bstrlib::CBString, Bstrlib::CBString> StringPair;
 typedef std::vector<StringPair> StringPairVector;
 typedef StringPairVector::iterator StringPairVectorIt;
 typedef StringPairVector::const_iterator StringPairVectorCIt;

@@ -583,14 +583,14 @@ std::size_t Bricklet::getUsedMemory() const
 
   for (StringPairVectorCIt it = m_metaData.begin(); it != m_metaData.end(); it++)
   {
-    usedMemMetaData += it->first.capacity();
-    usedMemMetaData += it->second.capacity();
+    usedMemMetaData += it->first.length() + 1;
+    usedMemMetaData += it->second.length() + 1;
   }
 
   for (StringPairVectorCIt it = m_deployParams.begin(); it != m_deployParams.end(); it++)
   {
-    usedMemMetaData += it->first.capacity();
-    usedMemMetaData += it->second.capacity();
+    usedMemMetaData += it->first.length() + 1;
+    usedMemMetaData += it->second.length() + 1;
   }
 
   DEBUGPRINT("Meta data %d KiB:", usedMemMetaData / 1024)

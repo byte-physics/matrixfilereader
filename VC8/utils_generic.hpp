@@ -74,6 +74,48 @@ inline std::string toString<std::string>( const std::string& s )
   return s;
 }
 
+/*
+  Converts any type to a CBString
+*/
+template <typename T>
+CBString toCBString(const T& t)
+{
+  std::stringstream ss;
+  ss.precision(DBL_DIG);
+  ss << t;
+
+  CBString str;
+  ss >> str;
+  return str;
+}
+
+/*
+  Specialization
+*/
+template<>
+inline CBString toCBString<std::wstring>(const std::wstring& s)
+{
+  return unicodeToAnsi(s).c_str();
+}
+
+/*
+  Specialization
+*/
+template<>
+inline CBString toCBString<std::string>(const std::string& s)
+{
+  return s.c_str();
+}
+
+/*
+  Specialization (which does nothing)
+*/
+template<>
+inline CBString toCBString<CBString>(const CBString& s)
+{
+  return s;
+}
+
 void  splitString(const char* stringChar, const char* sepChar, std::vector<std::string> &list);
 void  splitString(const std::string& str, const char* sepChar, std::vector<std::string> &list);
 
@@ -102,8 +144,8 @@ void ShrinkToFit( std::vector<T, U>& vec )
   std::vector<T, U>(vec.begin(),vec.end()).swap(vec);
 }
 
-template<typename T>
-inline void AddEntry(StringPairVector& vec, std::string key, T value )
+template<typename T, typename U>
+inline void AddEntry(StringPairVector& vec, T key, U value)
 {
-  vec.push_back(std::make_pair(key, toString(value)));
+  vec.push_back(std::make_pair(toCBString(key), toCBString(value)));
 }

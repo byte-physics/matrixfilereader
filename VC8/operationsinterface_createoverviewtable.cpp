@@ -144,6 +144,8 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
 
   ASSERT_RETURN_ZERO(waveHandle);
 
+  loadAllBrickletMetaData();
+
   std::vector<std::string> content;
   content.reserve(keys.size()*numberOfBricklets);
 

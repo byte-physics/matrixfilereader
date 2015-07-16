@@ -213,8 +213,8 @@ void Bricklet::loadMetaData()
   AddEntry(m_metaData,BRICKLET_ID_KEY,m_brickletID);
 
   // resultfile
-  AddEntry(m_metaData,RESULT_FILE_NAME_KEY,unicodeToAnsi(GlobalData::Instance().getFileName()));
-  AddEntry(m_metaData,RESULT_DIR_PATH_KEY,unicodeToAnsi(GlobalData::Instance().getDirPath()));
+  AddEntry(m_metaData,RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName());
+  AddEntry(m_metaData,RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath());
 
   // introduced with Vernissage 2.0
   AddEntry(m_metaData,"sampleName",session->getSampleName(m_brickletPtr));

@@ -10,6 +10,7 @@
 #include "wave.hpp"
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
+#include "bricklet.hpp"
 
 namespace {
 
@@ -157,6 +158,60 @@ namespace {
     const std::vector<std::string>& getData() const { return m_data; }
   };
 
+  // lower limit of number of bricklets for which we don't bother with multi threading
+  const int lowerLimitNumBrickletSingleThreaded = 50;
+
+  void loadBrickletMetaDataRange(GlobalData& globalData, int first, int last)
+  {
+    for(int i = first; i <= last; i += 1)
+    {
+      globalData.getBricklet(i).getMetaData();
+    }
+  }
+
+  void loadBrickletDataRange(GlobalData& globalData, int first, int last)
+  {
+    for(int i = first; i <= last; i += 1)
+      GlobalData::Instance().getBricklet(i).getRawData();
+  }
+
+  void loadBrickletDataAndMetaDataRange(GlobalData& globalData, int first, int last)
+  {
+    for(int i = first; i <= last; i += 1)
+    {
+      globalData.getBricklet(i).getMetaData();
+      globalData.getBricklet(i).getRawData();
+    }
+  }
+
+  void loadThreadedIfRequired(boost::function<void(GlobalData&, int, int)> func)
+  {
+    //START_TIMER(1);
+    const int numberOfBricklets = getVernissageSession()->getBrickletCount();
+
+    if(numberOfBricklets < lowerLimitNumBrickletSingleThreaded)
+    {
+      func(GlobalData::Instance(), 1, numberOfBricklets);
+      //STOP_TIMER(1);
+      return;
+    }
+
+    const int numThreads = boost::numeric_cast<int>(boost::thread::hardware_concurrency());
+    const int brickletsPerThread = numberOfBricklets / numThreads;
+
+    boost::thread_group threadGroup;
+
+    for (int i = 0; i < numThreads; i++)
+    {
+      int first = (i == 0 ? 1 : brickletsPerThread * i);
+      int last  = (i == numThreads - 1 ? numberOfBricklets : brickletsPerThread * (i + 1) - 1);
+
+      threadGroup.create_thread(boost::bind(func, boost::ref(GlobalData::Instance()),boost::cref(first), boost::cref(last)));
+    }
+
+    threadGroup.join_all();
+    //STOP_TIMER(1);
+  }
 } // anonymous namespace
 
 /*
@@ -230,7 +285,7 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const StringPairVec
 */
 std::string viewTypeCodeToString(unsigned int idx)
 {
-  const static ViewTypeConverter conv;
+  ViewTypeConverter conv;
   return conv(idx);
 }
 
@@ -239,7 +294,7 @@ std::string viewTypeCodeToString(unsigned int idx)
 */
 std::string brickletTypeToString(unsigned int idx)
 {
-  const static BrickletTypeConverter conv;
+  BrickletTypeConverter conv;
   return conv(idx);
 }
 
@@ -355,4 +410,28 @@ std::vector<void*> getBrickletSeries( void* rawBrickletPtr )
   }
 
   return brickeltSeries;
+}
+
+/*
+  Load the meta data of all bricklets maybe using threads
+*/
+void loadAllBrickletMetaData()
+{
+  loadThreadedIfRequired(&loadBrickletMetaDataRange);
+}
+
+/*
+  Load the raw data of all bricklets maybe using threads
+*/
+void loadAllBrickletData()
+{
+  loadThreadedIfRequired(&loadBrickletDataRange);
+}
+
+/*
+  Load the raw and meta data of all bricklets maybe using threads
+*/
+void loadAllBrickletDataAndMetaData()
+{
+  loadThreadedIfRequired(&loadBrickletDataAndMetaDataRange);
 }

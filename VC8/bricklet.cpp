@@ -17,6 +17,7 @@ namespace  {
   typedef ParameterMap::const_iterator ParameterMapIt;
   typedef std::vector<std::wstring> WstringVector;
   typedef WstringVector::const_iterator WstringVectorIt;
+  typedef boost::lock_guard<boost::recursive_mutex> guard;
 
   void AddParameterMap( StringPairVector& metaData, const std::string& parentName, const ParameterMap& paramMap )
   {
@@ -33,13 +34,18 @@ namespace  {
     return GlobalData::Instance().convertBrickletPtr(rawBrickletPtr);
   }
 
-  std::vector<int> convertRawBrickletVector(std::vector<void*> rawVec)
+  void AddBrickletList(StringPairVector& metaData, const std::string& key, const std::vector<void*>& rawVec)
   {
     std::vector<int> idVec(rawVec.size());
-    std::transform(rawVec.begin(),rawVec.end(),idVec.begin(),convertBrickletPtr);
-    return idVec;
-  }
+    std::transform(rawVec.begin(),rawVec.end(),idVec.begin(), convertBrickletPtr);
 
+    // we want to have a sorted list of bricklets
+    std::sort(idVec.begin(), idVec.end());
+    std::string brickletSeries;
+    joinString(idVec, listSepChar, brickletSeries);
+
+    AddEntry(metaData, key ,brickletSeries);
+  }
 } // anonymous namespace
 
 Bricklet::Bricklet(int brickletID, void* const vernissageBricklet)
@@ -65,6 +71,8 @@ Bricklet::~Bricklet()
 */
 void Bricklet::clearCache()
 {
+  guard lock(m_mutex);
+
   if (m_rawBufferContents)
   {
     DEBUGPRINT("Deleting raw data from bricklet %d", m_brickletID);
@@ -84,6 +92,8 @@ void Bricklet::clearCache()
 */
 int* Bricklet::getRawData()
 {
+  guard lock(m_mutex);
+
   // we are not called the first time
   if (m_rawBufferContents)
   {
@@ -153,6 +163,8 @@ int* Bricklet::getRawData()
 */
 const std::vector<StringPair>& Bricklet::getMetaData()
 {
+  guard lock(m_mutex);
+
   if (m_metaData.empty())
   {
     try
@@ -174,6 +186,8 @@ const std::vector<StringPair>& Bricklet::getMetaData()
 */
 void Bricklet::loadMetaData()
 {
+  guard lock(m_mutex);
+
   typedef std::vector<Vernissage::Session::ViewTypeCode> ViewTypeCodeVector;
   typedef ViewTypeCodeVector::const_iterator ViewTypeCodeVectorIt;
 
@@ -199,8 +213,8 @@ void Bricklet::loadMetaData()
   AddEntry(m_metaData,BRICKLET_ID_KEY,m_brickletID);
 
   // resultfile
-  AddEntry(m_metaData,RESULT_FILE_NAME_KEY,unicodeToAnsi(GlobalData::Instance().getFileName()));
-  AddEntry(m_metaData,RESULT_DIR_PATH_KEY,unicodeToAnsi(GlobalData::Instance().getDirPath()));
+  AddEntry(m_metaData,RESULT_FILE_NAME_KEY,GlobalData::Instance().getFileName());
+  AddEntry(m_metaData,RESULT_DIR_PATH_KEY,GlobalData::Instance().getDirPath());
 
   // introduced with Vernissage 2.0
   AddEntry(m_metaData,"sampleName",session->getSampleName(m_brickletPtr));
@@ -256,36 +270,9 @@ void Bricklet::loadMetaData()
   AddEntry(m_metaData,"scanCycleCount",session->getScanCycleCount(m_brickletPtr));
 
   // new in vernissage 2.1
-  // FIXME vernissage takes ages for the getDependingBricklets and friends calls
-  // *and* internally locks the accesses so that we can't access it concurrently
-  {
-    const std::vector<int> idVec = convertRawBrickletVector(session->getDependingBricklets(m_brickletPtr));
-    std::string dependentBricklets;
-    joinString(idVec, listSepChar, dependentBricklets);
-
-    AddEntry(m_metaData,"dependentBricklets",dependentBricklets);
-  }
-
-  // new in vernissage 2.1
-  {
-    const std::vector<int> idVec = convertRawBrickletVector(session->getReferencedBricklets(m_brickletPtr));
-    std::string referencedBricklets;
-    joinString(idVec, listSepChar, referencedBricklets);
-
-    AddEntry(m_metaData,"referencedBricklets",referencedBricklets);
-  }
-
-  // new in vernissage 2.1
-  {
-    std::vector<int> idVec = convertRawBrickletVector(getBrickletSeries(m_brickletPtr));
-
-    // we want to have a sorted list of bricklets
-    std::sort(idVec.begin(), idVec.end());
-    std::string brickletSeries;
-    joinString(idVec, listSepChar, brickletSeries);
-
-    AddEntry(m_metaData,"brickletSeries",brickletSeries);
-  }
+  AddBrickletList(m_metaData, "dependentBricklets",  session->getDependingBricklets(m_brickletPtr));
+  AddBrickletList(m_metaData, "referencedBricklets", session->getReferencedBricklets(m_brickletPtr));
+  AddBrickletList(m_metaData, "brickletSeries",      getBrickletSeries(m_brickletPtr));
 
   const std::vector<std::wstring> elementInstanceNames = session->getExperimentElementInstanceNames(m_brickletPtr, L"");
   for (std::vector<std::wstring>::const_iterator it = elementInstanceNames.begin(); it != elementInstanceNames.end(); it++)
@@ -436,6 +423,8 @@ Wrapper function which returns a vector with the deployment parameters and their
 */
 const std::vector<StringPair>& Bricklet::getDeploymentParameter()
 {
+  guard lock(m_mutex);
+
   if (m_deployParams.empty())
   {
     try
@@ -457,6 +446,8 @@ const std::vector<StringPair>& Bricklet::getDeploymentParameter()
 */
 void Bricklet::loadDeploymentParameters()
 {
+  guard lock(m_mutex);
+
   m_deployParams.clear();
   m_deployParams.reserve(RESERVE_SIZE);
 
@@ -488,6 +479,8 @@ void Bricklet::loadDeploymentParameters()
 // The returned list will have the entries "triggerAxisName;axisNameWhichTriggeredTheTriggerAxis;...;rootAxisName"
 void Bricklet::generateAllAxesVector()
 {
+  guard lock(m_mutex);
+
   unsigned int numRuns = 0;
   const unsigned int maxRuns = 100;
 
@@ -523,6 +516,8 @@ void Bricklet::generateAllAxesVector()
 template<>
 const std::vector<std::wstring>& Bricklet::getAxes<std::wstring>()
 {
+  guard lock(m_mutex);
+
   if (m_allAxesString.empty() || m_allAxesWString.empty())
   {
     generateAllAxesVector();
@@ -537,6 +532,8 @@ const std::vector<std::wstring>& Bricklet::getAxes<std::wstring>()
 template<>
 const std::vector<std::string>& Bricklet::getAxes<std::string>()
 {
+  guard lock(m_mutex);
+
   if (m_allAxesString.empty() || m_allAxesWString.empty())
   {
     generateAllAxesVector();
@@ -550,6 +547,8 @@ const std::vector<std::string>& Bricklet::getAxes<std::string>()
 */
 void Bricklet::setBrickletPointer( void* const vernissageBricklet )
 {
+  guard lock(m_mutex);
+
   THROW_IF_NULL(vernissageBricklet);
   m_brickletPtr = vernissageBricklet;
 }

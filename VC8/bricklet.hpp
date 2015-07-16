@@ -97,4 +97,6 @@ private:
   // special meta data
   std::vector<std::wstring> m_allAxesWString;
   std::vector<std::string>  m_allAxesString;
+
+  boost::recursive_mutex m_mutex;
 };

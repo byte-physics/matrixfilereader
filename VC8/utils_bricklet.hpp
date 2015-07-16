@@ -27,3 +27,7 @@ int createAndFillTextWave(DataFolderHandle baseFolderHandle, const StringPairVec
 
 Vernissage::Session* getVernissageSession();
 std::vector<void*> getBrickletSeries(void* rawBrickletPtr);
+
+void loadAllBrickletMetaData();
+void loadAllBrickletData();
+void loadAllBrickletDataAndMetaData();

@@ -21,7 +21,7 @@
 // @param A prints only if A evaluates to true
 // @param B uses silent printing (does not mark the experiment as changed) if true
 #define PRINT_TO_HISTORY(A,B,...)                         \
-  if (A)                                                  \
+  if (RunningInMainThread() && A)                         \
   {                                                       \
     char* buf = &GlobalData::Instance().outputBuffer[0];  \
     _snprintf(buf,ARRAY_SIZE-2, __VA_ARGS__);             \

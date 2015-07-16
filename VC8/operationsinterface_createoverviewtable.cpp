@@ -64,7 +64,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
     return 0;
   }
 
-  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+  Vernissage::Session* session = getVernissageSession();
   const int numberOfBricklets = session->getBrickletCount();
 
   if (numberOfBricklets == 0)
@@ -143,6 +143,8 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
   }
 
   ASSERT_RETURN_ZERO(waveHandle);
+
+  loadAllBrickletMetaData();
 
   std::vector<std::string> content;
   content.reserve(keys.size()*numberOfBricklets);

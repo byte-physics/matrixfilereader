@@ -64,7 +64,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
     return 0;
   }
 
-  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+  Vernissage::Session* session = getVernissageSession();
   const int numberOfBricklets = session->getBrickletCount();
 
   if (numberOfBricklets == 0)

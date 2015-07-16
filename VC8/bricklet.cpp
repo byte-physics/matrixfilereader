@@ -33,13 +33,18 @@ namespace  {
     return GlobalData::Instance().convertBrickletPtr(rawBrickletPtr);
   }
 
-  std::vector<int> convertRawBrickletVector(std::vector<void*> rawVec)
+  void AddBrickletList(StringPairVector& metaData, const std::string& key, const std::vector<void*>& rawVec)
   {
     std::vector<int> idVec(rawVec.size());
-    std::transform(rawVec.begin(),rawVec.end(),idVec.begin(),convertBrickletPtr);
-    return idVec;
-  }
+    std::transform(rawVec.begin(),rawVec.end(),idVec.begin(), convertBrickletPtr);
 
+    // we want to have a sorted list of bricklets
+    std::sort(idVec.begin(), idVec.end());
+    std::string brickletSeries;
+    joinString(idVec, listSepChar, brickletSeries);
+
+    AddEntry(metaData, key ,brickletSeries);
+  }
 } // anonymous namespace
 
 Bricklet::Bricklet(int brickletID, void* const vernissageBricklet)
@@ -258,34 +263,9 @@ void Bricklet::loadMetaData()
   // new in vernissage 2.1
   // FIXME vernissage takes ages for the getDependingBricklets and friends calls
   // *and* internally locks the accesses so that we can't access it concurrently
-  {
-    const std::vector<int> idVec = convertRawBrickletVector(session->getDependingBricklets(m_brickletPtr));
-    std::string dependentBricklets;
-    joinString(idVec, listSepChar, dependentBricklets);
-
-    AddEntry(m_metaData,"dependentBricklets",dependentBricklets);
-  }
-
-  // new in vernissage 2.1
-  {
-    const std::vector<int> idVec = convertRawBrickletVector(session->getReferencedBricklets(m_brickletPtr));
-    std::string referencedBricklets;
-    joinString(idVec, listSepChar, referencedBricklets);
-
-    AddEntry(m_metaData,"referencedBricklets",referencedBricklets);
-  }
-
-  // new in vernissage 2.1
-  {
-    std::vector<int> idVec = convertRawBrickletVector(getBrickletSeries(m_brickletPtr));
-
-    // we want to have a sorted list of bricklets
-    std::sort(idVec.begin(), idVec.end());
-    std::string brickletSeries;
-    joinString(idVec, listSepChar, brickletSeries);
-
-    AddEntry(m_metaData,"brickletSeries",brickletSeries);
-  }
+  AddBrickletList(m_metaData, "dependentBricklets",  session->getDependingBricklets(m_brickletPtr));
+  AddBrickletList(m_metaData, "referencedBricklets", session->getReferencedBricklets(m_brickletPtr));
+  AddBrickletList(m_metaData, "brickletSeries",      getBrickletSeries(m_brickletPtr));
 
   const std::vector<std::wstring> elementInstanceNames = session->getExperimentElementInstanceNames(m_brickletPtr, L"");
   for (std::vector<std::wstring>::const_iterator it = elementInstanceNames.begin(); it != elementInstanceNames.end(); it++)

@@ -143,8 +143,8 @@ namespace
         HISTPRINT("BUG: Unexpected mirrored trigger axis with non btc_SPMSpectroscopy dataset.");
       }
 
-      wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
-      wave2.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_2);
+      wave1.setProperties(waveBaseName, NO_TRACE, suffixRampFwd);
+      wave2.setProperties(waveBaseName, NO_TRACE, suffixRampBwd);
       numPointsTriggerAxis /= 2;
       dataSize = numPointsTriggerAxis;
     }
@@ -153,7 +153,7 @@ namespace
       // at the moment the special suffix makes only sense with 1D SPS data
       if (brickletType == Vernissage::Session::btc_SPMSpectroscopy)
       {
-        wave1.setProperties(waveBaseName, NO_TRACE, suffix_ramp_reversal_1);
+        wave1.setProperties(waveBaseName, NO_TRACE, suffixRampFwd);
       }
       else
       {

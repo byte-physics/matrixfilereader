@@ -72,7 +72,7 @@ namespace {
       sstr << TRACEDIR_KEY << '=' << CR_CHAR;
     }
 
-    sstr << SUFFIX_NAME          << '=' << suffix                                 << CR_CHAR;
+    sstr << suffixName           << '=' << suffix                                 << CR_CHAR;
     sstr << "xopVersion="        << MatrixFileReader_XOP_VERSION_STR              << CR_CHAR;
     sstr << "vernissageVersion=" << GlobalData::Instance().getVernissageVersion() << CR_CHAR;
   }

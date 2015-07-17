@@ -651,28 +651,6 @@ namespace
 
     // V triggerAxis -> V is triggered by X , X is triggered by Y and Y is the root axis
 
-    // check for correct view type codes
-    int found = 0;
-    const ViewTypeCodeVector viewTypeCodes = session->getViewTypes(vernissageBricklet);
-
-    for (ViewTypeCodeVectorCIt it = viewTypeCodes.begin(); it != viewTypeCodes.end(); it++)
-    {
-      if (*it == Vernissage::Session::vtc_Spectroscopy)
-      {
-        found += 1;
-      }
-
-      if (*it == Vernissage::Session::vtc_2Dof3D)
-      {
-        found += 2;
-      }
-    }
-
-    if (found != 3)
-    {
-      DEBUGPRINT("The 3D data is not of the type vtc_2Dof3D and vtc_Spectroscopy.");
-    }
-
     const AxisDescriptor specAxis = session->getAxisDescriptor(vernissageBricklet, session->getTriggerAxisName(vernissageBricklet));
     const AxisDescriptor xAxis = session->getAxisDescriptor(vernissageBricklet, specAxis.triggerAxisName);
     const AxisDescriptor yAxis = session->getAxisDescriptor(vernissageBricklet, xAxis.triggerAxisName);

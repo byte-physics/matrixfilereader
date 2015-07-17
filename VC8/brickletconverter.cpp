@@ -101,7 +101,79 @@ namespace
     return 0;
   }
 
-  int createWaves1D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, std::string& waveNameList)
+  int HandleResamplingIfRequested(waveHndl waveFolderHandle, Wave& wave, int dimension, bool resampleData, int pixelSize)
+  {
+    if (!resampleData)
+    {
+      return 0;
+    }
+
+    wave.SetPixelSize(pixelSize);
+
+    DEBUGPRINT("Resampling wave %s with pixelSize=%d", wave.getWaveName(), pixelSize);
+
+    char dataFolderPath[MAXCMDLEN + 1];
+    // flag=3 results in the full path being returned including a trailing colon
+    int ret = GetDataFolderNameOrPath(waveFolderHandle, 3, dataFolderPath);
+
+    if (ret != 0)
+    {
+      return ret;
+    }
+
+    char cmd[ARRAY_SIZE];
+    if(dimension == 1)
+    {
+      // Command: "Resample/DOWN= [...] wave"
+      sprintf(cmd, "Resample/DOWN={%d} %s", pixelSize, dataFolderPath);
+      CatPossiblyQuotedName(cmd, wave.getWaveName());
+
+      ret = XOPSilentCommand(cmd);
+
+      if (ret != 0)
+      {
+        HISTPRINT("The command _%s_ failed to execute. So the XOP has to be fixed...", cmd);
+        return ret;
+      }
+    }
+    else if(dimension == 2)
+    {
+      // Command: "ImageInterpolate [...] Pixelate"
+      sprintf(cmd, "ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s",
+              pixelSize, pixelSize, dataFolderPath, dataFolderPath);
+      CatPossiblyQuotedName(cmd, wave.getWaveName());
+
+      ret = XOPSilentCommand(cmd);
+
+      if (ret != 0)
+      {
+        HISTPRINT("The command _%s_ failed to execute. So the XOP has to be fixed...", cmd);
+        return ret;
+      }
+
+      // kill the un-interpolated wave
+      ret = KillWave(wave.getWaveHandle());
+
+      if (ret != 0)
+      {
+        return ret;
+      }
+
+      // rename wave from M_PixelatedImage to waveNameVector[i] both sitting in dataFolderPath
+      ret = RenameDataFolderObject(waveFolderHandle, WAVE_OBJECT, "M_PixelatedImage", wave.getWaveName());
+
+      if (ret != 0)
+      {
+        return ret;
+      }
+    }
+
+    wave.setWaveHandle(FetchWaveFromDataFolder(waveFolderHandle, wave.getWaveName()));
+
+    return 0;
+  }
+
+  int createWaves1D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, bool resampleData, int pixelSize, std::string& waveNameList)
   {
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
     MemClear(dimensionSizes, sizeof(dimensionSizes));
@@ -198,8 +270,38 @@ namespace
         continue;
       }
 
+      ret = HandleResamplingIfRequested(waveFolderHandle, *it, 1, resampleData, pixelSize);
+
+      if (ret != 0)
+      {
+        return ret;
+      }
+
+      double xAxisDelta;
+
+      // also the wave scaling changes if we have resampled the data
+      if (resampleData)
+      {
+        CountInt interpolatedDimSizes[MAX_DIMENSIONS + 1];
+        MemClear(interpolatedDimSizes, sizeof(interpolatedDimSizes));
+
+        int numDimensions;
+        ret = MDGetWaveDimensions(it->getWaveHandle(), &numDimensions, interpolatedDimSizes);
+
+        if (ret != 0)
+        {
+          return ret;
+        }
+
+        xAxisDelta = triggerAxis.physicalIncrement * double(dimensionSizes[ROWS]) / double(interpolatedDimSizes[ROWS]);
+      }
+      else // original spectrum
+      {
+        xAxisDelta = triggerAxis.physicalIncrement;
+      }
+
       setDataWaveNote(brickletID, *it);
-      it->setWaveScaling(ROWS, &triggerAxis.physicalIncrement, &triggerAxis.physicalStart);
+      it->setWaveScaling(ROWS, &xAxisDelta, &triggerAxis.physicalStart);
       it->setWaveUnits(DATA, bricklet.getMetaDataValue<std::string>(CHANNEL_UNIT_KEY));
       it->setWaveUnits(ROWS, triggerAxis.physicalUnit);
 
@@ -480,57 +582,21 @@ namespace
         continue;
       }
 
-      CountInt interpolatedDimSizes[MAX_DIMENSIONS + 1];
-      MemClear(interpolatedDimSizes, sizeof(interpolatedDimSizes));
+      ret = HandleResamplingIfRequested(waveFolderHandle, *it, 2, resampleData, pixelSize);
 
+      if (ret != 0)
+      {
+        continue;
+      }
+
+      double xAxisDelta, yAxisDelta;
+
+      // also the wave scaling changes if we have resampled the data
       if (resampleData)
       {
-        it->SetPixelSize(pixelSize);
+        CountInt interpolatedDimSizes[MAX_DIMENSIONS + 1];
+        MemClear(interpolatedDimSizes, sizeof(interpolatedDimSizes));
 
-        DEBUGPRINT("Resampling wave %s with pixelSize=%d", it->getWaveName(), pixelSize);
-
-        char dataFolderPath[MAXCMDLEN + 1];
-        // flag=3 results in the full path being returned including a trailing colon
-        int ret = GetDataFolderNameOrPath(waveFolderHandle, 3, dataFolderPath);
-
-        if (ret != 0)
-        {
-          return ret;
-        }
-
-        char cmd[ARRAY_SIZE];
-        // The "ImageInterpolate [...] Pixelate" command is used here
-        sprintf(cmd, "ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s",
-                pixelSize, pixelSize, dataFolderPath, dataFolderPath);
-        // quote waveName properly, it might be a liberal name
-        CatPossiblyQuotedName(cmd, it->getWaveName());
-
-        ret = XOPSilentCommand(cmd);
-
-        if (ret != 0)
-        {
-          HISTPRINT("The command _%s_ failed to execute. So the XOP has to be fixed...", cmd);
-          continue;
-        }
-
-        // kill the un-interpolated wave and invalidate waveHandeVector[i]
-        ret = KillWave(it->getWaveHandle());
-
-        if (ret != 0)
-        {
-          return ret;
-        }
-
-        // rename wave from M_PixelatedImage to waveNameVector[i] both sitting in dfHandle
-        ret = RenameDataFolderObject(waveFolderHandle, WAVE_OBJECT, "M_PixelatedImage", it->getWaveName());
-
-        if (ret != 0)
-        {
-          return ret;
-        }
-
-        it->setWaveHandle(FetchWaveFromDataFolder(waveFolderHandle, it->getWaveName()));
-        // get wave dimensions; needed for setScale below
         int numDimensions;
         ret = MDGetWaveDimensions(it->getWaveHandle(), &numDimensions, interpolatedDimSizes);
 
@@ -538,16 +604,7 @@ namespace
         {
           return ret;
         }
-      }
 
-      // set wave note and add info about resampling to the wave note
-      setDataWaveNote(brickletID, *it);
-
-      double xAxisDelta, yAxisDelta;
-
-      //  also the wave scaling changes if we have resampled the data
-      if (resampleData)
-      {
         xAxisDelta = triggerAxis.physicalIncrement * double(dimensionSizes[ROWS]) / double(interpolatedDimSizes[ROWS]);
         yAxisDelta = rootAxis.physicalIncrement * double(dimensionSizes[COLUMNS]) / double(interpolatedDimSizes[COLUMNS]);
       }
@@ -556,6 +613,9 @@ namespace
         xAxisDelta = triggerAxis.physicalIncrement;
         yAxisDelta = rootAxis.physicalIncrement;
       }
+
+      // set wave note and add info about resampling to the wave note
+      setDataWaveNote(brickletID, *it);
 
       const double zeroSetScaleOffset = 0.0;
       it->setWaveScaling(ROWS, &xAxisDelta, &zeroSetScaleOffset);
@@ -1094,7 +1154,7 @@ int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHa
   switch (dimension)
   {
   case 1:
-    return createWaves1D(baseFolderHandle, waveFolderHandle, waveBaseName, brickletID, waveNameList);
+    return createWaves1D(baseFolderHandle, waveFolderHandle, waveBaseName, brickletID, resampleData, pixelSize, waveNameList);
     break;
 
   case 2:

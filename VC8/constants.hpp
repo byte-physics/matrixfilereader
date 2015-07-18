@@ -77,8 +77,17 @@ const int RE_TRACE_UP             = 1;
 const int TRACE_DOWN              = 2;
 const int RE_TRACE_DOWN           = 3;
 
-// number of different trace types, TRACE_UP to RE_TRACE_DOWN
-const int MAX_NUM_WAVES          = 4;
+const int TRACE_UP_RAMP_FWD       = 0;
+const int RE_TRACE_UP_RAMP_FWD    = 1;
+const int TRACE_DOWN_RAMP_FWD     = 2;
+const int RE_TRACE_DOWN_RAMP_FWD  = 3;
+const int TRACE_UP_RAMP_BWD       = 4;
+const int RE_TRACE_UP_RAMP_BWD    = 5;
+const int TRACE_DOWN_RAMP_BWD     = 6;
+const int RE_TRACE_DOWN_RAMP_BWD  = 7;
+
+// number of different trace types, TRACE_UP to RE_TRACE_DOWN x 2 for Ramp Reversal
+const int MAX_NUM_WAVES           = 8;
 
 const char PROJECTURL[]           = "http://www.igorexchange.com/project/matrixFileReader";
 

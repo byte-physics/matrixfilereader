@@ -208,7 +208,7 @@ namespace {
       int first = (i == 0 ? 1 : brickletsPerThread * i);
       int last  = (i == numThreads - 1 ? numberOfBricklets : brickletsPerThread * (i + 1) - 1);
 
-      threadGroup.create_thread(boost::bind(func, boost::ref(GlobalData::Instance()),boost::cref(first), boost::cref(last)));
+      threadGroup.create_thread(boost::bind(func, boost::ref(GlobalData::Instance()), first, last));
     }
 
     threadGroup.join_all();

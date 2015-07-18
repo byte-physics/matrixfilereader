@@ -172,7 +172,9 @@ namespace {
   void loadBrickletDataRange(GlobalData& globalData, int first, int last)
   {
     for(int i = first; i <= last; i += 1)
-      GlobalData::Instance().getBricklet(i).getRawData();
+    {
+      globalData.getBricklet(i).getRawData();
+    }
   }
 
   void loadBrickletDataAndMetaDataRange(GlobalData& globalData, int first, int last)

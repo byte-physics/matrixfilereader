@@ -786,7 +786,9 @@ namespace
 
     // END Borrowed from SCALA exporter plugin
 
-    DEBUGPRINT("V Axis # points: %d", numPointsVAxis);
+    DEBUGPRINT("Axis mirroring: X=%s, Y=%s, Spec=%s", boolToCString(xAxis.mirrored), boolToCString(yAxis.mirrored), boolToCString(specAxis.mirrored));
+
+    DEBUGPRINT("Spec Axis: points %d, clocks %d", numPointsVAxis, specAxis.clocks);
 
     DEBUGPRINT("X Axis # points with tableSet: Total=%d, Forward=%d, Backward=%d",
                numPointsXAxisWithTableBoth, numPointsXAxisWithTableFWD, numPointsXAxisWithTableBWD);

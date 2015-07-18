@@ -18,17 +18,22 @@ namespace  {
   typedef BrickletPtrVector::iterator BrickletVectorIt;
   typedef BrickletPtrVector::const_iterator BrickletVectorCIt;
 
-  bool getSettingOrDefault( DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
+
+  template<typename T>
+  T getSettingOrDefault(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value);
+
+  template<>
+  double getSettingOrDefault<double>(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
   {
     int objType;
     DataObjectValue objValue;
-    bool value = default_value;
+    double value = default_value;
 
     const int ret = GetDataFolderObject(dataFolderHndl, option_name, &objType, &objValue);
 
     if (ret == 0 && objType == VAR_OBJECT)
     {
-      value = doubleToBool(objValue.nv.realValue);
+      value = objValue.nv.realValue;
       DEBUGPRINT("%s=%d", option_name, value);
     }
     else
@@ -40,6 +45,17 @@ namespace  {
     return value;
   }
 
+  template<>
+  bool getSettingOrDefault<bool>(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
+  {
+    return doubleToBool(getSettingOrDefault<double>(dataFolderHndl, option_name, default_value));
+  }
+
+  template<>
+  int getSettingOrDefault<int>(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
+  {
+    return int(getSettingOrDefault<double>(dataFolderHndl, option_name, default_value));
+  }
 } // anonymous namespace
 
 GlobalData::GlobalData()
@@ -396,7 +412,7 @@ std::string GlobalData::getErrorMessage(int errorCode) const
 */
 void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */)
 {
-  m_debug = getSettingOrDefault(dataFolderHndl,debug_option,debug_default);
+  m_debug = getSettingOrDefault<bool>(dataFolderHndl,debug_option,debug_default);
 
   if (m_debug)
   {
@@ -410,10 +426,11 @@ void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */)
     }
   }
 
-  m_overwrite  = getSettingOrDefault(dataFolderHndl,overwrite_option,overwrite_default);
-  m_doubleWave = getSettingOrDefault(dataFolderHndl,double_option,double_default);
-  m_datafolder = getSettingOrDefault(dataFolderHndl,datafolder_option,datafolder_default);
-  m_datacache  = getSettingOrDefault(dataFolderHndl,cache_option,cache_default);
+  m_overwrite  = getSettingOrDefault<bool>(dataFolderHndl,overwrite_option,overwrite_default);
+  m_doubleWave = getSettingOrDefault<bool>(dataFolderHndl,double_option,double_default);
+  m_datafolder = getSettingOrDefault<bool>(dataFolderHndl,datafolder_option,datafolder_default);
+  m_datacache  = getSettingOrDefault<bool>(dataFolderHndl,cache_option,cache_default);
+  m_magic      = getSettingOrDefault<int>(dataFolderHndl,magic_option,magic_default);
 }
 
 /*
@@ -454,6 +471,11 @@ bool GlobalData::isDoubleWaveEnabled() const
 bool GlobalData::isOverwriteEnabled() const
 {
   return m_overwrite;
+}
+
+int GlobalData::magicSetting() const
+{
+  return m_magic;
 }
 
 std::size_t GlobalData::getUsedMemory() const

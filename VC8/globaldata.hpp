@@ -61,6 +61,7 @@ public:
   bool isDatafolderEnabled() const;
   bool isDataCacheEnabled() const;
   bool isOverwriteEnabled() const;
+  int magicSetting() const;
 
   void readSettings(DataFolderHandle dataFolderHndl = NULL);
   ///@}
@@ -85,6 +86,7 @@ private:
   GlobalData(const GlobalData&); // hide copy ctor
   GlobalData& operator=(const GlobalData&); // hide assignment operator
   bool m_debug, m_doubleWave, m_datafolder, m_overwrite, m_datacache;
+  int m_magic;
   std::wstring m_resultFileName, m_resultDirPath;
   Vernissage::Session* m_VernissageSession;
   DLLHandler m_DLLHandler;

@@ -155,6 +155,13 @@ int* Bricklet::getRawData()
 
   // release memory from vernissage DLL
   session->unloadBrickletContents(m_brickletPtr);
+
+  if(GlobalData::Instance().magicSetting() & artifical_data)
+  {
+    for(int i = 0; i < m_rawBufferContentsSize; i += 1)
+      m_rawBufferContents[i] = i;
+  }
+
   return m_rawBufferContents.get();
 }
 

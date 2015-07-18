@@ -799,12 +799,13 @@ namespace
     // Theoretical the sizes of the cubes could be different but we are igoring that for now
     if (numPointsXAxisWithTableBWD != 0 && numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableFWD != numPointsXAxisWithTableBWD)
     {
-      HISTPRINT("BUG: Number of X axis points is different in forward and backward direction. Keep fingers crossed.");
+      HISTPRINT("BUG: Number of X axis points is different in forward and backward direction.");
+      return INTERNAL_ERROR_CONVERTING_DATA;
     }
-
-    if (numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableDown != 0 && numPointsYAxisWithTableUp != numPointsYAxisWithTableDown)
+    else if (numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableDown != 0 && numPointsYAxisWithTableUp != numPointsYAxisWithTableDown)
     {
-      HISTPRINT("BUG: Number of Y axis points is different in up and down direction. Keep fingers crossed.");
+      HISTPRINT("BUG: Number of Y axis points is different in up and down direction.");
+      return INTERNAL_ERROR_CONVERTING_DATA;
     }
 
     double xAxisDelta, yAxisDelta;

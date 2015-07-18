@@ -148,3 +148,8 @@ inline void AddEntry(StringPairVector& vec, T key, U value)
 {
   vec.push_back(std::make_pair(toCBString(key), toCBString(value)));
 }
+
+inline const char* boolToCString(bool val)
+{
+  return val ? "true" : "false";
+}

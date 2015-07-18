@@ -352,7 +352,7 @@ void Bricklet::loadMetaData()
 
     const Vernissage::Session::AxisDescriptor axisDescriptor = session->getAxisDescriptor(m_brickletPtr, axisNameWString);
     AddEntry(m_metaData,axisNameString + ".clocks",axisDescriptor.clocks);
-    AddEntry(m_metaData,axisNameString + ".mirrored",(axisDescriptor.mirrored ? "true" : "false"));
+    AddEntry(m_metaData,axisNameString + ".mirrored",boolToCString(axisDescriptor.mirrored));
     AddEntry(m_metaData,axisNameString + ".physicalUnit",axisDescriptor.physicalUnit);
     AddEntry(m_metaData,axisNameString + ".physicalIncrement",axisDescriptor.physicalIncrement);
     AddEntry(m_metaData,axisNameString + ".physicalStart",axisDescriptor.physicalStart);

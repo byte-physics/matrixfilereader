@@ -112,7 +112,7 @@ void Wave::printDebugInfo()
 {
   DEBUGPRINT("%s: waveHandle=%p, float=%p, double=%p, moreData=%s, traceDir=%d, specialSuffix=%s",
              m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle,
-             m_floatPtr, m_doublePtr, moreData ? "true" : "false",
+             m_floatPtr, m_doublePtr, boolToCString(moreData),
              m_traceDir, m_suffix.c_str());
 }
 

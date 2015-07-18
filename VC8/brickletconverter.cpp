@@ -207,7 +207,7 @@ namespace
     int dataSize             = rawBrickletSize;
 
     DEBUGPRINT("rawBrickletSize=%d, numPointsTriggerAxis=%d, triggerAxis.mirrored=%s",
-               rawBrickletSize, numPointsTriggerAxis, triggerAxis.mirrored ? "true" : "false");
+               rawBrickletSize, numPointsTriggerAxis, boolToCString(triggerAxis.mirrored));
 
     std::vector<Wave> waves(MAX_NUM_WAVES);
     Wave& wave1 = waves[0];

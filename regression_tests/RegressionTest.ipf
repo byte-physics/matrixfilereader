@@ -301,7 +301,12 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
   Note/K refWave, refWaveNote
   Note/K newWave, newWaveNote
 
-  REQUIRE_EQUAL_WAVES(refWave,newWave)
+  NVAR error = root:Packages:UnitTesting:error_count
+  variable oldError = error
+  CHECK_EQUAL_WAVES(refWave,newWave)
+  if(error > oldError)
+  	printf "WaveNames: %s, %s\r", NameOfWave(refWave), NameOfWave(newWave)
+  endif
 End
 
 // main entry point for creating data on the disc

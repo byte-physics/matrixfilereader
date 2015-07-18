@@ -92,17 +92,24 @@ const int DATA = -1;
 const int INVALID_BRICKLETID      = -1;
 
 // default values for the options
-const bool debug_default          = false;
-const bool double_default         = true;
-const bool datafolder_default     = true;
-const bool overwrite_default      = false;
-const bool cache_default          = true;
+const bool debug_default      = false;
+const bool double_default     = true;
+const bool datafolder_default = true;
+const bool overwrite_default  = false;
+const bool cache_default      = true;
+const bool magic_default      = false;
 
-const char debug_option[]         = "V_MatrixFileReaderDebug";
-const char datafolder_option[]    = "V_MatrixFileReaderFolder";
-const char overwrite_option[]     = "V_MatrixFileReaderOverwrite";
-const char double_option[]        = "V_MatrixFileReaderDouble";
-const char cache_option[]         = "V_MatrixFileReaderCache";
+// All possible values for magic_option
+// don't scale the converted data
+const int identity_transformation = 0x1;
+const int artifical_data          = 0x2;
+
+const char debug_option[]      = "V_MatrixFileReaderDebug";
+const char datafolder_option[] = "V_MatrixFileReaderFolder";
+const char overwrite_option[]  = "V_MatrixFileReaderOverwrite";
+const char double_option[]     = "V_MatrixFileReaderDouble";
+const char cache_option[]      = "V_MatrixFileReaderCache";
+const char magic_option[]      = "V_MatrixFileReaderMagic";
 
 // Due to historic problems with different vernissage version, we currently only support exactly one version
 const char properVernissageVersion[] = "2.2";

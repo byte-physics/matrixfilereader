@@ -34,24 +34,33 @@ namespace
   TransData CalculateTransformationParameter(const Bricklet& bricklet)
   {
     double slope, yIntercept;
+
     // the min and max values here are for the complete bricklet data and not only for one wave
     const int x1    = bricklet.getExtrema().getRawMin();
     const int x2    = bricklet.getExtrema().getRawMax();
     const double y1 = bricklet.getExtrema().getPhysValRawMin();
     const double y2 = bricklet.getExtrema().getPhysValRawMax();
 
-    // usually xOne is not equal to xTwo
-    if (x1 != x2)
+    if(GlobalData::Instance().magicSetting() & identity_transformation)
     {
-      slope = (y1 - y2) / (x1 * 1.0 - x2 * 1.0);
-      yIntercept = y1 - slope * x1;
+      slope      = 1.0;
+      yIntercept = 0.0;
     }
     else
     {
-      // but if it is we have to do something different
-      // xOne == xTwo means that the minimum is equal to the maximum, so the data is everywhere yOne == yTwo aka constant
-      slope      = 0.0;
-      yIntercept = y1;
+      // usually xOne is not equal to xTwo
+      if (x1 != x2)
+      {
+        slope = (y1 - y2) / (x1 * 1.0 - x2 * 1.0);
+        yIntercept = y1 - slope * x1;
+      }
+      else
+      {
+        // but if it is we have to do something different
+        // xOne == xTwo means that the minimum is equal to the maximum, so the data is everywhere yOne == yTwo aka constant
+        slope      = 0.0;
+        yIntercept = y1;
+      }
     }
     DEBUGPRINT("raw->scaled transformation: xOne=%d,xTwo=%d,yOne=%.15g,yTwo=%.15g", x1, x2, y1, y2);
     DEBUGPRINT("raw->scaled transformation: slope=%.15g,yIntercept=%.15g", slope, yIntercept);
@@ -198,7 +207,7 @@ namespace
     int dataSize             = rawBrickletSize;
 
     DEBUGPRINT("rawBrickletSize=%d, numPointsTriggerAxis=%d, triggerAxis.mirrored=%s",
-               rawBrickletSize, numPointsTriggerAxis, triggerAxis.mirrored ? "true" : "false");
+               rawBrickletSize, numPointsTriggerAxis, boolToCString(triggerAxis.mirrored));
 
     std::vector<Wave> waves(MAX_NUM_WAVES);
     Wave& wave1 = waves[0];
@@ -694,7 +703,7 @@ namespace
 
     // Determine the number of different x values
 
-    // number of y axis points with taking the axis table sets into account
+    // number of x axis points with taking the axis table sets into account
     int numPointsXAxisWithTableBoth = 0;
     // the part of numPointsXAxisWithTableBoth which is used in traceUp
     int numPointsXAxisWithTableFWD = 0;
@@ -777,7 +786,9 @@ namespace
 
     // END Borrowed from SCALA exporter plugin
 
-    DEBUGPRINT("V Axis # points: %d", numPointsVAxis);
+    DEBUGPRINT("Axis mirroring: X=%s, Y=%s, Spec=%s", boolToCString(xAxis.mirrored), boolToCString(yAxis.mirrored), boolToCString(specAxis.mirrored));
+
+    DEBUGPRINT("Spec Axis: points %d, clocks %d", numPointsVAxis, specAxis.clocks);
 
     DEBUGPRINT("X Axis # points with tableSet: Total=%d, Forward=%d, Backward=%d",
                numPointsXAxisWithTableBoth, numPointsXAxisWithTableFWD, numPointsXAxisWithTableBWD);
@@ -788,12 +799,13 @@ namespace
     // Theoretical the sizes of the cubes could be different but we are igoring that for now
     if (numPointsXAxisWithTableBWD != 0 && numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableFWD != numPointsXAxisWithTableBWD)
     {
-      HISTPRINT("BUG: Number of X axis points is different in forward and backward direction. Keep fingers crossed.");
+      HISTPRINT("BUG: Number of X axis points is different in forward and backward direction.");
+      return INTERNAL_ERROR_CONVERTING_DATA;
     }
-
-    if (numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableDown != 0 && numPointsYAxisWithTableUp != numPointsYAxisWithTableDown)
+    else if (numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableDown != 0 && numPointsYAxisWithTableUp != numPointsYAxisWithTableDown)
     {
-      HISTPRINT("BUG: Number of Y axis points is different in up and down direction. Keep fingers crossed.");
+      HISTPRINT("BUG: Number of Y axis points is different in up and down direction.");
+      return INTERNAL_ERROR_CONVERTING_DATA;
     }
 
     double xAxisDelta, yAxisDelta;
@@ -927,14 +939,14 @@ namespace
       return INTERNAL_ERROR_CONVERTING_DATA;
     }
 
-    // numPointsXAxisWithTableBWD or numPointsXAxisWithTableFWD being zero makes it correct
     const int xAxisBlockSize   = (numPointsXAxisWithTableBWD + numPointsXAxisWithTableFWD) * numPointsVAxis;
+    const int xAxisForwardBlockSize = numPointsXAxisWithTableFWD * numPointsVAxis;
 
     // data index to the start of the TraceDown data (this is the same for all combinations as xAxisBlockSize is set apropriately)
     // in case the traceDown scan does not exist this is also no problem
     const int firstBlockOffset = numPointsYAxisWithTableUp * xAxisBlockSize;
 
-    DEBUGPRINT("xAxisBlockSize=%d,firstBlockOffset=%d", xAxisBlockSize, firstBlockOffset);
+    DEBUGPRINT("xAxisBlockSize=%d, xAxisForwardBlockSize=%d, firstBlockOffset=%d", xAxisBlockSize, xAxisForwardBlockSize, firstBlockOffset);
 
     int ret = createEmptyWaves(waves,waveFolderHandle,dimensionSizes);
     if(ret != 0)
@@ -1014,7 +1026,7 @@ namespace
           if (reTraceUpData.moreData)
           {
 
-            rawIndex  = i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
+            rawIndex  = xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
             dataIndex = i * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&
@@ -1040,7 +1052,7 @@ namespace
           if (reTraceDownData.moreData)
           {
 
-            rawIndex  = firstBlockOffset + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
+            rawIndex  = firstBlockOffset + xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
             dataIndex = (dimensionSizes[COLUMNS] - (i + 1)) * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&

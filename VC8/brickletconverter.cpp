@@ -939,14 +939,14 @@ namespace
       return INTERNAL_ERROR_CONVERTING_DATA;
     }
 
-    // numPointsXAxisWithTableBWD or numPointsXAxisWithTableFWD being zero makes it correct
     const int xAxisBlockSize   = (numPointsXAxisWithTableBWD + numPointsXAxisWithTableFWD) * numPointsVAxis;
+    const int xAxisForwardBlockSize = numPointsXAxisWithTableFWD * numPointsVAxis;
 
     // data index to the start of the TraceDown data (this is the same for all combinations as xAxisBlockSize is set apropriately)
     // in case the traceDown scan does not exist this is also no problem
     const int firstBlockOffset = numPointsYAxisWithTableUp * xAxisBlockSize;
 
-    DEBUGPRINT("xAxisBlockSize=%d,firstBlockOffset=%d", xAxisBlockSize, firstBlockOffset);
+    DEBUGPRINT("xAxisBlockSize=%d, xAxisForwardBlockSize=%d, firstBlockOffset=%d", xAxisBlockSize, xAxisForwardBlockSize, firstBlockOffset);
 
     int ret = createEmptyWaves(waves,waveFolderHandle,dimensionSizes);
     if(ret != 0)
@@ -1026,7 +1026,7 @@ namespace
           if (reTraceUpData.moreData)
           {
 
-            rawIndex  = i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
+            rawIndex  = xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
             dataIndex = i * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&
@@ -1052,7 +1052,7 @@ namespace
           if (reTraceDownData.moreData)
           {
 
-            rawIndex  = firstBlockOffset + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
+            rawIndex  = firstBlockOffset + xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
             dataIndex = (dimensionSizes[COLUMNS] - (i + 1)) * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&

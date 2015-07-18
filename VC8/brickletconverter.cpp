@@ -703,7 +703,7 @@ namespace
 
     // Determine the number of different x values
 
-    // number of y axis points with taking the axis table sets into account
+    // number of x axis points with taking the axis table sets into account
     int numPointsXAxisWithTableBoth = 0;
     // the part of numPointsXAxisWithTableBoth which is used in traceUp
     int numPointsXAxisWithTableFWD = 0;

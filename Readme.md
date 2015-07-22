@@ -2,7 +2,7 @@
 
 ### Requirements
 * Igor Pro 6.2.0 or later
-* Omicron Vernissage 2.1/2.2 (depending on the branch)
+* Omicron Vernissage 2.2
 * Windows XP SP2/Vista/7
 
 ### Steps 
@@ -21,8 +21,8 @@
 ### Requirements
 * Visual Studio 2005 Professional, the Express Version does not work.
 * Windows XP SP2/Vista/7
-* Omicron Vernissage 2.1/2.2 and the corresponding SDK (depending on the branch)
-* XOP Toolkit 6
+* Omicron Vernissage 2.2 and the corresponding SDK
+* XOP Toolkit 6.30
 * Boost 1.55
 * Igor Pro 6.2.0 or later
 

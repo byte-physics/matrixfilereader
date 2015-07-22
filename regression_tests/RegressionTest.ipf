@@ -10,108 +10,108 @@ StrConstant RESULT_FILE_SUFFIX = ".mtrx"
 
 // Load all data from the result file and save it to the disc
 Function createData(resultFileFull)
-  string resultFileFull
+	string resultFileFull
 
-  dfref cdf = GetDataFolderDFR()
+	dfref cdf = GetDataFolderDFR()
 
-  string dataFolder = UniqueName("test",11,0)
-  NewDataFolder/S $dataFolder
+	string dataFolder = UniqueName("test", 11, 0)
+	NewDataFolder/S $dataFolder
 
-  variable/G V_MatrixFileReaderOverwrite = 0
-  variable/G V_MatrixFileReaderFolder    = 0
-  variable/G V_MatrixFileReaderCache     = 1
-  variable/G V_MatrixFileReaderDebug     = 0
-  variable/G V_MatrixFileReaderDouble    = 0
+	variable/G V_MatrixFileReaderOverwrite = 0
+	variable/G V_MatrixFileReaderFolder    = 0
+	variable/G V_MatrixFileReaderCache     = 1
+	variable/G V_MatrixFileReaderDebug     = 0
+	variable/G V_MatrixFileReaderDouble    = 0
 
-  MFR_OpenResultFile/K resultFileFull
+	MFR_OpenResultFile/K resultFileFull
 
-  MFR_GetBrickletCount
-  variable numBricklets = V_count
-  if(numBricklets == 0)
-    print "No bricklets in the result file"
-    return 0
-  endif
+	MFR_GetBrickletCount
+	variable numBricklets = V_count
+	if(numBricklets == 0)
+		print "No bricklets in the result file"
+		return 0
+	endif
 
-  MFR_GetResultFileName
-  string folder = CleanUpName(RemoveEnding(S_fileName,RESULT_FILE_SUFFIX),1)
+	MFR_GetResultFileName
+	string folder = CleanUpName(RemoveEnding(S_fileName, RESULT_FILE_SUFFIX), 1)
 
-  MFR_GetResultFileMetaData
-  MFR_CreateOverviewTable
-  
-  GetFileFolderInfo/Q/Z/P=savePath
-  if(V_flag != 0)
-  	PathInfo savePath
-  	print "Destination folder %s does not exist", S_path
-  endif
+	MFR_GetResultFileMetaData
+	MFR_CreateOverviewTable
 
-  SaveData/L=1/D=1/O/T=$folder/P=savePath ":"
-  Killwaves/Z/A
+	GetFileFolderInfo/Q/Z/P=savePath
+	if(V_flag != 0)
+		PathInfo savePath
+		print "Destination folder %s does not exist", S_path
+	endif
 
-  variable i
-  for(i = 1; i <= numBricklets; i += 1)
+	SaveData/L=1/D=1/O/T=$folder/P=savePath ":"
+	Killwaves/Z/A
 
-    V_MatrixFileReaderDouble    = 0
-    MFR_GetBrickletData/R=(i)/N="dataFP32"
+	variable i
+	for(i = 1; i <= numBricklets; i += 1)
+
+		V_MatrixFileReaderDouble    = 0
+		MFR_GetBrickletData/R=(i)/N="dataFP32"
 
 	MFR_GetBrickletData/S=2/R=(i)/N="dataFP32S2"
 
-    V_MatrixFileReaderDouble    = 1
-    MFR_GetBrickletData/R=(i)/N="dataFP64"
+		V_MatrixFileReaderDouble    = 1
+		MFR_GetBrickletData/R=(i)/N="dataFP64"
 
-    MFR_GetBrickletMetaData/R=(i)
-    MFR_GetBrickletRawData/R=(i)
-    MFR_GetBrickletDeployData/R=(i)
+		MFR_GetBrickletMetaData/R=(i)
+		MFR_GetBrickletRawData/R=(i)
+		MFR_GetBrickletDeployData/R=(i)
 
-    SaveData/Q/L=1/D=1/O/T=$folder/P=savePath ":"
-    Killwaves/Z/A
-  endfor
+		SaveData/Q/L=1/D=1/O/T=$folder/P=savePath ":"
+		Killwaves/Z/A
+	endfor
 
-  MFR_CloseResultFile
+	MFR_CloseResultFile
 
-  SetdataFolder cdf
-  KillDataFolder $dataFolder
+	SetdataFolder cdf
+	KillDataFolder $dataFolder
 End
 
 // compares all waves in the folders on the disc
 // every wave existing in refFolderOnDisc also exists in newFolderOnDisc
 Function compareDiscFolders(refFolderOnDisc, newFolderOnDisc, [ignoreTextWaves])
-  string refFolderOnDisc, newFolderOnDisc
-  variable ignoreTextWaves
+	string refFolderOnDisc, newFolderOnDisc
+	variable ignoreTextWaves
 
-  if(ParamIsDefault(ignoreTextWaves))
-    ignoreTextWaves = 0
-  endif
+	if(ParamIsDefault(ignoreTextWaves))
+		ignoreTextWaves = 0
+	endif
 
-  string refFileList, newFileList
-  string refSymPath, newSymPath
-  variable numWaves, i
+	string refFileList, newFileList
+	string refSymPath, newSymPath
+	variable numWaves, i
 
-  GetFileFolderInfo/Z/Q newFolderOnDisc
-  if(V_flag != 0)
-    printf "The path %s does not exist\r", newFolderOnDisc
-    return INF
-  endif
+	GetFileFolderInfo/Z/Q newFolderOnDisc
+	if(V_flag != 0)
+		printf "The path %s does not exist\r", newFolderOnDisc
+		return INF
+	endif
 
-  GetFileFolderInfo/Z/Q refFolderOnDisc
-  if(V_flag != 0)
-    printf "The path %s does not exist\r", refFolderOnDisc
-    return INF
-  endif
+	GetFileFolderInfo/Z/Q refFolderOnDisc
+	if(V_flag != 0)
+		printf "The path %s does not exist\r", refFolderOnDisc
+		return INF
+	endif
 
-  refSymPath="refSymPath"
-  newSymPath="newSymPath"
+	refSymPath="refSymPath"
+	newSymPath="newSymPath"
 
-  NewPath/O $refSymPath, refFolderOnDisc
-  NewPath/O $newSymPath, newFolderOnDisc
+	NewPath/O $refSymPath, refFolderOnDisc
+	NewPath/O $newSymPath, newFolderOnDisc
 
-  refFileList = getFilesRecursively(refSymPath, ".ibw")
+	refFileList = getFilesRecursively(refSymPath, ".ibw")
 
-  numWaves = ItemsInList(refFileList)
+	numWaves = ItemsInList(refFileList)
 
-  if( numWaves == 0 )
-    printf "Found no Igor Binary Waves in %s\r", refFolderOnDisc
-    return INF
-  endif
+	if(numWaves == 0)
+		printf "Found no Igor Binary Waves in %s\r", refFolderOnDisc
+		return INF
+	endif
 
 //  variable timerRefNum = startMSTimer
 //
@@ -123,7 +123,7 @@ Function compareDiscFolders(refFolderOnDisc, newFolderOnDisc, [ignoreTextWaves])
 //    variable first = i * wavesPerThread
 //    variable last
 //    // numWaves may not be a divisor of numThreads so we take the rest
-//    if( i == numThreads - 1 )
+//    if(i == numThreads - 1)
 //      last = numWaves
 //    else
 //      last = first + wavesPerThread - 1
@@ -142,303 +142,302 @@ Function compareDiscFolders(refFolderOnDisc, newFolderOnDisc, [ignoreTextWaves])
 //  Printf "Multithreaded seconds %d\r", stopMSTimer(timerRefNum)/1e6
 
 //  variable timerRefNum = startMSTimer
-  CompareRange(refFolderOnDisc, newFolderOnDisc, refFileList, ignoreTextWaves, 0, numWaves)
+	CompareRange(refFolderOnDisc, newFolderOnDisc, refFileList, ignoreTextWaves, 0, numWaves)
 //  printf "single threaded seconds %d\r", stopMSTimer(timerRefNum)/1e6
 End
 
 Function CompareRange(refFolderOnDisc, newFolderOnDisc, refFileList, ignoreTextWaves, first, last)
-  variable first, last, ignoreTextWaves
-  string refFolderOnDisc, refFileList, newFolderOnDisc
+	variable first, last, ignoreTextWaves
+	string refFolderOnDisc, refFileList, newFolderOnDisc
 
-  string cdf = GetDataFolder(1)
+	string cdf = GetDataFolder(1)
 
-  variable numErrors = 0
-  variable i
-  for(i=first; i < last; i+=1)
+	variable numErrors = 0
+	variable i
+	for(i=first; i < last; i+=1)
 
-    string fileName = ReplaceString(refFolderOnDisc,StringFromList(i,refFileList),"")
+		string fileName = ReplaceString(refFolderOnDisc, StringFromList(i, refFileList), "")
 
-    SetDataFolder cdf
-    NewDataFolder/S/O refFolder
+		SetDataFolder cdf
+		NewDataFolder/S/O refFolder
 
-    string path = refFolderOnDisc + fileName
-    GetFileFolderInfo/Q/Z path
-    if(V_flag != 0)
-    	print "Could not find the file " + path
-    	abortNow()
-    endif
-    LoadWave/Q/C path
-    Wave/Z refWave = $StringFromList(0,S_waveNames)
+		string path = refFolderOnDisc + fileName
+		GetFileFolderInfo/Q/Z path
+		if(V_flag != 0)
+			print "Could not find the file " + path
+			abortNow()
+		endif
+		LoadWave/Q/C path
+		Wave/Z refWave = $StringFromList(0, S_waveNames)
 
-    SetDataFolder cdf
-    NewDataFolder/S/O newFolder
+		SetDataFolder cdf
+		NewDataFolder/S/O newFolder
 
 	// Names of SPS curves have changed in c50506 and again in
 	// c6b95086 (Change SPS suffix for ramp reversal data to RampFwd/RampBwd, 2015-07-17)
 	GetFileFolderInfo/Q/Z newFolderOnDisc + fileName
 	if(V_flag != 0)
-		fileName = ReplaceString(".ibw",filename,"_RampFwd.ibw")
-    endif
+		fileName = ReplaceString(".ibw", filename, "_RampFwd.ibw")
+		endif
 
-    path = newFolderOnDisc + fileName
-    GetFileFolderInfo/Q/Z path
-    if(V_flag != 0)
-    	print "Could not find the file " + path
-    	abortNow()
-    endif
-    LoadWave/Q/C path
-    Wave/Z newWave = $StringFromList(0,S_waveNames)
+		path = newFolderOnDisc + fileName
+		GetFileFolderInfo/Q/Z path
+		if(V_flag != 0)
+			print "Could not find the file " + path
+			abortNow()
+		endif
+		LoadWave/Q/C path
+		Wave/Z newWave = $StringFromList(0, S_waveNames)
 
-    numErrors += compareTwoWaves(refWave, newWave, ignoreTextWaves)
+		numErrors += compareTwoWaves(refWave, newWave, ignoreTextWaves)
 
-    SetDataFolder cdf
-    KillDataFolder refFolder
-    KillDataFolder newFolder
+		SetDataFolder cdf
+		KillDataFolder refFolder
+		KillDataFolder newFolder
 
-    if(numErrors == INF)
-      break
-    endif
-  endfor
+		if(numErrors == INF)
+			break
+		endif
+	endfor
 
-  SetDataFolder cdf
+	SetDataFolder cdf
 End
 
 // Compares two waves, removes the variable parts first and then calls CHECK_EQUAL_WAVE
-Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
-  Wave/Z/T refWave, newWave
-  variable ignoreTextWaves
+Function compareTwoWaves(refWave, newWave, ignoreTextWaves)
+	Wave/Z/T refWave, newWave
+	variable ignoreTextWaves
 
-  variable i, j
-  variable refWaveCRC, newWaveCRC
-  variable waveNoteisEqual, miscStuffIsEqual, dimScalingIsEqual
-  string refWaveInfoString, newWaveInfoString
-  variable numErrors
+	variable i, j
+	variable refWaveCRC, newWaveCRC
+	variable waveNoteisEqual, miscStuffIsEqual, dimScalingIsEqual
+	string refWaveInfoString, newWaveInfoString
+	variable numErrors
 
-  if(!WaveExists(newWave) && !WaveExists(refWave))
-    print "Both waves are missing"
-    return INF
-  elseif(!WaveExists(newWave))
-    print "newWave is missing"
-    return INF
-  elseif(!WaveExists(refWave))
-    print "refWave is missing"
-    return INF
-  elseif(WaveRefsEqual(newWave,refWave))
-    print "Don't pass identical waves"
-    return INF
-  endif
+	if(!WaveExists(newWave) && !WaveExists(refWave))
+		print "Both waves are missing"
+		return INF
+	elseif(!WaveExists(newWave))
+		print "newWave is missing"
+		return INF
+	elseif(!WaveExists(refWave))
+		print "refWave is missing"
+		return INF
+	elseif(WaveRefsEqual(newWave, refWave))
+		print "Don't pass identical waves"
+		return INF
+	endif
 
-  if( WaveType(newWave) == 0) // non-numeric wave (aka text wave)
-    if(ignoreTextWaves)
-      return 0
-    endif
+	if(WaveType(newWave) == 0) // non-numeric wave (aka text wave)
+		if(ignoreTextWaves)
+			return 0
+		endif
 
-    // we have to set the resultDirPath to the correct path, the new one might be different
-    FindValue/TEXT="resultDirPath"/TXOP=4 refWave
-    variable idx = V_value
-    if(idx != -1)
-      newWave[idx][1] = refWave[idx][1]
-    endif
-  endif
+		// we have to set the resultDirPath to the correct path, the new one might be different
+		FindValue/TEXT="resultDirPath"/TXOP=4 refWave
+		variable idx = V_value
+		if(idx != -1)
+			newWave[idx][1] = refWave[idx][1]
+		endif
+	endif
 
-  // remove variable parts of the wave's note
-  string refWaveNote  = note(refWave)
-  string newWaveNote  = note(newWave)
+	// remove variable parts of the wave's note
+	string refWaveNote  = note(refWave)
+	string newWaveNote  = note(newWave)
 
-  refWaveNote = RemoveByKey("vernissageVersion",refWaveNote,"=","\r")
-  newWaveNote = RemoveByKey("vernissageVersion",newWaveNote,"=","\r")
+	refWaveNote = RemoveByKey("vernissageVersion", refWaveNote, "=", "\r")
+	newWaveNote = RemoveByKey("vernissageVersion", newWaveNote, "=", "\r")
 
-  refWaveNote = RemoveByKey("xopVersion",refWaveNote,"=","\r")
-  newWaveNote = RemoveByKey("xopVersion",newWaveNote,"=","\r")
+	refWaveNote = RemoveByKey("xopVersion", refWaveNote, "=", "\r")
+	newWaveNote = RemoveByKey("xopVersion", newWaveNote, "=", "\r")
 
-  refWaveNote = RemoveByKey("resultDirPath",refWaveNote,"=","\r")
-  newWaveNote = RemoveByKey("resultDirPath",newWaveNote,"=","\r")
+	refWaveNote = RemoveByKey("resultDirPath", refWaveNote, "=", "\r")
+	newWaveNote = RemoveByKey("resultDirPath", newWaveNote, "=", "\r")
 
-  Note/K refWave, refWaveNote
-  Note/K newWave, newWaveNote
+	Note/K refWave, refWaveNote
+	Note/K newWave, newWaveNote
 
 #if (IgorVersion() >= 7.0)
-  if(!WaveType(newWave))
-	 SetWaveTextEncoding 3, 16, newWave
-  endif
+	if(!WaveType(newWave))
+		SetWaveTextEncoding 3, 16, newWave
+	endif
 #endif
 
+	NVAR error = root:Packages:UnitTesting:error_count
+	variable oldError = error
 
-  NVAR error = root:Packages:UnitTesting:error_count
-  variable oldError = error
+	if(NumberByKey("pixelSize", refWaveNote, "=", "\r") > 1)
+		CHECK_EQUAL_WAVES(refWave, newWave, tol=1e-10)
+	else
+		CHECK_EQUAL_WAVES(refWave, newWave)
+	endif
 
-  if(NumberByKey("pixelSize", refWaveNote,"=","\r") > 1)
-	  CHECK_EQUAL_WAVES(refWave,newWave, tol=1e-10)
-  else
-	  CHECK_EQUAL_WAVES(refWave,newWave)
-  endif
-
-  if(error > oldError)
-  	printf "WaveNames: %s, %s\r", NameOfWave(refWave), NameOfWave(newWave)
-  endif
+	if(error > oldError)
+		printf "WaveNames: %s, %s\r", NameOfWave(refWave), NameOfWave(newWave)
+	endif
 End
 
 // main entry point for creating data on the disc
 // Loads all result files in the selected path
 // Calls createData for each result file
 Function createDataSet(targetPath, rawDataPath)
-  string targetPath, rawDataPath
+	string targetPath, rawDataPath
 
-  string startFolder="MFR_VerifyXOP", resultFile, fileList
-  variable i
+	string startFolder="MFR_VerifyXOP", resultFile, fileList
+	variable i
 
-  NewPath/Q/O/M="Select a folder with many result files" $startFolder, rawDataPath
-  if(V_flag != 0)
-    return 1
-  endif
+	NewPath/Q/O/M="Select a folder with many result files" $startFolder, rawDataPath
+	if(V_flag != 0)
+		return 1
+	endif
 
-  fileList = getFilesRecursively(startFolder, RESULT_FILE_SUFFIX)
-  KillPath/Z $startFolder
+	fileList = getFilesRecursively(startFolder, RESULT_FILE_SUFFIX)
+	KillPath/Z $startFolder
 
-  GetFileFolderInfo/Z/Q targetPath
-  if(V_flag == 0)
-    printf "The path %s does already exists, pleace rename it manually\r", targetPath
-    REQUIRE(0)
-    return 1
-  endif
+	GetFileFolderInfo/Z/Q targetPath
+	if(V_flag == 0)
+		printf "The path %s does already exists, pleace rename it manually\r", targetPath
+		REQUIRE(0)
+		return 1
+	endif
 
-  NewPath/O/C/Z savePath, targetPath
+	NewPath/O/C/Z savePath, targetPath
 
-  for(i=0; i < ItemsInList(fileList); i+=1)
-    resultFile = StringFromList(i,fileList)
-    printf "%d, %s\r", i, resultFile
-    createData(resultFile)
-  endfor
+	for(i=0; i < ItemsInList(fileList); i+=1)
+		resultFile = StringFromList(i, fileList)
+		printf "%d, %s\r", i, resultFile
+		createData(resultFile)
+	endfor
 
-  return 0
+	return 0
 End
 
 // Returns a list of all files with the extension given in the symbolic path pathName
 // Warning! This function uses recursion, so it might take some time
 Function/S getFilesRecursively(pathName, extension, [level])
-  String pathName      // Name of symbolic path in which to look for folders and files.
-  String extension      // File name extension (e.g., ".txt") or "????" for all files.
-  variable level        // indicate level of recursion, do not use for calling the function
+	String pathName      // Name of symbolic path in which to look for folders and files.
+	String extension      // File name extension (e.g., ".txt") or "????" for all files.
+	variable level        // indicate level of recursion, do not use for calling the function
 
-  Variable fileIndex, folderIndex, levelValue
-  String foundFilesList="", path, fileName, subFolderPathName, subFolderPath, recursFoundFilesList=""
+	Variable fileIndex, folderIndex, levelValue
+	String foundFilesList="", path, fileName, subFolderPathName, subFolderPath, recursFoundFilesList=""
 
-  if(ParamIsDefault(level))
-    levelValue = 0
-  else
-    levelValue = level
-  endif
+	if(ParamIsDefault(level))
+		levelValue = 0
+	else
+		levelValue = level
+	endif
 
-  levelValue+=1
+	levelValue+=1
 
-  // get folder name from symbolic path
-  PathInfo $pathName
-  path = S_path
+	// get folder name from symbolic path
+	PathInfo $pathName
+	path = S_path
 
-  if(V_flag == 0)
-    printf "path %s does not exist, aborting\r", path
-    return foundFilesList
-  endif
+	if(V_flag == 0)
+		printf "path %s does not exist, aborting\r", path
+		return foundFilesList
+	endif
 
-  string fileNames = IndexedFile($pathName, -1, extension)
-  fileIndex  = 0
-  // get all files in the folder pathName
-  do
-    filename = StringFromList(fileIndex,fileNames)
-    if (strlen(fileName) == 0)
-      break          // No more files
-    endif
-    foundFilesList = AddListItem(path + fileName, foundFilesList,";", inf)
-    fileIndex += 1
-  while(1)
+	string fileNames = IndexedFile($pathName, -1, extension)
+	fileIndex  = 0
+	// get all files in the folder pathName
+	do
+		filename = StringFromList(fileIndex, fileNames)
+		if(strlen(fileName) == 0)
+			break          // No more files
+		endif
+		foundFilesList = AddListItem(path + fileName, foundFilesList, ";", inf)
+		fileIndex += 1
+	while(1)
 
-  // traverse into the first subfolder and call this function recursively
-  string paths = IndexedDir($pathName, -1, 1)
-  folderIndex = 0
-  do
-    path = StringFromList(folderIndex,paths)
+	// traverse into the first subfolder and call this function recursively
+	string paths = IndexedDir($pathName, -1, 1)
+	folderIndex = 0
+	do
+		path = StringFromList(folderIndex, paths)
 
-    if (strlen(path) == 0)
-      break            // No more folders
-    endif
+		if(strlen(path) == 0)
+			break            // No more folders
+		endif
 
-    // name of the new symbolic path
-    subFolderPathName =  UniqueName("tempPrintFoldersPath_",12,levelValue)
-    // Now we get the path to the new parent folder
-    subFolderPath = path
+		// name of the new symbolic path
+		subFolderPathName =  UniqueName("tempPrintFoldersPath_", 12, levelValue)
+		// Now we get the path to the new parent folder
+		subFolderPath = path
 
-    NewPath/Q/O $subFolderPathName, subFolderPath
-    recursFoundFilesList = getFilesRecursively(subFolderPathName, extension, level=levelValue)
-    KillPath/Z $subFolderPathName
+		NewPath/Q/O $subFolderPathName, subFolderPath
+		recursFoundFilesList = getFilesRecursively(subFolderPathName, extension, level=levelValue)
+		KillPath/Z $subFolderPathName
 
-    if(cmpstr(recursFoundFilesList,"") != 0)
-      foundFilesList += recursFoundFilesList
-    endif
+		if(cmpstr(recursFoundFilesList, "") != 0)
+			foundFilesList += recursFoundFilesList
+		endif
 
-    folderIndex += 1
-  while(1)
+		folderIndex += 1
+	while(1)
 
-  return foundFilesList
+	return foundFilesList
 End
 
 Function diff(wvName)
-  string wvName
+	string wvName
 
-  variable i, j
+	variable i, j
 
-  if(WaveType(:newFolder:$wvName) == 0) // text waves
-    wave/T newWaveT = :newFolder:$wvName
-    wave/T refWaveT = :refFolder:$wvName
+	if(WaveType(:newFolder:$wvName) == 0) // text waves
+		wave/T newWaveT = :newFolder:$wvName
+		wave/T refWaveT = :refFolder:$wvName
 
-    for(i=0; i < DimSize(newWaveT,0); i+=1)
-      if ( cmpstr(newWaveT[i][0],refWaveT[i][0]) != 0 )
-        printf "mismatched key: row %d\r", i
-        printf "char:   new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
-        printf "num:   new _%d_ vs old _%d_\r", char2num(newWaveT[i][1]), char2num(refWaveT[i][1])
-      endif
+		for(i=0; i < DimSize(newWaveT, 0); i+=1)
+			if(cmpstr(newWaveT[i][0], refWaveT[i][0]) != 0)
+				printf "mismatched key: row %d\r", i
+				printf "char:   new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
+				printf "num:   new _%d_ vs old _%d_\r", char2num(newWaveT[i][1]), char2num(refWaveT[i][1])
+			endif
 
-      if ( cmpstr(newWaveT[i][1],refWaveT[i][1]) != 0 )
-        printf "mismatched value: row %d\r", i
-        printf "char:   new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
-        printf "num:   new _%d_ vs old _%d_\r", char2num(newWaveT[i][1]), char2num(refWaveT[i][1])
-      endif
-    endfor
-  else // numeric waves
+			if(cmpstr(newWaveT[i][1], refWaveT[i][1]) != 0)
+				printf "mismatched value: row %d\r", i
+				printf "char:   new _%s_ vs old _%s_\r", newWaveT[i][1], refWaveT[i][1]
+				printf "num:   new _%d_ vs old _%d_\r", char2num(newWaveT[i][1]), char2num(refWaveT[i][1])
+			endif
+		endfor
+	else // numeric waves
 
-    // todo check for matching dimensions
-    wave newWave = :newFolder:$wvName
-    wave refWave = :refFolder:$wvName
+		// todo check for matching dimensions
+		wave newWave = :newFolder:$wvName
+		wave refWave = :refFolder:$wvName
 
-    Make/D/O/N=(DimSize(newWave,0),DimSize(newWave,1)) diffWave
-    diffWave = newWave - refWave
+		Make/D/O/N=(DimSize(newWave, 0), DimSize(newWave, 1)) diffWave
+		diffWave = newWave - refWave
 
-    for(i=0; i < DimSize(newWave,0); i+=1)
-      for(j=0; j < DimSize(newWave,1); j+=1)
-        variable new = newWave[i][j]
-        variable ref = refWave[i][j]
-        if( new != ref  && numtype(ref) != 2 && numtype(new) != 2)
-          printf "mismatched value: row %d, col %d\r", i, j
-          printf "    new _%.15g_ vs old _%.15g_\r", newWave[i][j], refWave[i][j]
-          return NaN
-        endif
-      endfor
-    endfor
-  endif
+		for(i=0; i < DimSize(newWave, 0); i+=1)
+			for(j=0; j < DimSize(newWave, 1); j+=1)
+				variable new = newWave[i][j]
+				variable ref = refWave[i][j]
+				if(new != ref  && numtype(ref) != 2 && numtype(new) != 2)
+					printf "mismatched value: row %d, col %d\r", i, j
+					printf "    new _%.15g_ vs old _%.15g_\r", newWave[i][j], refWave[i][j]
+					return NaN
+				endif
+			endfor
+		endfor
+	endif
 End
 
 Function regressionTest()
 
-  string refDataPath = "e:projekte:matrixfilereader-data:referenceData_0.24"
-  string rawDataPath = "e:projekte:matrixfilereader-data"
+	string refDataPath = "e:projekte:matrixfilereader-data:referenceData_0.24"
+	string rawDataPath = "e:projekte:matrixfilereader-data"
 
-  string PATH = "e:newVersion_0.22"
-  DeleteFolder/Z=1 PATH
-  variable ret
-  ret = createDataSet(PATH, rawDataPath)
-  if(ret == 1)
-      return ret
-  endif
+	string PATH = "e:newVersion_0.22"
+	DeleteFolder/Z=1 PATH
+	variable ret
+	ret = createDataSet(PATH, rawDataPath)
+	if(ret == 1)
+		return ret
+	endif
 
-  compareDiscFolders(refDataPath, PATH)
+	compareDiscFolders(refDataPath, PATH)
 End
 

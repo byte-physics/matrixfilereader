@@ -41,7 +41,7 @@ static Function check_image_All()
 	brickletID = 98
 
 	MFR_OpenResultFile/K folderCube + fileCube
-	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 	CHECK_EMPTY_FOLDER()
 
 	// don't scale the converted data to ease comparison
@@ -53,12 +53,12 @@ static Function check_image_All()
 	MFR_GetBrickletMetaData/R=(brickletID)
 	MFR_GetBrickletRawData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 	WAVE rawData = $StringFromList(0, S_waveNames)
 
 	MFR_GetBrickletData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),4)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 4)
 	convDataNames = S_waveNames
 
 	check_unique_values(rawData, convDataNames)
@@ -73,7 +73,7 @@ static Function check_cube_Up_RampFwd()
 	brickletID = 1
 
 	MFR_OpenResultFile/K folderCubeUp + fileCubeUp
-	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 	CHECK_EMPTY_FOLDER()
 
 	// don't scale the converted data to ease comparison
@@ -85,12 +85,12 @@ static Function check_cube_Up_RampFwd()
 	MFR_GetBrickletMetaData/R=(brickletID)
 	MFR_GetBrickletRawData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 	WAVE rawData = $StringFromList(0, S_waveNames)
 
 	MFR_GetBrickletData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 	convDataNames = S_waveNames
 
 	check_unique_values(rawData, convDataNames)
@@ -122,7 +122,7 @@ End
 //	brickletID = 7
 //
 //	MFR_OpenResultFile/K folderCubeUp + fileCubeUp
-//	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+//	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 //	CHECK_EMPTY_FOLDER()
 //
 //	// don't scale the converted data to ease comparison
@@ -134,12 +134,12 @@ End
 //	MFR_GetBrickletMetaData/R=(brickletID)
 //	MFR_GetBrickletRawData/R=(brickletID)
 //	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-//	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+//	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 //	WAVE rawData = $StringFromList(0, S_waveNames)
 //
 //	MFR_GetBrickletData/R=(brickletID)
 //	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-//	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),2)
+//	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 2)
 //	convDataNames = S_waveNames
 //
 //	check_unique_values(rawData, convDataNames)
@@ -171,7 +171,7 @@ static Function check_cube_Up_Down_RampFwd()
 	brickletID = 88
 
 	MFR_OpenResultFile/K folderCube + fileCube
-	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 	CHECK_EMPTY_FOLDER()
 
 	// don't scale the converted data to ease comparison
@@ -183,12 +183,12 @@ static Function check_cube_Up_Down_RampFwd()
 	MFR_GetBrickletMetaData/R=(brickletID)
 	MFR_GetBrickletRawData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 	WAVE rawData = $StringFromList(0, S_waveNames)
 
 	MFR_GetBrickletData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),2)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 2)
 	convDataNames = S_waveNames
 
 	check_unique_values(rawData, convDataNames)
@@ -228,7 +228,7 @@ static Function check_cube_ReUp_ReDown_RampFwd()
 	brickletID = 91
 
 	MFR_OpenResultFile/K folderCube + fileCube
-	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 	CHECK_EMPTY_FOLDER()
 
 	// don't scale the converted data to ease comparison
@@ -240,12 +240,12 @@ static Function check_cube_ReUp_ReDown_RampFwd()
 	MFR_GetBrickletMetaData/R=(brickletID)
 	MFR_GetBrickletRawData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 	WAVE rawData = $StringFromList(0, S_waveNames)
 
 	MFR_GetBrickletData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),2)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 2)
 	convDataNames = S_waveNames
 
 	check_unique_values(rawData, convDataNames)
@@ -286,7 +286,7 @@ static Function check_cube_All_RampFwd()
 	brickletID = 100
 
 	MFR_OpenResultFile/K folderCube + fileCube
-	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 	CHECK_EMPTY_FOLDER()
 
 	// don't scale the converted data to ease comparison
@@ -298,12 +298,12 @@ static Function check_cube_All_RampFwd()
 	MFR_GetBrickletMetaData/R=(brickletID)
 	MFR_GetBrickletRawData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 	WAVE rawData = $StringFromList(0, S_waveNames)
 
 	MFR_GetBrickletData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),4)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 4)
 	convDataNames = S_waveNames
 
 	check_unique_values(rawData, convDataNames)
@@ -364,7 +364,7 @@ static Function check_cube_All_RampFwdBwd()
 	brickletID = 97
 
 	MFR_OpenResultFile/K folderCube + fileCube
-	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 	CHECK_EMPTY_FOLDER()
 
 	// don't scale the converted data to ease comparison
@@ -376,12 +376,12 @@ static Function check_cube_All_RampFwdBwd()
 	MFR_GetBrickletMetaData/R=(brickletID)
 	MFR_GetBrickletRawData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
 	WAVE rawData = $StringFromList(0, S_waveNames)
 
 	MFR_GetBrickletData/R=(brickletID)
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),8)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 8)
 	convDataNames = S_waveNames
 
 	check_unique_values(rawData, convDataNames)
@@ -420,7 +420,7 @@ static Function check_cube_All_RampFwdBwd()
 	Redimension/N=(numPointsSpecAxis) slice
 
 	blockBegin = numRows * numPointsSpecAxis * 2
-	Duplicate/O/R=[blockBegin,blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
 	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 3
 	WaveClear slice, sliceRaw, cube
 

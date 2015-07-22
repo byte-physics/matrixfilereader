@@ -1,0 +1,767 @@
+  Start of test "MatrixFileReader XOP"
+  Entering test suite "RegressionTest.ipf"
+  Entering test case "regressionTest"
+  path: "e:newVersion_0.22:"
+  0, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-11:20110111-164555_STM_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  1, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-12:20110112-103050_STM_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  2, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-12:20110112-144308_STM_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  3, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-14:default_20110114-2011Jan14-165821_STM-STM_AtomManipulation_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  4, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-03-01:20110301-162833_STM_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  5, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:I_t_data_bug_report:default_20120127-142723_STM_Spectroscopy_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  6, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-145132_STM_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  7, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-145631_STM_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  8, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-150653_STM_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  9, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110144_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  10, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110430_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  11, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110823_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  12, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111006_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  13, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111121_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  14, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111324_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  15, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111529_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  16, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-112049_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  17, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-112217_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  path: "E:projekte:matrixfilereader-data:referenceData_0.24:"
+  path: "e:newVersion_0.22:"
+  Leaving test case "regressionTest"
+  Finished with no errors
+  Leaving test suite "RegressionTest.ipf"
+  Entering test suite "Test_BrickletConversionDetails.ipf"
+  Entering test case "check_image_All"
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=98, endBrickletID=98
+  DEBUG: Loaded 796 keys/values as brickletMetaData for bricklet 98
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=98, endBrickletID=98
+  DEBUG: rawMin=52249088,rawMax=81383424,scaledMin=8.0218e-011,scaledMax=1.24948e-010
+  DEBUG: m_rawBufferContents=0B960020,size=640000
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=98, endBrickletID=98
+  DEBUG: ### BrickletID 98 ###
+  DEBUG: dimension 2
+  DEBUG: viewType vtc_ForwardBackward2D
+  DEBUG: brickletType btc_SPMImage
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=0B960020,size=640000
+  DEBUG: numPointsRootAxis=400
+  DEBUG: numPointsTriggerAxis=400
+  DEBUG: data_00098_Up: waveHandle=0585A1F8, float=00000000, double=0BBE0168, moreData=true, traceDir=0, specialSuffix=
+  DEBUG: data_00098_ReUp: waveHandle=0585A218, float=00000000, double=0D620168, moreData=true, traceDir=1, specialSuffix=
+  DEBUG: data_00098_Down: waveHandle=0585A0F8, float=00000000, double=0D760168, moreData=true, traceDir=2, specialSuffix=
+  DEBUG: data_00098_ReDown: waveHandle=0585A418, float=00000000, double=0D8A0168, moreData=true, traceDir=3, specialSuffix=
+  DEBUG: raw->scaled transformation: xOne=52249088,xTwo=81383424,yOne=8.02179756191439e-011,yTwo=1.249478942529e-010
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_image_All"
+  Entering test case "check_cube_Up_RampFwd"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=1, endBrickletID=1
+  DEBUG: Loaded 883 keys/values as brickletMetaData for bricklet 1
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=1, endBrickletID=1
+  DEBUG: rawMin=53646,rawMax=67413,scaledMin=0.000249807,scaledMax=0.000313914
+  DEBUG: m_rawBufferContents=1039DA08,size=6250
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=1, endBrickletID=1
+  DEBUG: ### BrickletID 1 ###
+  DEBUG: dimension 3
+  DEBUG: viewType vtc_Spectroscopy
+  DEBUG: brickletType btc_VolumeCITS
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis V
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=1039DA08,size=6250
+  DEBUG: Axis mirroring: X=true, Y=false, Spec=false
+  DEBUG: Spec Axis: points 250, clocks 250
+  DEBUG: X Axis # points with tableSet: Total=5, Forward=5, Backward=0
+  DEBUG: Y Axis # points with tableSet: Total=5, Up=5, Down=0
+  DEBUG: Number of axes we have table sets for: 2
+  DEBUG: Tablesets: xAxis
+  DEBUG: start=1, step=20, stop=81
+  DEBUG: Tablesets: yAxis
+  DEBUG: start=1, step=20, stop=81
+  DEBUG: xAxisDelta=1.0101e-009, yAxisDelta=1.0101e-009
+  DEBUG: xAxisOffset=0, yAxisOffset=0
+  DEBUG: dimensions of the cube: rows=5,cols=5,layers=250
+  DEBUG: xAxisBlockSize=1250, xAxisForwardBlockSize=1250, firstBlockOffset=6250
+  DEBUG: data_00001_Up_RampFwd: waveHandle=0585A0F8, float=00000000, double=06775A28, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: raw->scaled transformation: xOne=53646,xTwo=67413,yOne=0.000249806752037253,yTwo=0.000313913853317811
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_cube_Up_RampFwd"
+  Entering test case "check_cube_Up_Down_RampFwd"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=88, endBrickletID=88
+  DEBUG: Loaded 817 keys/values as brickletMetaData for bricklet 88
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=88, endBrickletID=88
+  DEBUG: rawMin=16776704,rawMax=75552597,scaledMin=2.57573e-011,scaledMax=1.15996e-010
+  DEBUG: m_rawBufferContents=129BBBF8,size=12800
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=88, endBrickletID=88
+  DEBUG: ### BrickletID 88 ###
+  DEBUG: dimension 3
+  DEBUG: viewType vtc_Spectroscopy
+  DEBUG: viewType vtc_2Dof3D
+  DEBUG: brickletType btc_VolumeCITS
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis V
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=129BBBF8,size=12800
+  DEBUG: Axis mirroring: X=true, Y=true, Spec=false
+  DEBUG: Spec Axis: points 100, clocks 100
+  DEBUG: X Axis # points with tableSet: Total=8, Forward=8, Backward=0
+  DEBUG: Y Axis # points with tableSet: Total=16, Up=8, Down=8
+  DEBUG: Number of axes we have table sets for: 2
+  DEBUG: Tablesets: xAxis
+  DEBUG: start=1, step=50, stop=351
+  DEBUG: Tablesets: yAxis
+  DEBUG: start=1, step=50, stop=351
+  DEBUG: start=450, step=50, stop=800
+  DEBUG: xAxisDelta=1.25313e-009, yAxisDelta=1.25313e-009
+  DEBUG: xAxisOffset=0, yAxisOffset=0
+  DEBUG: dimensions of the cube: rows=8,cols=8,layers=100
+  DEBUG: xAxisBlockSize=800, xAxisForwardBlockSize=800, firstBlockOffset=6400
+  DEBUG: data_00088_Up_RampFwd: waveHandle=063379C8, float=00000000, double=0E9FD958, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00088_Down_RampFwd: waveHandle=06337668, float=00000000, double=0E9664D8, moreData=true, traceDir=2, specialSuffix=_RampFwd
+  DEBUG: raw->scaled transformation: xOne=16776704,xTwo=75552597,yOne=2.57572578576222e-011,yTwo=1.15995831048936e-010
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_cube_Up_Down_RampFwd"
+  Entering test case "check_cube_ReUp_ReDown_RampFwd"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=91, endBrickletID=91
+  DEBUG: Loaded 817 keys/values as brickletMetaData for bricklet 91
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=91, endBrickletID=91
+  DEBUG: rawMin=21549568,rawMax=76914346,scaledMin=3.3085e-011,scaledMax=1.18087e-010
+  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=91, endBrickletID=91
+  DEBUG: ### BrickletID 91 ###
+  DEBUG: dimension 3
+  DEBUG: viewType vtc_Spectroscopy
+  DEBUG: brickletType btc_VolumeCITS
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis V
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: Axis mirroring: X=true, Y=true, Spec=false
+  DEBUG: Spec Axis: points 100, clocks 100
+  DEBUG: X Axis # points with tableSet: Total=8, Forward=0, Backward=8
+  DEBUG: Y Axis # points with tableSet: Total=16, Up=8, Down=8
+  DEBUG: Number of axes we have table sets for: 2
+  DEBUG: Tablesets: xAxis
+  DEBUG: start=450, step=50, stop=800
+  DEBUG: Tablesets: yAxis
+  DEBUG: start=1, step=50, stop=351
+  DEBUG: start=450, step=50, stop=800
+  DEBUG: xAxisDelta=1.25313e-009, yAxisDelta=1.25313e-009
+  DEBUG: xAxisOffset=0, yAxisOffset=0
+  DEBUG: dimensions of the cube: rows=8,cols=8,layers=100
+  DEBUG: xAxisBlockSize=800, xAxisForwardBlockSize=0, firstBlockOffset=6400
+  DEBUG: data_00091_ReUp_RampFwd: waveHandle=066210F8, float=00000000, double=0E9FD950, moreData=true, traceDir=1, specialSuffix=_RampFwd
+  DEBUG: data_00091_ReDown_RampFwd: waveHandle=06621178, float=00000000, double=0E9664D8, moreData=true, traceDir=3, specialSuffix=_RampFwd
+  DEBUG: raw->scaled transformation: xOne=21549568,xTwo=76914346,yOne=3.30850314636513e-011,yTwo=1.18086523006687e-010
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_cube_ReUp_ReDown_RampFwd"
+  Entering test case "check_cube_All_RampFwd"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=100, endBrickletID=100
+  DEBUG: Loaded 821 keys/values as brickletMetaData for bricklet 100
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=100, endBrickletID=100
+  DEBUG: rawMin=23558485,rawMax=60248576,scaledMin=3.61693e-011,scaledMax=9.24996e-011
+  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=100, endBrickletID=100
+  DEBUG: ### BrickletID 100 ###
+  DEBUG: dimension 3
+  DEBUG: viewType vtc_Spectroscopy
+  DEBUG: viewType vtc_2Dof3D
+  DEBUG: brickletType btc_VolumeCITS
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis V
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: Axis mirroring: X=true, Y=true, Spec=false
+  DEBUG: Spec Axis: points 100, clocks 100
+  DEBUG: X Axis # points with tableSet: Total=8, Forward=4, Backward=4
+  DEBUG: Y Axis # points with tableSet: Total=16, Up=8, Down=8
+  DEBUG: Number of axes we have table sets for: 2
+  DEBUG: Tablesets: xAxis
+  DEBUG: start=1, step=100, stop=301
+  DEBUG: start=500, step=100, stop=800
+  DEBUG: Tablesets: yAxis
+  DEBUG: start=1, step=50, stop=351
+  DEBUG: start=450, step=50, stop=800
+  DEBUG: xAxisDelta=2.50627e-009, yAxisDelta=1.25313e-009
+  DEBUG: xAxisOffset=0, yAxisOffset=0
+  DEBUG: dimensions of the cube: rows=4,cols=8,layers=100
+  DEBUG: xAxisBlockSize=800, xAxisForwardBlockSize=400, firstBlockOffset=6400
+  DEBUG: data_00100_Up_RampFwd: waveHandle=06337608, float=00000000, double=0EA3E4D8, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00100_ReUp_RampFwd: waveHandle=06337968, float=00000000, double=0677CA38, moreData=true, traceDir=1, specialSuffix=_RampFwd
+  DEBUG: data_00100_Down_RampFwd: waveHandle=06337668, float=00000000, double=0EA0A320, moreData=true, traceDir=2, specialSuffix=_RampFwd
+  DEBUG: data_00100_ReDown_RampFwd: waveHandle=06337768, float=00000000, double=0E9664D8, moreData=true, traceDir=3, specialSuffix=_RampFwd
+  DEBUG: raw->scaled transformation: xOne=23558485,xTwo=60248576,yOne=3.61693198425582e-011,yTwo=9.24995820148313e-011
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_cube_All_RampFwd"
+  Entering test case "check_cube_All_RampFwdBwd"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=97, endBrickletID=97
+  DEBUG: Loaded 821 keys/values as brickletMetaData for bricklet 97
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=97, endBrickletID=97
+  DEBUG: rawMin=17551189,rawMax=66867200,scaledMin=2.69463e-011,scaledMax=1.02661e-010
+  DEBUG: m_rawBufferContents=12DD3008,size=25600
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=97, endBrickletID=97
+  DEBUG: ### BrickletID 97 ###
+  DEBUG: dimension 3
+  DEBUG: viewType vtc_Spectroscopy
+  DEBUG: viewType vtc_2Dof3D
+  DEBUG: brickletType btc_VolumeCITS
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis V
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=12DD3008,size=25600
+  DEBUG: Axis mirroring: X=true, Y=true, Spec=true
+  DEBUG: Spec Axis: points 100, clocks 200
+  DEBUG: X Axis # points with tableSet: Total=8, Forward=4, Backward=4
+  DEBUG: Y Axis # points with tableSet: Total=16, Up=8, Down=8
+  DEBUG: Number of axes we have table sets for: 2
+  DEBUG: Tablesets: xAxis
+  DEBUG: start=1, step=100, stop=301
+  DEBUG: start=500, step=100, stop=800
+  DEBUG: Tablesets: yAxis
+  DEBUG: start=1, step=50, stop=351
+  DEBUG: start=450, step=50, stop=800
+  DEBUG: xAxisDelta=2.50627e-009, yAxisDelta=1.25313e-009
+  DEBUG: xAxisOffset=0, yAxisOffset=0
+  DEBUG: dimensions of the cube: rows=4,cols=8,layers=100
+  DEBUG: xAxisBlockSize=1600, xAxisForwardBlockSize=800, firstBlockOffset=12800
+  DEBUG: data_00097_Up_RampFwd: waveHandle=0585A0F8, float=00000000, double=0E9664D8, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00097_ReUp_RampFwd: waveHandle=0585A298, float=00000000, double=0EA3E4D8, moreData=true, traceDir=1, specialSuffix=_RampFwd
+  DEBUG: data_00097_Down_RampFwd: waveHandle=0585A8F8, float=00000000, double=0EA0F628, moreData=true, traceDir=2, specialSuffix=_RampFwd
+  DEBUG: data_00097_ReDown_RampFwd: waveHandle=0585A1F8, float=00000000, double=0677EA38, moreData=true, traceDir=3, specialSuffix=_RampFwd
+  DEBUG: data_00097_Up_RampBwd: waveHandle=0585A898, float=00000000, double=0E975A38, moreData=true, traceDir=0, specialSuffix=_RampBwd
+  DEBUG: data_00097_ReUp_RampBwd: waveHandle=0585ABD8, float=00000000, double=0E97BF88, moreData=true, traceDir=1, specialSuffix=_RampBwd
+  DEBUG: data_00097_Down_RampBwd: waveHandle=0585A418, float=00000000, double=0E9824D8, moreData=true, traceDir=2, specialSuffix=_RampBwd
+  DEBUG: data_00097_ReDown_RampBwd: waveHandle=0585A9B8, float=00000000, double=0E988A28, moreData=true, traceDir=3, specialSuffix=_RampBwd
+  DEBUG: raw->scaled transformation: xOne=17551189,xTwo=66867200,yOne=2.69463239490225e-011,yTwo=1.02661149211263e-010
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_cube_All_RampFwdBwd"
+  Finished with no errors
+  Leaving test suite "Test_BrickletConversionDetails.ipf"
+  Entering test suite "Test_CheckForNewBricklets.ipf"
+  Entering test case "complains_no_file_open"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  Leaving test case "complains_no_file_open"
+  Entering test case "no_new_bricklets"
+  Leaving test case "no_new_bricklets"
+  Finished with no errors
+  Leaving test suite "Test_CheckForNewBricklets.ipf"
+  Entering test suite "Test_CloseResultFile.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "works"
+  Leaving test case "works"
+  Finished with no errors
+  Leaving test suite "Test_CloseResultFile.ipf"
+  Entering test suite "Test_CreateOverviewTable.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "complains_empty_file"
+  Leaving test case "complains_empty_file"
+  Entering test case "complains_empty_wavename"
+  Leaving test case "complains_empty_wavename"
+  Entering test case "complains_wavename_toolong"
+  Leaving test case "complains_wavename_toolong"
+  Entering test case "complains_baseName_ill_chars"
+  Leaving test case "complains_baseName_ill_chars"
+  Entering test case "complains_empty_df"
+  Leaving test case "complains_empty_df"
+  Entering test case "complains_invalid_df"
+  Leaving test case "complains_invalid_df"
+  Entering test case "complains_deleted_df"
+  Leaving test case "complains_deleted_df"
+  Entering test case "complains_empty_keys"
+  Leaving test case "complains_empty_keys"
+  Entering test case "complains_not_with_invalid_keys"
+  Leaving test case "complains_not_with_invalid_keys"
+  Entering test case "creates_one_wave"
+  Leaving test case "creates_one_wave"
+  Entering test case "creates_one_wave_df_name"
+  Leaving test case "creates_one_wave_df_name"
+  Entering test case "creates_one_wave_free_df"
+  Leaving test case "creates_one_wave_free_df"
+  Entering test case "creates_one_wave_user_keys"
+  Leaving test case "creates_one_wave_user_keys"
+  Entering test case "does_not_overwrite_by_default"
+  Leaving test case "does_not_overwrite_by_default"
+  Entering test case "setting_overwrite"
+  Leaving test case "setting_overwrite"
+  Entering test case "prefers_dfref_settings"
+  Leaving test case "prefers_dfref_settings"
+  Entering test case "liberal_wave_name_works"
+  Leaving test case "liberal_wave_name_works"
+  Finished with no errors
+  Leaving test suite "Test_CreateOverviewTable.ipf"
+  Entering test suite "Test_GetBrickletCount.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "works_empty_file"
+  Leaving test case "works_empty_file"
+  Entering test case "check_with_filled_file"
+  Leaving test case "check_with_filled_file"
+  Finished with no errors
+  Leaving test suite "Test_GetBrickletCount.ipf"
+  Entering test suite "Test_GetBrickletData.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "complains_empty_file"
+  Leaving test case "complains_empty_file"
+  Entering test case "complains_invalid_range"
+  Leaving test case "complains_invalid_range"
+  Entering test case "complains_empty_wavename"
+  Leaving test case "complains_empty_wavename"
+  Entering test case "complains_wavename_toolong"
+  Leaving test case "complains_wavename_toolong"
+  Entering test case "complains_baseName_ill_chars"
+  Leaving test case "complains_baseName_ill_chars"
+  Entering test case "complains_empty_df"
+  Leaving test case "complains_empty_df"
+  Entering test case "complains_invalid_df"
+  Leaving test case "complains_invalid_df"
+  Entering test case "complains_deleted_df"
+  Leaving test case "complains_deleted_df"
+  Entering test case "complains_invalid_ps"
+  Leaving test case "complains_invalid_ps"
+  Entering test case "valid_pixelsizes"
+  Leaving test case "valid_pixelsizes"
+  Entering test case "valid_ps_with_liberal_names"
+  Leaving test case "valid_ps_with_liberal_names"
+  Entering test case "read_one_bricklet"
+  Leaving test case "read_one_bricklet"
+  Entering test case "read_one_bricklet_df_name"
+  Leaving test case "read_one_bricklet_df_name"
+  Entering test case "read_one_bricklet_free_df"
+  Leaving test case "read_one_bricklet_free_df"
+  Entering test case "creates_waves"
+  Leaving test case "creates_waves"
+  Entering test case "does_not_overwrite_by_default"
+  Leaving test case "does_not_overwrite_by_default"
+  Entering test case "setting_overwrite"
+  Leaving test case "setting_overwrite"
+  Entering test case "setting_datafolder"
+  Leaving test case "setting_datafolder"
+  Entering test case "setting_double"
+  Leaving test case "setting_double"
+  Entering test case "prefers_dfref_settings"
+  Leaving test case "prefers_dfref_settings"
+  Entering test case "liberal_wave_name_works"
+  Leaving test case "liberal_wave_name_works"
+  Finished with no errors
+  Leaving test suite "Test_GetBrickletData.ipf"
+  Entering test suite "Test_GetBrickletMetaData.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "complains_empty_file"
+  Leaving test case "complains_empty_file"
+  Entering test case "complains_invalid_range"
+  Leaving test case "complains_invalid_range"
+  Entering test case "complains_empty_wavename"
+  Leaving test case "complains_empty_wavename"
+  Entering test case "complains_wavename_toolong"
+  Leaving test case "complains_wavename_toolong"
+  Entering test case "complains_baseName_ill_chars"
+  Leaving test case "complains_baseName_ill_chars"
+  Entering test case "complains_empty_df"
+  Leaving test case "complains_empty_df"
+  Entering test case "complains_invalid_df"
+  Leaving test case "complains_invalid_df"
+  Entering test case "complains_deleted_df"
+  Leaving test case "complains_deleted_df"
+  Entering test case "creates_one_wave"
+  Leaving test case "creates_one_wave"
+  Entering test case "creates_one_wave_df_name"
+  Leaving test case "creates_one_wave_df_name"
+  Entering test case "creates_one_wave_free_df"
+  Leaving test case "creates_one_wave_free_df"
+  Entering test case "creates_waves"
+  Leaving test case "creates_waves"
+  Entering test case "does_not_overwrite_by_default"
+  Leaving test case "does_not_overwrite_by_default"
+  Entering test case "setting_overwrite"
+  Leaving test case "setting_overwrite"
+  Entering test case "setting_datafolder"
+  Leaving test case "setting_datafolder"
+  Entering test case "prefers_dfref_settings"
+  Leaving test case "prefers_dfref_settings"
+  Entering test case "liberal_wave_name_works"
+  Leaving test case "liberal_wave_name_works"
+  Finished with no errors
+  Leaving test suite "Test_GetBrickletMetaData.ipf"
+  Entering test suite "Test_GetBrickletRawData.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "complains_empty_file"
+  Leaving test case "complains_empty_file"
+  Entering test case "complains_invalid_range"
+  Leaving test case "complains_invalid_range"
+  Entering test case "complains_empty_wavename"
+  Leaving test case "complains_empty_wavename"
+  Entering test case "complains_wavename_toolong"
+  Leaving test case "complains_wavename_toolong"
+  Entering test case "complains_baseName_ill_chars"
+  Leaving test case "complains_baseName_ill_chars"
+  Entering test case "complains_empty_df"
+  Leaving test case "complains_empty_df"
+  Entering test case "complains_invalid_df"
+  Leaving test case "complains_invalid_df"
+  Entering test case "complains_deleted_df"
+  Leaving test case "complains_deleted_df"
+  Entering test case "creates_one_wave"
+  Leaving test case "creates_one_wave"
+  Entering test case "creates_one_wave_df_name"
+  Leaving test case "creates_one_wave_df_name"
+  Entering test case "creates_one_wave_free_df"
+  Leaving test case "creates_one_wave_free_df"
+  Entering test case "creates_waves"
+  Leaving test case "creates_waves"
+  Entering test case "does_not_overwrite_by_default"
+  Leaving test case "does_not_overwrite_by_default"
+  Entering test case "setting_overwrite"
+  Leaving test case "setting_overwrite"
+  Entering test case "setting_datafolder"
+  Leaving test case "setting_datafolder"
+  Entering test case "prefers_dfref_settings"
+  Leaving test case "prefers_dfref_settings"
+  Entering test case "liberal_wave_name_works"
+  Leaving test case "liberal_wave_name_works"
+  Finished with no errors
+  Leaving test suite "Test_GetBrickletRawData.ipf"
+  Entering test suite "Test_GetReportTemplate.ipf"
+  Entering test case "returns_non_empty_string"
+  ####
+Windows version: 6.1 (Build 7601)
+Free Memory: 23 GiB
+Total Memory: 31 GiB
+Used Memory by this XOP: 0 MiB
+Visual Studio version: 1400
+Igor Pro Version: 637
+Vernissage version: 2.2
+XOP version: 0.24 (Build 19bca9d)
+Compilation date and time: Jul 22 2015 15:21:38
+
+Your Name:
+Bug description:
+####
+
+  Leaving test case "returns_non_empty_string"
+  Finished with no errors
+  Leaving test suite "Test_GetReportTemplate.ipf"
+  Entering test suite "Test_GetResultFileMetaData.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "complains_empty_wavename"
+  Leaving test case "complains_empty_wavename"
+  Entering test case "complains_wavename_toolong"
+  Leaving test case "complains_wavename_toolong"
+  Entering test case "complains_empty_df"
+  Leaving test case "complains_empty_df"
+  Entering test case "complains_invalid_df"
+  Leaving test case "complains_invalid_df"
+  Entering test case "complains_waveName_ill_chars"
+  Leaving test case "complains_waveName_ill_chars"
+  Entering test case "complains_deleted_df"
+  Leaving test case "complains_deleted_df"
+  Entering test case "works_with_empty_file"
+  Leaving test case "works_with_empty_file"
+  Entering test case "creates_one_wave"
+  Leaving test case "creates_one_wave"
+  Entering test case "creates_one_wave_df_name"
+  Leaving test case "creates_one_wave_df_name"
+  Entering test case "creates_one_wave_free_df"
+  Leaving test case "creates_one_wave_free_df"
+  Entering test case "does_not_overwrite_by_default"
+  Leaving test case "does_not_overwrite_by_default"
+  Entering test case "overwrites_if_told"
+  Leaving test case "overwrites_if_told"
+  Entering test case "liberal_wave_name_works"
+  Leaving test case "liberal_wave_name_works"
+  Finished with no errors
+  Leaving test suite "Test_GetResultFileMetaData.ipf"
+  Entering test suite "Test_GetBrickletDeployData.ipf"
+  Entering test case "complains_no_file_open"
+  Leaving test case "complains_no_file_open"
+  Entering test case "complains_empty_file"
+  Leaving test case "complains_empty_file"
+  Entering test case "complains_invalid_range"
+  Leaving test case "complains_invalid_range"
+  Entering test case "complains_empty_wavename"
+  Leaving test case "complains_empty_wavename"
+  Entering test case "complains_wavename_toolong"
+  Leaving test case "complains_wavename_toolong"
+  Entering test case "complains_baseName_ill_chars"
+  Leaving test case "complains_baseName_ill_chars"
+  Entering test case "complains_empty_df"
+  Leaving test case "complains_empty_df"
+  Entering test case "complains_invalid_df"
+  Leaving test case "complains_invalid_df"
+  Entering test case "complains_deleted_df"
+  Leaving test case "complains_deleted_df"
+  Entering test case "creates_one_wave"
+  Leaving test case "creates_one_wave"
+  Entering test case "creates_one_wave_df_name"
+  Leaving test case "creates_one_wave_df_name"
+  Entering test case "creates_one_wave_free_df"
+  Leaving test case "creates_one_wave_free_df"
+  Entering test case "creates_waves"
+  Leaving test case "creates_waves"
+  Entering test case "does_not_overwrite_by_default"
+  Leaving test case "does_not_overwrite_by_default"
+  Entering test case "setting_overwrite"
+  Leaving test case "setting_overwrite"
+  Entering test case "setting_datafolder"
+  Leaving test case "setting_datafolder"
+  Entering test case "prefers_dfref_settings"
+  Leaving test case "prefers_dfref_settings"
+  Entering test case "liberal_wave_name_works"
+  Leaving test case "liberal_wave_name_works"
+  Finished with no errors
+  Leaving test suite "Test_GetBrickletDeployData.ipf"
+  Entering test suite "Test_GetResultFileName.ipf"
+  Entering test case "file_names_are_empty"
+  Leaving test case "file_names_are_empty"
+  Entering test case "file_names_are_filled"
+  Leaving test case "file_names_are_filled"
+  Entering test case "file_names_with_corr_bs"
+  Leaving test case "file_names_with_corr_bs"
+  Finished with no errors
+  Leaving test suite "Test_GetResultFileName.ipf"
+  Entering test suite "Test_GetVernissageVersion.ipf"
+  Entering test case "vernissage_version_format"
+  Leaving test case "vernissage_version_format"
+  Finished with no errors
+  Leaving test suite "Test_GetVernissageVersion.ipf"
+  Entering test suite "Test_GetVersion.ipf"
+  Entering test case "version_format_is_correct"
+  Leaving test case "version_format_is_correct"
+  Finished with no errors
+  Leaving test suite "Test_GetVersion.ipf"
+  Entering test suite "Test_GetXOPErrorMessage.ipf"
+  Entering test case "check_that_messages_are_set"
+  No error, everything went nice and smooth.
+  A file is already open and it can only be one file open at a time.
+  The result file is empty, so there is little one can do here...
+  The file/folder (missing argument) is not readable.
+  There are no new bricklets in the result file.
+  The paramter (missing argument) is missing or wrong. Please consult the documentation.
+  The rawdata could not be interpreted. You can try using getRawBrickleData() instead and consulting the vernissage documentation. Please file also a bug report and attach your data.
+  There is no result file open.
+  The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and startBrickletID may not be bigger than endBrickletID.
+  The wave (missing argument) already exists. Please move/delete it first.
+  Leaving test case "check_that_messages_are_set"
+  Finished with no errors
+  Leaving test suite "Test_GetXOPErrorMessage.ipf"
+  Entering test suite "Test_OpenResultFile.ipf"
+  Entering test case "openResultFile_empty_file_path"
+  Leaving test case "openResultFile_empty_file_path"
+  Entering test case "openResultFile_non_exist_file"
+  Leaving test case "openResultFile_non_exist_file"
+  Entering test case "openResultFile_empty_file_K"
+  Leaving test case "openResultFile_empty_file_K"
+  Entering test case "openResultFile_non_exist_file_K"
+  Leaving test case "openResultFile_non_exist_file_K"
+  Entering test case "openResultFile_non_exist_path"
+  no symbolic path of that name
+  Leaving test case "openResultFile_non_exist_path"
+  Entering test case "openResultFile_non_exist_path_K"
+  no symbolic path of that name
+  Leaving test case "openResultFile_non_exist_path_K"
+  Entering test case "openResultFile_undefined_path"
+  Leaving test case "openResultFile_undefined_path"
+  Entering test case "openResultFile_undefined_path_K"
+  Leaving test case "openResultFile_undefined_path_K"
+  Entering test case "openResultFile_undef_path_file"
+  no symbolic path of that name
+  Leaving test case "openResultFile_undef_path_file"
+  Entering test case "openResultFile_nonexist_path"
+  Leaving test case "openResultFile_nonexist_path"
+  Entering test case "openResultFile_loading_works"
+  Leaving test case "openResultFile_loading_works"
+  Entering test case "openResultFile_loading_works_K"
+  Leaving test case "openResultFile_loading_works_K"
+  Entering test case "openResultFile_loading_path"
+  Leaving test case "openResultFile_loading_path"
+  Entering test case "openResultFile_already_open"
+  Leaving test case "openResultFile_already_open"
+  Finished with no errors
+  Leaving test suite "Test_OpenResultFile.ipf"
+  Test finished with no errors
+  End of test "MatrixFileReader XOP"

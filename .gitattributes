@@ -3,3 +3,4 @@ public-releases    	  export-ignore
 .git*                 export-ignore
 *.cpp                 whitespace=cr-at-eol
 *.hpp                 whitespace=cr-at-eol
+*.rc                  whitespace=cr-at-eol

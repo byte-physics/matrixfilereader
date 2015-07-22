@@ -257,9 +257,22 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
   Note/K refWave, refWaveNote
   Note/K newWave, newWaveNote
 
+#if (IgorVersion() >= 7.0)
+  if(!WaveType(newWave))
+	 SetWaveTextEncoding 3, 16, newWave
+  endif
+#endif
+
+
   NVAR error = root:Packages:UnitTesting:error_count
   variable oldError = error
-  CHECK_EQUAL_WAVES(refWave,newWave)
+
+  if(NumberByKey("pixelSize", refWaveNote,"=","\r") > 1)
+	  CHECK_EQUAL_WAVES(refWave,newWave, tol=1e-10)
+  else
+	  CHECK_EQUAL_WAVES(refWave,newWave)
+  endif
+
   if(error > oldError)
   	printf "WaveNames: %s, %s\r", NameOfWave(refWave), NameOfWave(newWave)
   endif

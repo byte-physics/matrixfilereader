@@ -415,8 +415,8 @@ End
 
 Function regressionTest()
 
-  string refDataPath = "e:projekte:matrixfilereader-data:referenceData_0.23"
-  string rawDataPath = "e:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1"
+  string refDataPath = "e:projekte:matrixfilereader-data:referenceData_0.24"
+  string rawDataPath = "e:projekte:matrixfilereader-data"
 
   string PATH = "e:newVersion_0.22"
   DeleteFolder/Z=1 PATH

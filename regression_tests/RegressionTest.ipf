@@ -239,46 +239,6 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
     if(idx != -1)
       newWave[idx][1] = refWave[idx][1]
     endif
-
-    // Starting with Vernissage T2.2-2 the values spatialInfo.physicalX and
-    // spatialInfo.physicalY are not written anymore if spatialInfo.originatorKnown is false
-    // Therefore we delete these entries from the refWave
-    FindValue/TEXT="spatialInfo.physicalX.No1"/TXOP=4 refWave
-    variable pos1 = V_value
-
-    FindValue/TEXT="spatialInfo.originatorKnown"/TXOP=4 refWave
-    variable pos2 = V_value
-
-    if( pos2 > 0 && pos1 > 0 && cmpstr(refWave[pos2][1],"false") == 0 && cmpstr(refWave[pos1][1],"0") == 0)
-	    FindValue/TEXT="spatialInfo.physicalX.No1"/TXOP=4 refWave
-	    DeletePoints V_value, 1, refWave
-
-	    FindValue/TEXT="spatialInfo.physicalY.No1"/TXOP=4 refWave
-	    DeletePoints V_value, 1, refWave
-    endif
-
-	// old meta data reference waves don't have calibration data
-	// calibration data was added in 089069
-	FindValue/TEXT="calibration.Default.dataSet"/TXOP=4 newWave
-	if(V_Value > 0)
-	  DeletePoints V_Value, 1, newWave
-	endif
-
-	FindValue/TEXT="calibration.Default.dataSetVariant"/TXOP=4 newWave
-	if(V_Value > 0)
-	  DeletePoints V_Value, 1, newWave
-	endif
-
-	FindValue/TEXT="calibration.Default.parameterSetVariant"/TXOP=4 newWave
-	if(V_Value > 0)
-	  DeletePoints V_Value, 1, newWave
-	endif
-
-	FindValue/TEXT="calibration.Default.parameterSet"/TXOP=4 newWave
-	if(V_Value > 0)
-	  DeletePoints V_Value, 1, newWave
-	endif
-
   endif
 
   // remove variable parts of the wave's note
@@ -293,10 +253,6 @@ Function compareTwoWaves(refWave,newWave, ignoreTextWaves)
 
   refWaveNote = RemoveByKey("resultDirPath",refWaveNote,"=","\r")
   newWaveNote = RemoveByKey("resultDirPath",newWaveNote,"=","\r")
-
-  // suffix was introduced in c50506
-  refWaveNote = RemoveByKey("suffix",refWaveNote,"=","\r")
-  newWaveNote = RemoveByKey("suffix",newWaveNote,"=","\r")
 
   Note/K refWave, refWaveNote
   Note/K newWave, newWaveNote

@@ -139,6 +139,22 @@ static Function complains_not_with_invalid_keys()
 	CHECK_EQUAL_VAR(DimSize(wv, 1), 1)
 End
 
+static Function complains_not_with_toolong_key()
+	Struct errorCode err
+	initStruct(err)
+
+	MFR_OpenResultFile/K folder + file
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+
+	MFR_GetBrickletCount
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	variable numBricklets = V_count
+
+	// toolong keys are currently silently truncated
+	MFR_CreateOverviewTable/KEYS="non_existing_key_very_long_string_here_really"
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+End
+
 // defaults:
 // datafolders yes
 // double    no

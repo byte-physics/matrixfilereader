@@ -640,7 +640,6 @@ namespace
     return SUCCESS;
   }
 
-  // FIXME does not support ramp reversal
   int createWaves3D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolderHandle, const char* waveBaseName, int brickletID, std::string& waveNameList)
   {
     CountInt dimensionSizes[MAX_DIMENSIONS + 1];
@@ -890,47 +889,93 @@ namespace
                dimensionSizes[ROWS], dimensionSizes[COLUMNS], dimensionSizes[LAYERS]);
 
     WaveVec waves(MAX_NUM_WAVES);
-    Wave& traceUpData =  waves[TRACE_UP];
-    Wave& reTraceUpData = waves[RE_TRACE_UP];
-    Wave& traceDownData = waves[TRACE_DOWN];
-    Wave& reTraceDownData = waves[RE_TRACE_DOWN];
+    Wave& traceUpDataRampFwd     = waves[TRACE_UP_RAMP_FWD];
+    Wave& traceUpDataRampBwd     = waves[TRACE_UP_RAMP_BWD];
+    Wave& reTraceUpDataRampFwd   = waves[RE_TRACE_UP_RAMP_FWD];
+    Wave& reTraceUpDataRampBwd   = waves[RE_TRACE_UP_RAMP_BWD];
+    Wave& traceDownDataRampFwd   = waves[TRACE_DOWN_RAMP_FWD];
+    Wave& traceDownDataRampBwd   = waves[TRACE_DOWN_RAMP_BWD];
+    Wave& reTraceDownDataRampFwd = waves[RE_TRACE_DOWN_RAMP_FWD];
+    Wave& reTraceDownDataRampBwd = waves[RE_TRACE_DOWN_RAMP_BWD];
 
-    // 4 cubes, TraceUp, TraceDown, ReTraceUp, ReTraceDown
+    // 4 cubes, TraceUpRampFwd, TraceDownRampFwd, ReTraceUpRampFwd, ReTraceDownRampFwd
+    // x2 if spec axis mirrored
     if (numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableBWD != 0 &&
         numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableUp != 0)
     {
-      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
-      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
-      waves[TRACE_DOWN].setProperties(waveBaseName, TRACE_DOWN);
-      waves[RE_TRACE_DOWN].setProperties(waveBaseName, RE_TRACE_DOWN);
+      waves[TRACE_UP_RAMP_FWD].setProperties(waveBaseName, TRACE_UP, suffixRampFwd);
+      waves[RE_TRACE_UP_RAMP_FWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampFwd);
+      waves[TRACE_DOWN_RAMP_FWD].setProperties(waveBaseName, TRACE_DOWN, suffixRampFwd);
+      waves[RE_TRACE_DOWN_RAMP_FWD].setProperties(waveBaseName, RE_TRACE_DOWN, suffixRampFwd);
+
+      if(specAxis.mirrored)
+      {
+        waves[TRACE_UP_RAMP_BWD].setProperties(waveBaseName, TRACE_UP, suffixRampBwd);
+        waves[RE_TRACE_UP_RAMP_BWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampBwd);
+        waves[TRACE_DOWN_RAMP_BWD].setProperties(waveBaseName, TRACE_DOWN, suffixRampBwd);
+        waves[RE_TRACE_DOWN_RAMP_BWD].setProperties(waveBaseName, RE_TRACE_DOWN, suffixRampBwd);
+      }
     }
-    // 2 cubes, TraceUp, TraceDown
+    // 2 cubes, TraceUpRampFwd, TraceDownRampFwd
+    // x2 if spec axis mirrored
     else if (numPointsXAxisWithTableBWD == 0 && numPointsYAxisWithTableDown != 0)
     {
-      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
-      waves[TRACE_DOWN].setProperties(waveBaseName, TRACE_DOWN);
+      waves[TRACE_UP_RAMP_FWD].setProperties(waveBaseName, TRACE_UP, suffixRampFwd);
+      waves[TRACE_DOWN_RAMP_FWD].setProperties(waveBaseName, TRACE_DOWN, suffixRampFwd);
+
+      if(specAxis.mirrored)
+      {
+        waves[TRACE_UP_RAMP_BWD].setProperties(waveBaseName, TRACE_UP, suffixRampBwd);
+        waves[TRACE_DOWN_RAMP_BWD].setProperties(waveBaseName, TRACE_DOWN, suffixRampBwd);
+      }
     }
-    // 2 cubes, TraceUp, ReTraceUp
+    // 2 cubes, TraceUpRampFwd, ReTraceUpRampFwd
+    // x2 if spec axis mirrored
     else if (numPointsXAxisWithTableBWD != 0 && numPointsYAxisWithTableDown == 0)
     {
-      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
-      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
+      waves[TRACE_UP_RAMP_FWD].setProperties(waveBaseName, TRACE_UP, suffixRampFwd);
+      waves[RE_TRACE_UP_RAMP_FWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampFwd);
+
+      if(specAxis.mirrored)
+      {
+        waves[TRACE_UP_RAMP_BWD].setProperties(waveBaseName, TRACE_UP, suffixRampBwd);
+        waves[RE_TRACE_UP_RAMP_BWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampBwd);
+      }
     }
-    // 2 cubes, ReTraceUp, ReTraceDown
+    // 2 cubes, ReTraceUpRampFwd, ReTraceDownRampFwd
+    // x2 if spec axis mirrored
     else if (numPointsXAxisWithTableFWD == 0 && numPointsYAxisWithTableDown != 0)
     {
-      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
-      waves[RE_TRACE_DOWN].setProperties(waveBaseName, RE_TRACE_DOWN);
+      waves[RE_TRACE_UP_RAMP_FWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampFwd);
+      waves[RE_TRACE_DOWN_RAMP_FWD].setProperties(waveBaseName, RE_TRACE_DOWN, suffixRampFwd);
+
+      if(specAxis.mirrored)
+      {
+        waves[RE_TRACE_UP_RAMP_BWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampBwd);
+        waves[RE_TRACE_DOWN_RAMP_BWD].setProperties(waveBaseName, RE_TRACE_DOWN, suffixRampBwd);
+      }
     }
-    // 1 cube, TraceUp
+    // 1 cube, TraceUpRampFwd
+    // x2 if spec axis mirrored
     else if (numPointsXAxisWithTableBWD == 0 && numPointsYAxisWithTableDown == 0)
     {
-      waves[TRACE_UP].setProperties(waveBaseName, TRACE_UP);
+      waves[TRACE_UP_RAMP_FWD].setProperties(waveBaseName, TRACE_UP, suffixRampFwd);
+
+      if(specAxis.mirrored)
+      {
+        waves[TRACE_UP_RAMP_BWD].setProperties(waveBaseName, TRACE_UP, suffixRampBwd);
+      }
     }
-    // 1 cube, ReTraceUp
+    // 1 cube, ReTraceUpRampFwd
+    // x2 if spec axis mirrored
     else if (numPointsXAxisWithTableFWD == 0 && numPointsYAxisWithTableDown == 0)
     {
-      waves[RE_TRACE_UP].setProperties(waveBaseName, RE_TRACE_UP);
+      waves[RE_TRACE_UP_RAMP_FWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampFwd);
+
+      if(specAxis.mirrored)
+      {
+        waves[RE_TRACE_UP_RAMP_BWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampBwd);
+      }
     }
     // not possible
     else
@@ -939,8 +984,9 @@ namespace
       return INTERNAL_ERROR_CONVERTING_DATA;
     }
 
-    const int xAxisBlockSize   = (numPointsXAxisWithTableBWD + numPointsXAxisWithTableFWD) * numPointsVAxis;
-    const int xAxisForwardBlockSize = numPointsXAxisWithTableFWD * numPointsVAxis;
+    const int specAxisBlockSize     = specAxis.clocks;
+    const int xAxisBlockSize        = (numPointsXAxisWithTableBWD + numPointsXAxisWithTableFWD) * specAxisBlockSize;
+    const int xAxisForwardBlockSize = numPointsXAxisWithTableFWD * specAxisBlockSize;
 
     // data index to the start of the TraceDown data (this is the same for all combinations as xAxisBlockSize is set apropriately)
     // in case the traceDown scan does not exist this is also no problem
@@ -971,10 +1017,10 @@ namespace
         // LAYERS
         for (int k = 0; k < dimensionSizes[LAYERS]; k++)
         {
-          // traceUp
-          if (traceUpData.moreData)
+          // traceUp, RampFwd
+          if (traceUpDataRampFwd.moreData)
           {
-            rawIndex  = i * xAxisBlockSize + j * dimensionSizes[LAYERS] + k;
+            rawIndex  = i * xAxisBlockSize + j * specAxisBlockSize + k;
             dataIndex = i * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&
@@ -986,21 +1032,47 @@ namespace
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              traceUpData.fillWave(dataIndex, rawValue, scaledValue);
+              traceUpDataRampFwd.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
-              DEBUGPRINT("Index out of range in traceUp");
-              DEBUGPRINT("traceUpDataIndex=%d,waveSize=%d", dataIndex, waveSize);
-              DEBUGPRINT("traceUpRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              traceUpData.moreData = false;
+              DEBUGPRINT("Index out of range in traceUpRampFwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              traceUpDataRampFwd.moreData = false;
             }
-          }// if traceUpDataPtr
+          } // if traceUpDataRampFwd.moreData
 
-          if (traceDownData.moreData)
+          // traceUp, RampBwd
+          if (traceUpDataRampBwd.moreData)
           {
+            rawIndex  = i * xAxisBlockSize + j * specAxisBlockSize + specAxisBlockSize - (k + 1);
+            dataIndex = i * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
-            rawIndex  = firstBlockOffset + i * xAxisBlockSize + j * dimensionSizes[LAYERS] + k;
+            if (dataIndex >= 0 &&
+                dataIndex < waveSize &&
+                rawIndex < rawBrickletSize &&
+                rawIndex >= 0)
+            {
+
+              rawValue  = rawBrickletDataPtr[rawIndex];
+              scaledValue = rawValue * slope + yIntercept;
+
+              traceUpDataRampBwd.fillWave(dataIndex, rawValue, scaledValue);
+            }
+            else
+            {
+              DEBUGPRINT("Index out of range in traceUpRampBwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              traceUpDataRampBwd.moreData = false;
+            }
+          } // if traceUpDataRampBwd.moreData
+
+          // traceDown, RampFwd
+          if (traceDownDataRampFwd.moreData)
+          {
+            rawIndex  = firstBlockOffset + i * xAxisBlockSize + j * specAxisBlockSize + k;
             dataIndex = (dimensionSizes[COLUMNS] - (i + 1)) * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&
@@ -1012,21 +1084,47 @@ namespace
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              traceDownData.fillWave(dataIndex, rawValue, scaledValue);
+              traceDownDataRampFwd.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
-              DEBUGPRINT("Index out of range in traceDown");
-              DEBUGPRINT("traceDownDataIndex=%d,waveSize=%d", dataIndex, waveSize);
-              DEBUGPRINT("traceDownRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              traceDownData.moreData = false;
+              DEBUGPRINT("Index out of range in traceDownRampFwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              traceDownDataRampFwd.moreData = false;
             }
-          }// if traceDownDataPtr
+          } // if traceDownDataRampFwd.moreData
 
-          if (reTraceUpData.moreData)
+          // traceDown, RampBwd
+          if (traceDownDataRampBwd.moreData)
           {
+            rawIndex  = firstBlockOffset + i * xAxisBlockSize + j * specAxisBlockSize + specAxisBlockSize - (k + 1);
+            dataIndex = (dimensionSizes[COLUMNS] - (i + 1)) * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
-            rawIndex  = xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
+            if (dataIndex >= 0 &&
+                dataIndex < waveSize &&
+                rawIndex < rawBrickletSize &&
+                rawIndex >= 0
+               )
+            {
+              rawValue  = rawBrickletDataPtr[rawIndex];
+              scaledValue = rawValue * slope + yIntercept;
+
+              traceDownDataRampBwd.fillWave(dataIndex, rawValue, scaledValue);
+            }
+            else
+            {
+              DEBUGPRINT("Index out of range in traceDownRampBwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              traceDownDataRampBwd.moreData = false;
+            }
+          } // if traceDownDataRampBwd.moreData
+
+          // reTraceUp, RampFwd
+          if (reTraceUpDataRampFwd.moreData)
+          {
+            rawIndex  = xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * specAxisBlockSize + k;
             dataIndex = i * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&
@@ -1038,21 +1136,47 @@ namespace
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              reTraceUpData.fillWave(dataIndex, rawValue, scaledValue);
+              reTraceUpDataRampFwd.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
-              DEBUGPRINT("Index out of range in reTraceUp");
-              DEBUGPRINT("reTraceUpDataIndex=%d,waveSize=%d", dataIndex, waveSize);
-              DEBUGPRINT("reTraceUpRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              reTraceUpData.moreData = false;
+              DEBUGPRINT("Index out of range in reTraceUpRampFwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              reTraceUpDataRampFwd.moreData = false;
             }
-          }// if reTraceUpDataPtr
+          } // if reTraceUpDataRampFwd.moreData
 
-          if (reTraceDownData.moreData)
+          // reTraceUp, RampBwd
+          if (reTraceUpDataRampBwd.moreData)
           {
+            rawIndex  = xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * specAxisBlockSize + specAxisBlockSize - (k + 1);
+            dataIndex = i * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
-            rawIndex  = firstBlockOffset + xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * dimensionSizes[LAYERS] + k;
+            if (dataIndex >= 0 &&
+                dataIndex < waveSize &&
+                rawIndex < rawBrickletSize &&
+                rawIndex >= 0
+               )
+            {
+              rawValue  = rawBrickletDataPtr[rawIndex];
+              scaledValue = rawValue * slope + yIntercept;
+
+              reTraceUpDataRampBwd.fillWave(dataIndex, rawValue, scaledValue);
+            }
+            else
+            {
+              DEBUGPRINT("Index out of range in reTraceUpRampBwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              reTraceUpDataRampBwd.moreData = false;
+            }
+          } // if reTraceUpDataRampBwd.moreData
+
+          // reTraceDown, RampFwd
+          if (reTraceDownDataRampFwd.moreData)
+          {
+            rawIndex  = firstBlockOffset + xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * specAxisBlockSize + k;
             dataIndex = (dimensionSizes[COLUMNS] - (i + 1)) * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
             if (dataIndex >= 0 &&
@@ -1061,20 +1185,45 @@ namespace
                 rawIndex >= 0
                )
             {
-
               rawValue  = rawBrickletDataPtr[rawIndex];
               scaledValue = rawValue * slope + yIntercept;
 
-              reTraceDownData.fillWave(dataIndex, rawValue, scaledValue);
+              reTraceDownDataRampFwd.fillWave(dataIndex, rawValue, scaledValue);
             }
             else
             {
-              DEBUGPRINT("Index out of range in reTraceDown");
-              DEBUGPRINT("reTraceDownDataIndex=%d,waveSize=%d", dataIndex, waveSize);
-              DEBUGPRINT("reTraceDownRawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
-              reTraceDownData.moreData = false;
+              DEBUGPRINT("Index out of range in reTraceDownRampFwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              reTraceDownDataRampFwd.moreData = false;
             }
-          }// if reTraceDownDataPtr
+          } // if reTraceDownDataRampFwd.moreData
+
+          // reTraceDown, RampBwd
+          if (reTraceDownDataRampBwd.moreData)
+          {
+            rawIndex  = firstBlockOffset + xAxisForwardBlockSize + i * xAxisBlockSize + (dimensionSizes[ROWS] - (j + 1)) * specAxisBlockSize + specAxisBlockSize - (k + 1);
+            dataIndex = (dimensionSizes[COLUMNS] - (i + 1)) * dimensionSizes[ROWS] + j + k * dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
+
+            if (dataIndex >= 0 &&
+                dataIndex < waveSize &&
+                rawIndex < rawBrickletSize &&
+                rawIndex >= 0
+               )
+            {
+              rawValue  = rawBrickletDataPtr[rawIndex];
+              scaledValue = rawValue * slope + yIntercept;
+
+              reTraceDownDataRampBwd.fillWave(dataIndex, rawValue, scaledValue);
+            }
+            else
+            {
+              DEBUGPRINT("Index out of range in reTraceDownRampBwd");
+              DEBUGPRINT("dataIndex=%d,waveSize=%d", dataIndex, waveSize);
+              DEBUGPRINT("rawBrickletIndex=%d,rawBrickletSize=%d", rawIndex, rawBrickletSize);
+              reTraceDownDataRampBwd.moreData = false;
+            }
+          } // if reTraceDownDataRampBwd.moreData
         } // for LAYERS
       } // for ROWS
     } // for COLUMNS

@@ -77,7 +77,7 @@ void Wave::setProperties(const std::string& basename, int traceDir, std::string 
   switch (traceDir)
   {
   case NO_TRACE:
-    m_wavename = basename + suffix;
+    m_wavename = basename;
     break;
 
   case TRACE_UP:
@@ -101,6 +101,7 @@ void Wave::setProperties(const std::string& basename, int traceDir, std::string 
     return;
   }
 
+  m_wavename += suffix;
   m_traceDir = traceDir;
   m_suffix = suffix;
 }

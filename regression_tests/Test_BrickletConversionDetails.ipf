@@ -354,3 +354,127 @@ static Function check_cube_All_RampFwd()
 	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 4
 	WaveClear slice, sliceRaw, cube
 End
+
+static Function check_cube_All_RampFwdBwd()
+	Struct errorCode err
+	initStruct(err)
+
+	variable numPointsSpecAxis, blockBegin, brickletID, numCols, numRaw, numRows
+	string convDataNames
+	brickletID = 97
+
+	MFR_OpenResultFile/K folderCube + fileCube
+	CHECK_EQUAL_VAR(err.SUCCESS,V_flag)
+	CHECK_EMPTY_FOLDER()
+
+	// don't scale the converted data to ease comparison
+	// and use artifical data
+	variable/G V_MatrixFileReaderMagic  = 1 + 2
+	variable/G V_MatrixFileReaderFolder = 0
+	variable/G V_MatrixFileReaderDebug  = 1
+
+	MFR_GetBrickletMetaData/R=(brickletID)
+	MFR_GetBrickletRawData/R=(brickletID)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),1)
+	WAVE rawData = $StringFromList(0, S_waveNames)
+
+	MFR_GetBrickletData/R=(brickletID)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames),8)
+	convDataNames = S_waveNames
+
+	check_unique_values(rawData, convDataNames)
+
+	WAVE wv = $StringFromList(0, convDataNames)
+	numRows           = DimSize(wv, 0)
+	numCols           = DimSize(wv, 1)
+	numPointsSpecAxis = DimSize(wv, 2)
+	numRaw            = DimSize(rawData, 0)
+
+	// traceUP, RampFwd, first spectra
+	WAVE cube = data_00097_Up_RampFwd
+
+	Duplicate/O/R=[0][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	Duplicate/O/R=[0, numPointsSpecAxis - 1] rawData sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 1
+	WaveClear slice, sliceRaw, cube
+
+	// traceUP, RampBwd, first spectra
+	WAVE cube = data_00097_Up_RampBwd
+
+	Duplicate/O/R=[0][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	Duplicate/O/R=[numPointsSpecAxis, 2 * numPointsSpecAxis - 1] rawData sliceRaw
+	WaveTransform/O flip sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 2
+	WaveClear slice, sliceRaw, cube
+
+	// reTraceUP, RampFwd, first spectra
+	WAVE cube = data_00097_ReUp_RampFwd
+
+	Duplicate/O/R=[(numRows - 1)][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	blockBegin = numRows * numPointsSpecAxis * 2
+	Duplicate/O/R=[blockBegin,blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 3
+	WaveClear slice, sliceRaw, cube
+
+	// reTraceUP, RampBwd, first spectra
+	WAVE cube = data_00097_ReUp_RampBwd
+
+	Duplicate/O/R=[(numRows - 1)][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	blockBegin = numRows * numPointsSpecAxis * 2 + numPointsSpecAxis
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	WaveTransform/O flip sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 4
+	WaveClear slice, sliceRaw, cube
+
+	// traceDown, RampFwd, first spectra
+	WAVE cube = data_00097_Down_RampFwd
+
+	Duplicate/O/R=[0][numCols - 1][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+	blockBegin = numRaw/2
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 5
+	WaveClear slice, sliceRaw, cube
+
+	// traceDown, RampBwd, first spectra
+	WAVE cube = data_00097_Down_RampBwd
+
+	Duplicate/O/R=[0][numCols - 1][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+	blockBegin = numRaw/2 + numPointsSpecAxis
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	WaveTransform/O flip sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 6
+	WaveClear slice, sliceRaw, cube
+
+	// reTraceDown, RampFwd, first spectra
+	WAVE cube = data_00097_ReDown_RampFwd
+
+	Duplicate/O/R=[numRows -1][numCols - 1][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+	blockBegin = numRaw/2 + numRows * numPointsSpecAxis * 2
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 7
+	WaveClear slice, sliceRaw, cube
+
+	// reTraceDown, RampBwd, first spectra
+	WAVE cube = data_00097_ReDown_RampBwd
+
+	Duplicate/O/R=[numRows -1][numCols - 1][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+	blockBegin = numRaw/2 + numRows * numPointsSpecAxis * 2 + numPointsSpecAxis
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	WaveTransform/O flip sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 8
+	WaveClear slice, sliceRaw, cube
+End

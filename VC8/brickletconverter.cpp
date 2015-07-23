@@ -110,7 +110,7 @@ namespace
     return 0;
   }
 
-  int HandleResamplingIfRequested(waveHndl waveFolderHandle, Wave& wave, int dimension, bool resampleData, int pixelSize)
+  int HandleResamplingIfRequested(DataFolderHandle waveFolderHandle, Wave& wave, int dimension, bool resampleData, int pixelSize)
   {
     if (!resampleData)
     {

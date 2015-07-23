@@ -20,7 +20,7 @@ public:
   ~Wave();
 
   void clearWave();
-  void setWaveHandle(const waveHndl& waveHandle);
+  void setWaveHandle(waveHndl waveHandle);
   void setProperties(const std::string& basename, int traceDir, std::string suffix = std::string());
   void printDebugInfo();
   void setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr);

@@ -38,7 +38,7 @@ Wave::~Wave(){}
 /*
   Make a connection between the waveHandle and this class
 */
-void Wave::setWaveHandle(const waveHndl& waveHandle)
+void Wave::setWaveHandle(waveHndl waveHandle)
 {
   THROW_IF_NULL(waveHandle);
 

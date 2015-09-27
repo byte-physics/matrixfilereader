@@ -226,12 +226,18 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
       endBrickletID  = int(p->startBrickletID); // the range is restricted to one bricklet given by startBrickletID
     }
   }
-  else // preload all bricklet data
+  else
   {
-    if(typeOfData == CONVERTED_DATA)
-      loadAllBrickletDataAndMetaData();
-    else if(typeOfData == RAW_DATA)
-      loadAllBrickletData();
+	  // preload all bricklet data
+	  // we don't do that if caching is disabled in order
+	  // to prevent early out of memory errors
+	  if(GlobalData::Instance().isDataCacheEnabled())
+	  {
+		if(typeOfData == CONVERTED_DATA)
+		  loadAllBrickletDataAndMetaData();
+		else if(typeOfData == RAW_DATA)
+		  loadAllBrickletData();
+	  }
   }
 
   DEBUGPRINT("startBrickletID=%d, endBrickletID=%d", startBrickletID, endBrickletID);

@@ -112,55 +112,146 @@ static Function check_cube_Up_RampFwd()
 	WaveClear slice, sliceRaw, cube
 End
 
-// FIXME no dataset available
-//static Function check_cube_UpReUp_RampFwd()
-//	Struct errorCode err
-//	initStruct(err)
-//
-//	variable numPointsSpecAxis, blockOffset, brickletID, numCols, numRaw, numRows
-//	string convDataNames
-//	brickletID = 7
-//
-//	MFR_OpenResultFile/K folderCubeUp + fileCubeUp
-//	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-//	CHECK_EMPTY_FOLDER()
-//
-//	// don't scale the converted data to ease comparison
-//	// and use artifical data
-//	variable/G V_MatrixFileReaderMagic  = 1 + 2
-//	variable/G V_MatrixFileReaderFolder = 0
-//	variable/G V_MatrixFileReaderDebug  = 1
-//
-//	MFR_GetBrickletMetaData/R=(brickletID)
-//	MFR_GetBrickletRawData/R=(brickletID)
-//	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-//	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
-//	WAVE rawData = $StringFromList(0, S_waveNames)
-//
-//	MFR_GetBrickletData/R=(brickletID)
-//	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
-//	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 2)
-//	convDataNames = S_waveNames
-//
-//	check_unique_values(rawData, convDataNames)
-//
-//	WAVE wv = $StringFromList(0, convDataNames)
-// 	numRows           = DimSize(wv, 0)
-// 	numCols           = DimSize(wv, 1)
-// 	numPointsSpecAxis = DimSize(wv, 2)
-// 	numRaw            = DimSize(rawData, 0)
-//
-//	// traceUP, RampFwd, first spectra
-//	WAVE cube = $StringFromList(0, convDataNames)
-//
-//	Duplicate/O/R=[0][0][*] cube slice
-//	Redimension/N=(numPointsSpecAxis) slice
-//
-//	Duplicate/O/R=[0, numPointsSpecAxis - 1] rawData sliceRaw
-//	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA)
-//	WaveClear slice, sliceRaw, cube
-//	FAIL()
-//End
+static Function check_cube_Up_RampFwdBwd()
+	Struct errorCode err
+	initStruct(err)
+
+	variable numPointsSpecAxis, blockOffset, brickletID, numCols, numRaw, numRows
+	string convDataNames
+	brickletID = 26
+
+	MFR_OpenResultFile/K folderCubeSpecial + fileCubeSpecial
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EMPTY_FOLDER()
+
+	// don't scale the converted data to ease comparison
+	// and use artifical data
+	variable/G V_MatrixFileReaderMagic  = 1 + 2
+	variable/G V_MatrixFileReaderFolder = 0
+	variable/G V_MatrixFileReaderDebug  = 1
+
+	MFR_GetBrickletMetaData/R=(brickletID)
+	MFR_GetBrickletRawData/R=(brickletID)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
+	WAVE rawData = $StringFromList(0, S_waveNames)
+
+	MFR_GetBrickletData/R=(brickletID)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 2)
+	convDataNames = S_waveNames
+
+	check_unique_values(rawData, convDataNames)
+
+	WAVE wv = $StringFromList(0, convDataNames)
+	numRows           = DimSize(wv, 0)
+	numCols           = DimSize(wv, 1)
+	numPointsSpecAxis = DimSize(wv, 2)
+	numRaw            = DimSize(rawData, 0)
+
+	// traceUP, RampFwd, first spectra
+	WAVE cube = data_00026_Up_RampFwd
+
+	Duplicate/O/R=[0][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	Duplicate/O/R=[0, numPointsSpecAxis - 1] rawData sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA)
+	WaveClear slice, sliceRaw, cube
+
+	// traceUP, RampBwd, first spectra
+	WAVE cube = data_00026_Up_RampBwd
+
+	Duplicate/O/R=[0][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	Duplicate/O/R=[numPointsSpecAxis, 2 * numPointsSpecAxis - 1] rawData sliceRaw
+	WaveTransform/O flip sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA)
+	WaveClear slice, sliceRaw, cube
+End
+
+static Function check_cube_UpReUp_RampFwdBwd()
+	Struct errorCode err
+	initStruct(err)
+
+	variable numPointsSpecAxis, blockOffset, brickletID, numCols, numRaw, numRows, blockBegin
+	string convDataNames
+	brickletID = 21
+
+	MFR_OpenResultFile/K folderCubeSpecial + fileCubeSpecial
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EMPTY_FOLDER()
+
+	// don't scale the converted data to ease comparison
+	// and use artifical data
+	variable/G V_MatrixFileReaderMagic  = 1 + 2
+	variable/G V_MatrixFileReaderFolder = 0
+	variable/G V_MatrixFileReaderDebug  = 1
+
+	MFR_GetBrickletMetaData/R=(brickletID)
+	MFR_GetBrickletRawData/R=(brickletID)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 1)
+	WAVE rawData = $StringFromList(0, S_waveNames)
+
+	MFR_GetBrickletData/R=(brickletID)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK_EQUAL_VAR(ItemsInList(S_waveNames), 4)
+	convDataNames = S_waveNames
+
+	check_unique_values(rawData, convDataNames)
+
+	WAVE wv = $StringFromList(0, convDataNames)
+	numRows           = DimSize(wv, 0)
+	numCols           = DimSize(wv, 1)
+	numPointsSpecAxis = DimSize(wv, 2)
+	numRaw            = DimSize(rawData, 0)
+
+	// traceUP, RampFwd, first spectra
+	WAVE cube = data_00021_Up_RampFwd
+
+	Duplicate/O/R=[0][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	Duplicate/O/R=[0, numPointsSpecAxis - 1] rawData sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 1
+	WaveClear slice, sliceRaw, cube
+
+	// traceUP, RampBwd, first spectra
+	WAVE cube = data_00021_Up_RampBwd
+
+	Duplicate/O/R=[0][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	Duplicate/O/R=[numPointsSpecAxis, 2 * numPointsSpecAxis - 1] rawData sliceRaw
+	WaveTransform/O flip sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 2
+	WaveClear slice, sliceRaw, cube
+
+	// reTraceUP, RampFwd, first spectra
+	WAVE cube = data_00021_ReUp_RampFwd
+
+	Duplicate/O/R=[(numRows - 1)][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	blockBegin = numRows * numPointsSpecAxis * 2
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 3
+	WaveClear slice, sliceRaw, cube
+
+	// reTraceUP, RampBwd, first spectra
+	WAVE cube = data_00021_ReUp_RampBwd
+
+	Duplicate/O/R=[(numRows - 1)][0][*] cube slice
+	Redimension/N=(numPointsSpecAxis) slice
+
+	blockBegin = numRows * numPointsSpecAxis * 2 + numPointsSpecAxis
+	Duplicate/O/R=[blockBegin, blockBegin + numPointsSpecAxis - 1] rawData sliceRaw
+	WaveTransform/O flip sliceRaw
+	REQUIRE_EQUAL_WAVES(slice, sliceRaw, mode=WAVE_DATA) // 4
+	WaveClear slice, sliceRaw, cube
+End
 
 static Function check_cube_Up_Down_RampFwd()
 	Struct errorCode err

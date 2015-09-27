@@ -901,7 +901,7 @@ namespace
     // 4 cubes, TraceUpRampFwd, TraceDownRampFwd, ReTraceUpRampFwd, ReTraceDownRampFwd
     // x2 if spec axis mirrored
     if (numPointsXAxisWithTableFWD != 0 && numPointsXAxisWithTableBWD != 0 &&
-        numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableUp != 0)
+        numPointsYAxisWithTableUp != 0 && numPointsYAxisWithTableDown != 0)
     {
       waves[TRACE_UP_RAMP_FWD].setProperties(waveBaseName, TRACE_UP, suffixRampFwd);
       waves[RE_TRACE_UP_RAMP_FWD].setProperties(waveBaseName, RE_TRACE_UP, suffixRampFwd);

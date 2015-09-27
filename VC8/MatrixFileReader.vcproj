@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="&quot;E:\projekte\spass-projekte\physical-value\libs\boost_1_55_0&quot;;XOP_Toolkit_6/IgorXOPs6/XOPSupport"
+				AdditionalIncludeDirectories="&quot;E:\projekte\physical-value\libs\boost_1_55_0&quot;;XOP_Toolkit_6/IgorXOPs6/XOPSupport"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="false"
 				RuntimeLibrary="2"
@@ -78,7 +78,7 @@
 				AdditionalDependencies="version.lib Igor.lib XOPSupport.lib"
 				OutputFile="$(ConfigurationName)/matrixfilereader.xop"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8;&quot;E:\projekte\spass-projekte\physical-value\libs\boost_1_55_0\stage\lib&quot;"
+				AdditionalLibraryDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8;&quot;E:\projekte\physical-value\libs\boost_1_55_0\stage\lib&quot;"
 				IgnoreDefaultLibraryNames=""
 				DelayLoadDLLs=""
 				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"

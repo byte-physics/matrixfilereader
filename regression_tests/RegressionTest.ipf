@@ -447,17 +447,19 @@ End
 
 Function regressionTest()
 
-	string refDataPath = "e:projekte:matrixfilereader-data:referenceData_0.24"
-	string rawDataPath = "e:projekte:matrixfilereader-data"
-
-	string PATH = "e:newVersion_0.22"
-	DeleteFolder/Z=1 PATH
 	variable ret
+	string refDataPath, rawDataPath, path
+
+	refDataPath = "e:projekte:matrixfilereader-data:referenceData_0.24"
+	rawDataPath = "e:projekte:matrixfilereader-data"
+
+	path  = "e:newVersion_0.22"
+	DeleteFolder/Z=1 path
+
 	ret = createDataSet(PATH, rawDataPath)
 	if(ret == 1)
 		return ret
 	endif
 
-	compareDiscFolders(refDataPath, PATH)
+	compareDiscFolders(refDataPath, path)
 End
-

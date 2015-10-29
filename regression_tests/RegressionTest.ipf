@@ -41,7 +41,8 @@ Function createData(resultFileFull)
 	GetFileFolderInfo/Q/Z/P=savePath
 	if(V_flag != 0)
 		PathInfo savePath
-		print "Destination folder %s does not exist", S_path
+		printf "Destination folder %s does not exist\r", S_path
+		return NaN
 	endif
 
 	SaveData/L=1/D=1/O/T=$folder/P=savePath ":"

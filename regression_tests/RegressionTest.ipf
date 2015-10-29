@@ -51,12 +51,12 @@ Function createData(resultFileFull)
 	variable i
 	for(i = 1; i <= numBricklets; i += 1)
 
-		V_MatrixFileReaderDouble    = 0
+		V_MatrixFileReaderDouble = 0
 		MFR_GetBrickletData/R=(i)/N="dataFP32"
 
-	MFR_GetBrickletData/S=2/R=(i)/N="dataFP32S2"
+		MFR_GetBrickletData/S=2/R=(i)/N="dataFP32S2"
 
-		V_MatrixFileReaderDouble    = 1
+		V_MatrixFileReaderDouble = 1
 		MFR_GetBrickletData/R=(i)/N="dataFP64"
 
 		MFR_GetBrickletMetaData/R=(i)

@@ -415,9 +415,18 @@ Function diff(wvName)
 		endfor
 	else // numeric waves
 
-		// todo check for matching dimensions
 		wave newWave = :newFolder:$wvName
 		wave refWave = :refFolder:$wvName
+
+		Make/N=4/U/I newDimSize = DimSize(newWave, p)
+		Make/N=4/U/I refDimSize = DimSize(refWave, p)
+
+		if(!EqualWaves(newDimSize, refDimSize, 1, 0))
+			print "Non matching dimSizes"
+			print newDimSize
+			print refDimSize
+			return NaN
+		endif
 
 		Make/D/O/N=(DimSize(newWave, 0), DimSize(newWave, 1)) diffWave
 		diffWave = newWave - refWave

@@ -242,6 +242,13 @@ Function compareTwoWaves(refWave, newWave, ignoreTextWaves)
 		if(idx != -1)
 			newWave[idx][1] = refWave[idx][1]
 		endif
+	else
+		// XOP Toolkit 6.40 changed the definition of NaNs
+		// so we change all NaNs (quiet or signalling) to one type
+		Wave wrapper = refWave
+		wrapper = numtype(wrapper[p]) == 2 ? NaN : wrapper[p]
+		Wave wrapper = newWave
+		wrapper = numtype(wrapper[p]) == 2 ? NaN : wrapper[p]
 	endif
 
 	// remove variable parts of the wave's note

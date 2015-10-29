@@ -166,6 +166,7 @@ Function CompareRange(refFolderOnDisc, newFolderOnDisc, refFileList, ignoreTextW
 		GetFileFolderInfo/Q/Z path
 		if(V_flag != 0)
 			print "Could not find the file " + path
+			incrError()
 			abortNow()
 		endif
 		LoadWave/Q/C path
@@ -185,6 +186,7 @@ Function CompareRange(refFolderOnDisc, newFolderOnDisc, refFileList, ignoreTextW
 		GetFileFolderInfo/Q/Z path
 		if(V_flag != 0)
 			print "Could not find the file " + path
+			incrError()
 			abortNow()
 		endif
 		LoadWave/Q/C path

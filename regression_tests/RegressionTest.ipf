@@ -311,7 +311,8 @@ Function createDataSet(targetPath, rawDataPath)
 		return 1
 	endif
 
-	NewPath/O/C/Z savePath, targetPath
+	NewPath/Q/O/C/Z savePath, targetPath
+	REQUIRE(!V_Flag)
 
 	for(i=0; i < ItemsInList(fileList); i+=1)
 		resultFile = StringFromList(i, fileList)

@@ -40,6 +40,6 @@
 
 ### Testing
 
-* The unit and regression test suite requires my [unit testing framework](http://www.igorexchange.com/project/unitTesting).
+* The unit and regression test suite requires my [unit testing framework](https://github.com/t-b/igor-unit-testing-framework).
 * The test suite always finishes without errors.
 * The reference data is available upon request only as it is roughly 5GB.

@@ -38,7 +38,6 @@ void DLLHandler::closeSession()
 /*
 Reads the registry, which tells us where the vernissage libraries are located
 This path will then be added to the DLL search path
-Only one vernissage version can be installed at a time, so we take the one which is referenced in the regsitry
 The length of the arrays is taken from "Registry Element Size Limits"@MSDN
 The registry key looks like "HKEY_LOCAL_MACHINE\SOFTWARE\Omicron NanoTechnology\Vernissage\V1.0\Main"
 */
@@ -47,33 +46,63 @@ std::string DLLHandler::getVernissagePath()
   BOOL result;
   char data[16383];
 
-  DWORD dataLength = (DWORD) sizeof(data) / sizeof(char);
+  const DWORD dataLength = (DWORD) sizeof(data) / sizeof(char);
+  DWORD dataLengthActual;
   HKEY hKey, hregBaseKey;
-  std::string regKey;
-  char subKeyName[255];
-  DWORD subKeyLength = (DWORD) sizeof(subKeyName) / sizeof(WCHAR);
-  int subKeyIndex = 0;
-  std::string regBaseKeyName = "SOFTWARE\\Omicron NanoScience\\Vernissage";
+  std::string regKey, foundRegBaseKey;
+  std::vector<std::string> regBaseKeyNames = boost::assign::list_of("SOFTWARE\\Scienta Omicron\\Vernissage")("SOFTWARE\\Omicron NanoScience\\Vernissage");
 
-  result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regBaseKeyName.c_str(), 0, KEY_READ, &hregBaseKey);
-
-  if (result != ERROR_SUCCESS)
+  for(size_t i = 0; i < regBaseKeyNames.size(); i++)
   {
-    HISTPRINT("Opening a registry key failed. Is Vernissage installed?");
+    result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regBaseKeyNames[i].c_str(), 0, KEY_READ, &hregBaseKey);
+
+    if(result != ERROR_SUCCESS)
+    {
+      DEBUGPRINT("Opening a registry key %s failed (error code %d).", regBaseKeyNames[i].c_str(), result);
+    }
+    else
+    {
+      foundRegBaseKey = regBaseKeyNames[i];
+      DEBUGPRINT("Opening registry key %s suceeded.", foundRegBaseKey.c_str());
+      break;
+    }
+  }
+
+  if(foundRegBaseKey.empty())
+  {
+    HISTPRINT("Could not find a Vernissage installation.");
     return std::string();
   }
 
-  result = RegEnumKeyEx(hregBaseKey, subKeyIndex, subKeyName, &subKeyLength, NULL, NULL, NULL, NULL);
+  dataLengthActual = dataLength;
+  result = RegQueryValueEx(hregBaseKey, "RecentVersion", NULL, NULL, (LPBYTE) data, &dataLengthActual);
 
   if (result != ERROR_SUCCESS)
   {
-    DEBUGPRINT("Opening the registry key %s\\%s failed with error code %d. Please reinstall Vernissage.", regBaseKeyName.c_str(), subKeyName, result);
+    DEBUGPRINT("Reading the registry key %s:%s failed (error code %d).", foundRegBaseKey.c_str(), "RecentVersion", result);
     return std::string();
   }
 
-  regKey  = regBaseKeyName;
+  RegCloseKey(hregBaseKey);
+
+  m_vernissageVersion = std::string(data);
+  std::string majorVersion = m_vernissageVersion.substr(1, 3);
+
+  typedef std::vector<std::string>::const_iterator VecCIt;
+  VecCIt it = std::find(supportedMajorVernissageVersions.begin(), supportedMajorVernissageVersions.end(), majorVersion);
+  if (it == supportedMajorVernissageVersions.end())
+  {
+    HISTPRINT("Vernissage version %s is not supported. Please install one of the supported versions and try again.", m_vernissageVersion.c_str());
+    return std::string();
+  }
+  else
+  {
+    DEBUGPRINT("Vernissage version %s", m_vernissageVersion.c_str());
+  }
+
+  regKey  = foundRegBaseKey;
   regKey += "\\";
-  regKey += subKeyName;
+  regKey += data;
   regKey += "\\Main";
 
   DEBUGPRINT("Checking registry key %s", regKey.c_str());
@@ -82,32 +111,19 @@ std::string DLLHandler::getVernissagePath()
 
   if (result != ERROR_SUCCESS)
   {
-    DEBUGPRINT("Opening the registry key failed strangely (error code %d). Please reinstall Vernissage.", result);
+    DEBUGPRINT("Opening the registry key failed (error code %d). Please reinstall Vernissage.", result);
     return std::string();
   }
 
-  result = RegQueryValueEx(hKey, "InstallDirectory", NULL, NULL, (LPBYTE) data, &dataLength);
+  dataLengthActual = dataLength;
+  result = RegQueryValueEx(hKey, "InstallDirectory", NULL, NULL, (LPBYTE) data, &dataLengthActual);
 
   RegCloseKey(hKey);
-  RegCloseKey(hregBaseKey);
 
   if (result != ERROR_SUCCESS)
   {
-    DEBUGPRINT("Reading the registry key failed very strangely (error code %d). Please reinstall Vernissage.", result);
+    DEBUGPRINT("Reading the registry value %s:%s failed (error code %d). Please reinstall Vernissage.", regKey.c_str(), "InstallDirectory", result);
     return std::string();
-  }
-
-  std::string version = subKeyName;
-  m_vernissageVersion = version.substr(1, version.length() - 1);
-
-  if (m_vernissageVersion.compare(properVernissageVersion) != 0)
-  {
-    HISTPRINT("Vernissage version %s can not be used. Please install version %s and try again.", m_vernissageVersion.c_str(), properVernissageVersion);
-    return std::string();
-  }
-  else
-  {
-    DEBUGPRINT("Vernissage version %s", m_vernissageVersion.c_str());
   }
 
   std::string dllDirectory(data);

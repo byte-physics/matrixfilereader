@@ -32,6 +32,7 @@
 #include <map>
 #include <limits>
 
+#include <boost/assign.hpp>
 #include <boost/smart_ptr.hpp>
 #include <boost/numeric/conversion/cast.hpp>
 

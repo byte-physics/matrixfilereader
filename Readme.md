@@ -2,7 +2,7 @@
 
 ### Requirements
 * Igor Pro 6.2.0 or later (Igor Pro 7 works as well)
-* Scienta Omicron Vernissage 2.2
+* Scienta Omicron Vernissage 2.2 or 2.3.x
 * Windows XP SP2/Vista/7/10
 
 ### Steps

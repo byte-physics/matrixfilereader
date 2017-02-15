@@ -450,8 +450,8 @@ Function regressionTest()
 	variable ret
 	string refDataPath, rawDataPath, path
 
-	refDataPath = "e:projekte:matrixfilereader-data:referenceData_0.24"
-	rawDataPath = "e:projekte:matrixfilereader-data"
+	refDataPath = "h:projekte:matrixfilereader-data:referenceData_0.24"
+	rawDataPath = "h:projekte:matrixfilereader-data"
 
 	path  = "e:newVersion_0.22"
 	DeleteFolder/Z=1 path

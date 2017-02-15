@@ -1,45 +1,50 @@
   Start of test "MatrixFileReader XOP"
   Entering test suite "RegressionTest.ipf"
   Entering test case "regressionTest"
-  path: "e:newVersion_0.22:"
-  0, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-11:20110111-164555_STM_0001.mtrx
+  0, h:projekte:matrixfilereader-data:TestData-Matrix-V2.2:default_2010Oct19-190255_STM-STM_Spectroscopy-VT-STM_0001.mtrx
+  No bricklets in the result file
+  1, h:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-11:20110111-164555_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  1, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-12:20110112-103050_STM_0001.mtrx
+  2, h:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-12:20110112-103050_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  2, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-12:20110112-144308_STM_0001.mtrx
+  3, h:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-12:20110112-144308_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  3, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-14:default_20110114-2011Jan14-165821_STM-STM_AtomManipulation_0001.mtrx
+  4, h:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-01-14:default_20110114-2011Jan14-165821_STM-STM_AtomManipulation_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  4, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-03-01:20110301-162833_STM_0001.mtrx
+  5, h:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:2011-03-01:20110301-162833_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  5, E:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:I_t_data_bug_report:default_20120127-142723_STM_Spectroscopy_0001.mtrx
+  6, h:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:Beispieldaten-SPM-with-repetitions-2011-01-12:2011-01-12:20110112-144308_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  6, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-145132_STM_0001.mtrx
+  7, h:projekte:matrixfilereader-data:TestData-Matrix-V3.0-3.1:I_t_data_bug_report:default_20120127-142723_STM_Spectroscopy_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  7, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-145631_STM_0001.mtrx
+  8, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-145132_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  8, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-150653_STM_0001.mtrx
+  9, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-145631_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  9, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110144_STM-RT_0001.mtrx
+  10, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:20150310-150653_STM_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  10, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110430_STM-RT_0001.mtrx
+  11, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110144_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  11, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110823_STM-RT_0001.mtrx
+  12, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110430_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  12, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111006_STM-RT_0001.mtrx
+  13, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-110823_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  13, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111121_STM-RT_0001.mtrx
+  14, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111006_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  14, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111324_STM-RT_0001.mtrx
+  15, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111121_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  15, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111529_STM-RT_0001.mtrx
+  16, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111324_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  16, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-112049_STM-RT_0001.mtrx
+  17, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-111529_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  17, E:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-112217_STM-RT_0001.mtrx
+  18, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-112049_STM-RT_0001.mtrx
   Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
-  path: "E:projekte:matrixfilereader-data:referenceData_0.24:"
-  path: "e:newVersion_0.22:"
+  19, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-03-10:2015Mar10-112217_STM-RT_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  20, h:projekte:matrixfilereader-data:TestData-Matrix-V3.2:2015-09-16:default_2015Sep16-134954_STM-STM_AtomManipulation_0001.mtrx
+  Saved to "newVersion_0.22" - 1 data folder(s), 2 wave(s), 0 numeric variable(s) and 0 string variable(s)
+  path: "h:projekte:matrixfilereader-data:referenceData_0.24:"
+  path: "E:newVersion_0.22:"
   Leaving test case "regressionTest"
   Finished with no errors
   Leaving test suite "RegressionTest.ipf"
@@ -64,7 +69,7 @@
   DEBUG: V_MatrixFileReaderMagic=0
   DEBUG: startBrickletID=98, endBrickletID=98
   DEBUG: rawMin=52249088,rawMax=81383424,scaledMin=8.0218e-011,scaledMax=1.24948e-010
-  DEBUG: m_rawBufferContents=0B960020,size=640000
+  DEBUG: m_rawBufferContents=123A0020,size=640000
   DEBUG: lastErrorCode 0, argument 
   DEBUG: lastErrorCode 10001, argument 
   DEBUG: V_MatrixFileReaderDebug=0
@@ -83,13 +88,13 @@
   DEBUG: Axis X
   DEBUG: Axis Y
   DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
-  DEBUG: m_rawBufferContents=0B960020,size=640000
+  DEBUG: m_rawBufferContents=123A0020,size=640000
   DEBUG: numPointsRootAxis=400
   DEBUG: numPointsTriggerAxis=400
-  DEBUG: data_00098_Up: waveHandle=0585A1F8, float=00000000, double=0BBE0168, moreData=true, traceDir=0, specialSuffix=
-  DEBUG: data_00098_ReUp: waveHandle=0585A218, float=00000000, double=0D620168, moreData=true, traceDir=1, specialSuffix=
-  DEBUG: data_00098_Down: waveHandle=0585A0F8, float=00000000, double=0D760168, moreData=true, traceDir=2, specialSuffix=
-  DEBUG: data_00098_ReDown: waveHandle=0585A418, float=00000000, double=0D8A0168, moreData=true, traceDir=3, specialSuffix=
+  DEBUG: data_00098_Up: waveHandle=062ABC58, float=00000000, double=040F0168, moreData=true, traceDir=0, specialSuffix=
+  DEBUG: data_00098_ReUp: waveHandle=062ACD78, float=00000000, double=0E490168, moreData=true, traceDir=1, specialSuffix=
+  DEBUG: data_00098_Down: waveHandle=062AD678, float=00000000, double=0EE00168, moreData=true, traceDir=2, specialSuffix=
+  DEBUG: data_00098_ReDown: waveHandle=062AD538, float=00000000, double=12620168, moreData=true, traceDir=3, specialSuffix=
   DEBUG: raw->scaled transformation: xOne=52249088,xTwo=81383424,yOne=8.02179756191439e-011,yTwo=1.249478942529e-010
   DEBUG: raw->scaled transformation: slope=1,yIntercept=0
   DEBUG: lastErrorCode 0, argument 
@@ -115,7 +120,7 @@
   DEBUG: V_MatrixFileReaderMagic=0
   DEBUG: startBrickletID=1, endBrickletID=1
   DEBUG: rawMin=53646,rawMax=67413,scaledMin=0.000249807,scaledMax=0.000313914
-  DEBUG: m_rawBufferContents=1039DA08,size=6250
+  DEBUG: m_rawBufferContents=0EBCD4D0,size=6250
   DEBUG: lastErrorCode 0, argument 
   DEBUG: lastErrorCode 10001, argument 
   DEBUG: V_MatrixFileReaderDebug=0
@@ -135,7 +140,7 @@
   DEBUG: Axis X
   DEBUG: Axis Y
   DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
-  DEBUG: m_rawBufferContents=1039DA08,size=6250
+  DEBUG: m_rawBufferContents=0EBCD4D0,size=6250
   DEBUG: Axis mirroring: X=true, Y=false, Spec=false
   DEBUG: Spec Axis: points 250, clocks 250
   DEBUG: X Axis # points with tableSet: Total=5, Forward=5, Backward=0
@@ -149,11 +154,137 @@
   DEBUG: xAxisOffset=0, yAxisOffset=0
   DEBUG: dimensions of the cube: rows=5,cols=5,layers=250
   DEBUG: xAxisBlockSize=1250, xAxisForwardBlockSize=1250, firstBlockOffset=6250
-  DEBUG: data_00001_Up_RampFwd: waveHandle=0585A0F8, float=00000000, double=06775A28, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00001_Up_RampFwd: waveHandle=062AD858, float=00000000, double=0B5A0150, moreData=true, traceDir=0, specialSuffix=_RampFwd
   DEBUG: raw->scaled transformation: xOne=53646,xTwo=67413,yOne=0.000249806752037253,yTwo=0.000313913853317811
   DEBUG: raw->scaled transformation: slope=1,yIntercept=0
   DEBUG: lastErrorCode 0, argument 
   Leaving test case "check_cube_Up_RampFwd"
+  Entering test case "check_cube_Up_RampFwdBwd"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=26, endBrickletID=26
+  DEBUG: Loaded 883 keys/values as brickletMetaData for bricklet 26
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=26, endBrickletID=26
+  DEBUG: rawMin=-416540,rawMax=-366193,scaledMin=-0.00193965,scaledMax=-0.00170521
+  DEBUG: m_rawBufferContents=0E7D3B90,size=1500
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=26, endBrickletID=26
+  DEBUG: ### BrickletID 26 ###
+  DEBUG: dimension 3
+  DEBUG: viewType vtc_Spectroscopy
+  DEBUG: brickletType btc_VolumeCITS
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis V
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=0E7D3B90,size=1500
+  DEBUG: Axis mirroring: X=false, Y=false, Spec=true
+  DEBUG: Spec Axis: points 30, clocks 60
+  DEBUG: X Axis # points with tableSet: Total=5, Forward=5, Backward=0
+  DEBUG: Y Axis # points with tableSet: Total=5, Up=5, Down=0
+  DEBUG: Number of axes we have table sets for: 2
+  DEBUG: Tablesets: xAxis
+  DEBUG: start=1, step=20, stop=81
+  DEBUG: Tablesets: yAxis
+  DEBUG: start=1, step=20, stop=81
+  DEBUG: xAxisDelta=2.0202e-009, yAxisDelta=2.0202e-009
+  DEBUG: xAxisOffset=0, yAxisOffset=0
+  DEBUG: dimensions of the cube: rows=5,cols=5,layers=30
+  DEBUG: xAxisBlockSize=300, xAxisForwardBlockSize=300, firstBlockOffset=1500
+  DEBUG: data_00026_Up_RampFwd: waveHandle=062AD918, float=00000000, double=0B742DF0, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00026_Up_RampBwd: waveHandle=062ABB58, float=00000000, double=0B7414E8, moreData=true, traceDir=0, specialSuffix=_RampBwd
+  DEBUG: raw->scaled transformation: xOne=-416540,xTwo=-366193,yOne=-0.00193965075669383,yTwo=-0.00170520605355064
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_cube_Up_RampFwdBwd"
+  Entering test case "check_cube_UpReUp_RampFwdBwd"
+  DEBUG: V_MatrixFileReaderDebug=0 (default)
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=21, endBrickletID=21
+  DEBUG: Loaded 887 keys/values as brickletMetaData for bricklet 21
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=21, endBrickletID=21
+  DEBUG: rawMin=-40969216,rawMax=40470698,scaledMin=-6.29e-011,scaledMax=6.21346e-011
+  DEBUG: m_rawBufferContents=0E0828B0,size=3000
+  DEBUG: lastErrorCode 0, argument 
+  DEBUG: lastErrorCode 10001, argument 
+  DEBUG: V_MatrixFileReaderDebug=0
+  DEBUG: Variables in the folder root:tempFolder0::
+  DEBUG: V_MatrixFileReaderOverwrite=0 (default)
+  DEBUG: V_MatrixFileReaderDouble=0 (default)
+  DEBUG: V_MatrixFileReaderFolder=0
+  DEBUG: V_MatrixFileReaderCache=0 (default)
+  DEBUG: V_MatrixFileReaderMagic=0
+  DEBUG: startBrickletID=21, endBrickletID=21
+  DEBUG: ### BrickletID 21 ###
+  DEBUG: dimension 3
+  DEBUG: viewType vtc_Spectroscopy
+  DEBUG: viewType vtc_2Dof3D
+  DEBUG: brickletType btc_VolumeCITS
+  DEBUG: Axis order is from triggerAxis to rootAxis
+  DEBUG: Axis V
+  DEBUG: Axis X
+  DEBUG: Axis Y
+  DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
+  DEBUG: m_rawBufferContents=0E0828B0,size=3000
+  DEBUG: Axis mirroring: X=true, Y=false, Spec=true
+  DEBUG: Spec Axis: points 30, clocks 60
+  DEBUG: X Axis # points with tableSet: Total=10, Forward=5, Backward=5
+  DEBUG: Y Axis # points with tableSet: Total=5, Up=5, Down=0
+  DEBUG: Number of axes we have table sets for: 2
+  DEBUG: Tablesets: xAxis
+  DEBUG: start=1, step=20, stop=81
+  DEBUG: start=120, step=20, stop=200
+  DEBUG: Tablesets: yAxis
+  DEBUG: start=1, step=20, stop=81
+  DEBUG: xAxisDelta=2.0202e-009, yAxisDelta=2.0202e-009
+  DEBUG: xAxisOffset=0, yAxisOffset=0
+  DEBUG: dimensions of the cube: rows=5,cols=5,layers=30
+  DEBUG: xAxisBlockSize=600, xAxisForwardBlockSize=300, firstBlockOffset=3000
+  DEBUG: data_00021_Up_RampFwd: waveHandle=062ABC58, float=00000000, double=0B7414E8, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00021_ReUp_RampFwd: waveHandle=062ABBB8, float=00000000, double=0B742DF0, moreData=true, traceDir=1, specialSuffix=_RampFwd
+  DEBUG: data_00021_Up_RampBwd: waveHandle=062ABAF8, float=00000000, double=0B7446F8, moreData=true, traceDir=0, specialSuffix=_RampBwd
+  DEBUG: data_00021_ReUp_RampBwd: waveHandle=062AD678, float=00000000, double=0B746000, moreData=true, traceDir=1, specialSuffix=_RampBwd
+  DEBUG: raw->scaled transformation: xOne=-40969216,xTwo=40470698,yOne=-6.28999987564078e-011,yTwo=6.21346245403123e-011
+  DEBUG: raw->scaled transformation: slope=1,yIntercept=0
+  DEBUG: lastErrorCode 0, argument 
+  Leaving test case "check_cube_UpReUp_RampFwdBwd"
   Entering test case "check_cube_Up_Down_RampFwd"
   DEBUG: V_MatrixFileReaderDebug=0 (default)
   DEBUG: Variables in the folder root:tempFolder0::
@@ -175,7 +306,7 @@
   DEBUG: V_MatrixFileReaderMagic=0
   DEBUG: startBrickletID=88, endBrickletID=88
   DEBUG: rawMin=16776704,rawMax=75552597,scaledMin=2.57573e-011,scaledMax=1.15996e-010
-  DEBUG: m_rawBufferContents=129BBBF8,size=12800
+  DEBUG: m_rawBufferContents=0E35E948,size=12800
   DEBUG: lastErrorCode 0, argument 
   DEBUG: lastErrorCode 10001, argument 
   DEBUG: V_MatrixFileReaderDebug=0
@@ -196,7 +327,7 @@
   DEBUG: Axis X
   DEBUG: Axis Y
   DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
-  DEBUG: m_rawBufferContents=129BBBF8,size=12800
+  DEBUG: m_rawBufferContents=0E35E948,size=12800
   DEBUG: Axis mirroring: X=true, Y=true, Spec=false
   DEBUG: Spec Axis: points 100, clocks 100
   DEBUG: X Axis # points with tableSet: Total=8, Forward=8, Backward=0
@@ -211,8 +342,8 @@
   DEBUG: xAxisOffset=0, yAxisOffset=0
   DEBUG: dimensions of the cube: rows=8,cols=8,layers=100
   DEBUG: xAxisBlockSize=800, xAxisForwardBlockSize=800, firstBlockOffset=6400
-  DEBUG: data_00088_Up_RampFwd: waveHandle=063379C8, float=00000000, double=0E9FD958, moreData=true, traceDir=0, specialSuffix=_RampFwd
-  DEBUG: data_00088_Down_RampFwd: waveHandle=06337668, float=00000000, double=0E9664D8, moreData=true, traceDir=2, specialSuffix=_RampFwd
+  DEBUG: data_00088_Up_RampFwd: waveHandle=062AD538, float=00000000, double=0B46C548, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00088_Down_RampFwd: waveHandle=062AD6D8, float=00000000, double=0B478E98, moreData=true, traceDir=2, specialSuffix=_RampFwd
   DEBUG: raw->scaled transformation: xOne=16776704,xTwo=75552597,yOne=2.57572578576222e-011,yTwo=1.15995831048936e-010
   DEBUG: raw->scaled transformation: slope=1,yIntercept=0
   DEBUG: lastErrorCode 0, argument 
@@ -238,7 +369,7 @@
   DEBUG: V_MatrixFileReaderMagic=0
   DEBUG: startBrickletID=91, endBrickletID=91
   DEBUG: rawMin=21549568,rawMax=76914346,scaledMin=3.3085e-011,scaledMax=1.18087e-010
-  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: m_rawBufferContents=0E35E948,size=12800
   DEBUG: lastErrorCode 0, argument 
   DEBUG: lastErrorCode 10001, argument 
   DEBUG: V_MatrixFileReaderDebug=0
@@ -258,7 +389,7 @@
   DEBUG: Axis X
   DEBUG: Axis Y
   DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
-  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: m_rawBufferContents=0E35E948,size=12800
   DEBUG: Axis mirroring: X=true, Y=true, Spec=false
   DEBUG: Spec Axis: points 100, clocks 100
   DEBUG: X Axis # points with tableSet: Total=8, Forward=0, Backward=8
@@ -273,8 +404,8 @@
   DEBUG: xAxisOffset=0, yAxisOffset=0
   DEBUG: dimensions of the cube: rows=8,cols=8,layers=100
   DEBUG: xAxisBlockSize=800, xAxisForwardBlockSize=0, firstBlockOffset=6400
-  DEBUG: data_00091_ReUp_RampFwd: waveHandle=066210F8, float=00000000, double=0E9FD950, moreData=true, traceDir=1, specialSuffix=_RampFwd
-  DEBUG: data_00091_ReDown_RampFwd: waveHandle=06621178, float=00000000, double=0E9664D8, moreData=true, traceDir=3, specialSuffix=_RampFwd
+  DEBUG: data_00091_ReUp_RampFwd: waveHandle=062AD838, float=00000000, double=0B5F3150, moreData=true, traceDir=1, specialSuffix=_RampFwd
+  DEBUG: data_00091_ReDown_RampFwd: waveHandle=062ABBB8, float=00000000, double=0B5FFAA0, moreData=true, traceDir=3, specialSuffix=_RampFwd
   DEBUG: raw->scaled transformation: xOne=21549568,xTwo=76914346,yOne=3.30850314636513e-011,yTwo=1.18086523006687e-010
   DEBUG: raw->scaled transformation: slope=1,yIntercept=0
   DEBUG: lastErrorCode 0, argument 
@@ -300,7 +431,7 @@
   DEBUG: V_MatrixFileReaderMagic=0
   DEBUG: startBrickletID=100, endBrickletID=100
   DEBUG: rawMin=23558485,rawMax=60248576,scaledMin=3.61693e-011,scaledMax=9.24996e-011
-  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: m_rawBufferContents=0E35E948,size=12800
   DEBUG: lastErrorCode 0, argument 
   DEBUG: lastErrorCode 10001, argument 
   DEBUG: V_MatrixFileReaderDebug=0
@@ -321,7 +452,7 @@
   DEBUG: Axis X
   DEBUG: Axis Y
   DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
-  DEBUG: m_rawBufferContents=0E138188,size=12800
+  DEBUG: m_rawBufferContents=0E35E948,size=12800
   DEBUG: Axis mirroring: X=true, Y=true, Spec=false
   DEBUG: Spec Axis: points 100, clocks 100
   DEBUG: X Axis # points with tableSet: Total=8, Forward=4, Backward=4
@@ -337,10 +468,10 @@
   DEBUG: xAxisOffset=0, yAxisOffset=0
   DEBUG: dimensions of the cube: rows=4,cols=8,layers=100
   DEBUG: xAxisBlockSize=800, xAxisForwardBlockSize=400, firstBlockOffset=6400
-  DEBUG: data_00100_Up_RampFwd: waveHandle=06337608, float=00000000, double=0EA3E4D8, moreData=true, traceDir=0, specialSuffix=_RampFwd
-  DEBUG: data_00100_ReUp_RampFwd: waveHandle=06337968, float=00000000, double=0677CA38, moreData=true, traceDir=1, specialSuffix=_RampFwd
-  DEBUG: data_00100_Down_RampFwd: waveHandle=06337668, float=00000000, double=0EA0A320, moreData=true, traceDir=2, specialSuffix=_RampFwd
-  DEBUG: data_00100_ReDown_RampFwd: waveHandle=06337768, float=00000000, double=0E9664D8, moreData=true, traceDir=3, specialSuffix=_RampFwd
+  DEBUG: data_00100_Up_RampFwd: waveHandle=062ABC78, float=00000000, double=0B720150, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00100_ReUp_RampFwd: waveHandle=062AD278, float=00000000, double=0B35C540, moreData=true, traceDir=1, specialSuffix=_RampFwd
+  DEBUG: data_00100_Down_RampFwd: waveHandle=062AD198, float=00000000, double=0B2619F0, moreData=true, traceDir=2, specialSuffix=_RampFwd
+  DEBUG: data_00100_ReDown_RampFwd: waveHandle=062ABBD8, float=00000000, double=0B2F1740, moreData=true, traceDir=3, specialSuffix=_RampFwd
   DEBUG: raw->scaled transformation: xOne=23558485,xTwo=60248576,yOne=3.61693198425582e-011,yTwo=9.24995820148313e-011
   DEBUG: raw->scaled transformation: slope=1,yIntercept=0
   DEBUG: lastErrorCode 0, argument 
@@ -366,7 +497,7 @@
   DEBUG: V_MatrixFileReaderMagic=0
   DEBUG: startBrickletID=97, endBrickletID=97
   DEBUG: rawMin=17551189,rawMax=66867200,scaledMin=2.69463e-011,scaledMax=1.02661e-010
-  DEBUG: m_rawBufferContents=12DD3008,size=25600
+  DEBUG: m_rawBufferContents=0E87B9C0,size=25600
   DEBUG: lastErrorCode 0, argument 
   DEBUG: lastErrorCode 10001, argument 
   DEBUG: V_MatrixFileReaderDebug=0
@@ -387,7 +518,7 @@
   DEBUG: Axis X
   DEBUG: Axis Y
   DEBUG: BrickletClass::getBrickletContentsBuffer Using cached values
-  DEBUG: m_rawBufferContents=12DD3008,size=25600
+  DEBUG: m_rawBufferContents=0E87B9C0,size=25600
   DEBUG: Axis mirroring: X=true, Y=true, Spec=true
   DEBUG: Spec Axis: points 100, clocks 200
   DEBUG: X Axis # points with tableSet: Total=8, Forward=4, Backward=4
@@ -403,14 +534,14 @@
   DEBUG: xAxisOffset=0, yAxisOffset=0
   DEBUG: dimensions of the cube: rows=4,cols=8,layers=100
   DEBUG: xAxisBlockSize=1600, xAxisForwardBlockSize=800, firstBlockOffset=12800
-  DEBUG: data_00097_Up_RampFwd: waveHandle=0585A0F8, float=00000000, double=0E9664D8, moreData=true, traceDir=0, specialSuffix=_RampFwd
-  DEBUG: data_00097_ReUp_RampFwd: waveHandle=0585A298, float=00000000, double=0EA3E4D8, moreData=true, traceDir=1, specialSuffix=_RampFwd
-  DEBUG: data_00097_Down_RampFwd: waveHandle=0585A8F8, float=00000000, double=0EA0F628, moreData=true, traceDir=2, specialSuffix=_RampFwd
-  DEBUG: data_00097_ReDown_RampFwd: waveHandle=0585A1F8, float=00000000, double=0677EA38, moreData=true, traceDir=3, specialSuffix=_RampFwd
-  DEBUG: data_00097_Up_RampBwd: waveHandle=0585A898, float=00000000, double=0E975A38, moreData=true, traceDir=0, specialSuffix=_RampBwd
-  DEBUG: data_00097_ReUp_RampBwd: waveHandle=0585ABD8, float=00000000, double=0E97BF88, moreData=true, traceDir=1, specialSuffix=_RampBwd
-  DEBUG: data_00097_Down_RampBwd: waveHandle=0585A418, float=00000000, double=0E9824D8, moreData=true, traceDir=2, specialSuffix=_RampBwd
-  DEBUG: data_00097_ReDown_RampBwd: waveHandle=0585A9B8, float=00000000, double=0E988A28, moreData=true, traceDir=3, specialSuffix=_RampBwd
+  DEBUG: data_00097_Up_RampFwd: waveHandle=062AD838, float=00000000, double=0B2619F0, moreData=true, traceDir=0, specialSuffix=_RampFwd
+  DEBUG: data_00097_ReUp_RampFwd: waveHandle=062AD8B8, float=00000000, double=0B720150, moreData=true, traceDir=1, specialSuffix=_RampFwd
+  DEBUG: data_00097_Down_RampFwd: waveHandle=062AD6D8, float=00000000, double=0B35C540, moreData=true, traceDir=2, specialSuffix=_RampFwd
+  DEBUG: data_00097_ReDown_RampFwd: waveHandle=062ABB38, float=00000000, double=0B60C2A0, moreData=true, traceDir=3, specialSuffix=_RampFwd
+  DEBUG: data_00097_Up_RampBwd: waveHandle=062ABAF8, float=00000000, double=0B485568, moreData=true, traceDir=0, specialSuffix=_RampBwd
+  DEBUG: data_00097_ReUp_RampBwd: waveHandle=062AD4F8, float=00000000, double=0B2F1740, moreData=true, traceDir=1, specialSuffix=_RampBwd
+  DEBUG: data_00097_Down_RampBwd: waveHandle=062AC7D8, float=00000000, double=0B309578, moreData=true, traceDir=2, specialSuffix=_RampBwd
+  DEBUG: data_00097_ReDown_RampBwd: waveHandle=062AD478, float=00000000, double=0B5A0150, moreData=true, traceDir=3, specialSuffix=_RampBwd
   DEBUG: raw->scaled transformation: xOne=17551189,xTwo=66867200,yOne=2.69463239490225e-011,yTwo=1.02661149211263e-010
   DEBUG: raw->scaled transformation: slope=1,yIntercept=0
   DEBUG: lastErrorCode 0, argument 
@@ -453,6 +584,8 @@
   Leaving test case "complains_empty_keys"
   Entering test case "complains_not_with_invalid_keys"
   Leaving test case "complains_not_with_invalid_keys"
+  Entering test case "complains_not_with_toolong_key"
+  Leaving test case "complains_not_with_toolong_key"
   Entering test case "creates_one_wave"
   Leaving test case "creates_one_wave"
   Entering test case "creates_one_wave_df_name"
@@ -609,14 +742,14 @@
   Entering test case "returns_non_empty_string"
   ####
 Windows version: 6.1 (Build 7601)
-Free Memory: 23 GiB
+Free Memory: 26 GiB
 Total Memory: 31 GiB
 Used Memory by this XOP: 0 MiB
 Visual Studio version: 1400
-Igor Pro Version: 637
-Vernissage version: 2.2
-XOP version: 0.24 (Build 19bca9d)
-Compilation date and time: Jul 22 2015 15:21:38
+Igor Pro Version: 638
+Vernissage version: V2.3.3
+XOP version: 0.24 (Build b756252)
+Compilation date and time: Feb 15 2017 17:23:00
 
 Your Name:
 Bug description:

@@ -9,7 +9,7 @@
   version string of the XOP
   returned by the GetMtrxFileReaderVersion operation and also used for the resource file
 */
-#define MatrixFileReader_XOP_VERSION 0,2,4,0
+#define MatrixFileReader_XOP_VERSION 0,2,5,1
 
 // must be convertible to a double
-#define MatrixFileReader_XOP_VERSION_STR "0.24\0"
+#define MatrixFileReader_XOP_VERSION_STR "0.251\0"

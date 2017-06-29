@@ -91,6 +91,15 @@ CBString toCBString(const T& t)
 /*
   Specialization
 */
+template <>
+inline CBString toCBString<const char *>(const char* const& s)
+{
+  return CBString(s);
+}
+
+/*
+  Specialization
+*/
 template<>
 inline CBString toCBString<std::wstring>(const std::wstring& s)
 {

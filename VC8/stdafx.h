@@ -51,6 +51,4 @@
 #include "errorcodes.hpp"
 #include "version.hpp"
 
-#include "xop_const_wrappers.hpp"
-
 #include "VernissageSDK_V2.2/src/Incl/Vernissage.h"

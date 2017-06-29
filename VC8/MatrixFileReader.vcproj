@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="&quot;E:\projekte\physical-value\libs\boost_1_55_0&quot;;XOP_Toolkit_6/IgorXOPs6/XOPSupport"
+				AdditionalIncludeDirectories="&quot;boost_1_55_0&quot;;XOPSupport"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="false"
 				RuntimeLibrary="2"
@@ -68,7 +68,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				Culture="1033"
-				AdditionalIncludeDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport/"
+				AdditionalIncludeDirectories="XOPSupport/"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -78,7 +78,7 @@
 				AdditionalDependencies="version.lib Igor.lib XOPSupport.lib"
 				OutputFile="$(ConfigurationName)/matrixfilereader.xop"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="XOP_Toolkit_6/IgorXOPs6/XOPSupport;XOP_Toolkit_6/IgorXOPs6/XOPSupport/VC8;&quot;E:\projekte\physical-value\libs\boost_1_55_0\stage\lib&quot;"
+				AdditionalLibraryDirectories="XOPSupport\build\Release;XOPSupport;boost_1_55_0\stage\lib"
 				IgnoreDefaultLibraryNames=""
 				DelayLoadDLLs=""
 				ProgramDatabaseFile=".\Release/matrixFileReader.pdb"
@@ -350,18 +350,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\xop_const_wrappers.cpp"
-				>
-				<FileConfiguration
-					Name="Release (static build)|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -429,10 +417,6 @@
 			</File>
 			<File
 				RelativePath=".\wave.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\xop_const_wrappers.hpp"
 				>
 			</File>
 		</Filter>

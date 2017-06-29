@@ -37,7 +37,7 @@ extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
     return 0;
   }
 
-  ret = SetOperationStrVar(S_fileName, unicodeToAnsi(GlobalData::Instance().getFileName()).c_str());
+  ret = SetOperationStrVar(S_fileName, convertEncoding(GlobalData::Instance().getFileName()).c_str());
 
   if (ret != 0)
   {
@@ -45,7 +45,7 @@ extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
     return 0;
   }
 
-  ret = SetOperationStrVar(S_dirPath, unicodeToAnsi(GlobalData::Instance().getDirPath()).c_str());
+  ret = SetOperationStrVar(S_dirPath, convertEncoding(GlobalData::Instance().getDirPath()).c_str());
 
   if (ret != 0)
   {

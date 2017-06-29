@@ -3,6 +3,7 @@
 */
 #pragma once
 #include <boost/smart_ptr.hpp>
+#include <boost/function/function_fwd.hpp>
 
 class GlobalData;
 class ExtremaData;

@@ -267,12 +267,6 @@ Function compareTwoWaves(refWave, newWave, ignoreTextWaves)
 	Note/K refWave, refWaveNote
 	Note/K newWave, newWaveNote
 
-#if (IgorVersion() >= 7.0)
-	if(!WaveType(newWave))
-		SetWaveTextEncoding 3, 16, newWave
-	endif
-#endif
-
 	NVAR error = root:Packages:UnitTesting:error_count
 	variable oldError = error
 

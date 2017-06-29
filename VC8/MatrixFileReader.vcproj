@@ -259,6 +259,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\encoding_conversion.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\globaldata.cpp"
 				>
 				<FileConfiguration
@@ -369,6 +373,10 @@
 			</File>
 			<File
 				RelativePath=".\dllhandler.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\encoding_conversion.hpp"
 				>
 			</File>
 			<File

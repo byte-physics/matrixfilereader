@@ -24,7 +24,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
 
   if (GlobalData::Instance().resultFileOpen())
   {
-    GlobalData::Instance().setError(ALREADY_FILE_OPEN, unicodeToAnsi(GlobalData::Instance().getFileName()));
+    GlobalData::Instance().setError(ALREADY_FILE_OPEN, convertEncoding(GlobalData::Instance().getFileName()));
     return 0;
   }
 
@@ -130,8 +130,8 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
 
   // now we convert to wide strings
-  const std::wstring  dirPathWString = ansiToUnicode(dirPath);
-  const std::wstring  fileNameWString = ansiToUnicode(fileName);
+  const std::wstring  dirPathWString = convertEncoding(dirPath);
+  const std::wstring  fileNameWString = convertEncoding(fileName);
 
   // true -> result set will be added to the database
   // false -> replaces the current results sets in the internal databse

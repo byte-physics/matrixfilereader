@@ -53,6 +53,8 @@ Function TEST_CASE_BEGIN_OVERRIDE(testCase)
 	TEST_CASE_BEGIN(testCase)
 
 	MFR_CloseResultFile
+
+	KillPath/A/Z
 End
 
 Function TEST_CASE_END_OVERRIDE(testCase)

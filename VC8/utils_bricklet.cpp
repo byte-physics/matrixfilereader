@@ -51,8 +51,8 @@ namespace {
   {
     sstr.precision(DBL_DIG);
 
-    sstr << RESULT_FILE_NAME_KEY << '=' << unicodeToAnsi(GlobalData::Instance().getFileName()) << CR_CHAR;
-    sstr << RESULT_DIR_PATH_KEY  << '=' << unicodeToAnsi(GlobalData::Instance().getDirPath())  << CR_CHAR;
+    sstr << RESULT_FILE_NAME_KEY << '=' << convertEncoding(GlobalData::Instance().getFileName()) << CR_CHAR;
+    sstr << RESULT_DIR_PATH_KEY  << '=' << convertEncoding(GlobalData::Instance().getDirPath())  << CR_CHAR;
 
     if (isValidBrickletID(brickletID))
     {

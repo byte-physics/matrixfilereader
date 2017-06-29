@@ -37,6 +37,11 @@
 * Always compile the "Release" version. The "Debug" version can not be used with the Vernissage DLLs.
 * If you want to add new operations have a look at Operation-Template-Generator.pxp which uses `ParseOperationTemplate`.
 * Each header file contains a small abstract about its purpose.
+* Boost can be compiled from a Visual Studio command prompt with
+  `b2 -j6 toolset=msvc-8.0 variant=release threading=multi link=static runtime-link=shared stage`
+* XOP Toolkit 7.01 needs to be patched to compile with Visual Studio 2005.
+  Compilation itself can be done via `cmake -G "Visual Studio 8 2005` and
+  `cmake --build . --config release`.
 
 ### Testing
 

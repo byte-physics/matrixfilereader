@@ -8,16 +8,6 @@
 #include "utils_generic.hpp"
 #include "globaldata.hpp"
 
-std::wstring ansiToUnicode(const std::string& s)
-{
-  return GlobalData::Instance().getVernissageSession()->ansiToUnicode(s);
-}
-
-std::string unicodeToAnsi(const std::wstring& s)
-{
-  return GlobalData::Instance().getVernissageSession()->unicodeToAnsi(s);
-}
-
 /*
   Convenience wrapper
 */

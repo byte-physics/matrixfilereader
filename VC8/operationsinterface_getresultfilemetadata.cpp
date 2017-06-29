@@ -85,8 +85,8 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   }
 
   StringPairVector data;
-  AddEntry(data,RESULT_DIR_PATH_KEY,unicodeToAnsi(GlobalData::Instance().getDirPath()));
-  AddEntry(data,RESULT_FILE_NAME_KEY,unicodeToAnsi(GlobalData::Instance().getFileName()));
+  AddEntry(data,RESULT_DIR_PATH_KEY,convertEncoding(GlobalData::Instance().getDirPath()));
+  AddEntry(data,RESULT_FILE_NAME_KEY,convertEncoding(GlobalData::Instance().getFileName()));
   AddEntry(data,"totalNumberOfBricklets",toString(numberOfBricklets));
 
   if (numberOfBricklets > 0)

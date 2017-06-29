@@ -164,7 +164,7 @@ void Wave::setWaveUnits(int dimension, const std::string& units)
 
 void Wave::setWaveUnits(int dimension, const std::wstring& units)
 {
-  setWaveUnits(dimension, unicodeToAnsi(units));
+  setWaveUnits(dimension, convertEncoding(units));
 }
 
 const ExtremaData& Wave::getExtrema() const

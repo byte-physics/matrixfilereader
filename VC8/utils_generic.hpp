@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "encoding_conversion.hpp"
 
 #define THROW_IF_NULL(A) {if(A == NULL){ throw std::runtime_error("THROW_IF_NULL: Pointer " #A " is NULL.\r"); } }
 #define MYASSERT(A,B) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL.\r"); return B; } }
@@ -31,8 +32,15 @@
 //#define DEBUGCODE \
 //  HISTPRINT("line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);\
 
-std::wstring ansiToUnicode(const std::string& s);
-std::string unicodeToAnsi(const std::wstring& s);
+inline std::string convertEncoding(const std::wstring &str)
+{
+  return EncodingConversion::Instance().convertEncoding(str);
+}
+
+inline std::wstring convertEncoding(const std::string &str)
+{
+  return EncodingConversion::Instance().convertEncoding(str);
+}
 
 template <class T>
 T stringToAnyType(std::string str)
@@ -61,7 +69,7 @@ std::string toString(const T& t)
 template<>
 inline std::string toString<std::wstring>(const std::wstring& s)
 {
-  return unicodeToAnsi(s);
+  return convertEncoding(s);
 }
 
 /*
@@ -91,10 +99,19 @@ CBString toCBString(const T& t)
 /*
   Specialization
 */
+template <>
+inline CBString toCBString<const char *>(const char* const& s)
+{
+  return CBString(s);
+}
+
+/*
+  Specialization
+*/
 template<>
 inline CBString toCBString<std::wstring>(const std::wstring& s)
 {
-  return unicodeToAnsi(s).c_str();
+  return convertEncoding(s).c_str();
 }
 
 /*

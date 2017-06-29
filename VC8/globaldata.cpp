@@ -69,6 +69,8 @@ GlobalData::GlobalData()
   m_datacache(cache_default),
   m_errorToHistory(false)
 {
+  // initialize encoding conversion class
+  EncodingConversion::Instance();
   m_bricklets.reserve(RESERVE_SIZE);
 }
 

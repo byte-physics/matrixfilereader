@@ -22,7 +22,7 @@
 * Visual Studio 2005 Professional, the Express Version does not work.
 * Windows XP SP2/Vista/7/10
 * Vernissage and the corresponding SDK
-* XOP Toolkit 6.40
+* XOP Toolkit 7.01
 * Boost 1.55
 * Igor Pro
 

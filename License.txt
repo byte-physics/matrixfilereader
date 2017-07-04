@@ -1,4 +1,4 @@
-    Copyright (C) 2009-2014, Thomas Braun, thomas <dot> braun <aeht> byte <minus> physics <dot> de
+    Copyright (C) 2009-2017, Thomas Braun, thomas <dot> braun <aeht> byte <minus> physics <dot> de
      
     This work was partly done during the work at EMPA Thun, section 127 (nanotech@surfaces, http://www.empa.ch/plugin/template/empa/848/*/---/l=1), Switzerland.
 

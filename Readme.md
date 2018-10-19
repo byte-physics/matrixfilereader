@@ -45,6 +45,6 @@
 
 ### Testing
 
-* The unit and regression test suite requires the [unit testing framework](https://github.com/t-b/igor-unit-testing-framework).
+* The unit and regression test suite requires our [unit testing framework](https://github.com/byte-physics/igor-unit-testing-framework).
 * The test suite always finishes without errors.
 * The reference data is available upon request only as it is roughly 5GB.

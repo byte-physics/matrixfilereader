@@ -209,26 +209,48 @@ bool dataFolderExists(DataFolderHandle df)
     return false;
   }
 
-  int dfrefID;
-  int ret;
-
-  ret = GetDataFolderIDNumber(df, &dfrefID);
-  if(ret != 0)
+  DataFolderHandle root;
+  int ret = GetRootDataFolder(0, &root);
+  if (ret != 0)
   {
-    GlobalData::Instance().setInternalError(ret);
-    return false;
+	  GlobalData::Instance().setInternalError(ret);
+	  return false;
   }
 
-  DataFolderHandle newDFHandle;
-  ret = GetDataFolderByIDNumber(dfrefID,&newDFHandle);
-  if(ret == CANT_FIND_FOLDER || newDFHandle == NULL)
+  if (root == df)
   {
-    return false;
+	  return true;
   }
-  else if(ret != 0)
+
+  DataFolderHandle parent;
+  ret = GetParentDataFolder(df, &parent);
+
+  if (ret == NO_PARENT_DATAFOLDER)
   {
-    GlobalData::Instance().setInternalError(ret);
-    return false;
+	  // free data folder
+	  return true;
+  }
+  else if (ret != 0)
+  {
+	  return false;
+  }
+
+  // permanent existing or dangling
+
+  char dataFolderPathOrName[MAXCMDLEN + 1];
+  ret = GetDataFolderNameOrPath(df, 0x1, dataFolderPathOrName);
+  if (ret != 0)
+  {
+	  GlobalData::Instance().setInternalError(ret);
+	  return false;
+  }
+
+  std::string folder(dataFolderPathOrName);
+
+  // datafolder handle refers to non existing datafolder
+  if (folder.find(":_killed folder_:") != std::string::npos)
+  {
+	  return false;
   }
 
   return true;

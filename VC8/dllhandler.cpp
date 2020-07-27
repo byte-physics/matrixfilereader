@@ -50,7 +50,7 @@ std::string DLLHandler::getVernissagePath()
   DWORD dataLengthActual;
   HKEY hKey, hregBaseKey;
   std::string regKey, foundRegBaseKey;
-  std::vector<std::string> regBaseKeyNames = boost::assign::list_of("SOFTWARE\\Scienta Omicron\\Vernissage")("SOFTWARE\\Omicron NanoScience\\Vernissage");
+  std::vector<std::string> regBaseKeyNames = boost::assign::list_of("SOFTWARE\\Scienta Omicron\\Vernissage");
 
   for(size_t i = 0; i < regBaseKeyNames.size(); i++)
   {

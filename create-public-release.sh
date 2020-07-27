@@ -3,7 +3,7 @@
 set -e
 
 lastVersion=0.25.1
-newVersion=0.25.2
+newVersion=0.26.0
 
 filesToWatch="VC8 *.txt regression_tests *.pxp *.ihf"
 
@@ -41,7 +41,8 @@ cp -r VC8/bstrlib $srcFolder
 cp Operation-Template-Generator.pxp $srcFolder
 
 cp VC8/Release/matrixfilereader.xop $folder
-cp VC8/VC2005_Redist_package_x86/vcredist_x86.exe $folder
+cp VC8/Release-x64/matrixfilereader-64.xop $folder
+cp VC8/VC2013_Redist_package/*.exe $folder
 
 cd public-releases &&  zip -q -r $baseName.zip $baseName/* && cd ..
 

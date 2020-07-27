@@ -70,6 +70,26 @@ std::string DLLHandler::getVernissagePath()
 
   if(foundRegBaseKey.empty())
   {
+	  // check if the wrong bitness of vernissage is installed
+	  for (size_t i = 0; i < regBaseKeyNames.size(); i++)
+	  {
+#ifdef WINIGOR32
+		  const int expectedBitness = 32;
+		  const REGSAM samDesired = KEY_READ | KEY_WOW64_64KEY;
+#else
+		  const int expectedBitness = 64;
+		  const REGSAM samDesired = KEY_READ | KEY_WOW64_32KEY;
+#endif
+		  result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regBaseKeyNames[i].c_str(), 0, samDesired, &hregBaseKey);
+
+		  if (result == ERROR_SUCCESS)
+		  {
+			  RegCloseKey(hregBaseKey);
+			  HISTPRINT("Please install the %d-bit version of Vernissage for this XOP.", expectedBitness);
+			  return std::string();
+		  }
+	  }
+
     HISTPRINT("Could not find a Vernissage installation.");
     return std::string();
   }

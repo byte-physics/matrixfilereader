@@ -121,7 +121,7 @@ const char cache_option[]      = "V_MatrixFileReaderCache";
 const char magic_option[]      = "V_MatrixFileReaderMagic";
 
 // Supported major vernissage versions
-const std::vector<std::string> supportedMajorVernissageVersions = boost::assign::list_of("2.2")("2.3");
+const std::vector<std::string> supportedMajorVernissageVersions = boost::assign::list_of("2.4");
 
 // default keys for MFR_CreateOverViewTable
 const char keyList_default[] = "brickletID;scanCycleCount;runCycleCount;sequenceID;dimension;channelName";

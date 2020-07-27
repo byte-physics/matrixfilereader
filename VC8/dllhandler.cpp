@@ -85,8 +85,9 @@ std::string DLLHandler::getVernissagePath()
 
   RegCloseKey(hregBaseKey);
 
-  m_vernissageVersion = std::string(data);
-  std::string majorVersion = m_vernissageVersion.substr(1, 3);
+  // RecentVersion is "V2.4.1"
+  m_vernissageVersion = std::string(data).substr(1);
+  std::string majorVersion = m_vernissageVersion.substr(0, 3);
 
   typedef std::vector<std::string>::const_iterator VecCIt;
   VecCIt it = std::find(supportedMajorVernissageVersions.begin(), supportedMajorVernissageVersions.end(), majorVersion);

@@ -175,11 +175,16 @@ Function CompareRange(refFolderOnDisc, newFolderOnDisc, refFileList, ignoreTextW
 		SetDataFolder cdf
 		NewDataFolder/S/O newFolder
 
-	// Names of SPS curves have changed in c50506 and again in
-	// c6b95086 (Change SPS suffix for ramp reversal data to RampFwd/RampBwd, 2015-07-17)
-	GetFileFolderInfo/Q/Z newFolderOnDisc + fileName
-	if(V_flag != 0)
-		fileName = ReplaceString(".ibw", filename, "_RampFwd.ibw")
+		// replace short directory names with long ones
+		filename = ReplaceString("default_20110114-2011Jan14-1658", filename, "default_20110114-2011Jan14-165821_STM-STM_AtomManipulation_0001")
+		filename = ReplaceString("default_20120127-142723_STM_Spe", filename, "default_20120127-142723_STM_Spectroscopy_0001")
+		filename = ReplaceString("default_2015Sep16-134954_STM-ST", filename, "default_2015Sep16-134954_STM-STM_AtomManipulation_0001")
+
+		// Names of SPS curves have changed in c50506 and again in
+		// c6b95086 (Change SPS suffix for ramp reversal data to RampFwd/RampBwd, 2015-07-17)
+		GetFileFolderInfo/Q/Z newFolderOnDisc + fileName
+		if(V_flag != 0)
+			fileName = ReplaceString(".ibw", filename, "_RampFwd.ibw")
 		endif
 
 		path = newFolderOnDisc + fileName

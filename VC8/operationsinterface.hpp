@@ -12,7 +12,7 @@
 */
 
 /* custom error codes */
-#define REQUIRES_IGOR_620  FIRST_XOP_ERR + 1
+#define REQUIRES_IGOR_800  FIRST_XOP_ERR + 1
 #define BROKEN_XOP         FIRST_XOP_ERR + 2
 
 /* Prototypes */

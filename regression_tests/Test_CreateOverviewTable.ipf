@@ -41,7 +41,7 @@ static Function complains_wavename_toolong()
 	MFR_OpenResultFile/K folder + file
 	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
 
-	MFR_CreateOverviewTable/N="abcdefghijklmnopqrstuvwxyzabcdefghij"
+	MFR_CreateOverviewTable/N=PadString("", 256, 0x61)
 	CHECK_EQUAL_VAR(err.WRONG_PARAMETER, V_flag)
 	CHECK_EMPTY_STR(S_waveNames)
 	CHECK_EMPTY_FOLDER()

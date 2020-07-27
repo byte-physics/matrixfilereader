@@ -249,9 +249,9 @@ HOST_IMPORT int XOPMain(IORecHandle ioRecHandle)
   SetXOPEntry(XOPEntry);              /* set entry point for future calls */
   int errorCode;
 
-  if (igorVersion < 620)
+  if (igorVersion < 800)
   {
-    SetXOPResult(REQUIRES_IGOR_620);
+    SetXOPResult(REQUIRES_IGOR_800);
     return EXIT_FAILURE;
   }
 

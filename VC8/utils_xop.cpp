@@ -19,16 +19,16 @@ int stringVectorToTextWave(const std::vector<std::string> &stringVector, waveHnd
   ASSERT_RETURN_ONE(stringVector.size());
   ASSERT_RETURN_ONE(waveHandle);
 
-  std::vector<long int> stringSizes;
+  std::vector<size_t> stringSizes;
 
   int ret;
   unsigned int i;
 
-  long int offset;
-  long int totalSize = 0;
+  size_t offset;
+  size_t totalSize = 0;
 
-  // number of 32-bit integers (aka long int) is one more compared to the number of strings
-  const unsigned long int numEntriesPlusOne = stringVector.size() + 1;
+  // number of integers is one more compared to the number of strings
+  const size_t numEntriesPlusOne = stringVector.size() + 1;
 
   std::vector<std::string>::const_iterator it;
 
@@ -46,7 +46,7 @@ int stringVectorToTextWave(const std::vector<std::string> &stringVector, waveHnd
     totalSize += it->size();
   }
 
-  totalSize += numEntriesPlusOne * sizeof(long);
+  totalSize += numEntriesPlusOne * sizeof(size_t);
 
   Handle textHandle = NewHandle(totalSize);
 
@@ -62,7 +62,7 @@ int stringVectorToTextWave(const std::vector<std::string> &stringVector, waveHnd
 
     if(i == 0) // position of the first string
     {
-      offset = numEntriesPlusOne * sizeof(long);
+      offset = numEntriesPlusOne * sizeof(size_t);
     }
     else // and of all the others
     {
@@ -72,7 +72,7 @@ int stringVectorToTextWave(const std::vector<std::string> &stringVector, waveHnd
     // DEBUGPRINT("offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
     //
     // write offsets
-    memcpy(*textHandle + i * sizeof(long), &offset, sizeof(long));
+    memcpy(*textHandle + i * sizeof(size_t), &offset, sizeof(size_t));
 
     if(i < stringVector.size())
     {

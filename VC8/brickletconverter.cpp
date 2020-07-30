@@ -374,7 +374,7 @@ int createWaves2D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolder
 
   dimensionSizes[ROWS]    = numPointsTriggerAxis;
   dimensionSizes[COLUMNS] = numPointsRootAxis;
-  const int waveSize      = dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
+  const CountInt waveSize = dimensionSizes[ROWS] * dimensionSizes[COLUMNS];
 
   WaveVec waves(MAX_NUM_WAVES);
   Wave &traceUpData     = waves[TRACE_UP];
@@ -880,7 +880,7 @@ int createWaves3D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolder
   dimensionSizes[COLUMNS] = numPointsYAxisWithTableUp;
   dimensionSizes[LAYERS]  = numPointsVAxis;
 
-  const int waveSize = dimensionSizes[ROWS] * dimensionSizes[COLUMNS] * dimensionSizes[LAYERS];
+  const CountInt waveSize = dimensionSizes[ROWS] * dimensionSizes[COLUMNS] * dimensionSizes[LAYERS];
 
   DEBUGPRINT("dimensions of the cube: rows=%d,cols=%d,layers=%d", dimensionSizes[ROWS], dimensionSizes[COLUMNS],
              dimensionSizes[LAYERS]);
@@ -1002,18 +1002,18 @@ int createWaves3D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolder
   const double slope        = transData.first;
   const double yIntercept   = transData.second;
 
-  int rawIndex, dataIndex;
+  CountInt rawIndex, dataIndex;
   int rawValue;
   double scaledValue;
 
   // COLUMNS
-  for(int i = 0; i < dimensionSizes[COLUMNS]; i++)
+  for(CountInt i = 0; i < dimensionSizes[COLUMNS]; i++)
   {
     // ROWS
-    for(int j = 0; j < dimensionSizes[ROWS]; j++)
+    for(CountInt j = 0; j < dimensionSizes[ROWS]; j++)
     {
       // LAYERS
-      for(int k = 0; k < dimensionSizes[LAYERS]; k++)
+      for(CountInt k = 0; k < dimensionSizes[LAYERS]; k++)
       {
         // traceUp, RampFwd
         if(traceUpDataRampFwd.moreData)

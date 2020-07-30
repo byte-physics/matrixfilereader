@@ -35,8 +35,8 @@ void splitString(const std::string &string, const char *sepChar, std::vector<std
 
   list.clear();
   std::string stringCopy = string;
-  int pos                = -1;
-  int offset             = 0;
+  size_t pos             = std::string::npos;
+  size_t offset          = 0;
 
   stringCopy.append(sepChar); // add ; at the end to make the list complete, double ;; are no problem
   DEBUGPRINT("keyList=%s", stringCopy.c_str());

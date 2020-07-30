@@ -294,13 +294,13 @@ void Bricklet::loadMetaData()
   const Vernissage::Session::SpatialInfo spatialInfo = session->getSpatialInfo(m_brickletPtr);
   for(std::vector<double>::const_iterator it = spatialInfo.physicalX.begin(); it != spatialInfo.physicalX.end(); it++)
   {
-    const int index       = it - spatialInfo.physicalX.begin() + 1; // 1-based index
+    const size_t index    = it - spatialInfo.physicalX.begin() + 1; // 1-based index
     const std::string key = "spatialInfo.physicalX.No" + toString(index);
     AddEntry(m_metaData, key, *it);
   }
   for(std::vector<double>::const_iterator it = spatialInfo.physicalY.begin(); it != spatialInfo.physicalY.end(); it++)
   {
-    const int index       = it - spatialInfo.physicalY.begin() + 1; // 1-based index
+    const size_t index    = it - spatialInfo.physicalY.begin() + 1; // 1-based index
     const std::string key = "spatialInfo.physicalY.No" + toString(index);
     AddEntry(m_metaData, key, *it);
   }

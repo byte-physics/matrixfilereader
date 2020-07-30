@@ -32,12 +32,38 @@ public:
   int getTraceDir() const;
   bool isEmpty() const;
   const ExtremaData &getExtrema() const;
-  ;
   int GetPixelSize() const;
   void SetPixelSize(int pixelSize);
   std::string getSuffix() const;
 
-  void fillWave(int index, int rawValue, double scaledValue);
+  /*
+  Writes the data into the wave
+  It will _not_ be checked if index is out-of-range
+  Here we also determine the extrema values
+  */
+  void fillWave(CountInt index, int rawValue, double scaledValue)
+  {
+    if(m_floatPtr)
+    {
+      m_floatPtr[index] = static_cast<float>(scaledValue);
+    }
+    else if(m_doublePtr)
+    {
+      m_doublePtr[index] = scaledValue;
+    }
+
+    // check if it is a new minimum
+    if(rawValue < m_extrema.getRawMin())
+    {
+      m_extrema.setMinimum(rawValue, scaledValue);
+    }
+
+    // check if it is a new maximum
+    if(rawValue > m_extrema.getRawMax())
+    {
+      m_extrema.setMaximum(rawValue, scaledValue);
+    }
+  }
 
 public:
   bool moreData;
@@ -53,32 +79,3 @@ private:
   int m_pixelSize;
   std::string m_suffix;
 };
-
-/*
-  Writes the data into the wave
-  It will _not_ be checked if index is out-of-range
-  Here we also determine the extrema values
-*/
-inline void Wave::fillWave(int index, int rawValue, double scaledValue)
-{
-  if(m_floatPtr)
-  {
-    m_floatPtr[index] = static_cast<float>(scaledValue);
-  }
-  else if(m_doublePtr)
-  {
-    m_doublePtr[index] = scaledValue;
-  }
-
-  // check if it is a new minimium
-  if(rawValue < m_extrema.getRawMin())
-  {
-    m_extrema.setMinimum(rawValue, scaledValue);
-  }
-
-  // check if it is a new maximum
-  if(rawValue > m_extrema.getRawMax())
-  {
-    m_extrema.setMaximum(rawValue, scaledValue);
-  }
-}

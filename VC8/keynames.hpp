@@ -9,9 +9,9 @@
 /*
   Common names of the meta data keys
 */
-const char RESULT_FILE_NAME_KEY[]  = "resultFileName";
-const char RESULT_DIR_PATH_KEY[]   = "resultDirPath";
-const char BRICKLET_ID_KEY[]       = "brickletID";
-const char TRACEDIR_KEY[]          = "traceDirection";
-const char CHANNEL_UNIT_KEY[]      = "channelUnit";
-const char DIMENSION_KEY[]         = "dimension";
+const char RESULT_FILE_NAME_KEY[] = "resultFileName";
+const char RESULT_DIR_PATH_KEY[]  = "resultDirPath";
+const char BRICKLET_ID_KEY[]      = "brickletID";
+const char TRACEDIR_KEY[]         = "traceDirection";
+const char CHANNEL_UNIT_KEY[]     = "channelUnit";
+const char DIMENSION_KEY[]        = "dimension";

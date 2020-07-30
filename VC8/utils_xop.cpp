@@ -14,7 +14,7 @@
 /*
   Write stringVector to the textwave waveHandle, using memcpy this is quite fast
 */
-int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHndl waveHandle)
+int stringVectorToTextWave(const std::vector<std::string> &stringVector, waveHndl waveHandle)
 {
   ASSERT_RETURN_ONE(stringVector.size());
   ASSERT_RETURN_ONE(waveHandle);
@@ -32,13 +32,13 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 
   std::vector<std::string>::const_iterator it;
 
-  for (it = stringVector.begin(); it != stringVector.end(); it++)
+  for(it = stringVector.begin(); it != stringVector.end(); it++)
   {
     try
     {
       stringSizes.push_back(it->size());
     }
-    catch (...)
+    catch(...)
     {
       return NOMEM;
     }
@@ -50,34 +50,34 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 
   Handle textHandle = NewHandle(totalSize);
 
-  if (MemError() || textHandle == NULL)
+  if(MemError() || textHandle == NULL)
   {
     return NOMEM;
   }
 
-  //DEBUGPRINT("totalSize of strings %d",GetHandleSize(textHandle));
+  // DEBUGPRINT("totalSize of strings %d",GetHandleSize(textHandle));
   //
-  for (i = 0; i < numEntriesPlusOne; i++)
+  for(i = 0; i < numEntriesPlusOne; i++)
   {
 
-    if (i == 0) // position of the first string
+    if(i == 0) // position of the first string
     {
       offset = numEntriesPlusOne * sizeof(long);
     }
-    else  // and of all the others
+    else // and of all the others
     {
       offset += stringSizes[i - 1];
     }
 
-    //DEBUGPRINT("offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
+    // DEBUGPRINT("offset=%d, offsetPosition=%d*sizeof(long)",offset,i);
     //
     // write offsets
     memcpy(*textHandle + i * sizeof(long), &offset, sizeof(long));
 
-    if (i < stringVector.size())
+    if(i < stringVector.size())
     {
 
-      //DEBUGPRINT("string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
+      // DEBUGPRINT("string=%s, stringPosition=%d",stringVector[i].c_str(),offset);
       //
       // write strings
       memcpy(*textHandle + offset, stringVector[i].c_str(), stringSizes[i]);
@@ -104,11 +104,11 @@ int stringVectorToTextWave(const std::vector<std::string>& stringVector, waveHnd
 /*
   Sets the complete wave data to which data points to NaN (double precision version)
 */
-void waveClearNaN64(double* data, CountInt length)
+void waveClearNaN64(double *data, CountInt length)
 {
   ASSERT_RETURN_VOID(data);
 
-  for (CountInt i = 0; i < length; i++)
+  for(CountInt i = 0; i < length; i++)
   {
     *data++ = DOUBLE_NAN;
   }
@@ -117,19 +117,19 @@ void waveClearNaN64(double* data, CountInt length)
 /*
   Sets the complete wave data to which data points to NaN (single precision version)
 */
-void waveClearNaN32(float* data, CountInt length)
+void waveClearNaN32(float *data, CountInt length)
 {
   ASSERT_RETURN_VOID(data);
 
-  for (CountInt i = 0; i < length; i++)
+  for(CountInt i = 0; i < length; i++)
   {
     *data++ = SINGLE_NAN;
   }
 }
 
-void appendToWaveList(DataFolderHandle df, waveHndl wv, std::string& waveList)
+void appendToWaveList(DataFolderHandle df, waveHndl wv, std::string &waveList)
 {
-  waveList.append(getRelativePath(df,wv));
+  waveList.append(getRelativePath(df, wv));
   waveList.append(listSepChar);
 }
 
@@ -143,7 +143,7 @@ std::string getRelativePath(DataFolderHandle df, waveHndl wv)
   const int FULLPATH_WITH_QUOTES = 3;
   char basePath[MAXCMDLEN + 1];
   int ret = GetDataFolderNameOrPath(df, FULLPATH_WITH_QUOTES, basePath);
-  if (ret != 0)
+  if(ret != 0)
   {
     HISTPRINT("BUG: Could not query the datafolder handle for its name");
     return std::string();
@@ -151,7 +151,7 @@ std::string getRelativePath(DataFolderHandle df, waveHndl wv)
 
   DataFolderHandle waveDataFolder;
   ret = GetWavesDataFolder(wv, &waveDataFolder);
-  if (ret != 0)
+  if(ret != 0)
   {
     HISTPRINT("BUG: Could not query the wave for its datafolder path");
     return std::string();
@@ -159,13 +159,13 @@ std::string getRelativePath(DataFolderHandle df, waveHndl wv)
 
   char wavePath[MAXCMDLEN + 1];
   ret = GetDataFolderNameOrPath(waveDataFolder, FULLPATH_WITH_QUOTES, wavePath);
-  if (ret != 0)
+  if(ret != 0)
   {
     HISTPRINT("BUG: Could not query the wave's datafolder path");
     return std::string();
   }
 
-  std::string relativePath = std::string(wavePath,strlen(basePath),std::string::npos);
+  std::string relativePath = std::string(wavePath, strlen(basePath), std::string::npos);
 
   char waveName[MAX_OBJ_NAME + 2 + 1];
   WaveName(wv, waveName);
@@ -177,11 +177,11 @@ std::string getRelativePath(DataFolderHandle df, waveHndl wv)
 /*
   Convert a XOP string handle to a std::string
 */
-void convertHandleToString(Handle strHandle, std::string& str)
+void convertHandleToString(Handle strHandle, std::string &str)
 {
   str.clear();
   // for both cases we return an empty string
-  if (strHandle == NULL || GetHandleSize(strHandle) == 0L)
+  if(strHandle == NULL || GetHandleSize(strHandle) == 0L)
   {
     return;
   }
@@ -192,7 +192,7 @@ void convertHandleToString(Handle strHandle, std::string& str)
   {
     str = std::string(*strHandle, handleSize);
   }
-  catch (CMemoryException* e)
+  catch(CMemoryException *e)
   {
     e->Delete();
     HISTPRINT("Out of memory in convertHandleToString()");
@@ -204,53 +204,53 @@ void convertHandleToString(Handle strHandle, std::string& str)
 */
 bool dataFolderExists(DataFolderHandle df)
 {
-  if (df == NULL)
+  if(df == NULL)
   {
     return false;
   }
 
   DataFolderHandle root;
   int ret = GetRootDataFolder(0, &root);
-  if (ret != 0)
+  if(ret != 0)
   {
-	  GlobalData::Instance().setInternalError(ret);
-	  return false;
+    GlobalData::Instance().setInternalError(ret);
+    return false;
   }
 
-  if (root == df)
+  if(root == df)
   {
-	  return true;
+    return true;
   }
 
   DataFolderHandle parent;
   ret = GetParentDataFolder(df, &parent);
 
-  if (ret == NO_PARENT_DATAFOLDER)
+  if(ret == NO_PARENT_DATAFOLDER)
   {
-	  // free data folder
-	  return true;
+    // free data folder
+    return true;
   }
-  else if (ret != 0)
+  else if(ret != 0)
   {
-	  return false;
+    return false;
   }
 
   // permanent existing or dangling
 
   char dataFolderPathOrName[MAXCMDLEN + 1];
   ret = GetDataFolderNameOrPath(df, 0x1, dataFolderPathOrName);
-  if (ret != 0)
+  if(ret != 0)
   {
-	  GlobalData::Instance().setInternalError(ret);
-	  return false;
+    GlobalData::Instance().setInternalError(ret);
+    return false;
   }
 
   std::string folder(dataFolderPathOrName);
 
   // datafolder handle refers to non existing datafolder
-  if (folder.find(":_killed folder_:") != std::string::npos)
+  if(folder.find(":_killed folder_:") != std::string::npos)
   {
-	  return false;
+    return false;
   }
 
   return true;

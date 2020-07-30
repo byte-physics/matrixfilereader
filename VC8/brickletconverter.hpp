@@ -12,6 +12,7 @@
 
 #include <string>
 
-int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dataFolderHandle, const char* waveName, int brickletID, std::string& waveNameList);
-int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle dataFolderHandle, const char* baseName, int brickletID, bool resampleData, int pixelSize, std::string& waveNameList);
-
+int createRawDataWave(DataFolderHandle baseFolderHandle, DataFolderHandle dataFolderHandle, const char *waveName,
+                      int brickletID, std::string &waveNameList);
+int createWaves(DataFolderHandle baseFolderHandle, DataFolderHandle dataFolderHandle, const char *baseName,
+                int brickletID, bool resampleData, int pixelSize, std::string &waveNameList);

@@ -12,62 +12,56 @@
 #include "utils_generic.hpp"
 #include "utils_bricklet.hpp"
 
-namespace  {
+namespace
+{
 
-  typedef RawBrickletToIDMap::const_iterator MapCIt;
-  typedef BrickletPtrVector::iterator BrickletVectorIt;
-  typedef BrickletPtrVector::const_iterator BrickletVectorCIt;
+typedef RawBrickletToIDMap::const_iterator MapCIt;
+typedef BrickletPtrVector::iterator BrickletVectorIt;
+typedef BrickletPtrVector::const_iterator BrickletVectorCIt;
 
+template <typename T>
+T getSettingOrDefault(DataFolderHandle dataFolderHndl, const char *option_name, bool default_value);
 
-  template<typename T>
-  T getSettingOrDefault(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value);
+template <>
+double getSettingOrDefault<double>(DataFolderHandle dataFolderHndl, const char *option_name, bool default_value)
+{
+  int objType;
+  DataObjectValue objValue;
+  double value = default_value;
 
-  template<>
-  double getSettingOrDefault<double>(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
+  const int ret = GetDataFolderObject(dataFolderHndl, option_name, &objType, &objValue);
+
+  if(ret == 0 && objType == VAR_OBJECT)
   {
-    int objType;
-    DataObjectValue objValue;
-    double value = default_value;
-
-    const int ret = GetDataFolderObject(dataFolderHndl, option_name, &objType, &objValue);
-
-    if (ret == 0 && objType == VAR_OBJECT)
-    {
-      value = objValue.nv.realValue;
-      DEBUGPRINT("%s=%d", option_name, value);
-    }
-    else
-    {
-      // variable does not exist or is of wrong type
-      DEBUGPRINT("%s=%d (default)", option_name, value);
-    }
-
-    return value;
+    value = objValue.nv.realValue;
+    DEBUGPRINT("%s=%d", option_name, value);
+  }
+  else
+  {
+    // variable does not exist or is of wrong type
+    DEBUGPRINT("%s=%d (default)", option_name, value);
   }
 
-  template<>
-  bool getSettingOrDefault<bool>(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
-  {
-    return doubleToBool(getSettingOrDefault<double>(dataFolderHndl, option_name, default_value));
-  }
+  return value;
+}
 
-  template<>
-  int getSettingOrDefault<int>(DataFolderHandle dataFolderHndl, const char* option_name, bool default_value)
-  {
-    return int(getSettingOrDefault<double>(dataFolderHndl, option_name, default_value));
-  }
+template <>
+bool getSettingOrDefault<bool>(DataFolderHandle dataFolderHndl, const char *option_name, bool default_value)
+{
+  return doubleToBool(getSettingOrDefault<double>(dataFolderHndl, option_name, default_value));
+}
+
+template <>
+int getSettingOrDefault<int>(DataFolderHandle dataFolderHndl, const char *option_name, bool default_value)
+{
+  return int(getSettingOrDefault<double>(dataFolderHndl, option_name, default_value));
+}
 } // anonymous namespace
 
 GlobalData::GlobalData()
-  :
-  m_VernissageSession(NULL),
-  m_lastError(UNKNOWN_ERROR),
-  m_debug(debug_default),
-  m_doubleWave(double_default),
-  m_overwrite(overwrite_default),
-  m_datafolder(datafolder_default),
-  m_datacache(cache_default),
-  m_errorToHistory(false)
+    : m_VernissageSession(NULL), m_lastError(UNKNOWN_ERROR), m_debug(debug_default), m_doubleWave(double_default),
+      m_overwrite(overwrite_default), m_datafolder(datafolder_default), m_datacache(cache_default),
+      m_errorToHistory(false)
 {
   // initialize encoding conversion class
   EncodingConversion::Instance();
@@ -75,27 +69,28 @@ GlobalData::GlobalData()
 }
 
 GlobalData::~GlobalData()
-{}
+{
+}
 
 // store name and path of the open result file
-void GlobalData::setResultFile(const std::wstring& dirPath, const std::wstring& fileName)
+void GlobalData::setResultFile(const std::wstring &dirPath, const std::wstring &fileName)
 {
-  if (resultFileOpen())
+  if(resultFileOpen())
   {
     HISTPRINT("BUG: there is already a result file open, please close that first");
     return;
   }
 
-  m_resultDirPath = dirPath;
+  m_resultDirPath  = dirPath;
   m_resultFileName = fileName;
 }
 
-const std::wstring& GlobalData::getFileName() const
+const std::wstring &GlobalData::getFileName() const
 {
   return m_resultFileName;
 }
 
-const std::wstring& GlobalData::getDirPath() const
+const std::wstring &GlobalData::getDirPath() const
 {
   return m_resultDirPath;
 }
@@ -104,9 +99,9 @@ const std::wstring& GlobalData::getDirPath() const
   get a pointer to the vernissage session object
   automatically loads the vernissage DLL if there is no such object
 */
-Vernissage::Session* GlobalData::getVernissageSession()
+Vernissage::Session *GlobalData::getVernissageSession()
 {
-  if (m_VernissageSession != NULL)
+  if(m_VernissageSession != NULL)
   {
     return m_VernissageSession;
   }
@@ -127,7 +122,7 @@ void GlobalData::closeResultFile()
   m_rawToBrickletID.clear();
 
   // remove opened result set from internal database
-  if (m_VernissageSession)
+  if(m_VernissageSession)
   {
     m_VernissageSession->eraseResultSets();
   }
@@ -151,9 +146,9 @@ void GlobalData::closeSession()
 /*
   Returns a version string identifying the vernissage DLL version
 */
-const std::string& GlobalData::getVernissageVersion()
+const std::string &GlobalData::getVernissageVersion()
 {
-  if (m_VernissageSession == NULL)
+  if(m_VernissageSession == NULL)
   {
     getVernissageSession();
   }
@@ -166,12 +161,10 @@ bool GlobalData::resultFileOpen() const
   return (!m_resultFileName.empty());
 }
 
-Bricklet& GlobalData::getBricklet(int brickletID)
+Bricklet &GlobalData::getBricklet(int brickletID)
 {
-  if( !isValidBrickletID(brickletID)
-      || brickletID >= boost::numeric_cast<int>(m_bricklets.size())
-      || !m_bricklets[brickletID]
-    )
+  if(!isValidBrickletID(brickletID) || brickletID >= boost::numeric_cast<int>(m_bricklets.size()) ||
+     !m_bricklets[brickletID])
   {
     throw std::runtime_error("The requested bricklet " + toString(brickletID) + " does not exist");
   }
@@ -183,18 +176,18 @@ Bricklet& GlobalData::getBricklet(int brickletID)
   For each bricklet we have to call this function and make the connection between the vernissageBricklet pointer
   from the vernissage DLL and our Bricklet objects
 */
-void GlobalData::createBricklet(int brickletID, void* const vernissageBricklet)
+void GlobalData::createBricklet(int brickletID, void *const vernissageBricklet)
 {
   THROW_IF_NULL(vernissageBricklet);
 
   try
   {
-    const int numBricklets = boost::numeric_cast<int>(m_bricklets.size());
+    const int numBricklets      = boost::numeric_cast<int>(m_bricklets.size());
     const int totalNumBricklets = getVernissageSession()->getBrickletCount();
 
-    if (brickletID >= numBricklets)
+    if(brickletID >= numBricklets)
     {
-      if( totalNumBricklets < numBricklets )
+      if(totalNumBricklets < numBricklets)
       {
         throw std::runtime_error("BUG: Number of bricklets must not shrink.");
       }
@@ -203,8 +196,8 @@ void GlobalData::createBricklet(int brickletID, void* const vernissageBricklet)
 
       // we reserve more than we currently need
       // m_bricklets[0] is always unused, so we need to create a bye one larger vector
-      m_bricklets.reserve(totalNumBricklets*2);
-      m_bricklets.resize(totalNumBricklets+1);
+      m_bricklets.reserve(totalNumBricklets * 2);
+      m_bricklets.resize(totalNumBricklets + 1);
     }
 
     if(m_bricklets[brickletID])
@@ -212,12 +205,12 @@ void GlobalData::createBricklet(int brickletID, void* const vernissageBricklet)
       throw std::runtime_error("Trying to overwrite brickletID " + toString((brickletID)));
     }
 
-    m_bricklets[brickletID] = boost::make_shared<Bricklet>(brickletID, vernissageBricklet);
+    m_bricklets[brickletID]               = boost::make_shared<Bricklet>(brickletID, vernissageBricklet);
     m_rawToBrickletID[vernissageBricklet] = brickletID;
 
     DEBUGPRINT("createBricklet brickletID=%d,vernissageBricklet=%p", brickletID, vernissageBricklet);
   }
-  catch (CMemoryException* e)
+  catch(CMemoryException *e)
   {
     HISTPRINT("Out of memory in createBrickletClassObject\r");
     throw e;
@@ -227,12 +220,12 @@ void GlobalData::createBricklet(int brickletID, void* const vernissageBricklet)
 /*
   Update the vernissage bricklet pointer for Bricklet brickletID to vernissageBricklet
 */
-void GlobalData::updateBricklet(int brickletID, void* const vernissageBricklet)
+void GlobalData::updateBricklet(int brickletID, void *const vernissageBricklet)
 {
-  Bricklet& bricklet = getBricklet(brickletID);
-  void* const oldVernissageBricklet = bricklet.getBrickletPointer();
+  Bricklet &bricklet                = getBricklet(brickletID);
+  void *const oldVernissageBricklet = bricklet.getBrickletPointer();
 
-  if( oldVernissageBricklet == vernissageBricklet)
+  if(oldVernissageBricklet == vernissageBricklet)
   {
     return;
   }
@@ -251,10 +244,10 @@ void GlobalData::setInternalError(int errorValue)
 {
   DEBUGPRINT("BUG: xop internal error %d returned.", errorValue);
 
-  char errorMessage[256];   // 256 is taken from the GetIgorErrorMessage declaration
+  char errorMessage[256]; // 256 is taken from the GetIgorErrorMessage declaration
   const int ret = GetIgorErrorMessage(errorValue, errorMessage);
 
-  if (ret == 0)
+  if(ret == 0)
   {
     HISTPRINT(errorMessage);
   }
@@ -264,9 +257,9 @@ void GlobalData::finalizeWithFilledCache()
 {
   finalize();
 
-  if (!isDataCacheEnabled())
+  if(!isDataCacheEnabled())
   {
-    for (BrickletVectorIt it = m_bricklets.begin() + 1; it != m_bricklets.end(); it++)
+    for(BrickletVectorIt it = m_bricklets.begin() + 1; it != m_bricklets.end(); it++)
     {
       (*it)->clearCache();
     }
@@ -310,9 +303,9 @@ void GlobalData::initialize(int calledFromMacro, const int calledFromFunction)
   Takes care of setting V_flag to the current error value
   Should be called immediately before calling return in a operation
 */
-void GlobalData::setError(int errorCode, const std::string& argument /*= std::string()*/)
+void GlobalData::setError(int errorCode, const std::string &argument /*= std::string()*/)
 {
-  if (errorCode < SUCCESS || errorCode > WAVE_EXIST)
+  if(errorCode < SUCCESS || errorCode > WAVE_EXIST)
   {
     HISTPRINT("BUG: errorCode is out of range");
     m_lastError = UNKNOWN_ERROR;
@@ -323,7 +316,7 @@ void GlobalData::setError(int errorCode, const std::string& argument /*= std::st
 
   int ret = SetOperationNumVar(V_flag, static_cast<double>(errorCode));
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return;
@@ -333,7 +326,7 @@ void GlobalData::setError(int errorCode, const std::string& argument /*= std::st
 
   DEBUGPRINT("lastErrorCode %d, argument %s", errorCode, argument.c_str());
 
-  if (m_errorToHistory && errorCode != SUCCESS)
+  if(m_errorToHistory && errorCode != SUCCESS)
   {
     HISTPRINT(getLastErrorMessage().c_str());
   }
@@ -354,14 +347,15 @@ std::string GlobalData::getErrorMessage(int errorCode) const
 {
   std::string msg;
 
-  switch (errorCode)
+  switch(errorCode)
   {
   case SUCCESS:
     msg = "No error, everything went nice and smooth.";
     break;
 
   case UNKNOWN_ERROR:
-    msg = "A strange and unknown error happened. It might be appropriate to file a bug report at " + std::string(PROJECTURL) + ".";
+    msg = "A strange and unknown error happened. It might be appropriate to file a bug report at " +
+          std::string(PROJECTURL) + ".";
     break;
 
   case ALREADY_FILE_OPEN:
@@ -385,7 +379,8 @@ std::string GlobalData::getErrorMessage(int errorCode) const
     break;
 
   case INTERNAL_ERROR_CONVERTING_DATA:
-    msg = "The rawdata could not be interpreted. You can try using getRawBrickleData() instead and consulting the vernissage documentation. Please file also a bug report and attach your data.";
+    msg = "The rawdata could not be interpreted. You can try using getRawBrickleData() instead and consulting the "
+          "vernissage documentation. Please file also a bug report and attach your data.";
     break;
 
   case NO_FILE_OPEN:
@@ -393,7 +388,8 @@ std::string GlobalData::getErrorMessage(int errorCode) const
     break;
 
   case INVALID_RANGE:
-    msg = "The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and startBrickletID may not be bigger than endBrickletID.";
+    msg = "The brickletID range was wrong. brickletIDs have to lie between 1 and numberOfBricklets, and "
+          "startBrickletID may not be bigger than endBrickletID.";
     break;
 
   case WAVE_EXIST:
@@ -414,34 +410,34 @@ std::string GlobalData::getErrorMessage(int errorCode) const
 */
 void GlobalData::readSettings(DataFolderHandle dataFolderHndl /* = NULL */)
 {
-  m_debug = getSettingOrDefault<bool>(dataFolderHndl,debug_option,debug_default);
+  m_debug = getSettingOrDefault<bool>(dataFolderHndl, debug_option, debug_default);
 
-  if (m_debug)
+  if(m_debug)
   {
     char dataFolderPath[MAXCMDLEN + 1];
     // flags=3 returns the full path to the datafolder and including quotes if needed
     const int ret = GetDataFolderNameOrPath(dataFolderHndl, 3, dataFolderPath);
 
-    if (ret == 0)
+    if(ret == 0)
     {
       DEBUGPRINT("Variables in the folder %s:", dataFolderPath);
     }
   }
 
-  m_overwrite  = getSettingOrDefault<bool>(dataFolderHndl,overwrite_option,overwrite_default);
-  m_doubleWave = getSettingOrDefault<bool>(dataFolderHndl,double_option,double_default);
-  m_datafolder = getSettingOrDefault<bool>(dataFolderHndl,datafolder_option,datafolder_default);
-  m_datacache  = getSettingOrDefault<bool>(dataFolderHndl,cache_option,cache_default);
-  m_magic      = getSettingOrDefault<int>(dataFolderHndl,magic_option,magic_default);
+  m_overwrite  = getSettingOrDefault<bool>(dataFolderHndl, overwrite_option, overwrite_default);
+  m_doubleWave = getSettingOrDefault<bool>(dataFolderHndl, double_option, double_default);
+  m_datafolder = getSettingOrDefault<bool>(dataFolderHndl, datafolder_option, datafolder_default);
+  m_datacache  = getSettingOrDefault<bool>(dataFolderHndl, cache_option, cache_default);
+  m_magic      = getSettingOrDefault<int>(dataFolderHndl, magic_option, magic_default);
 }
 
 /*
   Returns a brickletID for the vernissage APIs raw bricklet pointer
 */
-int GlobalData::convertBrickletPtr(void* rawBrickletPtr) const
+int GlobalData::convertBrickletPtr(void *rawBrickletPtr) const
 {
   MapCIt it = m_rawToBrickletID.find(rawBrickletPtr);
-  if( it != m_rawToBrickletID.end())
+  if(it != m_rawToBrickletID.end())
   {
     return it->second;
   }
@@ -484,7 +480,7 @@ std::size_t GlobalData::getUsedMemory() const
 {
   std::size_t usedMemInBytes = sizeof(*this);
 
-  for(std::size_t i = 1; i  < m_bricklets.size(); i++)
+  for(std::size_t i = 1; i < m_bricklets.size(); i++)
   {
     usedMemInBytes += m_bricklets[i]->getUsedMemory();
   }

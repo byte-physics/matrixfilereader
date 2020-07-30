@@ -14,12 +14,37 @@
 #include <vector>
 #include "encoding_conversion.hpp"
 
-#define THROW_IF_NULL(A) {if(A == NULL){ throw std::runtime_error("THROW_IF_NULL: Pointer " #A " is NULL.\r"); } }
-#define MYASSERT(A,B) { if(A == NULL){ XOPNotice("ASSERT: Pointer " #A " is NULL.\r"); return B; } }
-#define ASSERT_RETURN_ZERO(A) { MYASSERT(A,0)}
-#define ASSERT_RETURN_MINUSONE(A) { MYASSERT(A,-1)}
-#define ASSERT_RETURN_ONE(A) { MYASSERT(A,1)}
-#define ASSERT_RETURN_VOID(A) { MYASSERT(A,)}
+#define THROW_IF_NULL(A)                                                                                               \
+  {                                                                                                                    \
+    if(A == NULL)                                                                                                      \
+    {                                                                                                                  \
+      throw std::runtime_error("THROW_IF_NULL: Pointer " #A " is NULL.\r");                                            \
+    }                                                                                                                  \
+  }
+#define MYASSERT(A, B)                                                                                                 \
+  {                                                                                                                    \
+    if(A == NULL)                                                                                                      \
+    {                                                                                                                  \
+      XOPNotice("ASSERT: Pointer " #A " is NULL.\r");                                                                  \
+      return B;                                                                                                        \
+    }                                                                                                                  \
+  }
+#define ASSERT_RETURN_ZERO(A)                                                                                          \
+  {                                                                                                                    \
+    MYASSERT(A, 0)                                                                                                     \
+  }
+#define ASSERT_RETURN_MINUSONE(A)                                                                                      \
+  {                                                                                                                    \
+    MYASSERT(A, -1)                                                                                                    \
+  }
+#define ASSERT_RETURN_ONE(A)                                                                                           \
+  {                                                                                                                    \
+    MYASSERT(A, 1)                                                                                                     \
+  }
+#define ASSERT_RETURN_VOID(A)                                                                                          \
+  {                                                                                                                    \
+    MYASSERT(A, )                                                                                                      \
+  }
 
 //#define START_TIMER(A)                                                                                \
 // HISTPRINT("Starting timer %d: line %d, function %s,  file %s", A, __LINE__, __FUNCTION__, __FILE__); \
@@ -55,7 +80,7 @@ T stringToAnyType(std::string str)
   Converts any type to a std::string
 */
 template <typename T>
-std::string toString(const T& t)
+std::string toString(const T &t)
 {
   std::stringstream ss;
   ss.precision(DBL_DIG);
@@ -66,8 +91,8 @@ std::string toString(const T& t)
 /*
   Specialization
 */
-template<>
-inline std::string toString<std::wstring>(const std::wstring& s)
+template <>
+inline std::string toString<std::wstring>(const std::wstring &s)
 {
   return convertEncoding(s);
 }
@@ -75,8 +100,8 @@ inline std::string toString<std::wstring>(const std::wstring& s)
 /*
   Specialization (which does nothing)
 */
-template<>
-inline std::string toString<std::string>( const std::string& s )
+template <>
+inline std::string toString<std::string>(const std::string &s)
 {
   return s;
 }
@@ -85,7 +110,7 @@ inline std::string toString<std::string>( const std::string& s )
   Converts any type to a CBString
 */
 template <typename T>
-CBString toCBString(const T& t)
+CBString toCBString(const T &t)
 {
   std::stringstream ss;
   ss.precision(DBL_DIG);
@@ -100,7 +125,7 @@ CBString toCBString(const T& t)
   Specialization
 */
 template <>
-inline CBString toCBString<const char *>(const char* const& s)
+inline CBString toCBString<const char *>(const char *const &s)
 {
   return CBString(s);
 }
@@ -108,8 +133,8 @@ inline CBString toCBString<const char *>(const char* const& s)
 /*
   Specialization
 */
-template<>
-inline CBString toCBString<std::wstring>(const std::wstring& s)
+template <>
+inline CBString toCBString<std::wstring>(const std::wstring &s)
 {
   return convertEncoding(s).c_str();
 }
@@ -117,8 +142,8 @@ inline CBString toCBString<std::wstring>(const std::wstring& s)
 /*
   Specialization
 */
-template<>
-inline CBString toCBString<std::string>(const std::string& s)
+template <>
+inline CBString toCBString<std::string>(const std::string &s)
 {
   return s.c_str();
 }
@@ -126,24 +151,24 @@ inline CBString toCBString<std::string>(const std::string& s)
 /*
   Specialization (which does nothing)
 */
-template<>
-inline CBString toCBString<CBString>(const CBString& s)
+template <>
+inline CBString toCBString<CBString>(const CBString &s)
 {
   return s;
 }
 
-void  splitString(const char* stringChar, const char* sepChar, std::vector<std::string> &list);
-void  splitString(const std::string& str, const char* sepChar, std::vector<std::string> &list);
+void splitString(const char *stringChar, const char *sepChar, std::vector<std::string> &list);
+void splitString(const std::string &str, const char *sepChar, std::vector<std::string> &list);
 
 /*
   Undos a former split string, therefore concatenating each element plus sepchar of list into one string
 */
 template <class T>
-void joinString(const std::vector<T> &list, const char* sepChar, std::string& joinedList)
+void joinString(const std::vector<T> &list, const char *sepChar, std::string &joinedList)
 {
   joinedList.clear();
 
-  for (std::vector<T>::const_iterator it = list.begin(); it != list.end(); it++)
+  for(std::vector<T>::const_iterator it = list.begin(); it != list.end(); it++)
   {
     joinedList.append(toString<T>(*it));
     joinedList.append(sepChar);
@@ -151,22 +176,22 @@ void joinString(const std::vector<T> &list, const char* sepChar, std::string& jo
 }
 
 bool doubleToBool(double value);
-void RemoveAllBackslashesAtTheEnd(char* str);
+void RemoveAllBackslashesAtTheEnd(char *str);
 
 // Shrink the memory usage of the passed vector
-template<class T, class U>
-void ShrinkToFit( std::vector<T, U>& vec )
+template <class T, class U>
+void ShrinkToFit(std::vector<T, U> &vec)
 {
-  std::vector<T, U>(vec.begin(),vec.end()).swap(vec);
+  std::vector<T, U>(vec.begin(), vec.end()).swap(vec);
 }
 
-template<typename T, typename U>
-inline void AddEntry(StringPairVector& vec, T key, U value)
+template <typename T, typename U>
+inline void AddEntry(StringPairVector &vec, T key, U value)
 {
   vec.push_back(std::make_pair(toCBString(key), toCBString(value)));
 }
 
-inline const char* boolToCString(bool val)
+inline const char *boolToCString(bool val)
 {
   return val ? "true" : "false";
 }

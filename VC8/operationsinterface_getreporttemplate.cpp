@@ -12,12 +12,13 @@
 #include "utils_generic.hpp"
 #include "gitversion.hpp"
 
-namespace  {
+namespace
+{
 
-  DWORDLONG convertBytesToGiB( DWORDLONG bytes )
-  {
-    return bytes /(1024 * 1024 * 1024);
-  }
+DWORDLONG convertBytesToGiB(DWORDLONG bytes)
+{
+  return bytes / (1024 * 1024 * 1024);
+}
 
 } // anonymous namespace
 
@@ -28,7 +29,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
 
   int ret = SetOperationStrVar(S_value, "");
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;
@@ -46,9 +47,10 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   BOOL retValue = GetVersionEx(&osvi);
 
   // non zero is success here
-  if (retValue != 0)
+  if(retValue != 0)
   {
-    str.append("Windows version: " + toString(osvi.dwMajorVersion) + "." + toString(osvi.dwMinorVersion) + " (Build " + toString(osvi.dwBuildNumber) + ")\r");
+    str.append("Windows version: " + toString(osvi.dwMajorVersion) + "." + toString(osvi.dwMinorVersion) + " (Build " +
+               toString(osvi.dwBuildNumber) + ")\r");
   }
   else
   {
@@ -58,9 +60,9 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   MEMORYSTATUSEX statex;
   ZeroMemory(&statex, sizeof(MEMORYSTATUSEX));
   statex.dwLength = sizeof(MEMORYSTATUSEX);
-  retValue = GlobalMemoryStatusEx(&statex);
+  retValue        = GlobalMemoryStatusEx(&statex);
 
-  if (retValue != 0)
+  if(retValue != 0)
   {
     str.append("Free Memory: " + toString(convertBytesToGiB(statex.ullAvailPhys)) + " GiB\r");
     str.append("Total Memory: " + toString(convertBytesToGiB(statex.ullTotalPhys)) + " GiB\r");
@@ -76,7 +78,8 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
   str.append("Visual Studio version: " + toString(_MSC_VER) + "\r");
   str.append("Igor Pro Version: " + toString(igorVersion) + "\r");
   str.append("Vernissage version: " + GlobalData::Instance().getVernissageVersion() + "\r");
-  str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + " (Build " + std::string(GIT_VERSION) + ")");
+  str.append("XOP version: " + std::string(MatrixFileReader_XOP_VERSION_STR) + " (Build " + std::string(GIT_VERSION) +
+             ")");
   str.append("\r");
   str.append("Compilation date and time: " __DATE__ " " __TIME__ "\r");
   str.append("\r");
@@ -86,7 +89,7 @@ extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
 
   ret = SetOperationStrVar(S_value, str.c_str());
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;

@@ -53,4 +53,4 @@
 #include "errorcodes.hpp"
 #include "version.hpp"
 
-#include "VernissageSDK_V2.2/src/Incl/Vernissage.h"
+#include "VernissageSDK_v2.4_msvc2013_64bit/include/Vernissage.h"

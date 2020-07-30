@@ -15,9 +15,7 @@ Wave::Wave()
   Init();
 }
 
-Wave::Wave( const ExtremaData& extremaData )
-  :
-  m_extrema(extremaData)
+Wave::Wave(const ExtremaData &extremaData) : m_extrema(extremaData)
 {
   Init();
 }
@@ -25,15 +23,17 @@ Wave::Wave( const ExtremaData& extremaData )
 // Common initialization routine for all ctors
 void Wave::Init()
 {
-  m_traceDir = NO_TRACE;
-  moreData = false;
-  m_doublePtr = NULL;
-  m_floatPtr = NULL;
+  m_traceDir   = NO_TRACE;
+  moreData     = false;
+  m_doublePtr  = NULL;
+  m_floatPtr   = NULL;
   m_waveHandle = NULL;
-  m_pixelSize = default_pixelsize;
+  m_pixelSize  = default_pixelsize;
 }
 
-Wave::~Wave(){}
+Wave::~Wave()
+{
+}
 
 /*
   Make a connection between the waveHandle and this class
@@ -43,21 +43,21 @@ void Wave::setWaveHandle(waveHndl waveHandle)
   THROW_IF_NULL(waveHandle);
 
   const int waveType = WaveType(waveHandle);
-  if ( waveType & NT_FP64)
+  if(waveType & NT_FP64)
   {
     m_doublePtr  = getWaveDataPtr<double>(waveHandle);
     m_floatPtr   = NULL;
     moreData     = true;
     m_waveHandle = waveHandle;
   }
-  else if (waveType & NT_FP32)
+  else if(waveType & NT_FP32)
   {
     m_doublePtr  = NULL;
     m_floatPtr   = getWaveDataPtr<float>(waveHandle);
     moreData     = true;
     m_waveHandle = waveHandle;
   }
-  else if (waveType & NT_I32)
+  else if(waveType & NT_I32)
   {
     m_doublePtr  = NULL;
     m_floatPtr   = NULL;
@@ -72,9 +72,9 @@ void Wave::setWaveHandle(waveHndl waveHandle)
 /*
   Set the name and trace direction of the wave, adds then the appropriate suffix to the wave name
 */
-void Wave::setProperties(const std::string& basename, int traceDir, std::string suffix)
+void Wave::setProperties(const std::string &basename, int traceDir, std::string suffix)
 {
-  switch (traceDir)
+  switch(traceDir)
   {
   case NO_TRACE:
     m_wavename = basename;
@@ -103,7 +103,7 @@ void Wave::setProperties(const std::string& basename, int traceDir, std::string 
 
   m_wavename += suffix;
   m_traceDir = traceDir;
-  m_suffix = suffix;
+  m_suffix   = suffix;
 }
 
 /*
@@ -112,9 +112,8 @@ void Wave::setProperties(const std::string& basename, int traceDir, std::string 
 void Wave::printDebugInfo()
 {
   DEBUGPRINT("%s: waveHandle=%p, float=%p, double=%p, moreData=%s, traceDir=%d, specialSuffix=%s",
-             m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle,
-             m_floatPtr, m_doublePtr, boolToCString(moreData),
-             m_traceDir, m_suffix.c_str());
+             m_wavename.empty() ? "empty" : m_wavename.c_str(), m_waveHandle, m_floatPtr, m_doublePtr,
+             boolToCString(moreData), m_traceDir, m_suffix.c_str());
 }
 
 /*
@@ -122,11 +121,11 @@ void Wave::printDebugInfo()
 */
 void Wave::clearWave()
 {
-  if (m_doublePtr)
+  if(m_doublePtr)
   {
     waveClearNaN64(m_doublePtr, WavePoints(m_waveHandle));
   }
-  else if (m_floatPtr)
+  else if(m_floatPtr)
   {
     waveClearNaN32(m_floatPtr, WavePoints(m_waveHandle));
   }
@@ -135,13 +134,13 @@ void Wave::clearWave()
 /*
   convenience wrapper
 */
-void Wave::setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr)
+void Wave::setWaveScaling(int dimension, const double *sfAPtr, const double *sfBPtr)
 {
   ASSERT_RETURN_VOID(m_waveHandle);
 
   int ret = MDSetWaveScaling(m_waveHandle, dimension, sfAPtr, sfBPtr);
 
-  if (ret != 0)
+  if(ret != 0)
   {
     HISTPRINT("WaveClass::setWaveScaling returned error %d", ret);
   }
@@ -150,24 +149,24 @@ void Wave::setWaveScaling(int dimension, const double* sfAPtr, const double* sfB
 /*
   convenience wrapper
 */
-void Wave::setWaveUnits(int dimension, const std::string& units)
+void Wave::setWaveUnits(int dimension, const std::string &units)
 {
   ASSERT_RETURN_VOID(m_waveHandle);
 
   int ret = MDSetWaveUnits(m_waveHandle, dimension, units.c_str());
 
-  if (ret != 0)
+  if(ret != 0)
   {
     HISTPRINT("WaveClass::setWaveUnits returned error %d", ret);
   }
 }
 
-void Wave::setWaveUnits(int dimension, const std::wstring& units)
+void Wave::setWaveUnits(int dimension, const std::wstring &units)
 {
   setWaveUnits(dimension, convertEncoding(units));
 }
 
-const ExtremaData& Wave::getExtrema() const
+const ExtremaData &Wave::getExtrema() const
 {
   return m_extrema;
 }
@@ -182,7 +181,7 @@ int Wave::getTraceDir() const
   return m_traceDir;
 }
 
-const char* Wave::getWaveName() const
+const char *Wave::getWaveName() const
 {
   return m_wavename.c_str();
 }

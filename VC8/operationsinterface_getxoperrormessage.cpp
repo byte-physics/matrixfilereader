@@ -14,7 +14,7 @@ extern "C" int ExecuteGetXOPErrorMessage(GetXOPErrorMessageRuntimeParamsPtr p)
 {
   std::string errorMessage;
   // return requested error message
-  if (p->errorCodeEncountered && p->errorCodeParamsSet[0])
+  if(p->errorCodeEncountered && p->errorCodeParamsSet[0])
   {
     errorMessage = GlobalData::Instance().getErrorMessage(int(p->errorCode));
   }

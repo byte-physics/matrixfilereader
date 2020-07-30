@@ -11,28 +11,26 @@
 #include "utils_generic.hpp"
 
 DLLHandler::DLLHandler()
-  :
-  m_foundationModule(NULL),
-  m_getSessionFunc(NULL),
-  m_releaseSessionFunc(NULL),
-  m_vernissageVersion("0.00")
-{}
+    : m_foundationModule(NULL), m_getSessionFunc(NULL), m_releaseSessionFunc(NULL), m_vernissageVersion("0.00")
+{
+}
 
 DLLHandler::~DLLHandler()
-{}
+{
+}
 
 void DLLHandler::closeSession()
 {
-  if (m_releaseSessionFunc != NULL)
+  if(m_releaseSessionFunc != NULL)
   {
     (*m_releaseSessionFunc)();
   }
 
   FreeLibrary(m_foundationModule);
-  m_foundationModule = NULL;
-  m_vernissageVersion = "0.00";
+  m_foundationModule   = NULL;
+  m_vernissageVersion  = "0.00";
   m_releaseSessionFunc = NULL;
-  m_getSessionFunc = NULL;
+  m_getSessionFunc     = NULL;
 }
 
 /*
@@ -70,50 +68,52 @@ std::string DLLHandler::getVernissagePath()
 
   if(foundRegBaseKey.empty())
   {
-	  // check if the wrong bitness of vernissage is installed
-	  for (size_t i = 0; i < regBaseKeyNames.size(); i++)
-	  {
+    // check if the wrong bitness of vernissage is installed
+    for(size_t i = 0; i < regBaseKeyNames.size(); i++)
+    {
 #ifdef WINIGOR32
-		  const int expectedBitness = 32;
-		  const REGSAM samDesired = KEY_READ | KEY_WOW64_64KEY;
+      const int expectedBitness = 32;
+      const REGSAM samDesired   = KEY_READ | KEY_WOW64_64KEY;
 #else
-		  const int expectedBitness = 64;
-		  const REGSAM samDesired = KEY_READ | KEY_WOW64_32KEY;
+      const int expectedBitness = 64;
+      const REGSAM samDesired   = KEY_READ | KEY_WOW64_32KEY;
 #endif
-		  result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regBaseKeyNames[i].c_str(), 0, samDesired, &hregBaseKey);
+      result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regBaseKeyNames[i].c_str(), 0, samDesired, &hregBaseKey);
 
-		  if (result == ERROR_SUCCESS)
-		  {
-			  RegCloseKey(hregBaseKey);
-			  HISTPRINT("Please install the %d-bit version of Vernissage for this XOP.", expectedBitness);
-			  return std::string();
-		  }
-	  }
+      if(result == ERROR_SUCCESS)
+      {
+        RegCloseKey(hregBaseKey);
+        HISTPRINT("Please install the %d-bit version of Vernissage for this XOP.", expectedBitness);
+        return std::string();
+      }
+    }
 
     HISTPRINT("Could not find a Vernissage installation.");
     return std::string();
   }
 
   dataLengthActual = dataLength;
-  result = RegQueryValueEx(hregBaseKey, "RecentVersion", NULL, NULL, (LPBYTE) data, &dataLengthActual);
+  result           = RegQueryValueEx(hregBaseKey, "RecentVersion", NULL, NULL, (LPBYTE) data, &dataLengthActual);
 
-  if (result != ERROR_SUCCESS)
+  if(result != ERROR_SUCCESS)
   {
-    DEBUGPRINT("Reading the registry key %s:%s failed (error code %d).", foundRegBaseKey.c_str(), "RecentVersion", result);
+    DEBUGPRINT("Reading the registry key %s:%s failed (error code %d).", foundRegBaseKey.c_str(), "RecentVersion",
+               result);
     return std::string();
   }
 
   RegCloseKey(hregBaseKey);
 
   // RecentVersion is "V2.4.1"
-  m_vernissageVersion = std::string(data).substr(1);
+  m_vernissageVersion      = std::string(data).substr(1);
   std::string majorVersion = m_vernissageVersion.substr(0, 3);
 
   typedef std::vector<std::string>::const_iterator VecCIt;
   VecCIt it = std::find(supportedMajorVernissageVersions.begin(), supportedMajorVernissageVersions.end(), majorVersion);
-  if (it == supportedMajorVernissageVersions.end())
+  if(it == supportedMajorVernissageVersions.end())
   {
-    HISTPRINT("Vernissage version %s is not supported. Please install one of the supported versions and try again.", m_vernissageVersion.c_str());
+    HISTPRINT("Vernissage version %s is not supported. Please install one of the supported versions and try again.",
+              m_vernissageVersion.c_str());
     return std::string();
   }
   else
@@ -121,7 +121,7 @@ std::string DLLHandler::getVernissagePath()
     DEBUGPRINT("Vernissage version %s", m_vernissageVersion.c_str());
   }
 
-  regKey  = foundRegBaseKey;
+  regKey = foundRegBaseKey;
   regKey += "\\";
   regKey += data;
   regKey += "\\Main";
@@ -130,20 +130,21 @@ std::string DLLHandler::getVernissagePath()
 
   result = RegOpenKeyEx(HKEY_LOCAL_MACHINE, regKey.c_str(), 0, KEY_READ, &hKey);
 
-  if (result != ERROR_SUCCESS)
+  if(result != ERROR_SUCCESS)
   {
     DEBUGPRINT("Opening the registry key failed (error code %d). Please reinstall Vernissage.", result);
     return std::string();
   }
 
   dataLengthActual = dataLength;
-  result = RegQueryValueEx(hKey, "InstallDirectory", NULL, NULL, (LPBYTE) data, &dataLengthActual);
+  result           = RegQueryValueEx(hKey, "InstallDirectory", NULL, NULL, (LPBYTE) data, &dataLengthActual);
 
   RegCloseKey(hKey);
 
-  if (result != ERROR_SUCCESS)
+  if(result != ERROR_SUCCESS)
   {
-    DEBUGPRINT("Reading the registry value %s:%s failed (error code %d). Please reinstall Vernissage.", regKey.c_str(), "InstallDirectory", result);
+    DEBUGPRINT("Reading the registry value %s:%s failed (error code %d). Please reinstall Vernissage.", regKey.c_str(),
+               "InstallDirectory", result);
     return std::string();
   }
 
@@ -158,9 +159,9 @@ std::string DLLHandler::getVernissagePath()
 Load the vernissage library, setLibraryPath() will be called before
 In case something goes wrong, NULL is returned
 */
-Vernissage::Session* DLLHandler::createSessionObject()
+Vernissage::Session *DLLHandler::createSessionObject()
 {
-  Vernissage::Session* session = NULL;
+  Vernissage::Session *session = NULL;
   std::vector<std::string> dllNames;
 
   dllNames.push_back("Ace.dll");
@@ -176,12 +177,12 @@ Vernissage::Session* DLLHandler::createSessionObject()
 
   HMODULE module;
 
-  for (std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++)
+  for(std::vector<std::string>::iterator it = dllNames.begin(); it != dllNames.end(); it++)
   {
-    std::string dllName = (dllDirectory.empty() ?  *it : dllDirectory + "\\" + *it);
-    module = LoadLibrary((LPCSTR) dllName.c_str());
+    std::string dllName = (dllDirectory.empty() ? *it : dllDirectory + "\\" + *it);
+    module              = LoadLibrary((LPCSTR) dllName.c_str());
 
-    if (module != NULL)
+    if(module != NULL)
     {
       DEBUGPRINT("Successfully loaded DLL %s", dllName.c_str());
     }
@@ -193,10 +194,10 @@ Vernissage::Session* DLLHandler::createSessionObject()
   }
 
   // module is now pointing to Foundation.dll
-  m_foundationModule    = module;
+  m_foundationModule = module;
   ASSERT_RETURN_ZERO(m_foundationModule);
 
-  m_getSessionFunc     = (GetSessionFunc)     GetProcAddress(m_foundationModule, "getSession");
+  m_getSessionFunc     = (GetSessionFunc) GetProcAddress(m_foundationModule, "getSession");
   m_releaseSessionFunc = (ReleaseSessionFunc) GetProcAddress(m_foundationModule, "releaseSession");
 
   ASSERT_RETURN_ZERO(m_getSessionFunc);
@@ -206,7 +207,7 @@ Vernissage::Session* DLLHandler::createSessionObject()
   return session;
 }
 
-const std::string& DLLHandler::getVernissageVersion() const
+const std::string &DLLHandler::getVernissageVersion() const
 {
   return m_vernissageVersion;
 }

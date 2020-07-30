@@ -16,21 +16,21 @@ class EncodingConversion
 {
 public:
   /// Access to singleton-type object
-  static EncodingConversion& EncodingConversion::Instance()
+  static EncodingConversion &EncodingConversion::Instance()
   {
     static EncodingConversion encConv;
     return encConv;
   }
 
-  std::wstring convertEncoding(const std::string& str);
-  std::string  convertEncoding(const std::wstring& str);
+  std::wstring convertEncoding(const std::string &str);
+  std::string convertEncoding(const std::wstring &str);
 
 private:
-  EncodingConversion(); // hide ctor
-  ~EncodingConversion(); // hide dtor
-  EncodingConversion(const EncodingConversion&); // hide copy ctor
-  EncodingConversion& operator=(const EncodingConversion&); // hide assignment operator
+  EncodingConversion();                                      // hide ctor
+  ~EncodingConversion();                                     // hide dtor
+  EncodingConversion(const EncodingConversion &);            // hide copy ctor
+  EncodingConversion &operator=(const EncodingConversion &); // hide assignment operator
 
-  boost::function<std::wstring (const std::string&)> m_stringToWString;
-  boost::function<std::string (const std::wstring&)> m_wstringToString;
+  boost::function<std::wstring(const std::string &)> m_stringToWString;
+  boost::function<std::string(const std::wstring &)> m_wstringToString;
 };

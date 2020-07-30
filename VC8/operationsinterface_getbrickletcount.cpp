@@ -16,16 +16,16 @@ extern "C" int ExecuteGetBrickletCount(GetBrickletCountRuntimeParamsPtr p)
   BEGIN_OUTER_CATCH
   GlobalData::Instance().initialize(p->calledFromMacro, p->calledFromFunction);
 
-  if (!GlobalData::Instance().resultFileOpen())
+  if(!GlobalData::Instance().resultFileOpen())
   {
     GlobalData::Instance().setError(NO_FILE_OPEN);
     return 0;
   }
 
-  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
-  int ret = SetOperationNumVar(V_count, session->getBrickletCount());
+  Vernissage::Session *session = GlobalData::Instance().getVernissageSession();
+  int ret                      = SetOperationNumVar(V_count, session->getBrickletCount());
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;

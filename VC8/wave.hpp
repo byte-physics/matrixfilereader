@@ -16,22 +16,23 @@ class Wave
 {
 public:
   Wave();
-  Wave(const ExtremaData& extremaData);
+  Wave(const ExtremaData &extremaData);
   ~Wave();
 
   void clearWave();
   void setWaveHandle(waveHndl waveHandle);
-  void setProperties(const std::string& basename, int traceDir, std::string suffix = std::string());
+  void setProperties(const std::string &basename, int traceDir, std::string suffix = std::string());
   void printDebugInfo();
-  void setWaveScaling(int dimension, const double* sfAPtr, const double* sfBPtr);
-  void setWaveUnits(int dimension, const std::wstring& units);
-  void setWaveUnits(int dimension, const std::string& units);
+  void setWaveScaling(int dimension, const double *sfAPtr, const double *sfBPtr);
+  void setWaveUnits(int dimension, const std::wstring &units);
+  void setWaveUnits(int dimension, const std::string &units);
 
-  const char* getWaveName() const;
+  const char *getWaveName() const;
   waveHndl getWaveHandle() const;
   int getTraceDir() const;
   bool isEmpty() const;
-  const ExtremaData& getExtrema() const;;
+  const ExtremaData &getExtrema() const;
+  ;
   int GetPixelSize() const;
   void SetPixelSize(int pixelSize);
   std::string getSuffix() const;
@@ -40,14 +41,15 @@ public:
 
 public:
   bool moreData;
+
 private:
   void Init();
   ExtremaData m_extrema;
   std::string m_wavename;
   int m_traceDir;
   waveHndl m_waveHandle;
-  float* m_floatPtr;
-  double* m_doublePtr;
+  float *m_floatPtr;
+  double *m_doublePtr;
   int m_pixelSize;
   std::string m_suffix;
 };
@@ -59,23 +61,23 @@ private:
 */
 inline void Wave::fillWave(int index, int rawValue, double scaledValue)
 {
-  if (m_floatPtr)
+  if(m_floatPtr)
   {
-    m_floatPtr[index]  = static_cast<float>(scaledValue);
+    m_floatPtr[index] = static_cast<float>(scaledValue);
   }
-  else if (m_doublePtr)
+  else if(m_doublePtr)
   {
     m_doublePtr[index] = scaledValue;
   }
 
-  //check if it is a new minimium
-  if (rawValue < m_extrema.getRawMin())
+  // check if it is a new minimium
+  if(rawValue < m_extrema.getRawMin())
   {
     m_extrema.setMinimum(rawValue, scaledValue);
   }
 
-  //check if it is a new maximum
-  if (rawValue > m_extrema.getRawMax())
+  // check if it is a new maximum
+  if(rawValue > m_extrema.getRawMax())
   {
     m_extrema.setMaximum(rawValue, scaledValue);
   }

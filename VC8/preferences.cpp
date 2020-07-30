@@ -16,9 +16,9 @@
 void loadXOPPreferences()
 {
   XOPprefStructHandle prefHandle;
-  GetXOPPrefsHandle((Handle*)&prefHandle);
+  GetXOPPrefsHandle((Handle *) &prefHandle);
 
-  if (prefHandle && (*prefHandle)->version == XOPprefStruct_VERSION)
+  if(prefHandle && (*prefHandle)->version == XOPprefStruct_VERSION)
   {
     DEBUGPRINT_SILENT("Loading preferences from file");
     size_t len = sizeof(GlobalData::Instance().openDlgInitialDir);
@@ -37,7 +37,7 @@ void loadXOPPreferences()
     strcpy(GlobalData::Instance().openDlgInitialDir, "");
   }
 
-  if (prefHandle != NULL)
+  if(prefHandle != NULL)
   {
     DisposeHandle((Handle) prefHandle);
   }
@@ -49,13 +49,13 @@ void saveXOPPreferences()
   XOPprefStructHandle prefHandle;
   prefHandle = (XOPprefStructHandle) NewHandle((BCInt) sizeof(XOPprefStruct));
 
-  if (prefHandle != NULL)
+  if(prefHandle != NULL)
   {
-    MemClear((char*) *prefHandle, sizeof(XOPprefStruct));
+    MemClear((char *) *prefHandle, sizeof(XOPprefStruct));
 
     DEBUGPRINT_SILENT("Saving preferences to file");
 
-    //write structure version
+    // write structure version
     (*prefHandle)->version = XOPprefStruct_VERSION;
 
     // write the starting directory of MFR_OpenResultFile
@@ -67,7 +67,7 @@ void saveXOPPreferences()
     (*prefHandle)->openDlgFileIndex = GlobalData::Instance().openDlgFileIndex;
 
     // save struct on disc
-    SaveXOPPrefsHandle((Handle)prefHandle);
-    DisposeHandle((Handle)prefHandle);
+    SaveXOPPrefsHandle((Handle) prefHandle);
+    DisposeHandle((Handle) prefHandle);
   }
 };

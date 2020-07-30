@@ -13,18 +13,18 @@
 
 struct XOPprefStruct
 {
-  short version;            /* structure version number */
+  short version; /* structure version number */
   char openDlgInitialDir[MAX_PATH_LEN + 1];
   int openDlgFileIndex;
 };
 
 typedef struct XOPprefStruct XOPprefStruct;
-typedef struct XOPprefStruct* XOPprefStructPtr;
-typedef struct XOPprefStruct** XOPprefStructHandle;
+typedef struct XOPprefStruct *XOPprefStructPtr;
+typedef struct XOPprefStruct **XOPprefStructHandle;
 
 #define XOPprefStruct_VERSION 1
 
-#pragma pack()    // Reset structure alignment to default.
+#pragma pack() // Reset structure alignment to default.
 
 void loadXOPPreferences();
 void saveXOPPreferences();

@@ -15,23 +15,22 @@ class ExtremaData
 {
 public:
   ExtremaData()
-    :
-    m_rawMin(std::numeric_limits<int>::max()),
-    m_rawMax(std::numeric_limits<int>::min()),
-    m_physValRawMin(std::numeric_limits<double>::max()),
-    // we don't want the smallest positive number but the most negative one
-    m_physValRawMax(-std::numeric_limits<double>::max())
-  {}
+      : m_rawMin(std::numeric_limits<int>::max()), m_rawMax(std::numeric_limits<int>::min()),
+        m_physValRawMin(std::numeric_limits<double>::max()),
+        // we don't want the smallest positive number but the most negative one
+        m_physValRawMax(-std::numeric_limits<double>::max())
+  {
+  }
 
   void setMinimum(int rawMin, double physValRawMin)
   {
-    m_rawMin = rawMin;
+    m_rawMin        = rawMin;
     m_physValRawMin = physValRawMin;
   }
 
   void setMaximum(int rawMax, double physValRawMax)
   {
-    m_rawMax = rawMax;
+    m_rawMax        = rawMax;
     m_physValRawMax = physValRawMax;
   }
 
@@ -56,6 +55,6 @@ public:
   }
 
 private:
-  int    m_rawMin, m_rawMax;
-  double  m_physValRawMin, m_physValRawMax; //converted value of rawMin, rawMax
+  int m_rawMin, m_rawMax;
+  double m_physValRawMin, m_physValRawMax; // converted value of rawMin, rawMax
 };

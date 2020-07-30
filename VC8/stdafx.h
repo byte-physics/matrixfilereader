@@ -12,9 +12,9 @@
 #define BSTRLIB_CAN_USE_STL
 #include "bstrlib/bstrwrap.h"
 
-// allow the system to be equal or newer than Windows Server 2003 with SP1 or Windows XP with SP2
+// allow the system to be equal or newer to Windows 10 (first version)
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0502
+#define _WIN32_WINNT 0x0A00
 #endif
 
 #define WIN32_LEAN_AND_MEAN

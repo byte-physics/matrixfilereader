@@ -27,23 +27,27 @@ const char brickletRawDefault[]    = "rawData";
 
 // bricklet types as string
 // from the vernissage header file
-const char BTC_UNKNOWN[]           = "btc_Unknown";
-const char BTC_SPMSPECTROSCOPY[]   = "btc_SPMSpectroscopy";
-const char BTC_ATOMMANIPULATION[]  = "btc_AtomManipulation";
-const char BTC_1DCURVE[]           = "btc_1DCurve";
-const char BTC_SPMIMAGE[]          = "btc_SPMImage";
-const char BTC_PATHSPECTROSCOPY[]  = "btc_PathSpectroscopy";
-const char BTC_ESPREGION[]         = "btc_ESpRegion";
-const char BTC_VOLUMECITS[]        = "btc_VolumeCITS";
-const char BTC_DISCRETEENERGYMAP[] = "btc_DiscreteEnergyMap";
-const char BTC_FORCECURVE[]        = "btc_ForceCurve";
-const char BTC_PHASEAMPLITUDECUR[] = "btc_PhaseAmplitudeCurve";
-const char BTC_SIGNALOVERTIME[]    = "btc_SignalOverTime";
-const char BTC_RAWPATHSPEC[]       = "btc_RawPathSpectroscopy";
-const char BTC_ESPSNAPSHOTSEQ[]    = "btc_ESpSnapshotSequence";
-const char BTC_ESPIMAGEMAP[]       = "btc_ESpImageMap";
-const char BTC_INTERFEROMETERCUR[] = "btc_InterferometerCurve";
-const char BTC_ESPIMAGE[]          = "btc_ESpImage";
+const char BTC_UNKNOWN[]                 = "btc_Unknown";
+const char BTC_SPMSPECTROSCOPY[]         = "btc_SPMSpectroscopy";
+const char BTC_ATOMMANIPULATION[]        = "btc_AtomManipulation";
+const char BTC_1DCURVE[]                 = "btc_1DCurve";
+const char BTC_SPMIMAGE[]                = "btc_SPMImage";
+const char BTC_PATHSPECTROSCOPY[]        = "btc_PathSpectroscopy";
+const char BTC_ESPREGION[]               = "btc_ESpRegion";
+const char BTC_VOLUMECITS[]              = "btc_VolumeCITS";
+const char BTC_DISCRETEENERGYMAP[]       = "btc_DiscreteEnergyMap";
+const char BTC_FORCECURVE[]              = "btc_ForceCurve";
+const char BTC_PHASEAMPLITUDECUR[]       = "btc_PhaseAmplitudeCurve";
+const char BTC_SIGNALOVERTIME[]          = "btc_SignalOverTime";
+const char BTC_RAWPATHSPEC[]             = "btc_RawPathSpectroscopy";
+const char BTC_ESPSNAPSHOTSEQ[]          = "btc_ESpSnapshotSequence";
+const char BTC_ESPIMAGEMAP[]             = "btc_ESpImageMap";
+const char BTC_INTERFEROMETERCUR[]       = "btc_InterferometerCurve";
+const char BTC_ESPIMAGE[]                = "btc_ESpImage";
+const char BTC_ESPSEMPAIMG[]             = "btc_ESpSempaImg";
+const char BTC_ESPSEMPALINE[]            = "btc_ESpSempaLine";
+const char BTC_ESPDEPTHPROFILESWEEP[]    = "btc_ESpDepthProfileSweep";
+const char BTC_ESPDEPTHPROFILESNAPSHOT[] = "btc_ESpDepthProfileSnapshot";
 
 // viewtype codes as strings
 // from the vernissage header file
@@ -63,6 +67,8 @@ const char VTC_PARAMETERISEDCUR[]  = "vtc_ParameterisedCurveSet";
 const char VTC_DISCRETEENERGYMAP[] = "vtc_DiscreteEnergyMap";
 const char VTC_ESPIMAGEMAP[]       = "vtc_ESpImageMap";
 const char VTC_DOWNWARD2D[]        = "vtc_Downward2D";
+const char VTC_ESPSEMPAIMG[]       = "vtc_ESpSempaImg";
+const char VTC_ESPSEMPALINE[]      = "vtc_ESpSempaLine";
 
 // wave name suffixes
 const char TRACE_UP_STRING[]      = "_Up";

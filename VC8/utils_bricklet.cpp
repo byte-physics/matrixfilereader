@@ -127,6 +127,8 @@ public:
     m_data.push_back(VTC_DISCRETEENERGYMAP);
     m_data.push_back(VTC_ESPIMAGEMAP);
     m_data.push_back(VTC_DOWNWARD2D);
+    m_data.push_back(VTC_ESPSEMPAIMG);
+    m_data.push_back(VTC_ESPSEMPALINE);
   }
 
 private:
@@ -159,6 +161,10 @@ public:
     m_data.push_back(BTC_ESPIMAGEMAP);
     m_data.push_back(BTC_INTERFEROMETERCUR);
     m_data.push_back(BTC_ESPIMAGE);
+    m_data.push_back(BTC_ESPSEMPAIMG);
+    m_data.push_back(BTC_ESPSEMPALINE);
+    m_data.push_back(BTC_ESPDEPTHPROFILESWEEP);
+    m_data.push_back(BTC_ESPDEPTHPROFILESNAPSHOT);
   }
 
 private:

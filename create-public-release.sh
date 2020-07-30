@@ -33,7 +33,7 @@ cp Readme.md $folder
 cp "matrixfilereader Help.ihf" $docFolder
 cp matrixfilereader-basic-gui.pxp $pxpFolder
 
-cp regression_tests/*.{bat,log,ipf,pxp} $regressFolder
+cp regression_tests/*.{bat,xml,ipf,pxp} $regressFolder
 
 cp VC8/*.{bat,cpp,h,hpp,rc} VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcxproj $srcFolder
 cp -r VC8/bstrlib $srcFolder

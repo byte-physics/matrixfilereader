@@ -259,7 +259,7 @@ int GenericGetBricklet(GenericGetBrickletParamsPtr p, int typeOfData)
   std::string baseName;
   if(p->NFlagEncountered)
   {
-    if(GetHandleSize(p->baseName) == 0L)
+    if(WMGetHandleSize(p->baseName) == 0L)
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "baseName");
       return 0;

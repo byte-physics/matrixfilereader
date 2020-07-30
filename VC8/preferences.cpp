@@ -39,7 +39,7 @@ void loadXOPPreferences()
 
   if(prefHandle != NULL)
   {
-    DisposeHandle((Handle) prefHandle);
+    WMDisposeHandle((Handle) prefHandle);
   }
 };
 
@@ -47,7 +47,7 @@ void loadXOPPreferences()
 void saveXOPPreferences()
 {
   XOPprefStructHandle prefHandle;
-  prefHandle = (XOPprefStructHandle) NewHandle((BCInt) sizeof(XOPprefStruct));
+  prefHandle = (XOPprefStructHandle) WMNewHandle((BCInt) sizeof(XOPprefStruct));
 
   if(prefHandle != NULL)
   {
@@ -68,6 +68,6 @@ void saveXOPPreferences()
 
     // save struct on disc
     SaveXOPPrefsHandle((Handle) prefHandle);
-    DisposeHandle((Handle) prefHandle);
+    WMDisposeHandle((Handle) prefHandle);
   }
 };

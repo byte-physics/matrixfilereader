@@ -26,7 +26,7 @@ void setWaveNote(const std::string &waveNote, waveHndl waveHandle)
     return;
   }
 
-  Handle noteHandle = NewHandle(waveNote.size());
+  Handle noteHandle = WMNewHandle(waveNote.size());
 
   if(noteHandle == NULL)
   {

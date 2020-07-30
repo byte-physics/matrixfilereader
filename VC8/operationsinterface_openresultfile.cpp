@@ -31,7 +31,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   char fullPath[MAX_PATH_LEN + 1], fileName[MAX_FILENAME_LEN + 1], dirPath[MAX_PATH_LEN + 1],
       fileNameOrPath[MAX_PATH_LEN + 1];
   int ret = 0;
-  if(p->fileNameOrPathEncountered && GetHandleSize(p->fileNameOrPath) != 0L)
+  if(p->fileNameOrPathEncountered && WMGetHandleSize(p->fileNameOrPath) != 0L)
   {
     ret = GetCStringFromHandle(p->fileNameOrPath, fileNameOrPath, MAX_PATH_LEN);
 

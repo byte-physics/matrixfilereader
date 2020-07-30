@@ -48,14 +48,14 @@ int stringVectorToTextWave(const std::vector<std::string> &stringVector, waveHnd
 
   totalSize += numEntriesPlusOne * sizeof(size_t);
 
-  Handle textHandle = NewHandle(totalSize);
+  Handle textHandle = WMNewHandle(totalSize);
 
   if(MemError() || textHandle == NULL)
   {
     return NOMEM;
   }
 
-  // DEBUGPRINT("totalSize of strings %d",GetHandleSize(textHandle));
+  // DEBUGPRINT("totalSize of strings %d",WMGetHandleSize(textHandle));
   //
   for(i = 0; i < numEntriesPlusOne; i++)
   {
@@ -96,7 +96,7 @@ int stringVectorToTextWave(const std::vector<std::string> &stringVector, waveHnd
   ret = SetTextWaveData(waveHandle, mode, textHandle);
 
   // DEBUGPRINT("SetTextWaveData returned %d",ret);
-  DisposeHandle(textHandle);
+  WMDisposeHandle(textHandle);
 
   return ret;
 }
@@ -181,12 +181,12 @@ void convertHandleToString(Handle strHandle, std::string &str)
 {
   str.clear();
   // for both cases we return an empty string
-  if(strHandle == NULL || GetHandleSize(strHandle) == 0L)
+  if(strHandle == NULL || WMGetHandleSize(strHandle) == 0L)
   {
     return;
   }
 
-  const int handleSize = GetHandleSize(strHandle);
+  const BCInt handleSize = WMGetHandleSize(strHandle);
 
   try
   {

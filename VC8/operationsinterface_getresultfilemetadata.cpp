@@ -66,7 +66,7 @@ extern "C" int ExecuteGetResultFileMetaData(GetResultFileMetaDataRuntimeParamsPt
   std::string waveName = resultMetaDefault;
   if(p->NFlagEncountered)
   {
-    if(GetHandleSize(p->waveName) == 0L)
+    if(WMGetHandleSize(p->waveName) == 0L)
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "waveName");
       return 0;

@@ -76,7 +76,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
   // check keyList parameter
   if(p->KEYSFlagEncountered)
   {
-    if(GetHandleSize(p->keyList) == 0L)
+    if(WMGetHandleSize(p->keyList) == 0L)
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "keyList");
       return 0;
@@ -94,7 +94,7 @@ extern "C" int ExecuteCreateOverviewTable(CreateOverviewTableRuntimeParamsPtr p)
   // check waveName parameter
   if(p->NFlagEncountered)
   {
-    if(GetHandleSize(p->waveName) == 0L)
+    if(WMGetHandleSize(p->waveName) == 0L)
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "waveName");
       return 0;

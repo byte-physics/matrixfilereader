@@ -11,7 +11,7 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
-extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p)
+extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr /* p */)
 {
   BEGIN_OUTER_CATCH
   int ret = SetOperationNumVar(V_DLLversion, 0);

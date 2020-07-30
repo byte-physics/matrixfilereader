@@ -11,7 +11,7 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
-extern "C" int ExecuteGetVersion(GetVersionRuntimeParamsPtr p)
+extern "C" int ExecuteGetVersion(GetVersionRuntimeParamsPtr /* p */)
 {
   BEGIN_OUTER_CATCH
   int ret = SetOperationNumVar(V_XOPversion, stringToAnyType<double>(MatrixFileReader_XOP_VERSION_STR));

@@ -22,7 +22,7 @@ DWORDLONG convertBytesToGiB(DWORDLONG bytes)
 
 } // anonymous namespace
 
-extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr p)
+extern "C" int ExecuteGetReportTemplate(GetReportTemplateRuntimeParamsPtr /* p */)
 {
   BEGIN_OUTER_CATCH
   GlobalData::Instance().readSettings();

@@ -132,7 +132,7 @@ int HandleResamplingIfRequested(DataFolderHandle waveFolderHandle, Wave &wave, i
     return ret;
   }
 
-  char cmd[ARRAY_SIZE];
+  char cmd[MAXCMDLEN + ARRAY_SIZE];
   if(dimension == 1)
   {
     // Command: "Resample/DOWN= [...] wave"

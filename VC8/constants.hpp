@@ -95,7 +95,7 @@ const int RE_TRACE_DOWN_RAMP_BWD = 7;
 // number of different trace types, TRACE_UP to RE_TRACE_DOWN x 2 for Ramp Reversal
 const int MAX_NUM_WAVES = 8;
 
-const char PROJECTURL[] = "http://www.igorexchange.com/project/matrixFileReader";
+const char PROJECTURL[] = "https://github.com/byte-physics/matrixfilereader";
 
 // number of entries to reserve in some vectors
 const int RESERVE_SIZE = 1024;

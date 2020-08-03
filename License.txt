@@ -1,4 +1,4 @@
-    Copyright (C) 2009-2017, Thomas Braun, thomas <dot> braun <aeht> byte <minus> physics <dot> de
+    Copyright (C) 2009-2020, Thomas Braun, thomas <dot> braun <aeht> byte <minus> physics <dot> de
      
     This work was partly done during the work at EMPA Thun, section 127 (nanotech@surfaces, http://www.empa.ch/plugin/template/empa/848/*/---/l=1), Switzerland.
 
@@ -9,7 +9,7 @@
     Additional permission under GNU GPL version 3 section 7
 
     - The "MatrixFileReader Project" may be statically linked against libraries from the XOP Toolkit (WaveMetrics Incorporated, Portland, USA) to produce an External Operation for Igor Pro.
-    - Dynamic/Static linking to libraries from the Vernissage Toolkit from Omicron NanoTechnology GmbH, Taunusstein, Germany is also allowed.
+    - Dynamic/Static linking to libraries from the Vernissage Toolkit from Scienta Omicron, Uppsala, Sweden is also allowed.
     - You may copy and distribute such a system following the terms of the GNU Lesser GPL v3 or later for the "MatrixFileReader XOP" and the licenses of the other code/libraries concerned.
 
 

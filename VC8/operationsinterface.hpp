@@ -12,8 +12,8 @@
 */
 
 /* custom error codes */
-#define REQUIRES_IGOR_620  FIRST_XOP_ERR + 1
-#define BROKEN_XOP         FIRST_XOP_ERR + 2
+#define REQUIRES_IGOR_800 FIRST_XOP_ERR + 1
+#define BROKEN_XOP FIRST_XOP_ERR + 2
 
 /* Prototypes */
 HOST_IMPORT int XOPMain(IORecHandle ioRecHandle);
@@ -21,13 +21,17 @@ extern "C" void XOPEntry();
 
 // Igor aborts if it encounters an unhandled exception, therefore every operation
 // needs enclosing BEGIN_OUTER_CATCH and END_OUTER_CATCH macros
-#define BEGIN_OUTER_CATCH  try{
-#define END_OUTER_CATCH    }\
-              catch(...){\
-                DEBUGPRINT("Unexpected exception caught in line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);\
-                GlobalData::Instance().setError(UNKNOWN_ERROR);\
-                return 0;\
-              }
+#define BEGIN_OUTER_CATCH                                                                                              \
+  try                                                                                                                  \
+  {
+#define END_OUTER_CATCH                                                                                                \
+  }                                                                                                                    \
+  catch(...)                                                                                                           \
+  {                                                                                                                    \
+    DEBUGPRINT("Unexpected exception caught in line %d, function %s,  file %s", __LINE__, __FUNCTION__, __FILE__);     \
+    GlobalData::Instance().setError(UNKNOWN_ERROR);                                                                    \
+    return 0;                                                                                                          \
+  }
 
 // each execute function holds the implementation of one igor operation
 // are each in a separate file named operationsinterface_*

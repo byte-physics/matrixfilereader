@@ -12,13 +12,15 @@
 #define BSTRLIB_CAN_USE_STL
 #include "bstrlib/bstrwrap.h"
 
-// allow the system to be equal or newer than Windows Server 2003 with SP1 or Windows XP with SP2
+// allow the system to be equal or newer to Windows 10 (first version)
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0502
+#define _WIN32_WINNT 0x0A00
 #endif
 
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
+
+#define NO_WARN_MBCS_MFC_DEPRECATION
 
 #include <afx.h>
 
@@ -39,7 +41,6 @@
 #define BOOST_THREAD_VERSION 3
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include <boost/timer/timer.hpp>
 
 #include "XOPStandardHeaders.h"
@@ -51,4 +52,4 @@
 #include "errorcodes.hpp"
 #include "version.hpp"
 
-#include "VernissageSDK_V2.2/src/Incl/Vernissage.h"
+#include "VernissageSDK_v2.4_msvc2013_64bit/include/Vernissage.h"

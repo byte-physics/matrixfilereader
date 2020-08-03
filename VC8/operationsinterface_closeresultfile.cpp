@@ -15,7 +15,7 @@ extern "C" int ExecuteCloseResultFile(CloseResultFileRuntimeParamsPtr p)
   BEGIN_OUTER_CATCH
   GlobalData::Instance().initialize(p->calledFromMacro, p->calledFromFunction);
 
-  if (!GlobalData::Instance().resultFileOpen())
+  if(!GlobalData::Instance().resultFileOpen())
   {
     GlobalData::Instance().setError(NO_FILE_OPEN);
     return 0;

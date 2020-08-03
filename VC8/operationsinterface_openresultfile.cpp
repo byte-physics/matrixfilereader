@@ -17,35 +17,36 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   GlobalData::Instance().initialize(p->calledFromMacro, p->calledFromFunction);
 
   // /K will close an possibly open result file before opening a new one
-  if (p->KFlagEncountered)
+  if(p->KFlagEncountered)
   {
     GlobalData::Instance().closeResultFile();
   }
 
-  if (GlobalData::Instance().resultFileOpen())
+  if(GlobalData::Instance().resultFileOpen())
   {
     GlobalData::Instance().setError(ALREADY_FILE_OPEN, convertEncoding(GlobalData::Instance().getFileName()));
     return 0;
   }
 
-  char fullPath[MAX_PATH_LEN + 1], fileName[MAX_FILENAME_LEN + 1], dirPath[MAX_PATH_LEN + 1], fileNameOrPath[MAX_PATH_LEN + 1];
+  char fullPath[MAX_PATH_LEN + 1], fileName[MAX_FILENAME_LEN + 1], dirPath[MAX_PATH_LEN + 1],
+      fileNameOrPath[MAX_PATH_LEN + 1];
   int ret = 0;
-  if (p->fileNameOrPathEncountered && GetHandleSize(p->fileNameOrPath) != 0L)
+  if(p->fileNameOrPathEncountered && WMGetHandleSize(p->fileNameOrPath) != 0L)
   {
     ret = GetCStringFromHandle(p->fileNameOrPath, fileNameOrPath, MAX_PATH_LEN);
 
-    if (ret != 0)
+    if(ret != 0)
     {
       GlobalData::Instance().setInternalError(ret);
       return 0;
     }
 
     // check if we have a symbolic path
-    if (p->PFlagEncountered && strlen(p->pathName) > 0L)
+    if(p->PFlagEncountered && strlen(p->pathName) > 0L)
     {
       ret = GetFullPathFromSymbolicPathAndFilePath(p->pathName, fileNameOrPath, fullPath);
 
-      if (ret != 0)
+      if(ret != 0)
       {
         GlobalData::Instance().setInternalError(ret);
         return 0;
@@ -57,7 +58,7 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
       // GetDirectoryAndFileNameFromFullPath() does not like that
       ret = GetNativePath(fileNameOrPath, fullPath);
 
-      if (ret != 0)
+      if(ret != 0)
       {
         GlobalData::Instance().setInternalError(ret);
         return 0;
@@ -71,14 +72,15 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
 
     // empty initial filename
     fullPath[0] = '\0';
-    ret = XOPOpenFileDialog(dlgPrompt , filterStr, &(GlobalData::Instance().openDlgFileIndex), GlobalData::Instance().openDlgInitialDir, fullPath);
+    ret         = XOPOpenFileDialog(dlgPrompt, filterStr, &(GlobalData::Instance().openDlgFileIndex),
+                            GlobalData::Instance().openDlgInitialDir, fullPath);
 
-    if (ret == -1) //the user cancelled the dialog
+    if(ret == -1) // the user cancelled the dialog
     {
       GlobalData::Instance().setError(WRONG_PARAMETER, "fileNameOrPath");
       return 0;
     }
-    else if (ret != 0)
+    else if(ret != 0)
     {
       GlobalData::Instance().setInternalError(ret);
       return 0;
@@ -87,12 +89,12 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
 
   ret = GetDirectoryAndFileNameFromFullPath(fullPath, dirPath, fileName);
 
-  if (ret == WM_BAD_FILE_NAME)
+  if(ret == WM_BAD_FILE_NAME)
   {
     GlobalData::Instance().setError(FILE_NOT_READABLE, fullPath);
     return 0;
   }
-  else if (ret != 0)
+  else if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;
@@ -107,13 +109,13 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
   DEBUGPRINT("filename %s", fileName);
   DEBUGPRINT("dirPath %s", dirPath);
 
-  if (!FullPathPointsToFolder(dirPath))
+  if(!FullPathPointsToFolder(dirPath))
   {
     GlobalData::Instance().setError(FILE_NOT_READABLE, dirPath);
     return 0;
   }
 
-  if (!FullPathPointsToFile(fullPath))
+  if(!FullPathPointsToFile(fullPath))
   {
     GlobalData::Instance().setError(FILE_NOT_READABLE, fullPath);
     return 0;
@@ -127,18 +129,19 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
 
   // first call to getVernissageSession() will result in the DLL loading
   // which must happen in the main thread
-  Vernissage::Session* session = GlobalData::Instance().getVernissageSession();
+  Vernissage::Session *session = GlobalData::Instance().getVernissageSession();
 
   // now we convert to wide strings
-  const std::wstring  dirPathWString = convertEncoding(dirPath);
-  const std::wstring  fileNameWString = convertEncoding(fileName);
+  const std::wstring dirPathWString  = convertEncoding(dirPath);
+  const std::wstring fileNameWString = convertEncoding(fileName);
 
   // true -> result set will be added to the database
   // false -> replaces the current results sets in the internal databse
   const bool accumulative = false;
 
   // loading the result set is done in its own thread in order to not block the GUI
-  boost::packaged_task<bool> task(boost::bind(&Vernissage::Session::loadResultSet, session, boost::cref(dirPathWString), boost::cref(fileNameWString), accumulative));
+  boost::packaged_task<bool> task(boost::bind(&Vernissage::Session::loadResultSet, session, boost::cref(dirPathWString),
+                                              boost::cref(fileNameWString), accumulative));
   boost::future<bool> loadResult = task.get_future();
   boost::thread thread(boost::move(task));
 
@@ -148,29 +151,29 @@ extern "C" int ExecuteOpenResultFile(OpenResultFileRuntimeParamsPtr p)
     SpinProcess();
   }
 
-  if (!loadResult.get())
+  if(!loadResult.get())
   {
     HISTPRINT("Could not load the result file");
     return 0;
   }
 
-  //starting from here the result file is valid
+  // starting from here the result file is valid
   GlobalData::Instance().setResultFile(dirPathWString, fileNameWString);
 
   const int totalNumBricklets = session->getBrickletCount();
   DEBUGPRINT("totalNumBricklets=%d", totalNumBricklets);
 
   // brickletIDs are 1-based
-  void* pContext = NULL;
-  for (int i = 1; i <= totalNumBricklets; i++)
+  void *pContext = NULL;
+  for(int i = 1; i <= totalNumBricklets; i++)
   {
-    void* vernissageBricklet = session->getNextBricklet(&pContext);
+    void *vernissageBricklet = session->getNextBricklet(&pContext);
 
     try
     {
       GlobalData::Instance().createBricklet(i, vernissageBricklet);
     }
-    catch (CMemoryException* e)
+    catch(CMemoryException *e)
     {
       e->Delete();
       HISTPRINT("Could not reserve memory for brickletID %d, giving up", i);

@@ -12,23 +12,23 @@
 */
 class DLLHandler
 {
-  typedef Vernissage::Session* (*GetSessionFunc)();
+  typedef Vernissage::Session *(*GetSessionFunc)();
   typedef void (*ReleaseSessionFunc)();
 
 public:
   DLLHandler();
   ~DLLHandler();
 
-  Vernissage::Session* createSessionObject();
+  Vernissage::Session *createSessionObject();
   void closeSession();
-  const std::string& getVernissageVersion()const;
+  const std::string &getVernissageVersion() const;
 
 private:
   std::string getVernissagePath();
 
 private:
   GetSessionFunc m_getSessionFunc;
-  ReleaseSessionFunc  m_releaseSessionFunc;
+  ReleaseSessionFunc m_releaseSessionFunc;
   HMODULE m_foundationModule;
   std::string m_vernissageVersion;
 };

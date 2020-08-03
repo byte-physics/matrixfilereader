@@ -11,12 +11,12 @@
 #include "globaldata.hpp"
 #include "utils_generic.hpp"
 
-extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr p)
+extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr /* p */)
 {
   BEGIN_OUTER_CATCH
   int ret = SetOperationNumVar(V_DLLversion, 0);
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;
@@ -24,7 +24,7 @@ extern "C" int ExecuteGetVernissageVersion(GetVernissageVersionRuntimeParamsPtr 
 
   ret = SetOperationNumVar(V_DLLversion, stringToAnyType<double>(GlobalData::Instance().getVernissageVersion()));
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;

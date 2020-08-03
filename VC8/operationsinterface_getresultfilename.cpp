@@ -17,7 +17,7 @@ extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
 
   int ret = SetOperationStrVar(S_fileName, "");
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;
@@ -25,13 +25,13 @@ extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
 
   ret = SetOperationStrVar(S_dirPath, "");
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;
   }
 
-  if (!GlobalData::Instance().resultFileOpen())
+  if(!GlobalData::Instance().resultFileOpen())
   {
     GlobalData::Instance().setError(NO_FILE_OPEN);
     return 0;
@@ -39,7 +39,7 @@ extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
 
   ret = SetOperationStrVar(S_fileName, convertEncoding(GlobalData::Instance().getFileName()).c_str());
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;
@@ -47,7 +47,7 @@ extern "C" int ExecuteGetResultFileName(GetResultFileNameRuntimeParamsPtr p)
 
   ret = SetOperationStrVar(S_dirPath, convertEncoding(GlobalData::Instance().getDirPath()).c_str());
 
-  if (ret != 0)
+  if(ret != 0)
   {
     GlobalData::Instance().setInternalError(ret);
     return 0;

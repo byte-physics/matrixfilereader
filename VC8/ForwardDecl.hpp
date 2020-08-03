@@ -15,12 +15,12 @@ class Wave;
 // Forward Declare Vernissage classes also
 namespace Vernissage
 {
-  class Session;
+class Session;
 } // namespace Vernissage
 
 namespace Bstrlib
 {
-  struct CBString;
+struct CBString;
 }
 
 typedef std::pair<Bstrlib::CBString, Bstrlib::CBString> StringPair;

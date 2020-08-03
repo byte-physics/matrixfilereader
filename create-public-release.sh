@@ -2,8 +2,8 @@
 
 set -e
 
-lastVersion=0.25.1
-newVersion=0.25.2
+lastVersion=0.25.2
+newVersion=0.26
 
 filesToWatch="VC8 *.txt regression_tests *.pxp *.ihf"
 
@@ -33,15 +33,16 @@ cp Readme.md $folder
 cp "matrixfilereader Help.ihf" $docFolder
 cp matrixfilereader-basic-gui.pxp $pxpFolder
 
-cp regression_tests/*.{bat,log,ipf,pxp} $regressFolder
+cp regression_tests/*.{bat,xml,ipf,pxp} $regressFolder
 
-cp VC8/*.{bat,cpp,h,hpp,rc} VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcproj $srcFolder
+cp VC8/*.{bat,cpp,h,hpp,rc} VC8/MatrixFileReader.sln VC8/MatrixFileReader.vcxproj $srcFolder
 cp -r VC8/bstrlib $srcFolder
 
 cp Operation-Template-Generator.pxp $srcFolder
 
 cp VC8/Release/matrixfilereader.xop $folder
-cp VC8/VC2005_Redist_package_x86/vcredist_x86.exe $folder
+cp VC8/Release-x64/matrixfilereader-64.xop $folder
+cp VC8/VC2013_Redist_package/*.exe $folder
 
 cd public-releases &&  zip -q -r $baseName.zip $baseName/* && cd ..
 

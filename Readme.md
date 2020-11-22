@@ -10,9 +10,8 @@
 2. Start Igor, this will create a folder called WaveMetrics in "My Documents"
 3. Install Vernissage
 4. Install vcredist_x86.exe/vcredist_x64.exe (Microsoft Visual C++ 2013 Redistributable Package x86/x64) shipped with the XOP.
-5.
-  1. Copy "matrixfilereader.xop" to "My Documents\WaveMetrics\Igor Pro X User Files\Igor extensions"
-  2. Copy "matrixfilereader Help.ihf" to "My Documents\WaveMetrics\Igor Pro X User Files\Igor Help files"
+5. 1. Copy "matrixfilereader.xop" to "My Documents\WaveMetrics\Igor Pro X User Files\Igor extensions"
+   2. Copy "matrixfilereader Help.ihf" to "My Documents\WaveMetrics\Igor Pro X User Files\Igor Help files"
 6. Restart Igor
 7. Load the experiment matrixfilereader-basic-gui.pxp which includes a basic GUI for easy access to the XOP operations.
 

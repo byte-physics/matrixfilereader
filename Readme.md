@@ -15,6 +15,10 @@
 6. Restart Igor
 7. Load the experiment matrixfilereader-basic-gui.pxp which includes a basic GUI for easy access to the XOP operations.
 
+### Minimalistic GUI
+
+![GUI](artwork/matrix-file-reader-gui.png)
+
 ## Compilation
 
 ### Requirements

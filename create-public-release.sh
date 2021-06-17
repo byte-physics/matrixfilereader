@@ -2,8 +2,8 @@
 
 set -e
 
-lastVersion=0.25.2
-newVersion=0.26
+lastVersion=0.26
+newVersion=0.27
 
 filesToWatch="VC8 *.txt regression_tests *.pxp *.ihf"
 

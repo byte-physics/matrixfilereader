@@ -226,8 +226,30 @@ static Function valid_pixelsizes()
 		CHECK(ItemsInList(S_waveNames) == 4) // we have four trace directions
 		variable j
 		for(j = 0; j < ItemsInList(S_waveNames); j+=1)
-			CHECK_WAVE($StringFromList(j, S_waveNames), NUMERIC_WAVE, minorType = DOUBLE_WAVE)
+			WAVE wv = $StringFromList(j, S_waveNames)
+			CHECK_WAVE(wv, NUMERIC_WAVE, minorType = DOUBLE_WAVE)
+			CHECK_EQUAL_VAR(NumberByKey("pixelSize", note(wv), "=", "\r"), i)
 		endfor
+	endfor
+End
+
+static Function pixelsize_too_large_and_ignored()
+	Struct errorCode err
+	initStruct(err)
+
+	MFR_OpenResultFile/K folder + file
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+
+	variable/G V_MatrixFileReaderOverwrite = 1
+
+	MFR_GetBrickletData/S=(10)/R=(39)
+	CHECK_EQUAL_VAR(err.SUCCESS, V_flag)
+	CHECK(ItemsInList(S_waveNames) == 4) // we have four trace directions
+	variable j
+	for(j = 0; j < ItemsInList(S_waveNames); j+=1)
+		WAVE wv = $StringFromList(j, S_waveNames)
+		CHECK_WAVE(wv, NUMERIC_WAVE, minorType = DOUBLE_WAVE)
+		CHECK_EQUAL_VAR(NumberByKey("pixelSize", note(wv), "=", "\r"), 1)
 	endfor
 End
 

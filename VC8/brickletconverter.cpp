@@ -111,15 +111,12 @@ int createEmptyWaves(WaveVec &waves, DataFolderHandle waveFolderHandle, CountInt
   return 0;
 }
 
-int HandleResamplingIfRequested(DataFolderHandle waveFolderHandle, Wave &wave, int dimension, bool resampleData,
-                                int pixelSize)
+int HandleResamplingIfRequested(DataFolderHandle waveFolderHandle, Wave &wave, CountInt dimensionSizes[MAX_DIMENSIONS + 1], int dimension, bool resampleData, CountInt pixelSize)
 {
   if(!resampleData)
   {
     return 0;
   }
-
-  wave.SetPixelSize(pixelSize);
 
   DEBUGPRINT("Resampling wave %s with pixelSize=%d", wave.getWaveName(), pixelSize);
 
@@ -135,6 +132,11 @@ int HandleResamplingIfRequested(DataFolderHandle waveFolderHandle, Wave &wave, i
   char cmd[MAXCMDLEN + ARRAY_SIZE];
   if(dimension == 1)
   {
+    if((pixelSize * 15) >= dimensionSizes[ROWS])
+    {
+      return LA_TOO_FEW_PNTS;
+    }
+
     // Command: "Resample/DOWN= [...] wave"
     sprintf(cmd, "Resample/DOWN={%d} %s", pixelSize, dataFolderPath);
     CatPossiblyQuotedName(cmd, wave.getWaveName());
@@ -149,6 +151,11 @@ int HandleResamplingIfRequested(DataFolderHandle waveFolderHandle, Wave &wave, i
   }
   else if(dimension == 2)
   {
+    if ((pixelSize >= dimensionSizes[ROWS]) || (pixelSize >= dimensionSizes[COLUMNS]))
+    {
+      return LA_TOO_FEW_PNTS;
+    }
+
     // Command: "ImageInterpolate [...] Pixelate"
     sprintf(cmd, "ImageInterpolate/PXSZ={%d,%d}/DEST=%sM_PixelatedImage Pixelate %s", pixelSize, pixelSize,
             dataFolderPath, dataFolderPath);
@@ -180,6 +187,7 @@ int HandleResamplingIfRequested(DataFolderHandle waveFolderHandle, Wave &wave, i
   }
 
   wave.setWaveHandle(FetchWaveFromDataFolder(waveFolderHandle, wave.getWaveName()));
+  wave.SetPixelSize(static_cast<int>(pixelSize));
 
   return 0;
 }
@@ -282,17 +290,12 @@ int createWaves1D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolder
       continue;
     }
 
-    ret = HandleResamplingIfRequested(waveFolderHandle, *it, 1, resampleData, pixelSize);
-
-    if(ret != 0)
-    {
-      return ret;
-    }
+    ret = HandleResamplingIfRequested(waveFolderHandle, *it, dimensionSizes, 1, resampleData, pixelSize);
 
     double xAxisDelta;
 
-    // also the wave scaling changes if we have resampled the data
-    if(resampleData)
+    // also the wave scaling changes if we have resampled the data successfully
+    if(resampleData && ret == 0)
     {
       CountInt interpolatedDimSizes[MAX_DIMENSIONS + 1];
       MemClear(interpolatedDimSizes, sizeof(interpolatedDimSizes));
@@ -582,17 +585,12 @@ int createWaves2D(DataFolderHandle baseFolderHandle, DataFolderHandle waveFolder
       continue;
     }
 
-    ret = HandleResamplingIfRequested(waveFolderHandle, *it, 2, resampleData, pixelSize);
-
-    if(ret != 0)
-    {
-      continue;
-    }
+    ret = HandleResamplingIfRequested(waveFolderHandle, *it, dimensionSizes, 2, resampleData, pixelSize);
 
     double xAxisDelta, yAxisDelta;
 
-    // also the wave scaling changes if we have resampled the data
-    if(resampleData)
+    // also the wave scaling changes if we have resampled the data successfully
+    if(resampleData && ret == 0)
     {
       CountInt interpolatedDimSizes[MAX_DIMENSIONS + 1];
       MemClear(interpolatedDimSizes, sizeof(interpolatedDimSizes));

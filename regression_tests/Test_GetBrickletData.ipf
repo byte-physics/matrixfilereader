@@ -226,7 +226,9 @@ static Function valid_pixelsizes()
 		CHECK(ItemsInList(S_waveNames) == 4) // we have four trace directions
 		variable j
 		for(j = 0; j < ItemsInList(S_waveNames); j+=1)
-			CHECK_WAVE($StringFromList(j, S_waveNames), NUMERIC_WAVE, minorType = DOUBLE_WAVE)
+			WAVE wv = $StringFromList(j, S_waveNames)
+			CHECK_WAVE(wv, NUMERIC_WAVE, minorType = DOUBLE_WAVE)
+			CHECK_EQUAL_VAR(NumberByKey("pixelSize", note(wv), "=", "\r"), i)
 		endfor
 	endfor
 End
